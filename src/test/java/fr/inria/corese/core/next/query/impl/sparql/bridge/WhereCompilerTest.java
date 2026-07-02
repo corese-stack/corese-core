@@ -4,6 +4,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.FunctionCallAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.GreaterThanAst;
 import fr.inria.corese.core.next.query.kgram.core.Exp;
+import fr.inria.corese.core.next.query.kgram.tool.KgramNodes;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -141,12 +142,14 @@ class WhereCompilerTest {
     }
 
     @Test
-    @DisplayName("BGP ?s ?p ?o — variable predicate exposed via getEdgeVariable()")
+    @DisplayName("BGP ?s ?p ?o — variable predicate uses KGRAM root property and edge variable")
     void edgeExposesVariablePredicateAsEdgeVariable() {
         Exp bgp = new WhereCompiler().compile(new BgpAst(List.of(
                 new TriplePatternAst(new VarAst("s"), new VarAst("p"), new VarAst("o")))));
 
         Exp edgeExp = bgp.get(0);
+        assertEquals(KgramNodes.ROOT_PROPERTY_URI, edgeExp.getEdge().getEdgeNode().getLabel());
+        assertEquals(KgramNodes.ROOT_PROPERTY_URI, edgeExp.getEdge().getEdgeLabel());
         assertNotNull(edgeExp.getEdge().getEdgeVariable(), "variable predicate should be exposed as edge variable");
         assertTrue(edgeExp.getEdge().getEdgeVariable().isVariable());
     }

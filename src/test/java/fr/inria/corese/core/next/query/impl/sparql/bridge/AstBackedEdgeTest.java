@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
 import fr.inria.corese.core.next.query.kgram.api.core.Node;
+import fr.inria.corese.core.next.query.kgram.tool.KgramNodes;
 import fr.inria.corese.core.next.query.kgram.tool.NodeImpl;
 import fr.inria.corese.core.sparql.triple.parser.Constant;
 import fr.inria.corese.core.sparql.triple.parser.Variable;
@@ -50,17 +51,25 @@ class AstBackedEdgeTest {
     }
 
     @Test
-    @DisplayName("getEdgeVariable() exposes the predicate when it is a variable, null otherwise")
+    @DisplayName("Variable predicate is exposed as edge variable with root property as edge node")
     void edgeVariableExposedOnlyForVariablePredicate() {
         Node predicateVar = new NodeImpl(Variable.create("p"));
         AstBackedEdge withVarPredicate = new AstBackedEdge(
                 new NodeImpl(Variable.create("s")), predicateVar, new NodeImpl(Variable.create("o")));
+
+        assertEquals(KgramNodes.ROOT_PROPERTY_URI, withVarPredicate.getEdgeNode().getLabel());
+        assertEquals(KgramNodes.ROOT_PROPERTY_URI, withVarPredicate.getEdgeLabel());
+        assertSame(predicateVar, withVarPredicate.getProperty());
         assertSame(predicateVar, withVarPredicate.getEdgeVariable());
 
+        Node iriPredicate = new NodeImpl(Constant.createResource("http://example.org/p"));
         AstBackedEdge withIriPredicate = new AstBackedEdge(
                 new NodeImpl(Variable.create("s")),
-                new NodeImpl(Constant.createResource("http://example.org/p")),
+                iriPredicate,
                 new NodeImpl(Variable.create("o")));
+        assertSame(iriPredicate, withIriPredicate.getEdgeNode());
+        assertSame(iriPredicate, withIriPredicate.getProperty());
+        assertEquals("http://example.org/p", withIriPredicate.getEdgeLabel());
         assertNull(withIriPredicate.getEdgeVariable());
     }
 
