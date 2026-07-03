@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
+import fr.inria.corese.core.next.query.impl.parser.SparqlParser;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.kgram.core.Query;
@@ -20,6 +21,21 @@ class CoreseAstQueryBuilderDescribeTest {
         return new GroupGraphPatternAst(List.of(
                 new BgpAst(List.of(
                         new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o"))))));
+    }
+
+    @Test
+    @DisplayName("Parser -> DescribeQueryAst -> Query keeps the DESCRIBE form")
+    void parserDescribeAstToQuery() {
+        SparqlParser parser = new SparqlParser();
+        DescribeQueryAst describe = (DescribeQueryAst) parser.parse(
+                "DESCRIBE ?x WHERE { ?x ?p ?o }");
+
+        Query query = builder.toNextQuery(describe);
+
+        assertTrue(query.isDescribe());
+        assertTrue(query.getBody().isAnd());
+        assertEquals(1, query.getDescribeList().size());
+        assertSame(query.getExtNode("x"), query.getDescribeList().getFirst());
     }
 
     @Test
