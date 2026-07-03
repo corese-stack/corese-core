@@ -7,20 +7,10 @@ import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
 /**
  * Adapts a runtime {@link IDatatype} to the Corese-next {@link DatatypeValue} API.
  */
-public final class NextDatatypeValueAdapter implements DatatypeValue {
-
-    private final IDatatype delegate;
-
-    public NextDatatypeValueAdapter(IDatatype delegate) {
-        this.delegate = delegate;
-    }
+public record NextDatatypeValueAdapter(IDatatype delegate) implements DatatypeValue {
 
     public static DatatypeValue ofNullable(IDatatype dt) {
         return dt == null ? null : new NextDatatypeValueAdapter(dt);
-    }
-
-    public IDatatype delegate() {
-        return delegate;
     }
 
     @Override
@@ -90,8 +80,8 @@ public final class NextDatatypeValueAdapter implements DatatypeValue {
     }
 
     private static IDatatype unwrap(DatatypeValue other) throws CoreseDatatypeException {
-        if (other instanceof NextDatatypeValueAdapter a) {
-            return a.delegate;
+        if (other instanceof NextDatatypeValueAdapter(IDatatype delegate1)) {
+            return delegate1;
         }
         if (other instanceof IDatatype id) {
             return id;

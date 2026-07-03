@@ -4,6 +4,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.AskQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ASTConstants;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ConstraintAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.DatasetClauseAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.DescribeQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
@@ -32,8 +33,8 @@ import java.util.Objects;
  * Builds KGRAM {@code Exp} / {@code Query} structures from Corese-next query AST nodes.
  *
  * <p>This bridge sits between the parsed SPARQL AST and the KGRAM runtime query model:
- * it does not execute queries, it translates syntax-level query forms ({@code ASK}, {@code SELECT})
- * into runtime-ready {@link Query}/{@link Exp} structures.</p>
+ * it does not execute queries, it translates syntax-level query forms ({@code ASK}, {@code SELECT},
+ * {@code DESCRIBE}) into runtime-ready {@link Query}/{@link Exp} structures.</p>
  */
 public final class CoreseAstQueryBuilder {
 
@@ -97,6 +98,30 @@ public final class CoreseAstQueryBuilder {
         applyProjection(query, selectQueryAst.projection());
         query.setDistinct(selectQueryAst.solutionModifier().distinct());
         applyOrderBy(query, selectQueryAst.solutionModifier());
+        return query;
+    }
+
+    /**
+     * Builds a KGRAM {@link Query} from a {@link DescribeQueryAst}.
+     *
+     * <p>Reuses the shared query shell (compiled {@code WHERE} body, dataset, LIMIT/OFFSET) and
+     * {@code ORDER BY} like the other forms, then lowers {@code DESCRIBE} to the construct-like
+     * shape expected by the current KGRAM runtime. A described variable reuses its runtime node,
+     * a described IRI becomes a fresh constant node, and {@code DESCRIBE *} reuses the in-scope
+     * nodes of the body, matching {@code SELECT *}. Clauses that require dedicated aggregate or
+     * values handling are rejected explicitly.</p>
+     */
+    public Query toNextQuery(DescribeQueryAst describeQueryAst) {
+        Objects.requireNonNull(describeQueryAst, "describeQueryAst");
+        rejectUnsupportedDescribeClauses(describeQueryAst);
+
+        Query query = createQuery(
+                describeQueryAst.whereClause(),
+                describeQueryAst.datasetClause(),
+                describeQueryAst.solutionModifier());
+        applyOrderBy(query, describeQueryAst.solutionModifier());
+        List<Node> describedNodes = describeNodes(query, describeQueryAst);
+        lowerDescribeToConstructQuery(query, describedNodes);
         return query;
     }
 
@@ -165,13 +190,11 @@ public final class CoreseAstQueryBuilder {
         if (!selectQueryAst.valuesClause().mappings().isEmpty()) {
             throw new UnsupportedOperationException("VALUES is not supported yet when building a next Query");
         }
-
         ProjectionAst projection = selectQueryAst.projection();
         if (!projection.expressionTerms().isEmpty() || !projection.expressionBoundVariables().isEmpty()) {
             throw new UnsupportedOperationException(
                     "SELECT expressions are not supported yet when building a next Query");
         }
-
         SolutionModifierAst solutionModifier = selectQueryAst.solutionModifier();
         if (solutionModifier.reduced()) {
             throw new UnsupportedOperationException("REDUCED is not supported yet when building a next Query");
@@ -188,6 +211,21 @@ public final class CoreseAstQueryBuilder {
         // TODO(#387): REDUCED support should be aligned with the final next-pipeline query-form policy.
     }
 
+    private static void rejectUnsupportedDescribeClauses(DescribeQueryAst describeQueryAst) {
+        if (!describeQueryAst.valuesClause().mappings().isEmpty()) {
+            throw new UnsupportedOperationException(
+                    "Inline VALUES is not supported yet for DESCRIBE (values handling is a follow-up)");
+        }
+        SolutionModifierAst mod = describeQueryAst.solutionModifier();
+        if (mod.hasGroupBy() || mod.hasHaving() || mod.distinct() || mod.reduced()) {
+            throw new UnsupportedOperationException(
+                    "Solution modifiers (GROUP BY, HAVING, DISTINCT, REDUCED) are not supported for DESCRIBE");
+        }
+        // TODO(#390): inline VALUES needs a dedicated runtime mapping.
+        // TODO(#390): GROUP BY / HAVING would require aggregate-aware DESCRIBE semantics, not just field copying.
+        // TODO(#390): REDUCED support should be aligned with the final query-form policy for the next pipeline.
+    }
+
     /**
      * Creates the runtime {@link Query} shell shared by every query form handled here.
      *
@@ -200,7 +238,7 @@ public final class CoreseAstQueryBuilder {
             DatasetClauseAst datasetClause,
             SolutionModifierAst solutionModifier) {
         Query query = Query.create(whereCompiler.compile(whereClause));
-        // Collect visible nodes once so later clauses (projection, ORDER BY, GROUP BY)
+        // Collect visible nodes once so later clauses (projection, ORDER BY, DESCRIBE)
         // can resolve variables against the compiled runtime body.
         query.collect();
         applyDataset(query, datasetClause);
@@ -243,9 +281,79 @@ public final class CoreseAstQueryBuilder {
                 selectExpressions.add(Exp.create(Type.NODE, node));
             }
         }
-
         query.setSelectFun(selectExpressions);
         query.setSelect(selectNodeList(selectExpressions));
+    }
+
+    /**
+     * Resolves the resources of a {@code DESCRIBE} against the compiled body.
+     *
+     * <p>{@code DESCRIBE *} reuses the in-scope nodes of the body (like {@code SELECT *}).
+     * A described variable reuses its runtime node (so it is the one bound by the body) and
+     * fails fast when it is not visible; a described IRI becomes a fresh constant node.</p>
+     */
+    private List<Node> describeNodes(Query query, DescribeQueryAst describeQueryAst) {
+        if (describeQueryAst.isDescribeAll()) {
+            return query.selectNodesFromPattern();
+        }
+        List<Node> nodes = new ArrayList<>();
+        for (TermAst term : describeQueryAst.described()) {
+            if (term instanceof VarAst(String name)) {
+                Node node = query.getExtNode(name);
+                if (node == null) {
+                    throw new IllegalArgumentException(
+                            "DESCRIBE variable ?" + name + " is not visible in the compiled query body");
+                }
+                nodes.add(node);
+            } else {
+                nodes.add(toNode(term));
+            }
+        }
+        return nodes;
+    }
+
+    /**
+     * Lowers {@code DESCRIBE} to the construct-like shape expected by the current
+     * KGRAM-next runtime.
+     *
+     * <p>This keeps the current KGRAM contract, inherited from the historical pipeline:
+     * {@code DESCRIBE} is executed through the construct runtime path.</p>
+     */
+    private void lowerDescribeToConstructQuery(Query query, List<Node> describedNodes) {
+        Exp constructTemplate = Exp.create(Type.BGP);
+        int syntheticIndex = 0;
+        for (Node describedNode : describedNodes) {
+            DescribePattern describePattern = describePattern(describedNode, syntheticIndex++);
+            // KGRAM-next currently represents DESCRIBE with outgoing and incoming construct triples.
+            constructTemplate.add(describePattern.outgoing().getEdge());
+            constructTemplate.add(describePattern.incoming().getEdge());
+            query.getBody().add(Exp.create(Type.OPTIONAL, Exp.create(Type.AND), describePattern.optionalBody()));
+        }
+        query.setConstruct(constructTemplate);
+        query.setConstruct(true);
+        query.setConstructNodes(constructTemplate.getNodes());
+    }
+
+    private DescribePattern describePattern(Node describedNode, int index) {
+        Node outgoingPredicate = createSyntheticDescribeNode("p", index, 0);
+        Node outgoingValue = createSyntheticDescribeNode("v", index, 0);
+        Node incomingPredicate = createSyntheticDescribeNode("p", index, 1);
+        Node incomingValue = createSyntheticDescribeNode("v", index, 1);
+
+        Exp outgoing = Exp.create(Type.EDGE, new AstBackedEdge(describedNode, outgoingPredicate, outgoingValue));
+        Exp incoming = Exp.create(Type.EDGE, new AstBackedEdge(incomingValue, incomingPredicate, describedNode));
+        Exp outgoingBgp = Exp.create(Type.BGP);
+        outgoingBgp.add(outgoing);
+        Exp incomingBgp = Exp.create(Type.BGP);
+        incomingBgp.add(incoming);
+        return new DescribePattern(outgoing, incoming, Exp.create(Type.UNION, outgoingBgp, incomingBgp));
+    }
+
+    private Node createSyntheticDescribeNode(String role, int describedIndex, int directionIndex) {
+        return new NodeImpl(Variable.create("__describe_" + role + "_" + describedIndex + "_" + directionIndex));
+    }
+
+    private record DescribePattern(Exp outgoing, Exp incoming, Exp optionalBody) {
     }
 
     /**
@@ -258,7 +366,6 @@ public final class CoreseAstQueryBuilder {
         if (!solutionModifier.hasOrderBy()) {
             return;
         }
-
         List<Exp> orderByExpressions = new ArrayList<>();
         int syntheticIndex = 0;
         for (OrderConditionAst orderCondition : solutionModifier.orderBy()) {
@@ -282,7 +389,6 @@ public final class CoreseAstQueryBuilder {
             }
             return Exp.create(Type.NODE, node);
         }
-
         Filter filter = SparqlAstToExpression.toNextFilter(expression);
         Exp exp = Exp.create(Type.NODE, createSyntheticOrderNode(syntheticIndex));
         exp.setFilter(filter);

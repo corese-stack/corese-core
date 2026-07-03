@@ -37,8 +37,8 @@ public final class AstBackedExpr implements Expr {
     }
 
     public AstBackedExpr(Expression delegate, Optional<TermAst> sourceAst) {
-        this.delegate = Objects.requireNonNull(delegate);
-        this.sourceAst = sourceAst == null ? Optional.empty() : sourceAst;
+        this.delegate = Objects.requireNonNull(delegate, "delegate");
+        this.sourceAst = Objects.requireNonNull(sourceAst, "sourceAst");
         this.filterView = new NextFilterFromAst(this);
     }
 
@@ -300,8 +300,8 @@ public final class AstBackedExpr implements Expr {
     }
 
     private static Binding bindingFrom(BindingContext b) {
-        if (b instanceof BindingAdapter ba) {
-            return ba.delegate();
+        if (b instanceof BindingAdapter(Binding delegate1)) {
+            return delegate1;
         }
         if (b instanceof Binding binding) {
             return binding;

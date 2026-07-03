@@ -80,6 +80,7 @@ public class Query extends Exp  {
             //selectWithExp, 
             orderBy, groupBy;
     List<Filter> failure, pathFilter, funList;
+
     List<String> errors, info;
     Exp having, construct, delete;
 	// gNode is a local graph node when subquery has no ?g in its select 
@@ -820,6 +821,14 @@ public class Query extends Exp  {
 
     public Exp getInsert() {
         return construct;
+    }
+
+    public List<Node> getConstructNodes() {
+        return constructNodes;
+    }
+
+    public void setConstructNodes(List<Node> constructNodes) {
+        this.constructNodes = constructNodes;
     }
 
     public void setDelete(Exp c) {
