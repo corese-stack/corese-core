@@ -35,8 +35,7 @@ class CoreseAstQueryBuilderDescribeTest {
 
         assertLoweredDescribeConstruct(query, 1);
         assertTrue(query.getBody().isAnd());
-        assertEquals(2, query.getBody().size(), "WHERE plus generated DESCRIBE optional pattern");
-        assertDescribeOptional(query.getBody().get(1));
+        assertEquals(1, describeOptionalCount(query), "one DESCRIBE optional generated");
         assertSame(query.getExtNode("x"), query.getConstruct().get(0).getEdge().getNode(0));
     }
 
@@ -50,7 +49,7 @@ class CoreseAstQueryBuilderDescribeTest {
 
         assertLoweredDescribeConstruct(query, 1);
         assertTrue(query.getBody().isAnd(), "WHERE compiled into the body");
-        assertEquals(2, query.getBody().size(), "WHERE plus generated DESCRIBE optional pattern");
+        assertEquals(1, describeOptionalCount(query));
         Node described = query.getConstruct().get(0).getEdge().getNode(0);
         assertTrue(described.isVariable());
         assertSame(query.getExtNode("x"), described, "described ?x is the runtime node bound by the body");
@@ -66,8 +65,7 @@ class CoreseAstQueryBuilderDescribeTest {
 
         assertLoweredDescribeConstruct(query, 1);
         assertTrue(query.getBody().isAnd(), "body remains an AND");
-        assertEquals(1, query.getBody().size(), "generated DESCRIBE optional pattern");
-        assertDescribeOptional(query.getBody().get(0));
+        assertEquals(1, describeOptionalCount(query));
         assertFalse(query.getConstruct().get(0).getEdge().getNode(0).isVariable(), "described term is a fixed IRI");
     }
 
@@ -80,7 +78,7 @@ class CoreseAstQueryBuilderDescribeTest {
         Query query = builder.toNextQuery(describe);
 
         assertLoweredDescribeConstruct(query, 3);
-        assertEquals(4, query.getBody().size(), "WHERE plus one generated optional pattern per described node");
+        assertEquals(3, describeOptionalCount(query));
         List<Node> described = query.getConstruct().getNodes().stream()
                 .filter(node -> "x".equals(node.getLabel()) || "p".equals(node.getLabel()) || "o".equals(node.getLabel()))
                 .toList();
@@ -173,14 +171,26 @@ class CoreseAstQueryBuilderDescribeTest {
 
     private static void assertLoweredDescribeConstruct(Query query, int describedNodeCount) {
         assertTrue(query.isConstruct(), "DESCRIBE is lowered to the construct runtime path");
+        assertFalse(query.isSelect(), "a lowered DESCRIBE must not report itself as SELECT");
         assertNotNull(query.getConstruct(), "construct template created");
         assertEquals(2 * describedNodeCount, query.getConstruct().size(),
                 "construct template has outgoing and incoming triple patterns per described node");
         assertNotNull(query.getConstructNodes(), "construct nodes collected");
     }
 
-    private static void assertDescribeOptional(Exp exp) {
-        assertTrue(exp.isOptional(), "generated DESCRIBE pattern is optional");
-        assertTrue(exp.get(1).isUnion(), "generated DESCRIBE pattern matches outgoing or incoming triples");
+    /**
+     * Counts the DESCRIBE-generated {@code OPTIONAL { outgoing UNION incoming }} patterns directly
+     * under the body — independently of how the parser shaped the original WHERE.
+     */
+    private static long describeOptionalCount(Query query) {
+        Exp body = query.getBody();
+        long count = 0;
+        for (int i = 0; i < body.size(); i++) {
+            Exp child = body.get(i);
+            if (child.isOptional() && child.size() > 1 && child.get(1).isUnion()) {
+                count++;
+            }
+        }
+        return count;
     }
 }
