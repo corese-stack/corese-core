@@ -3,6 +3,7 @@ package fr.inria.corese.core.next.query.impl.sparql.bridge;
 import fr.inria.corese.core.next.query.impl.parser.SparqlParser;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.kgram.api.core.Node;
+import fr.inria.corese.core.next.query.kgram.core.Exp;
 import fr.inria.corese.core.next.query.kgram.core.Query;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,7 @@ class CoreseAstQueryBuilderDescribeTest {
     }
 
     @Test
-    @DisplayName("Parser -> DescribeQueryAst -> Query keeps the DESCRIBE form")
+    @DisplayName("Parser -> DescribeQueryAst -> Query lowers DESCRIBE to a construct-like query")
     void parserDescribeAstToQuery() {
         SparqlParser parser = new SparqlParser();
         DescribeQueryAst describe = (DescribeQueryAst) parser.parse(
@@ -32,41 +33,42 @@ class CoreseAstQueryBuilderDescribeTest {
 
         Query query = builder.toNextQuery(describe);
 
-        assertTrue(query.isDescribe());
+        assertLoweredDescribeConstruct(query, 1);
         assertTrue(query.getBody().isAnd());
-        assertEquals(1, query.getDescribeList().size());
-        assertSame(query.getExtNode("x"), query.getDescribeList().getFirst());
+        assertEquals(2, query.getBody().size(), "WHERE plus generated DESCRIBE optional pattern");
+        assertDescribeOptional(query.getBody().get(1));
+        assertSame(query.getExtNode("x"), query.getConstruct().get(0).getEdge().getNode(0));
     }
 
     @Test
-    @DisplayName("DESCRIBE ?x WHERE { ... }: ?x resolves to the body node and is flagged DESCRIBE")
+    @DisplayName("DESCRIBE ?x WHERE { ... }: ?x resolves to the body node")
     void describesVariableResolvedAgainstBody() {
         DescribeQueryAst describe = new DescribeQueryAst(
                 DatasetClauseAst.none(), List.of(new VarAst("x")), whereBindingX());
 
         Query query = builder.toNextQuery(describe);
 
-        assertTrue(query.isDescribe(), "query flagged as DESCRIBE");
+        assertLoweredDescribeConstruct(query, 1);
         assertTrue(query.getBody().isAnd(), "WHERE compiled into the body");
-        assertEquals(1, query.getDescribeList().size());
-        Node described = query.getDescribeList().getFirst();
+        assertEquals(2, query.getBody().size(), "WHERE plus generated DESCRIBE optional pattern");
+        Node described = query.getConstruct().get(0).getEdge().getNode(0);
         assertTrue(described.isVariable());
         assertSame(query.getExtNode("x"), described, "described ?x is the runtime node bound by the body");
     }
 
     @Test
-    @DisplayName("DESCRIBE <uri> with no WHERE: empty body, IRI as a fresh constant node")
+    @DisplayName("DESCRIBE <uri> with no WHERE: IRI as a fresh constant node and lowered construct shape")
     void describesFixedResourceWithoutWhere() {
         DescribeQueryAst describe = new DescribeQueryAst(
                 DatasetClauseAst.none(), List.of(new IriAst("<http://example.org/x>")), null);
 
         Query query = builder.toNextQuery(describe);
 
-        assertTrue(query.isDescribe());
-        assertTrue(query.getBody().isAnd(), "default empty WHERE compiles to an empty AND");
-        assertEquals(0, query.getBody().size(), "no pattern in the body");
-        assertEquals(1, query.getDescribeList().size());
-        assertFalse(query.getDescribeList().getFirst().isVariable(), "described term is a fixed IRI");
+        assertLoweredDescribeConstruct(query, 1);
+        assertTrue(query.getBody().isAnd(), "body remains an AND");
+        assertEquals(1, query.getBody().size(), "generated DESCRIBE optional pattern");
+        assertDescribeOptional(query.getBody().get(0));
+        assertFalse(query.getConstruct().get(0).getEdge().getNode(0).isVariable(), "described term is a fixed IRI");
     }
 
     @Test
@@ -77,8 +79,11 @@ class CoreseAstQueryBuilderDescribeTest {
 
         Query query = builder.toNextQuery(describe);
 
-        List<Node> described = query.getDescribeList();
-        assertFalse(described.isEmpty(), "DESCRIBE * describes the in-scope variables");
+        assertLoweredDescribeConstruct(query, 3);
+        assertEquals(4, query.getBody().size(), "WHERE plus one generated optional pattern per described node");
+        List<Node> described = query.getConstruct().getNodes().stream()
+                .filter(node -> "x".equals(node.getLabel()) || "p".equals(node.getLabel()) || "o".equals(node.getLabel()))
+                .toList();
         assertTrue(described.stream().allMatch(Node::isVariable));
         assertTrue(described.stream().anyMatch(n -> "x".equals(n.getLabel())));
         assertTrue(described.stream().anyMatch(n -> "p".equals(n.getLabel())), "variable predicate is in scope too");
@@ -164,5 +169,18 @@ class CoreseAstQueryBuilderDescribeTest {
     @DisplayName("toNextQuery((DescribeQueryAst) null) throws NullPointerException")
     void rejectsNull() {
         assertThrows(NullPointerException.class, () -> builder.toNextQuery((DescribeQueryAst) null));
+    }
+
+    private static void assertLoweredDescribeConstruct(Query query, int describedNodeCount) {
+        assertTrue(query.isConstruct(), "DESCRIBE is lowered to the construct runtime path");
+        assertNotNull(query.getConstruct(), "construct template created");
+        assertEquals(2 * describedNodeCount, query.getConstruct().size(),
+                "construct template has outgoing and incoming triple patterns per described node");
+        assertNotNull(query.getConstructNodes(), "construct nodes collected");
+    }
+
+    private static void assertDescribeOptional(Exp exp) {
+        assertTrue(exp.isOptional(), "generated DESCRIBE pattern is optional");
+        assertTrue(exp.get(1).isUnion(), "generated DESCRIBE pattern matches outgoing or incoming triples");
     }
 }

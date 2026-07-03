@@ -105,11 +105,11 @@ public final class CoreseAstQueryBuilder {
      * Builds a KGRAM {@link Query} from a {@link DescribeQueryAst}.
      *
      * <p>Reuses the shared query shell (compiled {@code WHERE} body, dataset, LIMIT/OFFSET) and
-     * {@code ORDER BY} like the other forms. The described resources are resolved against the
-     * compiled body: a described variable reuses its runtime node (so it is bound by the body),
-     * a described IRI becomes a fresh constant node. {@code DESCRIBE *} reuses the in-scope nodes
-     * of the body, matching {@code SELECT *}. Clauses that require dedicated aggregate or values
-     * handling are rejected explicitly.</p>
+     * {@code ORDER BY} like the other forms, then lowers {@code DESCRIBE} to the construct-like
+     * shape expected by the current KGRAM runtime. A described variable reuses its runtime node,
+     * a described IRI becomes a fresh constant node, and {@code DESCRIBE *} reuses the in-scope
+     * nodes of the body, matching {@code SELECT *}. Clauses that require dedicated aggregate or
+     * values handling are rejected explicitly.</p>
      */
     public Query toNextQuery(DescribeQueryAst describeQueryAst) {
         Objects.requireNonNull(describeQueryAst, "describeQueryAst");
@@ -120,8 +120,8 @@ public final class CoreseAstQueryBuilder {
                 describeQueryAst.datasetClause(),
                 describeQueryAst.solutionModifier());
         applyOrderBy(query, describeQueryAst.solutionModifier());
-        query.setDescribe(true);
-        query.setDescribeList(describeNodes(query, describeQueryAst));
+        List<Node> describedNodes = describeNodes(query, describeQueryAst);
+        lowerDescribeToConstructQuery(query, describedNodes);
         return query;
     }
 
@@ -310,6 +310,50 @@ public final class CoreseAstQueryBuilder {
             }
         }
         return nodes;
+    }
+
+    /**
+     * Lowers {@code DESCRIBE} to the construct-like shape expected by the current
+     * KGRAM-next runtime.
+     *
+     * <p>This keeps the current KGRAM contract, inherited from the historical pipeline:
+     * {@code DESCRIBE} is executed through the construct runtime path.</p>
+     */
+    private void lowerDescribeToConstructQuery(Query query, List<Node> describedNodes) {
+        Exp constructTemplate = Exp.create(Type.BGP);
+        int syntheticIndex = 0;
+        for (Node describedNode : describedNodes) {
+            DescribePattern describePattern = describePattern(describedNode, syntheticIndex++);
+            // KGRAM-next currently represents DESCRIBE with outgoing and incoming construct triples.
+            constructTemplate.add(describePattern.outgoing().getEdge());
+            constructTemplate.add(describePattern.incoming().getEdge());
+            query.getBody().add(Exp.create(Type.OPTIONAL, Exp.create(Type.AND), describePattern.optionalBody()));
+        }
+        query.setConstruct(constructTemplate);
+        query.setConstruct(true);
+        query.setConstructNodes(constructTemplate.getNodes());
+    }
+
+    private DescribePattern describePattern(Node describedNode, int index) {
+        Node outgoingPredicate = createSyntheticDescribeNode("p", index, 0);
+        Node outgoingValue = createSyntheticDescribeNode("v", index, 0);
+        Node incomingPredicate = createSyntheticDescribeNode("p", index, 1);
+        Node incomingValue = createSyntheticDescribeNode("v", index, 1);
+
+        Exp outgoing = Exp.create(Type.EDGE, new AstBackedEdge(describedNode, outgoingPredicate, outgoingValue));
+        Exp incoming = Exp.create(Type.EDGE, new AstBackedEdge(incomingValue, incomingPredicate, describedNode));
+        Exp outgoingBgp = Exp.create(Type.BGP);
+        outgoingBgp.add(outgoing);
+        Exp incomingBgp = Exp.create(Type.BGP);
+        incomingBgp.add(incoming);
+        return new DescribePattern(outgoing, incoming, Exp.create(Type.UNION, outgoingBgp, incomingBgp));
+    }
+
+    private Node createSyntheticDescribeNode(String role, int describedIndex, int directionIndex) {
+        return new NodeImpl(Variable.create("__describe_" + role + "_" + describedIndex + "_" + directionIndex));
+    }
+
+    private record DescribePattern(Exp outgoing, Exp incoming, Exp optionalBody) {
     }
 
     /**

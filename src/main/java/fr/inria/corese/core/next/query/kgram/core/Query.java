@@ -80,7 +80,6 @@ public class Query extends Exp  {
             //selectWithExp, 
             orderBy, groupBy;
     List<Filter> failure, pathFilter, funList;
-    private List<Node> describeList = new ArrayList<>();
 
     List<String> errors, info;
     Exp having, construct, delete;
@@ -142,7 +141,6 @@ public class Query extends Exp  {
     boolean isDelete = false;
     boolean isUpdate = false;
     boolean isAsk = false;
-    boolean isDescribe = false;
     boolean isCheckLoop = false;
     boolean isListGroup = false;
     boolean isListPath = true;
@@ -662,7 +660,7 @@ public class Query extends Exp  {
 
 
     public boolean isSelect(){
-        return ! (isConstruct() || isUpdate() || isInsert() || isDelete() || isAsk() || isDescribe());
+        return ! (isConstruct() || isUpdate() || isInsert() || isDelete() || isAsk());
     }
 
     public boolean isConstruct() {
@@ -696,21 +694,7 @@ public class Query extends Exp  {
     public void setAsk(boolean b) {
         isAsk = b;
     }
-    public boolean isDescribe() {
-        return isDescribe;
-    }
 
-    public void setDescribe(boolean b) {
-        isDescribe = b;
-    }
-
-    public List<Node> getDescribeList() {
-        return describeList;
-    }
-
-    public void setDescribeList(List<Node> list) {
-        describeList = list;
-    }
     public boolean isTest() {
         return isTest;
     }
@@ -837,6 +821,14 @@ public class Query extends Exp  {
 
     public Exp getInsert() {
         return construct;
+    }
+
+    public List<Node> getConstructNodes() {
+        return constructNodes;
+    }
+
+    public void setConstructNodes(List<Node> constructNodes) {
+        this.constructNodes = constructNodes;
     }
 
     public void setDelete(Exp c) {
