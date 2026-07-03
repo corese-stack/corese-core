@@ -37,8 +37,8 @@ public final class AstBackedExpr implements Expr {
     }
 
     public AstBackedExpr(Expression delegate, Optional<TermAst> sourceAst) {
-        this.delegate = Objects.requireNonNull(delegate);
-        this.sourceAst = sourceAst.isEmpty() ? Optional.empty() : sourceAst;
+        this.delegate = Objects.requireNonNull(delegate, "delegate");
+        this.sourceAst = Objects.requireNonNull(sourceAst, "sourceAst");
         this.filterView = new NextFilterFromAst(this);
     }
 
