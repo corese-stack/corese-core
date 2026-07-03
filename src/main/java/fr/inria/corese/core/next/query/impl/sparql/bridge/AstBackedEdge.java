@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
 import fr.inria.corese.core.next.query.kgram.api.core.Edge;
 import fr.inria.corese.core.next.query.kgram.api.core.Node;
+import fr.inria.corese.core.next.query.kgram.tool.KgramNodes;
 
 import java.util.Objects;
 
@@ -12,7 +13,8 @@ import java.util.Objects;
 final class AstBackedEdge implements Edge {
 
     private final Node subject;
-    private final Node predicate;
+    private final Node edgeNode;
+    private final Node edgeVariable;
     private final Node object;
     private final Node graph;
 
@@ -22,7 +24,14 @@ final class AstBackedEdge implements Edge {
 
     AstBackedEdge(Node subject, Node predicate, Node object, Node graph) {
         this.subject = Objects.requireNonNull(subject, "subject");
-        this.predicate = Objects.requireNonNull(predicate, "predicate");
+        Node checkedPredicate = Objects.requireNonNull(predicate, "predicate");
+        if (checkedPredicate.isVariable()) {
+            this.edgeNode = KgramNodes.rootProperty();
+            this.edgeVariable = checkedPredicate;
+        } else {
+            this.edgeNode = checkedPredicate;
+            this.edgeVariable = null;
+        }
         this.object = Objects.requireNonNull(object, "object");
         this.graph = graph;
     }
@@ -39,17 +48,22 @@ final class AstBackedEdge implements Edge {
 
     @Override
     public Node getProperty() {
-        return predicate;
+        return edgeVariable == null ? edgeNode : edgeVariable;
+    }
+
+    @Override
+    public Node getEdgeNode() {
+        return edgeNode;
     }
 
     @Override
     public Node getEdgeVariable() {
-        return predicate.isVariable() ? predicate : null;
+        return edgeVariable;
     }
 
     @Override
     public String getEdgeLabel() {
-        return predicate.getLabel();
+        return edgeNode.getLabel();
     }
 
     /**
@@ -82,6 +96,6 @@ final class AstBackedEdge implements Edge {
 
     @Override
     public String toString() {
-        return subject + " " + predicate + " " + object;
+        return subject + " " + getProperty() + " " + object;
     }
 }
