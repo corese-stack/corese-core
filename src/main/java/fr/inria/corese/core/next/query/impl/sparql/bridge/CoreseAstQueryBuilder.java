@@ -423,4 +423,72 @@ public final class CoreseAstQueryBuilder {
             query.setOffset(Math.toIntExact(solutionModifier.offset()));
         }
     }
+
+    /**
+     * Builds a KGRAM {@link Query} from a {@link ConstructQueryAst}.
+     *
+     * <p>Reuses the shared query shell (compiled {@code WHERE} body, dataset, LIMIT/OFFSET) and
+     * {@code ORDER BY} like the other forms, then compiles the {@code CONSTRUCT} template into a
+     * separate {@link Exp} carried by the query. Template variables reuse the runtime node bound by
+     * the body when visible; a template-only variable stays fresh (an unbound template variable is
+     * valid SPARQL, its triple is simply skipped at instantiation time). Clauses that require
+     * dedicated aggregate or values handling are rejected explicitly.</p>
+     */
+    public Query toNextQuery(ConstructQueryAst constructQueryAst) {
+        Objects.requireNonNull(constructQueryAst, "constructQueryAst");
+        rejectUnsupportedConstructClauses(constructQueryAst);
+
+        Query query = createQuery(
+                constructQueryAst.whereClause(),
+                constructQueryAst.datasetClause(),
+                constructQueryAst.solutionModifier());
+        applyOrderBy(query, constructQueryAst.solutionModifier());
+        query.setConstruct(true);
+        query.setConstruct(compileConstructTemplate(query, constructQueryAst.constructTemplate()));
+        return query;
+    }
+
+    private static void rejectUnsupportedConstructClauses(ConstructQueryAst constructQueryAst) {
+        if (!constructQueryAst.valuesClause().mappings().isEmpty()) {
+            throw new UnsupportedOperationException(
+                    "Inline VALUES is not supported yet for CONSTRUCT (values handling is a follow-up)");
+        }
+        SolutionModifierAst mod = constructQueryAst.solutionModifier();
+        if (mod.hasGroupBy() || mod.hasHaving() || mod.distinct() || mod.reduced()) {
+            throw new UnsupportedOperationException(
+                    "Solution modifiers (GROUP BY, HAVING, DISTINCT, REDUCED) are not supported for CONSTRUCT");
+        }
+        // TODO(#389): inline VALUES needs a dedicated runtime mapping.
+        // TODO(#389): GROUP BY / HAVING would require aggregate-aware CONSTRUCT semantics, not just field copying.
+        // TODO(#389): DISTINCT / REDUCED are SELECT-only in the grammar; kept as a defensive guard.
+    }
+
+    /**
+     * Compiles a {@code CONSTRUCT} template into a KGRAM {@link Exp} (a BGP of edges), kept separate
+     * from the {@code WHERE} body and carried by {@link Query#setConstruct(Exp)}.
+     */
+    private Exp compileConstructTemplate(Query query, ConstructTemplateAst template) {
+        Exp bgp = Exp.create(Type.BGP);
+        for (TriplePatternAst triple : template.triplePatternAsts()) {
+            Node subject = constructNode(query, triple.subject());
+            Node predicate = constructNode(query, triple.predicate());
+            Node object = constructNode(query, triple.object());
+            bgp.add(new AstBackedEdge(subject, predicate, object));
+        }
+        return bgp;
+    }
+
+    /**
+     * Resolves a template term to a runtime {@link Node}. A variable reuses the body node when it is
+     * bound by the {@code WHERE}; otherwise it stays a fresh node (an unbound template variable is
+     * valid SPARQL and simply skips its triple at instantiation, so this does not throw). IRIs, blank
+     * nodes and literals become fresh constant nodes.
+     */
+    private Node constructNode(Query query, TermAst term) {
+        if (term instanceof VarAst(String name)) {
+            Node bound = query.getExtNode(name);
+            return bound != null ? bound : toNode(term);
+        }
+        return toNode(term);
+    }
 }
