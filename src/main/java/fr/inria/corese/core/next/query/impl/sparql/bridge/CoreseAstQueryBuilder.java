@@ -20,7 +20,9 @@ import java.util.Objects;
  * Builds KGRAM {@code Exp} / {@code Query} structures from Corese-next query AST nodes.
  *
  * <p>This bridge sits between the parsed SPARQL AST and the KGRAM runtime query model:
- * it does not execute queries, it translates syntax-level query forms ({@code ASK}, {@code SELECT}, {@code DESCRIBE}, {@code CONSTRUCT}) into runtime-ready {@link Query}/{@link Exp} structures.</p>
+ * it does not execute queries, it translates syntax-level query forms ({@code ASK},
+ * {@code SELECT}, {@code DESCRIBE}, {@code CONSTRUCT}) into runtime-ready
+ * {@link Query}/{@link Exp} structures.</p>
  */
 public final class CoreseAstQueryBuilder {
 
@@ -108,6 +110,32 @@ public final class CoreseAstQueryBuilder {
         applyOrderBy(query, describeQueryAst.solutionModifier());
         List<Node> describedNodes = describeNodes(query, describeQueryAst);
         lowerDescribeToConstructQuery(query, describedNodes);
+        return query;
+    }
+
+    /**
+     * Builds a KGRAM {@link Query} from a {@link ConstructQueryAst}.
+     *
+     * <p>Reuses the shared query shell (compiled {@code WHERE} body, dataset, LIMIT/OFFSET) and
+     * {@code ORDER BY} like the other forms, then compiles the {@code CONSTRUCT} template into a
+     * separate {@link Exp} carried by the query. Template variables reuse the runtime node bound by
+     * the body when visible; a template-only variable stays fresh (an unbound template variable is
+     * valid SPARQL, its triple is simply skipped at instantiation time). Clauses that require
+     * dedicated aggregate or values handling are rejected explicitly.</p>
+     */
+    public Query toNextQuery(ConstructQueryAst constructQueryAst) {
+        Objects.requireNonNull(constructQueryAst, "constructQueryAst");
+        rejectUnsupportedConstructClauses(constructQueryAst);
+
+        Query query = createQuery(
+                constructQueryAst.whereClause(),
+                constructQueryAst.datasetClause(),
+                constructQueryAst.solutionModifier());
+        applyOrderBy(query, constructQueryAst.solutionModifier());
+        Exp template = compileConstructTemplate(query, constructQueryAst.constructTemplate());
+        query.setConstruct(true);
+        query.setConstruct(template);
+        query.setConstructNodes(template.getNodes());
         return query;
     }
 
@@ -408,32 +436,6 @@ public final class CoreseAstQueryBuilder {
         if (solutionModifier.hasOffset()) {
             query.setOffset(Math.toIntExact(solutionModifier.offset()));
         }
-    }
-
-    /**
-     * Builds a KGRAM {@link Query} from a {@link ConstructQueryAst}.
-     *
-     * <p>Reuses the shared query shell (compiled {@code WHERE} body, dataset, LIMIT/OFFSET) and
-     * {@code ORDER BY} like the other forms, then compiles the {@code CONSTRUCT} template into a
-     * separate {@link Exp} carried by the query. Template variables reuse the runtime node bound by
-     * the body when visible; a template-only variable stays fresh (an unbound template variable is
-     * valid SPARQL, its triple is simply skipped at instantiation time). Clauses that require
-     * dedicated aggregate or values handling are rejected explicitly.</p>
-     */
-    public Query toNextQuery(ConstructQueryAst constructQueryAst) {
-        Objects.requireNonNull(constructQueryAst, "constructQueryAst");
-        rejectUnsupportedConstructClauses(constructQueryAst);
-
-        Query query = createQuery(
-                constructQueryAst.whereClause(),
-                constructQueryAst.datasetClause(),
-                constructQueryAst.solutionModifier());
-        applyOrderBy(query, constructQueryAst.solutionModifier());
-        Exp template = compileConstructTemplate(query, constructQueryAst.constructTemplate());
-        query.setConstruct(true);
-        query.setConstruct(template);
-        query.setConstructNodes(template.getNodes());
-        return query;
     }
 
     private static void rejectUnsupportedConstructClauses(ConstructQueryAst constructQueryAst) {

@@ -175,7 +175,7 @@ class CoreseAstQueryBuilderDescribeTest {
         assertNotNull(query.getConstruct(), "construct template created");
         assertEquals(2 * describedNodeCount, query.getConstruct().size(),
                 "construct template has outgoing and incoming triple patterns per described node");
-        assertFalse(query.getConstructNodes().isEmpty(), "construct nodes collected");  // était assertNotNull
+        assertFalse(query.getConstructNodes().isEmpty(), "construct nodes collected");
     }
 
     /**
