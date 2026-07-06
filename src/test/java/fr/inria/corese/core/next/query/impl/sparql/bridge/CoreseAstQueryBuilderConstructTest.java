@@ -34,7 +34,7 @@ class CoreseAstQueryBuilderConstructTest extends AbstractSparqlParserFeatureTest
         ConstructQueryAst construct = new ConstructQueryAst(template(new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o"))), whereSPO());
 
         Query query = builder.toNextQuery(construct);
-
+        assertFalse(query.getConstructNodes().isEmpty(), "construct nodes populated");
         assertTrue(query.isConstruct(), "query flagged as CONSTRUCT");
         assertFalse(query.isSelect(), "CONSTRUCT should not also report itself as SELECT");
         assertTrue(query.getBody().isAnd(), "WHERE compiled into the body");

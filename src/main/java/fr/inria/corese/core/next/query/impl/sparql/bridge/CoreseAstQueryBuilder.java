@@ -1,19 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
-import fr.inria.corese.core.next.query.impl.sparql.ast.AskQueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.ASTConstants;
-import fr.inria.corese.core.next.query.impl.sparql.ast.ConstraintAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.DatasetClauseAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.DescribeQueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.OrderConditionAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.ProjectionAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.SolutionModifierAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.kgram.api.core.ExpType.Type;
 import fr.inria.corese.core.next.query.kgram.api.core.Filter;
 import fr.inria.corese.core.next.query.kgram.api.core.Node;
@@ -33,8 +20,7 @@ import java.util.Objects;
  * Builds KGRAM {@code Exp} / {@code Query} structures from Corese-next query AST nodes.
  *
  * <p>This bridge sits between the parsed SPARQL AST and the KGRAM runtime query model:
- * it does not execute queries, it translates syntax-level query forms ({@code ASK}, {@code SELECT},
- * {@code DESCRIBE}) into runtime-ready {@link Query}/{@link Exp} structures.</p>
+ * it does not execute queries, it translates syntax-level query forms ({@code ASK}, {@code SELECT}, {@code DESCRIBE}, {@code CONSTRUCT}) into runtime-ready {@link Query}/{@link Exp} structures.</p>
  */
 public final class CoreseAstQueryBuilder {
 
@@ -443,8 +429,10 @@ public final class CoreseAstQueryBuilder {
                 constructQueryAst.datasetClause(),
                 constructQueryAst.solutionModifier());
         applyOrderBy(query, constructQueryAst.solutionModifier());
+        Exp template = compileConstructTemplate(query, constructQueryAst.constructTemplate());
         query.setConstruct(true);
-        query.setConstruct(compileConstructTemplate(query, constructQueryAst.constructTemplate()));
+        query.setConstruct(template);
+        query.setConstructNodes(template.getNodes());
         return query;
     }
 
