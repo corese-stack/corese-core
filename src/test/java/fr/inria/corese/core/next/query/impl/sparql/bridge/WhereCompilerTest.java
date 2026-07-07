@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
+import fr.inria.corese.core.next.query.impl.parser.AbstractSparqlParserFeatureTest;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.FunctionCallAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.GreaterThanAst;
@@ -12,7 +13,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class WhereCompilerTest {
+class WhereCompilerTest extends AbstractSparqlParserFeatureTest {
 
     private final WhereCompiler compiler = new WhereCompiler();
 
@@ -93,6 +94,24 @@ class WhereCompilerTest {
         assertTrue(minusExp.rest().isAnd(), "right part is the MINUS body");
     }
 
+
+    @Test
+    @DisplayName("OPTIONAL { BGP . FILTER } — the filter is compiled inside the optional right part")
+    void compilesOptionalWithFilter() {
+        FilterAst filter = new FilterAst(new GreaterThanAst(List.of(
+                new VarAst("z"), new LiteralAst("5", null, null))));
+        GroupGraphPatternAst optionalBody = group(bgp("s", "q", "z"), filter);
+
+        Exp body = compiler.compile(group(bgp("s", "p", "o"), new OptionalAst(optionalBody)));
+
+        Exp optional = body.get(0);
+        assertTrue(optional.isOptional());
+        Exp right = optional.rest();
+        assertTrue(right.isAnd(), "optional body is a group");
+        assertEquals(2, right.size(), "BGP + FILTER inside the optional body");
+        assertTrue(right.get(0).isBGP());
+        assertTrue(right.get(1).isFilter());
+    }
 
     @Test
     @DisplayName("BIND produces an Exp with a filter and a target variable node")
@@ -195,5 +214,131 @@ class WhereCompilerTest {
 
         assertTrue(serviceExp.rest().getQuery().isService(),
                 "SERVICE body query should be marked as service");
+    }
+
+    @Test
+    @DisplayName("Pattern after OPTIONAL stays a sibling: { P1 . OPTIONAL{P2} . P3 } -> AND[ OPTIONAL(AND[P1], P2), BGP(P3) ]")
+    void patternAfterOptionalStaysSibling() {
+        Exp body = compiler.compile(group(
+                bgp("s", "p", "o"),
+                new OptionalAst(bgp("s", "q", "z")),
+                bgp("s", "r", "w")));
+
+        assertTrue(body.isAnd());
+        assertEquals(2, body.size(), "OPTIONAL and the trailing BGP are two siblings");
+
+        Exp optional = body.get(0);
+        assertTrue(optional.isOptional());
+        assertTrue(optional.first().isAnd(), "mandatory left part is the preceding pattern");
+        assertTrue(optional.first().get(0).isBGP());
+        assertTrue(optional.rest().isBGP(), "optional right part is P2");
+
+        assertTrue(body.get(1).isBGP(), "P3 is a sibling of the OPTIONAL, not folded into it");
+    }
+
+    @Test
+    @DisplayName("Chained OPTIONALs left-associate: { P1 . OPTIONAL{P2} . OPTIONAL{P3} } -> OPTIONAL(OPTIONAL(P1,P2), P3)")
+    void chainedOptionalsLeftAssociate() {
+        Exp body = compiler.compile(group(
+                bgp("s", "p", "o"),
+                new OptionalAst(bgp("s", "q", "z")),
+                new OptionalAst(bgp("s", "r", "w"))));
+
+        assertEquals(1, body.size());
+        Exp outer = body.get(0);
+        assertTrue(outer.isOptional(), "outermost OPTIONAL");
+        assertTrue(outer.rest().isBGP(), "outer optional part is P3");
+
+        Exp inner = outer.first().get(0);
+        assertTrue(inner.isOptional(), "left part is the inner OPTIONAL(P1, P2)");
+        assertTrue(inner.rest().isBGP(), "inner optional part is P2");
+        assertTrue(inner.first().get(0).isBGP(), "inner mandatory part is P1");
+    }
+
+    @Test
+    @DisplayName("Pattern after MINUS stays a sibling: { P1 . MINUS{P2} . P3 } -> AND[ MINUS(AND[P1], AND[P2]), BGP(P3) ]")
+    void patternAfterMinusStaysSibling() {
+        Exp body = compiler.compile(group(
+                bgp("s", "p", "o"),
+                new MinusAst(group(bgp("s", "q", "z"))),
+                bgp("s", "r", "w")));
+
+        assertTrue(body.isAnd());
+        assertEquals(2, body.size());
+
+        Exp minus = body.get(0);
+        assertTrue(minus.isMinus());
+        assertTrue(minus.first().isAnd(), "mandatory left part is the preceding pattern");
+        assertTrue(minus.first().get(0).isBGP());
+        assertTrue(minus.rest().isAnd(), "right part is the MINUS body");
+        assertTrue(minus.rest().get(0).isBGP());
+
+        assertTrue(body.get(1).isBGP(), "P3 is a sibling of the MINUS");
+    }
+
+    @Test
+    @DisplayName("OPTIONAL first in the group has an empty mandatory left part: { OPTIONAL{P1} } -> OPTIONAL(AND[], P1)")
+    void optionalFirstHasEmptyMandatoryPart() {
+        Exp body = compiler.compile(group(new OptionalAst(bgp("s", "p", "o"))));
+
+        assertEquals(1, body.size());
+        Exp optional = body.get(0);
+        assertTrue(optional.isOptional());
+        assertTrue(optional.first().isAnd());
+        assertEquals(0, optional.first().size(), "mandatory left part is empty ({} OPTIONAL { ... })");
+        assertTrue(optional.rest().isBGP());
+    }
+
+    @Test
+    @DisplayName("Bare OPTIONAL/MINUS via the pattern dispatcher use an empty mandatory left part")
+    void bareOptionalAndMinusUseEmptyLeft() {
+        Exp optional = compiler.compile(new OptionalAst(bgp("s", "p", "o")));
+        assertTrue(optional.isOptional());
+        assertTrue(optional.first().isAnd());
+        assertEquals(0, optional.first().size(), "bare OPTIONAL: {} OPTIONAL { ... }");
+        assertTrue(optional.rest().isBGP());
+
+        Exp minus = compiler.compile(new MinusAst(group(bgp("s", "p", "o"))));
+        assertTrue(minus.isMinus());
+        assertTrue(minus.first().isAnd());
+        assertEquals(0, minus.first().size(), "bare MINUS: {} MINUS { ... }");
+        assertTrue(minus.rest().isAnd());
+    }
+
+    @Test
+    @DisplayName("Parser -> WhereCompiler: OPTIONAL compiles to an OPTIONAL Exp")
+    void parsedOptionalCompilesCorrectly() {
+        SelectQueryAst select = assertInstanceOf(SelectQueryAst.class,
+                newParserDefault().parse("SELECT * WHERE { ?s ?p ?o . OPTIONAL { ?s ?q ?z } }"));
+
+        Exp body = compiler.compile(select.whereClause());
+
+        assertTrue(body.isAnd());
+        Exp optional = body.get(0);
+        assertTrue(optional.isOptional(), "OPTIONAL compiled from parsed query");
+        assertTrue(optional.first().isAnd(), "mandatory left part");
+        assertTrue(optional.first().get(0).isBGP());
+        assertTrue(optional.rest().isAnd(), "optional right part is the inner group");
+    }
+
+    @Test
+    @DisplayName("Parser -> WhereCompiler: MINUS compiles to a MINUS Exp")
+    void parsedMinusCompilesCorrectly() {
+        SelectQueryAst select = assertInstanceOf(SelectQueryAst.class,
+                newParserDefault().parse("SELECT * WHERE { ?s ?p ?o . MINUS { ?s ?q ?z } }"));
+
+        Exp body = compiler.compile(select.whereClause());
+
+        assertTrue(body.isAnd());
+        Exp minus = body.get(0);
+        assertTrue(minus.isMinus(), "MINUS compiled from parsed query");
+        assertTrue(minus.first().isAnd(), "left part is the preceding pattern");
+        assertTrue(minus.first().get(0).isBGP());
+        assertTrue(minus.rest().isAnd(), "right part is the MINUS body");
+    }
+
+    private static BgpAst bgp(String s, String p, String o) {
+        return new BgpAst(List.of(
+                new TriplePatternAst(new VarAst(s), new VarAst(p), new VarAst(o))));
     }
 }
