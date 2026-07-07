@@ -83,7 +83,7 @@ public final class StorageManagerProducer extends ProducerDefault {
             Node source,
             Node start,
             int index) {
-        return List.of();
+        throw new UnsupportedOperationException("StorageManagerProducer does not support path/regex edge enumeration yet");
     }
 
     @Override
