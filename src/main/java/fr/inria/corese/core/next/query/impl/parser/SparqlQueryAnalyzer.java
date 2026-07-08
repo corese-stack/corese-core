@@ -16,13 +16,17 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Performs SPARQL syntax, AST, and semantic analysis and returns the
@@ -40,7 +44,7 @@ final class SparqlQueryAnalyzer {
         }
 
         try {
-            QueryAst ast = buildAst(syntaxAnalysis.parseTree(), options);
+            QueryAst ast = buildAst(syntaxAnalysis.parseTree(), options, syntaxAnalysis.blankNodeLabels());
             QueryValidationResult semanticValidation = semanticValidator.validate(ast);
             return new AnalysisResult(ast, semanticValidation);
         } catch (QuerySyntaxException e) {
@@ -85,13 +89,15 @@ final class SparqlQueryAnalyzer {
             }
 
             ParseTree tree = parser.query();
+            Set<String> blankNodeLabels = blankNodeLabels(tokens);
             if (errorListener.hasErrors()) {
                 return new SyntaxAnalysis(
                         null,
-                        new QueryValidationResult(mapSyntaxDiagnostics(errorListener.getDiagnostics())));
+                        new QueryValidationResult(mapSyntaxDiagnostics(errorListener.getDiagnostics())),
+                        blankNodeLabels);
             }
 
-            return new SyntaxAnalysis(tree, new QueryValidationResult(List.of()));
+            return new SyntaxAnalysis(tree, new QueryValidationResult(List.of()), blankNodeLabels);
         } catch (RecognitionException e) {
             return new SyntaxAnalysis(null, new QueryValidationResult(List.of(
                     new QueryDiagnostic(
@@ -101,21 +107,32 @@ final class SparqlQueryAnalyzer {
                             -1,
                             -1,
                             null,
-                            e.getClass().getSimpleName()))));
+                            e.getClass().getSimpleName()))), Set.of());
         } catch (ParseCancellationException e) {
             QuerySyntaxException syntaxException = SparqlParser.toQuerySyntaxException(e, errorListener);
-            return new SyntaxAnalysis(null, new QueryValidationResult(List.of(toSyntaxDiagnostic(syntaxException))));
+            return new SyntaxAnalysis(
+                    null,
+                    new QueryValidationResult(List.of(toSyntaxDiagnostic(syntaxException))),
+                    Set.of());
         } catch (QuerySyntaxException e) {
-            return new SyntaxAnalysis(null, new QueryValidationResult(List.of(toSyntaxDiagnostic(e))));
+            return new SyntaxAnalysis(
+                    null,
+                    new QueryValidationResult(List.of(toSyntaxDiagnostic(e))),
+                    Set.of());
         }
     }
 
-    private QueryAst buildAst(ParseTree tree, SparqlParserOptions options) {
-        fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.QueryContext root = (fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.QueryContext) tree;
+    private QueryAst buildAst(
+            ParseTree tree,
+            SparqlParserOptions options,
+            Collection<String> blankNodeLabels) {
+        fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.QueryContext root =
+                (fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.QueryContext) tree;
         ParseTreeWalker walker = new ParseTreeWalker();
 
         if (root.queryUnit() != null) {
             SparqlQueryAstBuilder queryBuilder = new SparqlQueryAstBuilder(options);
+            queryBuilder.reserveBlankNodeLabels(blankNodeLabels);
             SparqlListener queryListener = new SparqlListener(List.of(
                     new AskQueryFeature(queryBuilder),
                     new ConstructQueryFeature(queryBuilder),
@@ -139,6 +156,7 @@ final class SparqlQueryAnalyzer {
 
         if (root.updateUnit() != null) {
             SparqlUpdateAstBuilder updateBuilder = new SparqlUpdateAstBuilder(options);
+            updateBuilder.reserveBlankNodeLabels(blankNodeLabels);
             SparqlListener updateListener = new SparqlListener(List.of(
                     new ClearRequestFeature(updateBuilder),
                     new CreateRequestFeature(updateBuilder),
@@ -155,7 +173,19 @@ final class SparqlQueryAnalyzer {
             return updateBuilder.getResult();
         }
 
-        throw new QueryEvaluationException("Unknown parse root, could not determine if this is an update request or a query.");
+        throw new QueryEvaluationException(
+                "Unknown parse root, could not determine if this is an update request or a query.");
+    }
+
+    private Set<String> blankNodeLabels(CommonTokenStream tokens) {
+        tokens.fill();
+        Set<String> labels = new LinkedHashSet<>();
+        for (Token token : tokens.getTokens()) {
+            if (token.getType() == SparqlLexer.BLANK_NODE_LABEL) {
+                labels.add(token.getText());
+            }
+        }
+        return labels;
     }
 
     private List<QueryDiagnostic> mapSyntaxDiagnostics(List<SparqlAstError> diagnostics) {
@@ -198,7 +228,10 @@ final class SparqlQueryAnalyzer {
                 exception.getClass().getSimpleName());
     }
 
-    private record SyntaxAnalysis(ParseTree parseTree, QueryValidationResult validationResult) {
+    private record SyntaxAnalysis(
+            ParseTree parseTree,
+            QueryValidationResult validationResult,
+            Set<String> blankNodeLabels) {
     }
 
     record AnalysisResult(QueryAst ast, QueryValidationResult validationResult) {
