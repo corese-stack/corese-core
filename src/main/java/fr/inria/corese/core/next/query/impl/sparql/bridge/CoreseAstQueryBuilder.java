@@ -1,6 +1,23 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
-import fr.inria.corese.core.next.query.impl.sparql.ast.*;
+import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
+import fr.inria.corese.core.next.query.impl.sparql.ast.AskQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ASTConstants;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ConstraintAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ConstructTemplateAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ConstructQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.DatasetClauseAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.DescribeQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.OrderConditionAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ProjectionAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.SolutionModifierAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.path.PathAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.path.PredicatePathAst;
 import fr.inria.corese.core.next.query.kgram.api.core.ExpType.Type;
@@ -198,12 +215,12 @@ public final class CoreseAstQueryBuilder {
 
     private static void rejectUnsupportedAskClauses(AskQueryAst askQueryAst) {
         if (!askQueryAst.valuesClause().mappings().isEmpty()) {
-            throw new UnsupportedOperationException(
+            throw new UnsupportedQueryFeatureException(
                     "Inline VALUES is not supported yet for ASK (values handling is a follow-up)");
         }
         SolutionModifierAst mod = askQueryAst.solutionModifier();
         if (mod.hasGroupBy() || mod.hasHaving() || mod.distinct() || mod.reduced()) {
-            throw new UnsupportedOperationException(
+            throw new UnsupportedQueryFeatureException(
                     "Solution modifiers (GROUP BY, HAVING, DISTINCT, REDUCED) are not supported for ASK");
         }
         // TODO(#388): inline VALUES needs a dedicated runtime mapping.
@@ -213,22 +230,22 @@ public final class CoreseAstQueryBuilder {
 
     private static void rejectUnsupportedSelectClauses(SelectQueryAst selectQueryAst) {
         if (!selectQueryAst.valuesClause().mappings().isEmpty()) {
-            throw new UnsupportedOperationException("VALUES is not supported yet when building a next Query");
+            throw new UnsupportedQueryFeatureException("VALUES is not supported yet when building a next Query");
         }
         ProjectionAst projection = selectQueryAst.projection();
         if (!projection.expressionTerms().isEmpty() || !projection.expressionBoundVariables().isEmpty()) {
-            throw new UnsupportedOperationException(
+            throw new UnsupportedQueryFeatureException(
                     "SELECT expressions are not supported yet when building a next Query");
         }
         SolutionModifierAst solutionModifier = selectQueryAst.solutionModifier();
         if (solutionModifier.reduced()) {
-            throw new UnsupportedOperationException("REDUCED is not supported yet when building a next Query");
+            throw new UnsupportedQueryFeatureException("REDUCED is not supported yet when building a next Query");
         }
         if (solutionModifier.hasGroupBy()) {
-            throw new UnsupportedOperationException("GROUP BY is not supported yet when building a next Query");
+            throw new UnsupportedQueryFeatureException("GROUP BY is not supported yet when building a next Query");
         }
         if (solutionModifier.hasHaving()) {
-            throw new UnsupportedOperationException("HAVING is not supported yet when building a next Query");
+            throw new UnsupportedQueryFeatureException("HAVING is not supported yet when building a next Query");
         }
         // TODO(#387): inline VALUES needs a dedicated runtime mapping.
         // TODO(#387): SELECT expressions need a clear runtime story for aliases and reuse in later clauses.
@@ -238,17 +255,31 @@ public final class CoreseAstQueryBuilder {
 
     private static void rejectUnsupportedDescribeClauses(DescribeQueryAst describeQueryAst) {
         if (!describeQueryAst.valuesClause().mappings().isEmpty()) {
-            throw new UnsupportedOperationException(
+            throw new UnsupportedQueryFeatureException(
                     "Inline VALUES is not supported yet for DESCRIBE (values handling is a follow-up)");
         }
         SolutionModifierAst mod = describeQueryAst.solutionModifier();
         if (mod.hasGroupBy() || mod.hasHaving() || mod.distinct() || mod.reduced()) {
-            throw new UnsupportedOperationException(
+            throw new UnsupportedQueryFeatureException(
                     "Solution modifiers (GROUP BY, HAVING, DISTINCT, REDUCED) are not supported for DESCRIBE");
         }
         // TODO(#390): inline VALUES needs a dedicated runtime mapping.
         // TODO(#390): GROUP BY / HAVING would require aggregate-aware DESCRIBE semantics, not just field copying.
         // TODO(#390): REDUCED support should be aligned with the final query-form policy for the next pipeline.
+    }
+
+    private static void rejectUnsupportedConstructClauses(ConstructQueryAst constructQueryAst) {
+        if (!constructQueryAst.valuesClause().mappings().isEmpty()) {
+            throw new UnsupportedQueryFeatureException(
+                    "Inline VALUES is not supported yet for CONSTRUCT (values handling is a follow-up)");
+        }
+        SolutionModifierAst mod = constructQueryAst.solutionModifier();
+        if (mod.hasGroupBy() || mod.hasHaving() || mod.distinct() || mod.reduced()) {
+            throw new UnsupportedQueryFeatureException(
+                    "Solution modifiers (GROUP BY, HAVING, DISTINCT, REDUCED) are not supported for CONSTRUCT");
+        }
+        // TODO(#473): blank nodes in CONSTRUCT templates need per-solution allocation.
+        // TODO(#473): inline VALUES needs a dedicated runtime mapping.
     }
 
     /**
@@ -282,6 +313,17 @@ public final class CoreseAstQueryBuilder {
             nodes.add(toNode(iri));
         }
         return nodes;
+    }
+
+    private static void rejectUnsupportedConstructTemplateTerm(TermAst term, String role) {
+        if (term instanceof IriAst(String raw) && isBlankNodeLabel(raw)) {
+            throw new UnsupportedQueryFeatureException(
+                    "Blank nodes in CONSTRUCT " + role + " templates are not supported yet");
+        }
+    }
+
+    private static boolean isBlankNodeLabel(String raw) {
+        return raw.startsWith("_:") || raw.equals("[]") || raw.startsWith("[");
     }
 
     /**
@@ -352,7 +394,8 @@ public final class CoreseAstQueryBuilder {
             // KGRAM-next currently represents DESCRIBE with outgoing and incoming construct triples.
             constructTemplate.add(describePattern.outgoing().getEdge());
             constructTemplate.add(describePattern.incoming().getEdge());
-            query.getBody().add(Exp.create(Type.OPTIONAL, Exp.create(Type.AND), describePattern.optionalBody()));
+            Exp optional = Exp.create(Type.OPTIONAL, Exp.create(Type.AND), describePattern.optionalBody());
+            query.getBody().add(optional);
         }
         query.setConstruct(constructTemplate);
         query.setConstruct(true);
@@ -463,21 +506,6 @@ public final class CoreseAstQueryBuilder {
         }
     }
 
-    private static void rejectUnsupportedConstructClauses(ConstructQueryAst constructQueryAst) {
-        if (!constructQueryAst.valuesClause().mappings().isEmpty()) {
-            throw new UnsupportedOperationException(
-                    "Inline VALUES is not supported yet for CONSTRUCT (values handling is a follow-up)");
-        }
-        SolutionModifierAst mod = constructQueryAst.solutionModifier();
-        if (mod.hasGroupBy() || mod.hasHaving() || mod.distinct() || mod.reduced()) {
-            throw new UnsupportedOperationException(
-                    "Solution modifiers (GROUP BY, HAVING, DISTINCT, REDUCED) are not supported for CONSTRUCT");
-        }
-        // TODO(#389): inline VALUES needs a dedicated runtime mapping.
-        // TODO(#389): GROUP BY / HAVING would require aggregate-aware CONSTRUCT semantics, not just field copying.
-        // TODO(#389): DISTINCT / REDUCED are SELECT-only in the grammar; kept as a defensive guard.
-    }
-
     /**
      * Compiles a {@code CONSTRUCT} template into a KGRAM {@link Exp} (a BGP of edges), kept separate
      * from the {@code WHERE} body and carried by {@link Query#setConstruct(Exp)}.
@@ -485,9 +513,9 @@ public final class CoreseAstQueryBuilder {
     private Exp compileConstructTemplate(Query query, ConstructTemplateAst template) {
         Exp bgp = Exp.create(Type.BGP);
         for (TriplePatternAst triple : template.triplePatternAsts()) {
-            Node subject = constructNode(query, triple.subject());
-            Node predicate = constructNode(query, simplePredicate(triple.predicate()));
-            Node object = constructNode(query, triple.object());
+            Node subject = constructNode(query, triple.subject(), "subject");
+            Node predicate = constructNode(query, simplePredicate(triple.predicate()), "predicate");
+            Node object = constructNode(query, triple.object(), "object");
             bgp.add(new AstBackedEdge(subject, predicate, object));
         }
         return bgp;
@@ -499,7 +527,8 @@ public final class CoreseAstQueryBuilder {
      * valid SPARQL and simply skips its triple at instantiation, so this does not throw). IRIs, blank
      * nodes and literals become fresh constant nodes.
      */
-    private Node constructNode(Query query, TermAst term) {
+    private Node constructNode(Query query, TermAst term, String role) {
+        rejectUnsupportedConstructTemplateTerm(term, role);
         if (term instanceof VarAst(String name)) {
             Node bound = visibleBodyNode(query, name);
             return bound != null ? bound : toNode(term);

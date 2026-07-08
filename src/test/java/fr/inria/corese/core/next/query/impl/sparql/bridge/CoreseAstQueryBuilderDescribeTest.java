@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
+import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.impl.parser.SparqlParser;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.kgram.api.core.Node;
@@ -160,25 +161,25 @@ class CoreseAstQueryBuilderDescribeTest {
     }
 
     @Test
-    @DisplayName("Inline VALUES is not supported yet → UnsupportedOperationException")
+    @DisplayName("Inline VALUES is not supported yet -> UnsupportedQueryFeatureException")
     void rejectsValuesClause() {
         ValuesAst values = new ValuesAst(List.of(
                 new ValueMappingAst(Map.of(new VarAst("x"), new IriAst("http://example.org/v")))));
         DescribeQueryAst describe = new DescribeQueryAst(
                 DatasetClauseAst.none(), List.of(new VarAst("x")), whereBindingX(), null, null, values);
 
-        assertThrows(UnsupportedOperationException.class, () -> builder.toNextQuery(describe));
+        assertThrows(UnsupportedQueryFeatureException.class, () -> builder.toNextQuery(describe));
     }
 
     @Test
-    @DisplayName("Unsupported solution modifier (e.g. DISTINCT) → UnsupportedOperationException")
+    @DisplayName("Unsupported solution modifier (e.g. DISTINCT) -> UnsupportedQueryFeatureException")
     void rejectsUnsupportedModifier() {
         SolutionModifierAst mod = SolutionModifierAst.withoutGroupBy(
                 true, false, List.of(), null, null);
         DescribeQueryAst describe = new DescribeQueryAst(
                 DatasetClauseAst.none(), List.of(new VarAst("x")), whereBindingX(), mod);
 
-        assertThrows(UnsupportedOperationException.class, () -> builder.toNextQuery(describe));
+        assertThrows(UnsupportedQueryFeatureException.class, () -> builder.toNextQuery(describe));
     }
 
     @Test
