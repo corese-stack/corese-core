@@ -1,7 +1,14 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
+import fr.inria.corese.core.next.query.impl.sparql.ast.BgpAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAstTestSupport;
+import fr.inria.corese.core.next.query.impl.sparql.ast.WhereClauseQueryAst;
 
 public class AbstractSparqlParserFeatureTest {
 
@@ -31,5 +38,16 @@ public class AbstractSparqlParserFeatureTest {
                 .failFast(failFast)
                 .collectErrors(collectErrors)
                 .build());
+    }
+
+    protected static TermAst simplePredicateTerm(TriplePatternAst triple) {
+        return TriplePatternAstTestSupport.simplePredicateTerm(triple);
+    }
+
+    protected static TriplePatternAst firstWhereTriple(QueryAst ast) {
+        WhereClauseQueryAst query = (WhereClauseQueryAst) ast;
+        GroupGraphPatternAst whereClause = query.whereClause();
+        BgpAst bgp = (BgpAst) whereClause.patterns().getFirst();
+        return bgp.triples().getFirst();
     }
 }
