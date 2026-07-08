@@ -15,6 +15,10 @@ public record TriplePatternAst(TermAst subject, PathAst predicate, TermAst objec
         }
     }
 
+    public TriplePatternAst(TermAst subject, TermAst predicate, TermAst object) {
+        this(subject, new PredicatePathAst(predicate), object);
+    }
+
     /**
      * Builds a triple whose predicate is a single term (IRI, variable, etc.).
      */

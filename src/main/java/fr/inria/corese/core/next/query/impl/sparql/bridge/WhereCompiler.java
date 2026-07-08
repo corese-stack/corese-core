@@ -99,7 +99,7 @@ public final class WhereCompiler {
 
     private Edge toEdge(TriplePatternAst triple) {
         Node subject = CoreseAstQueryBuilder.toNode(triple.subject());
-        Node predicate = CoreseAstQueryBuilder.toNode(triple.predicate());
+        Node predicate = CoreseAstQueryBuilder.toNode(CoreseAstQueryBuilder.simplePredicate(triple.predicate()));
         Node object = CoreseAstQueryBuilder.toNode(triple.object());
         return new AstBackedEdge(subject, predicate, object);
     }
