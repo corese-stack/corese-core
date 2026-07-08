@@ -160,6 +160,8 @@ final class SparqlQueryAnalyzer {
             SparqlListener updateListener = new SparqlListener(List.of(
                     new ClearRequestFeature(updateBuilder),
                     new CreateRequestFeature(updateBuilder),
+                    new DeleteDataRequestFeature(updateBuilder),
+                    new InsertDataRequestFeature(updateBuilder),
                     new LoadRequestFeature(updateBuilder),
                     new BgpFeature(updateBuilder),
                     new BindFeature(updateBuilder),

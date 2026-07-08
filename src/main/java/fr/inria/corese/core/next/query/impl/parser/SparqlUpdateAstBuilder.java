@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlParser;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
+import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 
 import java.util.ArrayList;
@@ -65,6 +66,62 @@ public class SparqlUpdateAstBuilder extends SparqlAstBuilder{
             return new CreateRequestAst(targetGraphRef, silentFlag);
         }
         throw new QueryEvaluationException("No target graph reference found in CREATE query");
+    }
+
+    public InsertDataRequestAst insertDataToAst(SparqlParser.InsertDataContext ctx) {
+        return new InsertDataRequestAst(triplesFromQuadData(ctx.quadData()));
+    }
+
+    public DeleteDataRequestAst deleteDataToAst(SparqlParser.DeleteDataContext ctx) {
+        return new DeleteDataRequestAst(triplesFromQuadData(ctx.quadData()));
+    }
+
+    private List<TriplePatternAst> triplesFromQuadData(SparqlParser.QuadDataContext ctx) {
+        if (ctx == null || ctx.quads() == null) {
+            return List.of();
+        }
+        return triplesFromQuads(ctx.quads());
+    }
+
+    private List<TriplePatternAst> triplesFromQuads(SparqlParser.QuadsContext ctx) {
+        if (ctx.quadsNotTriples() != null && !ctx.quadsNotTriples().isEmpty()) {
+            throw new UnsupportedQueryFeatureException(
+                    "GRAPH blocks in INSERT DATA / DELETE DATA are not supported yet by the next pipeline");
+        }
+
+        List<TriplePatternAst> triples = new ArrayList<>();
+        if (ctx.triplesTemplate() != null) {
+            for (SparqlParser.TriplesTemplateContext template : ctx.triplesTemplate()) {
+                collectTriplesTemplate(template, triples);
+            }
+        }
+        return List.copyOf(triples);
+    }
+
+    private void collectTriplesTemplate(SparqlParser.TriplesTemplateContext ctx, List<TriplePatternAst> triples) {
+        if (ctx == null) {
+            return;
+        }
+        if (ctx.triplesSameSubject() != null) {
+            collectTriplesSameSubject(ctx.triplesSameSubject(), triples);
+        }
+        if (ctx.triplesTemplate() != null) {
+            collectTriplesTemplate(ctx.triplesTemplate(), triples);
+        }
+    }
+
+    private void collectTriplesSameSubject(SparqlParser.TriplesSameSubjectContext ctx, List<TriplePatternAst> triples) {
+        if (ctx.varOrTerm() == null || ctx.propertyListNotEmpty() == null) {
+            return;
+        }
+        TermAst subject = termFromVarOrTerm(ctx.varOrTerm());
+        var propertyList = ctx.propertyListNotEmpty();
+        for (int verbIndex = 0; verbIndex < propertyList.verb().size(); verbIndex++) {
+            TermAst predicate = termFromVerb(propertyList.verb(verbIndex));
+            for (TermAst object : termListFromObjectList(propertyList.objectList(verbIndex))) {
+                triples.add(new TriplePatternAst(subject, predicate, object));
+            }
+        }
     }
 
     public void addRequest(UpdateRequestUnitAst ast) {

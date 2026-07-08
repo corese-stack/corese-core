@@ -67,6 +67,9 @@ public class BgpFeature extends AbstractSparqlFeature {
         if (ctx.getParent() instanceof SparqlParser.ConstructTriplesContext) {
             return;
         }
+        if (!builder().hasCurrentBgp()) {
+            return;
+        }
         if (ctx.varOrTerm() == null || ctx.propertyListNotEmpty() == null) {
             return;
         }

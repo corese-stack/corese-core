@@ -8,9 +8,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * SPARQL listener multiplexer: forwards to delegates only the events needed for
- * triple patterns (?s ?p ?o) and BGPs (GroupGraphPattern, TriplesBlock, TriplesSameSubject).
- * Additional rules can be added later if needed.
+ * SPARQL listener multiplexer: forwards the grammar events supported by the
+ * next AST builders to their feature-specific delegates.
  */
 public final class SparqlListener extends SparqlParserBaseListener {
 
@@ -77,6 +76,16 @@ public final class SparqlListener extends SparqlParserBaseListener {
     @Override
     public void exitLoad(SparqlParser.LoadContext ctx) {
         for (var d : delegates) d.exitLoad(ctx);
+    }
+
+    @Override
+    public void exitInsertData(SparqlParser.InsertDataContext ctx) {
+        for (var d : delegates) d.exitInsertData(ctx);
+    }
+
+    @Override
+    public void exitDeleteData(SparqlParser.DeleteDataContext ctx) {
+        for (var d : delegates) d.exitDeleteData(ctx);
     }
 
     @Override

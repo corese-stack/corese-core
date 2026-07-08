@@ -285,6 +285,10 @@ public abstract class SparqlAstBuilder {
         bgpStack.push(new ArrayList<>());
     }
 
+    public boolean hasCurrentBgp() {
+        return !bgpStack.isEmpty();
+    }
+
     /**
      * Exit a TriplesBlock -> finalize into BgpAst and attach it to the current group.
      * Empty triples blocks produce no pattern.
@@ -1204,9 +1208,9 @@ public abstract class SparqlAstBuilder {
                             case SparqlParser.MultiplicativeExpressionContext multiplicativeExpressionContext ->
                                     termFromMultiplicative(multiplicativeExpressionContext);
                             case SparqlParser.NumericLiteralPositiveContext numericLiteralPositiveContext ->
-                                    (ExprAst) termFromNumericLiteralPositive(numericLiteralPositiveContext);
+                                    termFromNumericLiteralPositive(numericLiteralPositiveContext);
                             case SparqlParser.NumericLiteralNegativeContext numericLiteralNegativeContext ->
-                                    (ExprAst) termFromNumericLiteralNegative(numericLiteralNegativeContext);
+                                    termFromNumericLiteralNegative(numericLiteralNegativeContext);
                             case null, default ->
                                     throw new QueryEvaluationException(
                                             "Unexpected left hand termFromExpression in additive termFromExpression "
