@@ -1,3 +1,4 @@
+import org.gradle.api.tasks.compile.JavaCompile
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -54,7 +55,7 @@ javacc {
 sourceSets {
     main {
         java {
-            setSrcDirs(listOf("src/main/java", javaccGeneratedDir, antlrPackageDir))
+            setSrcDirs(listOf("src/main/java", javaccGeneratedDir, antlrGeneratedDir))
         }
     }
 }
@@ -306,11 +307,15 @@ tasks.named("compileJava") {
     dependsOn("generateGrammarSource", "javaccSparqlCorese")
 }
 
+tasks.named<JavaCompile>("compileJava") {
+    source(antlrPackageDir)
+}
+
 // Ensure sources JAR includes generated sources and depends on code generation
 tasks.named<Jar>("sourcesJar") {
     dependsOn("generateGrammarSource", "generateTestGrammarSource", "javaccSparqlCorese")
     from(javaccGeneratedDir)
-    from(antlrPackageDir)
+    from(antlrGeneratedDir)
     includeEmptyDirs = false
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
