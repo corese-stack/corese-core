@@ -237,22 +237,13 @@ public final class CoreseAstQueryBuilder {
             GroupGraphPatternAst whereClause,
             DatasetClauseAst datasetClause,
             SolutionModifierAst solutionModifier) {
-        Exp body = whereCompiler.compile(whereClause);
-        markEvaluable(body);
-        Query query = Query.create(body);
+        Query query = Query.create(whereCompiler.compile(whereClause));
         // Collect visible nodes once so later clauses (projection, ORDER BY, DESCRIBE)
         // can resolve variables against the compiled runtime body.
         query.collect();
         applyDataset(query, datasetClause);
         applyLimitOffset(query, solutionModifier);
         return query;
-    }
-
-    private static void markEvaluable(Exp exp) {
-        exp.setFail(true);
-        for (Exp child : exp) {
-            markEvaluable(child);
-        }
     }
 
     private void applyDataset(Query query, DatasetClauseAst datasetClause) {

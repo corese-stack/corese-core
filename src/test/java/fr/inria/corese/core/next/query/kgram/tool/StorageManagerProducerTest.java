@@ -245,20 +245,12 @@ class StorageManagerProducerTest {
         Exp bgp = Exp.create(Type.BGP);
         bgp.add(Exp.create(Type.EDGE, new QueryEdge(s, KgramNodes.rootProperty(), p, o)));
         body.add(bgp);
-        markEvaluable(body);
         Query query = Query.create(body);
         query.collect();
         List<Node> select = query.selectNodesFromPattern();
         query.setSelect(select);
         query.setSelectFun(select.stream().map(node -> Exp.create(Type.NODE, node)).toList());
         return query;
-    }
-
-    private static void markEvaluable(Exp exp) {
-        exp.setFail(true);
-        for (Exp child : exp) {
-            markEvaluable(child);
-        }
     }
 
     private static final class BasicMatcher implements Matcher {
