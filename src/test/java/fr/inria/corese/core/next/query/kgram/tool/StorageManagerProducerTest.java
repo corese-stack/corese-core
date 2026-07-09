@@ -122,6 +122,37 @@ class StorageManagerProducerTest {
     }
 
     @Test
+    @DisplayName("Graph node is accepted when it belongs to the named dataset")
+    void graphNodeAllowedByFromRestrictsContext() {
+        Node s = variable("s");
+        Node o = variable("o");
+
+        List<Edge> edges = edges(
+                new QueryEdge(s, resource(NAME), null, o),
+                resource(GRAPH),
+                List.of(resource(GRAPH)),
+                null);
+
+        assertEquals(1, edges.size());
+        assertEquals(CAROL, edges.getFirst().getNode(0).getLabel());
+    }
+
+    @Test
+    @DisplayName("Graph node outside the named dataset returns no candidate edges")
+    void graphNodeOutsideFromReturnsNoEdges() {
+        Node s = variable("s");
+        Node o = variable("o");
+
+        List<Edge> edges = edges(
+                new QueryEdge(s, resource(NAME), null, o),
+                resource(GRAPH),
+                List.of(resource("http://example.org/other-graph")),
+                null);
+
+        assertTrue(edges.isEmpty());
+    }
+
+    @Test
     @DisplayName("FROM nodes restrict the StatementPattern contexts")
     void fromNodesRestrictContexts() {
         Node s = variable("s");

@@ -210,9 +210,20 @@ public final class StorageManagerProducer extends ProducerDefault {
     }
 
     private Node predicateQueryNode(Edge queryEdge) {
+        // KGRAM stores variable predicates in edgeVariable; edgeNode may only be
+        // the technical root-property placeholder for ?s ?p ?o patterns.
         return queryEdge.getEdgeVariable() == null ? queryEdge.getEdgeNode() : queryEdge.getEdgeVariable();
     }
 
+    /**
+     * Selects the storage contexts for the active graph pattern.
+     *
+     * <p>SPARQL evaluates {@code GRAPH <g> { ... }} only when {@code <g>} is a named graph
+     * in the active dataset; otherwise the graph pattern has no solution.
+     *
+     * @see <a href="https://www.w3.org/TR/sparql11-query/#sparqlAlgebra">SPARQL 1.1 Query
+     * Language - Evaluation of Graph</a>
+     */
     private ContextSelection contextSelection(Node graphNode, List<Node> from, Environment environment) {
         if (graphNode != null) {
             Node resolvedGraphNode = resolve(graphNode, environment);
@@ -221,6 +232,9 @@ public final class StorageManagerProducer extends ProducerDefault {
             }
             Value value = rdfValue(resolvedGraphNode);
             if (!(value instanceof Resource resource)) {
+                return ContextSelection.emptyResult();
+            }
+            if (!matchesFrom(resolvedGraphNode, from, environment)) {
                 return ContextSelection.emptyResult();
             }
             return ContextSelection.of(List.of(resource));
@@ -350,7 +364,7 @@ public final class StorageManagerProducer extends ProducerDefault {
         }
     }
 
-        private record ContextSelection(List<Resource> contexts, boolean noMatch) {
+    private record ContextSelection(List<Resource> contexts, boolean noMatch) {
 
         private static ContextSelection of(List<Resource> contexts) {
             return new ContextSelection(List.copyOf(contexts), false);
