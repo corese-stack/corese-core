@@ -34,10 +34,21 @@ public final class StorageManagerProducer extends ProducerDefault {
     private final StorageManager storage;
     private final ValueFactory valueFactory;
 
+    /**
+     * Creates a KGRAM producer backed by the given storage manager.
+     *
+     * @param storage storage manager queried by this producer
+     */
     public StorageManagerProducer(StorageManager storage) {
         this(storage, new CoreseAdaptedValueFactory());
     }
 
+    /**
+     * Creates a producer with an explicit value factory.
+     *
+     * @param storage storage manager queried by this producer
+     * @param valueFactory factory used to convert KGRAM values to storage values
+     */
     StorageManagerProducer(StorageManager storage, ValueFactory valueFactory) {
         this.storage = Objects.requireNonNull(storage, "storage");
         this.valueFactory = Objects.requireNonNull(valueFactory, "valueFactory");
@@ -171,6 +182,19 @@ public final class StorageManagerProducer extends ProducerDefault {
         return null;
     }
 
+    /**
+     * Converts a KGRAM query edge into the storage-layer statement pattern.
+     *
+     * <p>Unbound KGRAM variables become {@code null} components, which the storage API
+     * interprets as wildcards. Impossible RDF combinations, such as a literal subject
+     * or predicate, are represented as an empty-result pattern.
+     *
+     * @param graphNode current GRAPH node, or {@code null} for the default graph context
+     * @param from active FROM/FROM NAMED restriction computed by KGRAM
+     * @param queryEdge KGRAM triple pattern to translate
+     * @param environment current bindings used to resolve already-bound variables
+     * @return a storage query pattern, or an empty-result marker when no RDF statement can match
+     */
     private StorageQueryPattern queryPattern(Node graphNode, List<Node> from, Edge queryEdge, Environment environment) {
         Node subjectNode = resolve(queryEdge.getNode(0), environment);
         Node predicateNode = resolve(predicateQueryNode(queryEdge), environment);
@@ -180,6 +204,8 @@ public final class StorageManagerProducer extends ProducerDefault {
         IRI predicate = null;
         Value object = null;
 
+        // Subject and predicate have stricter RDF roles than object: subject must
+        // be a resource, predicate must be an IRI, while object accepts any RDF value.
         if (subjectNode != null) {
             Value value = rdfValue(subjectNode);
             if (!(value instanceof Resource resource)) {
@@ -198,6 +224,7 @@ public final class StorageManagerProducer extends ProducerDefault {
             object = rdfValue(objectNode);
         }
 
+        // Graph and dataset clauses become the statement contexts passed to storage.
         ContextSelection contextSelection = contextSelection(graphNode, from, environment);
         if (contextSelection.noMatch()) {
             return StorageQueryPattern.emptyResult();
@@ -209,9 +236,16 @@ public final class StorageManagerProducer extends ProducerDefault {
                 contextSelection.contextsArray()));
     }
 
+    /**
+     * Returns the effective predicate node carried by a KGRAM edge.
+     *
+     * <p>KGRAM stores variable predicates in {@link Edge#getEdgeVariable()}; {@link Edge#getEdgeNode()}
+     * may only be the technical root-property placeholder for {@code ?s ?p ?o} patterns.
+     *
+     * @param queryEdge KGRAM edge whose predicate must be read
+     * @return the predicate variable when present, otherwise the constant predicate node
+     */
     private Node predicateQueryNode(Edge queryEdge) {
-        // KGRAM stores variable predicates in edgeVariable; edgeNode may only be
-        // the technical root-property placeholder for ?s ?p ?o patterns.
         return queryEdge.getEdgeVariable() == null ? queryEdge.getEdgeNode() : queryEdge.getEdgeVariable();
     }
 
@@ -226,6 +260,8 @@ public final class StorageManagerProducer extends ProducerDefault {
      */
     private ContextSelection contextSelection(Node graphNode, List<Node> from, Environment environment) {
         if (graphNode != null) {
+            // GRAPH <g>: evaluate in the requested named graph, provided it belongs
+            // to the active named dataset restriction.
             Node resolvedGraphNode = resolve(graphNode, environment);
             if (resolvedGraphNode == null) {
                 return ContextSelection.allContexts();
@@ -241,9 +277,11 @@ public final class StorageManagerProducer extends ProducerDefault {
         }
 
         if (from == null || from.isEmpty()) {
+            // No GRAPH and no dataset restriction: leave storage contexts unrestricted.
             return ContextSelection.allContexts();
         }
 
+        // No explicit GRAPH: use the dataset restriction as storage contexts.
         List<Resource> contexts = new ArrayList<>();
         for (Node node : from) {
             Node resolvedNode = resolve(node, environment);
@@ -259,6 +297,14 @@ public final class StorageManagerProducer extends ProducerDefault {
         return ContextSelection.of(contexts);
     }
 
+    /**
+     * Checks whether a resolved graph node is allowed by the active dataset restriction.
+     *
+     * @param graphNode resolved graph node to test
+     * @param from active FROM/FROM NAMED restriction computed by KGRAM
+     * @param environment current bindings used to resolve graph variables in {@code from}
+     * @return {@code true} when no restriction exists or when {@code graphNode} belongs to it
+     */
     private boolean matchesFrom(Node graphNode, List<Node> from, Environment environment) {
         if (from == null || from.isEmpty()) {
             return true;
@@ -272,6 +318,16 @@ public final class StorageManagerProducer extends ProducerDefault {
         return false;
     }
 
+    /**
+     * Resolves a query node against the current KGRAM environment.
+     *
+     * <p>Constants resolve to themselves, bound variables resolve to their current target node,
+     * and unbound variables resolve to {@code null}.
+     *
+     * @param queryNode KGRAM query node to resolve
+     * @param environment current bindings, or {@code null}
+     * @return resolved node, or {@code null} when the node is unbound
+     */
     private Node resolve(Node queryNode, Environment environment) {
         if (queryNode == null) {
             return null;
@@ -282,6 +338,20 @@ public final class StorageManagerProducer extends ProducerDefault {
         return environment == null ? null : environment.getNode(queryNode);
     }
 
+    /**
+     * Extends partial bindings with the matches of one triple pattern.
+     *
+     * <p>Each input binding is exposed through a temporary {@link BindingEnvironment}, so already
+     * bound variables are pushed into {@link #queryPattern(Node, List, Edge, Environment)} before
+     * querying storage.
+     *
+     * @param graphNode active graph node
+     * @param from active dataset restriction
+     * @param queryEdge triple pattern to join
+     * @param environment base KGRAM environment
+     * @param inputBindings bindings produced by previous BGP edges
+     * @return bindings extended with the matches of {@code queryEdge}
+     */
     private List<BindingSet> join(
             Node graphNode,
             List<Node> from,
@@ -303,18 +373,43 @@ public final class StorageManagerProducer extends ProducerDefault {
         return results;
     }
 
+    /**
+     * Converts a storage RDF value to a KGRAM node.
+     *
+     * @param value storage value to wrap
+     * @return KGRAM node carrying the equivalent Corese datatype
+     */
     private Node node(Value value) {
         return node(datatypeValue(value));
     }
 
+    /**
+     * Wraps a Corese datatype as a KGRAM node.
+     *
+     * @param datatype Corese datatype to wrap
+     * @return KGRAM node backed by a parser constant
+     */
     private static Node node(IDatatype datatype) {
         return new NodeImpl(Constant.create(datatype));
     }
 
+    /**
+     * Converts a KGRAM node to a storage RDF value.
+     *
+     * @param node KGRAM node to convert
+     * @return equivalent storage value
+     */
     private Value rdfValue(Node node) {
         return rdfValue(node.getDatatypeValue());
     }
 
+    /**
+     * Converts a Corese datatype to the storage RDF value model.
+     *
+     * @param datatype Corese datatype to convert
+     * @return equivalent storage value
+     * @throws IllegalArgumentException when the datatype cannot be represented as RDF
+     */
     private Value rdfValue(IDatatype datatype) {
         if (datatype.isURI()) {
             return valueFactory.createIRI(datatype.getLabel());
@@ -336,6 +431,13 @@ public final class StorageManagerProducer extends ProducerDefault {
         throw new IllegalArgumentException("Unsupported KGRAM datatype value: " + datatype);
     }
 
+    /**
+     * Converts a storage RDF value to the Corese datatype model used by KGRAM nodes.
+     *
+     * @param value storage value to convert
+     * @return equivalent Corese datatype
+     * @throws IllegalArgumentException when the value is not an RDF IRI, blank node or literal
+     */
     private IDatatype datatypeValue(Value value) {
         if (value instanceof IRI iri) {
             return fr.inria.corese.core.sparql.datatype.DatatypeMap.newResource(iri.stringValue());
@@ -395,6 +497,13 @@ public final class StorageManagerProducer extends ProducerDefault {
             return copy;
         }
 
+        /**
+         * Adds a query-variable binding, or validates it against an existing binding.
+         *
+         * @param queryNode query-side node, usually a variable
+         * @param targetNode storage match node
+         * @return {@code true} when the binding is compatible with previous bindings
+         */
         private boolean bind(Node queryNode, Node targetNode) {
             if (queryNode == null || queryNode.isConstant()) {
                 return true;
@@ -408,6 +517,12 @@ public final class StorageManagerProducer extends ProducerDefault {
             return current.match(targetNode);
         }
 
+        /**
+         * Looks up the target node already bound to a query node.
+         *
+         * @param queryNode query node to find
+         * @return bound target node, or {@code null} when the query node is unbound
+         */
         private Node get(Node queryNode) {
             if (queryNode == null) {
                 return null;
@@ -420,11 +535,22 @@ public final class StorageManagerProducer extends ProducerDefault {
             return null;
         }
 
+        /**
+         * Converts this local binding set into a KGRAM mapping.
+         *
+         * @return mapping containing all query-to-target bindings
+         */
         private Mapping toMapping() {
             return Mapping.create(queryNodes, targetNodes);
         }
     }
 
+    /**
+     * Environment overlay used while joining BGP edges.
+     *
+     * <p>Local bindings produced by earlier triple patterns take precedence over the delegate
+     * environment, which lets later patterns see already-bound variables.
+     */
     private static final class BindingEnvironment implements Environment {
 
         private final Environment delegate;
