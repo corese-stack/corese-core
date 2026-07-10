@@ -24,6 +24,15 @@ class CoreseAstQueryBuilderDescribeTest {
                         new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o"))))));
     }
 
+    private static GroupGraphPatternAst whereWithMinusOnlyZ() {
+        return new GroupGraphPatternAst(List.of(
+                new BgpAst(List.of(
+                        new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o")))),
+                new MinusAst(new GroupGraphPatternAst(List.of(
+                        new BgpAst(List.of(
+                                new TriplePatternAst(new VarAst("x"), new VarAst("q"), new VarAst("z")))))))));
+    }
+
     @Test
     @DisplayName("Parser -> DescribeQueryAst -> Query lowers DESCRIBE to a construct-like query")
     void parserDescribeAstToQuery() {
@@ -93,6 +102,15 @@ class CoreseAstQueryBuilderDescribeTest {
     void rejectsDescribeVariableNotVisible() {
         DescribeQueryAst describe = new DescribeQueryAst(
                 DatasetClauseAst.none(), List.of(new VarAst("y")), whereBindingX());
+
+        assertThrows(IllegalArgumentException.class, () -> builder.toNextQuery(describe));
+    }
+
+    @Test
+    @DisplayName("DESCRIBE rejects a variable that only occurs in MINUS")
+    void rejectsDescribeMinusOnlyVariable() {
+        DescribeQueryAst describe = new DescribeQueryAst(
+                DatasetClauseAst.none(), List.of(new VarAst("z")), whereWithMinusOnlyZ());
 
         assertThrows(IllegalArgumentException.class, () -> builder.toNextQuery(describe));
     }

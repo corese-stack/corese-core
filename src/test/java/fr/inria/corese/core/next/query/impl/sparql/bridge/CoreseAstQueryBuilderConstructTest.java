@@ -24,6 +24,13 @@ class CoreseAstQueryBuilderConstructTest extends AbstractSparqlParserFeatureTest
         return new GroupGraphPatternAst(List.of(new BgpAst(List.of(new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o"))))));
     }
 
+    private static GroupGraphPatternAst whereWithMinusOnlyZ() {
+        return new GroupGraphPatternAst(List.of(
+                new BgpAst(List.of(new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o")))),
+                new MinusAst(new GroupGraphPatternAst(List.of(
+                        new BgpAst(List.of(new TriplePatternAst(new VarAst("x"), new VarAst("q"), new VarAst("z")))))))));
+    }
+
     private static ConstructTemplateAst template(TriplePatternAst... triples) {
         return new ConstructTemplateAst(List.of(triples));
     }
@@ -91,6 +98,22 @@ class CoreseAstQueryBuilderConstructTest extends AbstractSparqlParserFeatureTest
         assertNull(query.getExtNode("newVar"), "template-only variable is not injected into the body");
         Node object = query.getConstruct().first().getEdge().getNode(1);
         assertTrue(object.isVariable(), "template-only variable is still a variable node");
+    }
+
+    @Test
+    @DisplayName("Template variable that only occurs in MINUS stays fresh")
+    void templateMinusOnlyVariableStaysFresh() {
+        ConstructQueryAst construct = new ConstructQueryAst(
+                template(new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("z"))),
+                whereWithMinusOnlyZ());
+
+        Query query = builder.toNextQuery(construct);
+
+        Node minusNode = query.getQueryNode("z");
+        Node templateNode = query.getConstruct().first().getEdge().getNode(1);
+        assertNotNull(minusNode, "MINUS-only variable is stored as an internal query node");
+        assertNotSame(minusNode, templateNode, "template ?z must not reuse the internal MINUS node");
+        assertTrue(templateNode.isVariable(), "template-only ?z remains a variable node");
     }
 
     @Test
