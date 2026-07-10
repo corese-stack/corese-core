@@ -179,6 +179,19 @@ class StorageManagerProducerTest {
     }
 
     @Test
+    @DisplayName("Invalid subject binding returns no candidate edges")
+    void invalidSubjectBindingReturnsNoEdges() {
+        Node s = variable("s");
+        Node o = variable("o");
+        Environment environment = mock(Environment.class);
+        when(environment.getNode(s)).thenReturn(literal("not-a-subject"));
+
+        List<Edge> edges = edges(new QueryEdge(s, resource(KNOWS), null, o), null, List.of(), environment);
+
+        assertTrue(edges.isEmpty());
+    }
+
+    @Test
     @DisplayName("Eval executes SELECT * WHERE { ?s ?p ?o } over StorageManagerProducer")
     void evalExecutesSelectStarSpoOverStorageManagerProducer() throws Exception {
         Node s = variable("s");
@@ -227,11 +240,36 @@ class StorageManagerProducerTest {
         assertContainsMapping(mappings, ALICE, KNOWS, BOB);
     }
 
+    @Test
+    @DisplayName("Producer joins BGP mappings across repeated variables")
+    void producerJoinsBgpMappingsAcrossRepeatedVariables() {
+        Node s = variable("s");
+        Node o = variable("o");
+        Node name = variable("name");
+        Query query = selectKnowsNameQuery(s, o, name);
+        Environment environment = mock(Environment.class);
+        when(environment.getQuery()).thenReturn(query);
+
+        Exp bgp = query.getBody().first();
+        Mappings mappings = producer.getMappings(null, List.of(), bgp, environment);
+
+        assertEquals(2, mappings.size());
+        assertContainsNameMapping(mappings, ALICE, BOB, "Bob");
+        assertContainsNameMapping(mappings, ALICE, CAROL, "Carol");
+    }
+
     private static void assertContainsMapping(Mappings mappings, String subject, String predicate, String object) {
         assertTrue(mappings.getMappingList().stream().anyMatch(mapping ->
                 subject.equals(mapping.getValue("s").getLabel())
                         && predicate.equals(mapping.getValue("p").getLabel())
                         && object.equals(mapping.getValue("o").getLabel())));
+    }
+
+    private static void assertContainsNameMapping(Mappings mappings, String subject, String object, String name) {
+        assertTrue(mappings.getMappingList().stream().anyMatch(mapping ->
+                subject.equals(mapping.getValue("s").getLabel())
+                        && object.equals(mapping.getValue("o").getLabel())
+                        && name.equals(mapping.getValue("name").getLabel())));
     }
 
     private void insert(Resource subject, IRI predicate, Value object, Resource... contexts) {
@@ -272,9 +310,20 @@ class StorageManagerProducerTest {
     }
 
     private static Query selectStarSpoQuery(Node s, Node p, Node o) {
-        Exp body = Exp.create(Type.AND);
         Exp bgp = Exp.create(Type.BGP);
         bgp.add(Exp.create(Type.EDGE, new QueryEdge(s, KgramNodes.rootProperty(), p, o)));
+        return selectQuery(bgp);
+    }
+
+    private static Query selectKnowsNameQuery(Node s, Node o, Node name) {
+        Exp bgp = Exp.create(Type.BGP);
+        bgp.add(Exp.create(Type.EDGE, new QueryEdge(s, resource(KNOWS), null, o)));
+        bgp.add(Exp.create(Type.EDGE, new QueryEdge(o, resource(NAME), null, name)));
+        return selectQuery(bgp);
+    }
+
+    private static Query selectQuery(Exp bgp) {
+        Exp body = Exp.create(Type.AND);
         body.add(bgp);
         Query query = Query.create(body);
         query.collect();
