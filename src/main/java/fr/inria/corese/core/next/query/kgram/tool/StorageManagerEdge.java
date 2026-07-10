@@ -1,11 +1,8 @@
 package fr.inria.corese.core.next.query.kgram.tool;
 
 import fr.inria.corese.core.next.data.api.Statement;
-import fr.inria.corese.core.next.data.api.Value;
-import fr.inria.corese.core.next.data.impl.temp.CoreseValueConverter;
 import fr.inria.corese.core.next.query.kgram.api.core.Edge;
 import fr.inria.corese.core.next.query.kgram.api.core.Node;
-import fr.inria.corese.core.sparql.triple.parser.Constant;
 
 import java.util.Objects;
 
@@ -18,8 +15,6 @@ import java.util.Objects;
  */
 public final class StorageManagerEdge implements Edge {
 
-    private static final CoreseValueConverter VALUE_CONVERTER = new CoreseValueConverter();
-
     private final Statement statement;
     private final Node subject;
     private final Node predicate;
@@ -28,10 +23,10 @@ public final class StorageManagerEdge implements Edge {
 
     public StorageManagerEdge(Statement statement) {
         this.statement = Objects.requireNonNull(statement, "statement");
-        this.subject = node(statement.getSubject());
-        this.predicate = node(statement.getPredicate());
-        this.object = node(statement.getObject());
-        this.graph = statement.getContext() == null ? null : node(statement.getContext());
+        this.subject = StorageManagerKgramValues.node(statement.getSubject());
+        this.predicate = StorageManagerKgramValues.node(statement.getPredicate());
+        this.object = StorageManagerKgramValues.node(statement.getObject());
+        this.graph = statement.getContext() == null ? null : StorageManagerKgramValues.node(statement.getContext());
     }
 
     public Statement getSourceStatement() {
@@ -78,10 +73,5 @@ public final class StorageManagerEdge implements Edge {
 
     private static boolean sameNode(Node left, Node right) {
         return left == right || left.same(right);
-    }
-
-    private static Node node(Value value) {
-        fr.inria.corese.core.kgram.api.core.Node node = VALUE_CONVERTER.toCoreseNode(value);
-        return new NodeImpl(Constant.create(node.getDatatypeValue()));
     }
 }

@@ -1,8 +1,6 @@
 package fr.inria.corese.core.next.query.kgram.tool;
 
-import fr.inria.corese.core.next.data.api.BNode;
 import fr.inria.corese.core.next.data.api.IRI;
-import fr.inria.corese.core.next.data.api.Literal;
 import fr.inria.corese.core.next.data.api.Resource;
 import fr.inria.corese.core.next.data.api.Value;
 import fr.inria.corese.core.next.data.api.ValueFactory;
@@ -19,7 +17,6 @@ import fr.inria.corese.core.next.query.kgram.core.Query;
 import fr.inria.corese.core.next.storagemanager.api.StorageManager;
 import fr.inria.corese.core.next.storagemanager.api.support.model.StatementPattern;
 import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.triple.parser.Constant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +73,7 @@ public final class StorageManagerProducer extends ProducerDefault {
     public Iterable<Node> getGraphNodes(Node graphNode, List<Node> from, Environment environment) {
         List<Node> nodes = new ArrayList<>();
         for (Resource context : storage.getMetadataOperations().getContexts()) {
-            Node node = node(context);
+            Node node = StorageManagerKgramValues.node(context);
             if (matchesFrom(node, from, environment)) {
                 nodes.add(node);
             }
@@ -113,10 +110,10 @@ public final class StorageManagerProducer extends ProducerDefault {
             return node;
         }
         if (value instanceof Value rdfValue) {
-            return node(rdfValue);
+            return StorageManagerKgramValues.node(rdfValue);
         }
         if (value instanceof IDatatype datatype) {
-            return node(datatype);
+            return StorageManagerKgramValues.node(datatype);
         }
         return null;
     }
@@ -132,7 +129,7 @@ public final class StorageManagerProducer extends ProducerDefault {
             return node.getDatatypeValue();
         }
         if (value instanceof Value rdfValue) {
-            return node(rdfValue).getDatatypeValue();
+            return StorageManagerKgramValues.datatypeValue(rdfValue);
         }
         if (value instanceof IDatatype datatype) {
             return datatype;
@@ -207,21 +204,21 @@ public final class StorageManagerProducer extends ProducerDefault {
         // Subject and predicate have stricter RDF roles than object: subject must
         // be a resource, predicate must be an IRI, while object accepts any RDF value.
         if (subjectNode != null) {
-            Value value = rdfValue(subjectNode);
+            Value value = StorageManagerKgramValues.rdfValue(subjectNode, valueFactory);
             if (!(value instanceof Resource resource)) {
                 return StorageQueryPattern.emptyResult();
             }
             subject = resource;
         }
         if (predicateNode != null) {
-            Value value = rdfValue(predicateNode);
+            Value value = StorageManagerKgramValues.rdfValue(predicateNode, valueFactory);
             if (!(value instanceof IRI iri)) {
                 return StorageQueryPattern.emptyResult();
             }
             predicate = iri;
         }
         if (objectNode != null) {
-            object = rdfValue(objectNode);
+            object = StorageManagerKgramValues.rdfValue(objectNode, valueFactory);
         }
 
         // Graph and dataset clauses become the statement contexts passed to storage.
@@ -266,7 +263,7 @@ public final class StorageManagerProducer extends ProducerDefault {
             if (resolvedGraphNode == null) {
                 return ContextSelection.allContexts();
             }
-            Value value = rdfValue(resolvedGraphNode);
+            Value value = StorageManagerKgramValues.rdfValue(resolvedGraphNode, valueFactory);
             if (!(value instanceof Resource resource)) {
                 return ContextSelection.emptyResult();
             }
@@ -288,7 +285,7 @@ public final class StorageManagerProducer extends ProducerDefault {
             if (resolvedNode == null) {
                 continue;
             }
-            Value value = rdfValue(resolvedNode);
+            Value value = StorageManagerKgramValues.rdfValue(resolvedNode, valueFactory);
             if (!(value instanceof Resource resource)) {
                 return ContextSelection.emptyResult();
             }
@@ -371,88 +368,6 @@ public final class StorageManagerProducer extends ProducerDefault {
             }
         }
         return results;
-    }
-
-    /**
-     * Converts a storage RDF value to a KGRAM node.
-     *
-     * @param value storage value to wrap
-     * @return KGRAM node carrying the equivalent Corese datatype
-     */
-    private Node node(Value value) {
-        return node(datatypeValue(value));
-    }
-
-    /**
-     * Wraps a Corese datatype as a KGRAM node.
-     *
-     * @param datatype Corese datatype to wrap
-     * @return KGRAM node backed by a parser constant
-     */
-    private static Node node(IDatatype datatype) {
-        return new NodeImpl(Constant.create(datatype));
-    }
-
-    /**
-     * Converts a KGRAM node to a storage RDF value.
-     *
-     * @param node KGRAM node to convert
-     * @return equivalent storage value
-     */
-    private Value rdfValue(Node node) {
-        return rdfValue(node.getDatatypeValue());
-    }
-
-    /**
-     * Converts a Corese datatype to the storage RDF value model.
-     *
-     * @param datatype Corese datatype to convert
-     * @return equivalent storage value
-     * @throws IllegalArgumentException when the datatype cannot be represented as RDF
-     */
-    private Value rdfValue(IDatatype datatype) {
-        if (datatype.isURI()) {
-            return valueFactory.createIRI(datatype.getLabel());
-        }
-        if (datatype.isBlank()) {
-            return valueFactory.createBNode(datatype.getLabel());
-        }
-        if (datatype.isLiteral()) {
-            String language = datatype.getLang();
-            if (language != null && !language.isEmpty()) {
-                return valueFactory.createLiteral(datatype.getLabel(), language);
-            }
-            String datatypeUri = datatype.getDatatypeURI();
-            if (datatypeUri != null && !datatypeUri.isEmpty()) {
-                return valueFactory.createLiteral(datatype.getLabel(), valueFactory.createIRI(datatypeUri));
-            }
-            return valueFactory.createLiteral(datatype.getLabel());
-        }
-        throw new IllegalArgumentException("Unsupported KGRAM datatype value: " + datatype);
-    }
-
-    /**
-     * Converts a storage RDF value to the Corese datatype model used by KGRAM nodes.
-     *
-     * @param value storage value to convert
-     * @return equivalent Corese datatype
-     * @throws IllegalArgumentException when the value is not an RDF IRI, blank node or literal
-     */
-    private IDatatype datatypeValue(Value value) {
-        if (value instanceof IRI iri) {
-            return fr.inria.corese.core.sparql.datatype.DatatypeMap.newResource(iri.stringValue());
-        }
-        if (value instanceof BNode bNode) {
-            return fr.inria.corese.core.sparql.datatype.DatatypeMap.createBlank(bNode.getID());
-        }
-        if (value instanceof Literal literal) {
-            return literal.getLanguage()
-                    .<IDatatype>map(language -> fr.inria.corese.core.sparql.datatype.DatatypeMap
-                            .createLiteral(literal.getLabel(), null, language))
-                    .orElseGet(() -> fr.inria.corese.core.sparql.datatype.DatatypeMap
-                            .createLiteral(literal.getLabel(), literal.getDatatype().stringValue(), null));
-        }
-        throw new IllegalArgumentException("Unsupported RDF value: " + value);
     }
 
     /**
