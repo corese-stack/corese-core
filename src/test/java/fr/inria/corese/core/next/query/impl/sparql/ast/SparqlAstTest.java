@@ -1,5 +1,8 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
+import fr.inria.corese.core.next.query.impl.sparql.ast.path.NegatedPropertySetPathAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.path.PathAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.path.PredicatePathAst;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -263,6 +266,37 @@ class SparqlAstTest {
         }
     }
 
+    // ---------- PathAst ----------
+
+    @Nested
+    @DisplayName("PathAst")
+    class PathAstTest {
+
+        @Test
+        @DisplayName("negated property set rejects null excluded paths")
+        void negatedPropertySetRejectsNullExcludedPath() {
+            List<PathAst> paths = new ArrayList<>();
+            paths.add(new PredicatePathAst(new IriAst("ex:p")));
+            paths.add(null);
+
+            assertThrows(
+                    NullPointerException.class,
+                    () -> new NegatedPropertySetPathAst(paths));
+        }
+
+        @Test
+        @DisplayName("negated property set defensively copies excluded paths")
+        void negatedPropertySetDefensivelyCopiesExcludedPaths() {
+            PathAst excluded = new PredicatePathAst(new IriAst("ex:p"));
+            List<PathAst> paths = new ArrayList<>(List.of(excluded));
+
+            NegatedPropertySetPathAst negated = new NegatedPropertySetPathAst(paths);
+            paths.clear();
+
+            assertEquals(List.of(excluded), negated.excluded());
+        }
+    }
+
     // ---------- BgpAst ----------
 
     @Nested
@@ -302,7 +336,8 @@ class SparqlAstTest {
         @DisplayName("returned list is unmodifiable")
         void unmodifiable() {
             BgpAst bgp = new BgpAst(List.of(triple));
-            assertThrows(UnsupportedOperationException.class, () -> bgp.triples().add(triple));
+            List<TriplePatternAst> triples = bgp.triples();
+            assertThrows(UnsupportedOperationException.class, () -> triples.add(triple));
         }
 
         @Test
@@ -360,7 +395,8 @@ class SparqlAstTest {
         @DisplayName("returned list is unmodifiable")
         void unmodifiable() {
             GroupGraphPatternAst g = new GroupGraphPatternAst(List.of(bgp));
-            assertThrows(UnsupportedOperationException.class, () -> g.patterns().add(bgp));
+            List<PatternAst> patterns = g.patterns();
+            assertThrows(UnsupportedOperationException.class, () -> patterns.add(bgp));
         }
 
         @Test

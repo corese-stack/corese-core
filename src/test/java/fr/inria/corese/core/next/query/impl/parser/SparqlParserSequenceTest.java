@@ -5,12 +5,14 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.BgpAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.WhereClauseQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.path.AlternativePathAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.path.InversePathAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.path.NegatedPropertySetPathAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.path.OneOrMorePathAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.path.OptionalPathAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.path.PathAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.path.PredicatePathAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.path.SequencePathAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.path.ZeroOrMorePathAst;
@@ -23,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-public class SparqlParserSequenceTest extends AbstractSparqlParserFeatureTest {
+class SparqlParserSequenceTest extends AbstractSparqlParserFeatureTest {
 
     private static final String PREFIX = """
             PREFIX ex: <http://example.org/>
@@ -41,7 +43,9 @@ public class SparqlParserSequenceTest extends AbstractSparqlParserFeatureTest {
                 """);
 
         TriplePatternAst triple = firstWhereTriple(ast);
-        assertInstanceOf(SequencePathAst.class, triple.predicate());
+        SequencePathAst sequence = assertInstanceOf(SequencePathAst.class, triple.predicate());
+        assertPredicate("ex:p1", sequence.left());
+        assertPredicate("ex:p2", sequence.right());
     }
 
     @Test
@@ -54,7 +58,47 @@ public class SparqlParserSequenceTest extends AbstractSparqlParserFeatureTest {
                 """);
 
         TriplePatternAst triple = firstWhereTriple(ast);
-        assertInstanceOf(AlternativePathAst.class, triple.predicate());
+        AlternativePathAst alternative = assertInstanceOf(AlternativePathAst.class, triple.predicate());
+        assertPredicate("ex:p1", alternative.left());
+        assertPredicate("ex:p2", alternative.right());
+    }
+
+    @Test
+    void shouldGiveSequenceHigherPrecedenceThanAlternativePath() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse(PREFIX + """
+                SELECT * WHERE {
+                  ?s ex:p1/ex:p2|ex:p3 ?o .
+                }
+                """);
+
+        AlternativePathAst alternative = assertInstanceOf(
+                AlternativePathAst.class,
+                firstWhereTriple(ast).predicate());
+        SequencePathAst sequence = assertInstanceOf(SequencePathAst.class, alternative.left());
+        assertPredicate("ex:p1", sequence.left());
+        assertPredicate("ex:p2", sequence.right());
+        assertPredicate("ex:p3", alternative.right());
+    }
+
+    @Test
+    void shouldKeepParenthesizedAlternativeInsideSequencePath() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse(PREFIX + """
+                SELECT * WHERE {
+                  ?s ex:p1/(ex:p2|ex:p3) ?o .
+                }
+                """);
+
+        SequencePathAst sequence = assertInstanceOf(
+                SequencePathAst.class,
+                firstWhereTriple(ast).predicate());
+        assertPredicate("ex:p1", sequence.left());
+        AlternativePathAst alternative = assertInstanceOf(AlternativePathAst.class, sequence.right());
+        assertPredicate("ex:p2", alternative.left());
+        assertPredicate("ex:p3", alternative.right());
     }
 
     @Test
@@ -68,7 +112,8 @@ public class SparqlParserSequenceTest extends AbstractSparqlParserFeatureTest {
                 """);
 
         TriplePatternAst triple = firstWhereTriple(ast);
-        assertInstanceOf(ZeroOrMorePathAst.class, triple.predicate());
+        ZeroOrMorePathAst path = assertInstanceOf(ZeroOrMorePathAst.class, triple.predicate());
+        assertPredicate("ex:p", path.pathAst());
     }
 
     @Test
@@ -82,7 +127,8 @@ public class SparqlParserSequenceTest extends AbstractSparqlParserFeatureTest {
                 """);
 
         TriplePatternAst triple = firstWhereTriple(ast);
-        assertInstanceOf(OptionalPathAst.class, triple.predicate());
+        OptionalPathAst path = assertInstanceOf(OptionalPathAst.class, triple.predicate());
+        assertPredicate("ex:p", path.pathAst());
     }
 
     @Test
@@ -96,7 +142,8 @@ public class SparqlParserSequenceTest extends AbstractSparqlParserFeatureTest {
                 """);
 
         TriplePatternAst triple = firstWhereTriple(ast);
-        assertInstanceOf(OneOrMorePathAst.class, triple.predicate());
+        OneOrMorePathAst path = assertInstanceOf(OneOrMorePathAst.class, triple.predicate());
+        assertPredicate("ex:p", path.pathAst());
     }
 
     @Test
@@ -110,7 +157,25 @@ public class SparqlParserSequenceTest extends AbstractSparqlParserFeatureTest {
                 """);
 
         TriplePatternAst triple = firstWhereTriple(ast);
-        assertInstanceOf(InversePathAst.class, triple.predicate());
+        InversePathAst path = assertInstanceOf(InversePathAst.class, triple.predicate());
+        assertPredicate("ex:p", path.pathAst());
+    }
+
+    @Test
+    void shouldApplyInverseToModifiedPathElt() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse(PREFIX + """
+                SELECT * WHERE {
+                  ?s ^ex:p+ ?o .
+                }
+                """);
+
+        InversePathAst inverse = assertInstanceOf(
+                InversePathAst.class,
+                firstWhereTriple(ast).predicate());
+        OneOrMorePathAst plus = assertInstanceOf(OneOrMorePathAst.class, inverse.pathAst());
+        assertPredicate("ex:p", plus.pathAst());
     }
 
     @Test
@@ -124,7 +189,48 @@ public class SparqlParserSequenceTest extends AbstractSparqlParserFeatureTest {
                 """);
 
         TriplePatternAst triple = firstWhereTriple(ast);
-        assertInstanceOf(NegatedPropertySetPathAst.class, triple.predicate());
+        NegatedPropertySetPathAst negated = assertInstanceOf(NegatedPropertySetPathAst.class, triple.predicate());
+        assertEquals(2, negated.excluded().size());
+        assertPredicate("ex:p1", negated.excluded().get(0));
+        assertPredicate("ex:p2", negated.excluded().get(1));
+    }
+
+    @Test
+    void shouldParseInverseInsideNegatedPropertySetPath() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse(PREFIX + """
+                SELECT * WHERE {
+                  ?s !(^ex:p|ex:q) ?o .
+                }
+                """);
+
+        NegatedPropertySetPathAst negated = assertInstanceOf(
+                NegatedPropertySetPathAst.class,
+                firstWhereTriple(ast).predicate());
+        assertEquals(2, negated.excluded().size());
+        InversePathAst inverse = assertInstanceOf(InversePathAst.class, negated.excluded().getFirst());
+        assertPredicate("ex:p", inverse.pathAst());
+        assertPredicate("ex:q", negated.excluded().get(1));
+    }
+
+    @Test
+    void shouldKeepMixedPropertyListPathPredicatesInSourceOrder() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse(PREFIX + """
+                SELECT * WHERE {
+                  ?s ex:p1/ex:p2 ?o ;
+                     ?p ?x ;
+                     ex:p3|ex:p4 ?y .
+                }
+                """);
+
+        BgpAst bgp = whereBgp(ast);
+        assertEquals(3, bgp.triples().size());
+        assertInstanceOf(SequencePathAst.class, bgp.triples().get(0).predicate());
+        assertPredicateVariable("p", bgp.triples().get(1).predicate());
+        assertInstanceOf(AlternativePathAst.class, bgp.triples().get(2).predicate());
     }
 
     @Test
@@ -178,5 +284,22 @@ public class SparqlParserSequenceTest extends AbstractSparqlParserFeatureTest {
         assertEquals(2, generatedBlankNodes.size());
         assertEquals(1, generatedBlankNodes.stream().distinct().count());
         assertNotEquals(userBlankNode, generatedBlankNodes.getFirst());
+    }
+
+    private static void assertPredicate(String expectedRaw, PathAst path) {
+        PredicatePathAst predicatePath = assertInstanceOf(PredicatePathAst.class, path);
+        IriAst predicate = assertInstanceOf(IriAst.class, predicatePath.predicate());
+        assertEquals(expectedRaw, predicate.raw());
+    }
+
+    private static void assertPredicateVariable(String expectedName, PathAst path) {
+        PredicatePathAst predicatePath = assertInstanceOf(PredicatePathAst.class, path);
+        VarAst predicate = assertInstanceOf(VarAst.class, predicatePath.predicate());
+        assertEquals(expectedName, predicate.name());
+    }
+
+    private static BgpAst whereBgp(QueryAst ast) {
+        WhereClauseQueryAst query = (WhereClauseQueryAst) ast;
+        return (BgpAst) query.whereClause().patterns().getFirst();
     }
 }
