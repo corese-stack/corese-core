@@ -287,7 +287,7 @@ public final class CoreseAstQueryBuilder {
         } else {
             selectExpressions = new ArrayList<>();
             for (VarAst variable : projection.variables()) {
-                Node node = query.getExtNode(variable.name());
+                Node node = visibleBodyNode(query, variable.name());
                 if (node == null) {
                     throw new IllegalArgumentException(
                             "Projected variable ?" + variable.name() + " is not visible in the compiled query body");
@@ -313,7 +313,7 @@ public final class CoreseAstQueryBuilder {
         List<Node> nodes = new ArrayList<>();
         for (TermAst term : describeQueryAst.described()) {
             if (term instanceof VarAst(String name)) {
-                Node node = query.getExtNode(name);
+                Node node = visibleBodyNode(query, name);
                 if (node == null) {
                     throw new IllegalArgumentException(
                             "DESCRIBE variable ?" + name + " is not visible in the compiled query body");
@@ -396,7 +396,7 @@ public final class CoreseAstQueryBuilder {
             Exp selectExpression = query.getSelectExp(name);
             Node node = selectExpression != null
                     ? selectExpression.getNode()
-                    : query.getProperAndSubSelectNode(name);
+                    : visibleBodyNode(query, name);
             if (node == null) {
                 throw new IllegalArgumentException(
                         "ORDER BY variable ?" + name + " is not visible in the compiled query");
@@ -427,6 +427,20 @@ public final class CoreseAstQueryBuilder {
             selectNodes.add(selectExpression.getNode());
         }
         return new ArrayList<>(selectNodes);
+    }
+
+    /**
+     * Resolves only variables visible from the outer body scope. This deliberately
+     * excludes nodes collected from MINUS/EXISTS bodies, which KGRAM stores as query
+     * nodes for internal evaluation but which are not projectable SPARQL bindings.
+     */
+    private Node visibleBodyNode(Query query, String name) {
+        for (Node node : query.selectNodesFromPattern()) {
+            if (node.getLabel().equals(name)) {
+                return node;
+            }
+        }
+        return null;
     }
 
     private void applyLimitOffset(Query query, SolutionModifierAst solutionModifier) {
@@ -476,7 +490,7 @@ public final class CoreseAstQueryBuilder {
      */
     private Node constructNode(Query query, TermAst term) {
         if (term instanceof VarAst(String name)) {
-            Node bound = query.getExtNode(name);
+            Node bound = visibleBodyNode(query, name);
             return bound != null ? bound : toNode(term);
         }
         return toNode(term);

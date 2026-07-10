@@ -28,7 +28,6 @@ class CoreseAstQueryBuilderMinusScopeTest {
     @Test
     @DisplayName("{ ?s ?p ?o . MINUS { ?s ?q ?z } } : ?z (MINUS-only) is a query node, not a pattern node")
     void minusRightSideVariablesStayOutOfOuterScope() {
-        // { ?s ?p ?o . MINUS { ?s ?q ?z } }
         Exp body = compiler.compile(new GroupGraphPatternAst(List.of(
                 bgp("s", "p", "o"),
                 new MinusAst(new GroupGraphPatternAst(List.of(bgp("s", "q", "z")))))));
@@ -52,7 +51,6 @@ class CoreseAstQueryBuilderMinusScopeTest {
     @Test
     @DisplayName("{ ?s ?p ?o . OPTIONAL { ?s ?q ?z } } : ?z (OPTIONAL-only) is a pattern node visible in the outer scope")
     void optionalVariablesAreInOuterScope() {
-        // { ?s ?p ?o . OPTIONAL { ?s ?q ?z } }
         Exp body = compiler.compile(new GroupGraphPatternAst(List.of(
                 bgp("s", "p", "o"),
                 new OptionalAst(new GroupGraphPatternAst(List.of(bgp("s", "q", "z")))))));

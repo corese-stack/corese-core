@@ -5,7 +5,9 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.BgpAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.DatasetClauseAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.MinusAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.OrderConditionAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.PatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ProjectionAsts;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
@@ -23,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -71,6 +74,43 @@ class CoreseAstQueryBuilderTest extends AbstractSparqlParserFeatureTest {
         Query query = builder.toNextQuery(select);
 
         assertEquals(List.of("o", "s"), labels(query.getSelect()));
+    }
+
+    @Test
+    @DisplayName("SELECT * excludes variables that only occur in MINUS")
+    void selectStarExcludesMinusOnlyVariables() {
+        SelectQueryAst select = parseSelect("SELECT * WHERE { ?s ?p ?o . MINUS { ?s ?q ?z } }");
+
+        Query query = builder.toNextQuery(select);
+
+        assertEquals(List.of("s", "p", "o"), labels(query.getSelect()),
+                "MINUS-only variables are stored separately and must not be visible to SELECT *");
+        assertFalse(labels(query.getSelect()).contains("z"));
+    }
+
+    @Test
+    @DisplayName("Explicit projection rejects a variable that only occurs in MINUS")
+    void explicitProjectionRejectsMinusOnlyVariable() {
+        SelectQueryAst select = new SelectQueryAst(
+                ProjectionAsts.of(List.of(new VarAst("z"))),
+                null,
+                group(bgp("s", "p", "o"), new MinusAst(group(bgp("s", "q", "z")))));
+
+        IllegalArgumentException error =
+                assertThrows(IllegalArgumentException.class, () -> builder.toNextQuery(select));
+
+        assertEquals("Projected variable ?z is not visible in the compiled query body", error.getMessage());
+    }
+
+    @Test
+    @DisplayName("SELECT * includes variables introduced by OPTIONAL")
+    void selectStarIncludesOptionalVariables() {
+        SelectQueryAst select = parseSelect("SELECT * WHERE { ?s ?p ?o . OPTIONAL { ?s ?q ?z } }");
+
+        Query query = builder.toNextQuery(select);
+
+        assertEquals(List.of("s", "p", "o", "q", "z"), labels(query.getSelect()),
+                "OPTIONAL variables remain visible in the outer query scope");
     }
 
     @Test
@@ -135,6 +175,35 @@ class CoreseAstQueryBuilderTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
+    @DisplayName("ORDER BY rejects a variable that only occurs in MINUS")
+    void orderByRejectsMinusOnlyVariable() {
+        SelectQueryAst select = new SelectQueryAst(
+                ProjectionAsts.selectAll(),
+                null,
+                group(bgp("s", "p", "o"), new MinusAst(group(bgp("s", "q", "z")))),
+                SolutionModifierAst.withoutGroupBy(false, false,
+                        List.of(new OrderConditionAst(ASTConstants.OrderDirection.ASC, new VarAst("z"))),
+                        null,
+                        null));
+
+        IllegalArgumentException error =
+                assertThrows(IllegalArgumentException.class, () -> builder.toNextQuery(select));
+
+        assertEquals("ORDER BY variable ?z is not visible in the compiled query", error.getMessage());
+    }
+
+    @Test
+    @DisplayName("ORDER BY accepts a variable introduced by OPTIONAL")
+    void orderByAcceptsOptionalVariable() {
+        SelectQueryAst select = parseSelect("SELECT * WHERE { ?s ?p ?o . OPTIONAL { ?s ?q ?z } } ORDER BY ?z");
+
+        Query query = builder.toNextQuery(select);
+
+        assertEquals(1, query.getOrderBy().size());
+        assertEquals("z", query.getOrderBy().getFirst().getNode().getLabel());
+    }
+
+    @Test
     @DisplayName("FROM and FROM NAMED are copied onto the next Query dataset")
     void appliesDatasetClauses() {
         DatasetClauseAst dataset = new DatasetClauseAst(
@@ -195,6 +264,19 @@ class CoreseAstQueryBuilderTest extends AbstractSparqlParserFeatureTest {
 
     private static GroupGraphPatternAst group(TriplePatternAst triple) {
         return new GroupGraphPatternAst(List.of(new BgpAst(List.of(triple))));
+    }
+
+    private static GroupGraphPatternAst group(PatternAst... elements) {
+        return new GroupGraphPatternAst(List.of(elements));
+    }
+
+    private static BgpAst bgp(String s, String p, String o) {
+        return new BgpAst(List.of(
+                new TriplePatternAst(new VarAst(s), new VarAst(p), new VarAst(o))));
+    }
+
+    private SelectQueryAst parseSelect(String query) {
+        return assertInstanceOf(SelectQueryAst.class, newParserDefault().parse(query));
     }
 
     private static List<String> labels(List<Node> nodes) {
