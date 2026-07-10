@@ -168,7 +168,7 @@ public final class CoreseAstQueryBuilder {
      */
     public Filter toNextFilter(ConstraintAst filterExpression) {
         Objects.requireNonNull(filterExpression, "filterExpression");
-        return SparqlAstToExpression.toNextFilter(filterExpression);
+        return SparqlAstToExpression.toNextFilter(filterExpression, whereCompiler);
     }
 
     /**
@@ -416,7 +416,7 @@ public final class CoreseAstQueryBuilder {
             }
             return Exp.create(Type.NODE, node);
         }
-        Filter filter = SparqlAstToExpression.toNextFilter(expression);
+        Filter filter = SparqlAstToExpression.toNextFilter(expression, whereCompiler);
         Exp exp = Exp.create(Type.NODE, createSyntheticOrderNode(syntheticIndex));
         exp.setFilter(filter);
         return exp;

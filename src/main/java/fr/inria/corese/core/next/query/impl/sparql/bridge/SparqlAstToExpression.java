@@ -50,6 +50,15 @@ public final class SparqlAstToExpression {
     }
 
     /**
+     * Converts a {@code FILTER} clause, compiling the graph pattern of any embedded
+     * {@code EXISTS} / {@code NOT EXISTS} with the given {@link WhereCompiler}.
+     */
+    public static Filter toNextFilter(FilterAst filterClause, WhereCompiler whereCompiler) {
+        Objects.requireNonNull(filterClause, "filterClause");
+        return toNextFilter(filterClause.operator(), whereCompiler);
+    }
+
+    /**
      * Converts a filter {@link TermAst} to an {@link Expression}, then wraps it as a
      * {@link Filter} with {@link Filter#coreseNextSource()} set to {@code filterExpression}.
      *
@@ -57,10 +66,40 @@ public final class SparqlAstToExpression {
      * method is the shared implementation. For a full {@link FilterAst} node, use {@link #toNextFilter(FilterAst)}.
      */
     public static Filter toNextFilter(TermAst filterExpression) {
+        return toNextFilter(filterExpression, null);
+    }
+
+    /**
+     * Converts a filter {@link TermAst}, then compiles the graph pattern of every embedded
+     * {@code EXISTS} / {@code NOT EXISTS} with the given {@link WhereCompiler}.
+     *
+     */
+    public static Filter toNextFilter(TermAst filterExpression, WhereCompiler whereCompiler) {
         Expression exprTree = convert(filterExpression);
+        compileExists(exprTree, whereCompiler);
         initializeExpList(exprTree);
         AstBackedExpr expr = new AstBackedExpr(exprTree, Optional.of(filterExpression));
         return expr.getFilter();
+    }
+
+    /**
+     * Second pass: compiles the graph pattern carried by every {@link AstBackedExistTerm} of the
+     * expression tree. Mirrors {@code compileExist} of the historical pipeline.
+     */
+    private static void compileExists(Expression expression, WhereCompiler whereCompiler) {
+        if (expression instanceof AstBackedExistTerm exist) {
+            if (whereCompiler == null) {
+                throw new UnsupportedOperationException(
+                        "EXISTS / NOT EXISTS conversion requires a WhereCompiler to compile its graph pattern");
+            }
+            exist.setCompiledPattern(whereCompiler.compile(exist.patternAst()));
+            return;
+        }
+        if (expression instanceof Term term) {
+            for (Expression arg : term.getArgs()) {
+                compileExists(arg, whereCompiler);
+            }
+        }
     }
 
     /**
@@ -212,16 +251,28 @@ public final class SparqlAstToExpression {
             case Sha512Ast sha512Ast ->
                     functionTerm("sha512", convert(sha512Ast.argument()));
             case ExistsAst existsAst ->
-                    throw new UnsupportedQueryFeatureException(
-                            "EXISTS filters are not supported yet by the next pipeline");
+                    new AstBackedExistTerm(existsAst.pattern());
             case NotExistsAst notExistsAst ->
-                    throw new UnsupportedQueryFeatureException(
-                            "NOT EXISTS filters are not supported yet by the next pipeline");
+                    notTerm(new AstBackedExistTerm(notExistsAst.pattern()));
             default ->
                     throw new UnsupportedQueryFeatureException(
                             "Filter expression is not supported yet by the next pipeline: "
                                     + constraint.getClass().getSimpleName());
         };
+    }
+
+    /**
+     * {@code NOT EXISTS} is the boolean negation of {@code EXISTS}.
+     *
+     * <p>The interpreter resolves operator codes in a later compilation phase
+     * ({@code Processor.type(Term, ASTQuery)}) that this bridge never runs, so {@code oper()} is set
+     * explicitly here — just like {@link AstBackedExistTerm} does for {@code EXIST}. The engine reads
+     * {@code oper()} when collecting and indexing existence tests.</p>
+     */
+    private static Term notTerm(Term existTerm) {
+        Term not = Term.create("!", existTerm);
+        not.setOper(fr.inria.corese.core.next.query.kgram.api.core.ExprType.NOT);
+        return not;
     }
 
     private static Term functionTerm(String name, Expression arg) {
