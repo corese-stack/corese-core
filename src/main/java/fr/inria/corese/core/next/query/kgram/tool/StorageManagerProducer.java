@@ -455,6 +455,12 @@ public final class StorageManagerProducer extends ProducerDefault {
         throw new IllegalArgumentException("Unsupported RDF value: " + value);
     }
 
+    /**
+     * Statement pattern plus an explicit empty-result marker.
+     *
+     * <p>This avoids using {@code null} to represent impossible RDF patterns while still
+     * keeping a non-null placeholder pattern for the record state.
+     */
     private record StorageQueryPattern(StatementPattern statementPattern, boolean noMatch) {
 
         private static StorageQueryPattern of(StatementPattern statementPattern) {
@@ -466,6 +472,12 @@ public final class StorageManagerProducer extends ProducerDefault {
         }
     }
 
+    /**
+     * Storage contexts selected for a query pattern.
+     *
+     * <p>An empty context list means "all contexts" for the storage API; {@code noMatch}
+     * distinguishes this from a graph/dataset restriction that cannot produce results.
+     */
     private record ContextSelection(List<Resource> contexts, boolean noMatch) {
 
         private static ContextSelection of(List<Resource> contexts) {
