@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.data.api.base.exception;
+package fr.inria.corese.core.next.util.exception;
 
 /**
  * CoreseException is the superclass for all exceptions thrown by the Corese framework.

@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.data.impl.exception;
 
-import fr.inria.corese.core.next.data.api.base.exception.CoreseException;
+import fr.inria.corese.core.next.util.exception.CoreseException;
 
 /**
  * Used for any error raised from parsing of a string that should have been in a standard format (i.e RDF/XML, Turtle, JSON-LD, etc.)

@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.data.impl.exception;
 
-import fr.inria.corese.core.next.data.api.base.exception.CoreseException;
+import fr.inria.corese.core.next.util.exception.CoreseException;
 
 /**
  * Used for exception related to the inner workings of the system.

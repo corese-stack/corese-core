@@ -1,7 +1,5 @@
 package fr.inria.corese.core.next.util.exception;
 
-import fr.inria.corese.core.next.data.api.base.exception.CoreseException;
-
 /**
  * Class for any exception related to the configuration of Corese.
  */
