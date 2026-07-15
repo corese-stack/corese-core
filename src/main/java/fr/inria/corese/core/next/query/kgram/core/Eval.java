@@ -845,7 +845,9 @@ public class Eval implements ExpType, Plugin {
             send(Event.START, exp, graphNode, stack);
         }
 
-        if (exp.isFail()) {
+        // A false filter was detected at compile time, or this expression was
+        // identified as always failing: no use to evaluate it.
+        if (!exp.isFail()) {
             if (exp.isBGPAble()) {
                 // @deprecated
                 // evaluate and record result for next time
