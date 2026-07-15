@@ -74,7 +74,7 @@ class SparqlParserDescribeTest extends AbstractSparqlParserFeatureTest {
 
             TriplePatternAst triple = bgp.triples().getFirst();
             assertEquals("s", ((VarAst) triple.subject()).name());
-            assertEquals("p", ((VarAst) triple.predicate()).name());
+            assertEquals("p", ((VarAst) simplePredicateTerm(triple)).name());
             assertEquals("o", ((VarAst) triple.object()).name());
         }
     }

@@ -1,6 +1,8 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
+import fr.inria.corese.core.next.query.impl.sparql.ast.path.PathAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.path.PredicatePathAst;
 import fr.inria.corese.core.next.query.kgram.api.core.ExpType.Type;
 import fr.inria.corese.core.next.query.kgram.api.core.Filter;
 import fr.inria.corese.core.next.query.kgram.api.core.Node;
@@ -183,6 +185,15 @@ public final class CoreseAstQueryBuilder {
         throw new IllegalArgumentException(
                 "A query term must be a variable, IRI or literal, got: "
                         + term.getClass().getSimpleName());
+    }
+
+    static TermAst simplePredicate(PathAst path) {
+        if (path instanceof PredicatePathAst(TermAst predicate)) {
+            return predicate;
+        }
+        throw new UnsupportedOperationException(
+                "Property path bridge compilation is not supported yet for: "
+                        + path.getClass().getSimpleName());
     }
 
     private static void rejectUnsupportedAskClauses(AskQueryAst askQueryAst) {
@@ -475,7 +486,7 @@ public final class CoreseAstQueryBuilder {
         Exp bgp = Exp.create(Type.BGP);
         for (TriplePatternAst triple : template.triplePatternAsts()) {
             Node subject = constructNode(query, triple.subject());
-            Node predicate = constructNode(query, triple.predicate());
+            Node predicate = constructNode(query, simplePredicate(triple.predicate()));
             Node object = constructNode(query, triple.object());
             bgp.add(new AstBackedEdge(subject, predicate, object));
         }

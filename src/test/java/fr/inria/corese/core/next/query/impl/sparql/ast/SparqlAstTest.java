@@ -1,5 +1,8 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
+import fr.inria.corese.core.next.query.impl.sparql.ast.path.NegatedPropertySetPathAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.path.PathAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.path.PredicatePathAst;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -7,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAstTestSupport.simplePredicateTerm;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -210,9 +214,9 @@ class SparqlAstTest {
         @Test
         @DisplayName("creates with three terms")
         void valid() {
-            TriplePatternAst t = new TriplePatternAst(s, p, o);
+            TriplePatternAst t = TriplePatternAst.of(s, p, o);
             assertSame(s, t.subject());
-            assertSame(p, t.predicate());
+            assertSame(p, simplePredicateTerm(t));
             assertSame(o, t.object());
         }
 
@@ -221,35 +225,35 @@ class SparqlAstTest {
         void mixedTerms() {
             IriAst pred = new IriAst("a");
             LiteralAst obj = new LiteralAst("lit", null, null);
-            TriplePatternAst t = new TriplePatternAst(s, pred, obj);
+            TriplePatternAst t = TriplePatternAst.of(s, pred, obj);
             assertTrue(t.subject() instanceof VarAst);
-            assertTrue(t.predicate() instanceof IriAst);
+            assertInstanceOf(IriAst.class, simplePredicateTerm(t));
             assertTrue(t.object() instanceof LiteralAst);
         }
 
         @Test
         @DisplayName("throws when subject is null")
         void nullSubject() {
-            assertThrows(IllegalArgumentException.class, () -> new TriplePatternAst(null, p, o));
+            assertThrows(IllegalArgumentException.class, () -> TriplePatternAst.of(null, p, o));
         }
 
         @Test
         @DisplayName("throws when predicate is null")
         void nullPredicate() {
-            assertThrows(IllegalArgumentException.class, () -> new TriplePatternAst(s, null, o));
+            assertThrows(IllegalArgumentException.class, () -> TriplePatternAst.of(s, null, o));
         }
 
         @Test
         @DisplayName("throws when object is null")
         void nullObject() {
-            assertThrows(IllegalArgumentException.class, () -> new TriplePatternAst(s, p, null));
+            assertThrows(IllegalArgumentException.class, () -> TriplePatternAst.of(s, p, null));
         }
 
         @Test
         @DisplayName("equals and hashCode for same triple")
         void equality() {
-            TriplePatternAst a = new TriplePatternAst(s, p, o);
-            TriplePatternAst b = new TriplePatternAst(new VarAst("s"), new VarAst("p"), new VarAst("o"));
+            TriplePatternAst a = TriplePatternAst.of(s, p, o);
+            TriplePatternAst b = TriplePatternAst.of(new VarAst("s"), new VarAst("p"), new VarAst("o"));
             assertEquals(a, b);
             assertEquals(a.hashCode(), b.hashCode());
         }
@@ -257,8 +261,39 @@ class SparqlAstTest {
         @Test
         @DisplayName("not equal when component differs")
         void inequality() {
-            TriplePatternAst t = new TriplePatternAst(s, p, o);
-            assertNotEquals(t, new TriplePatternAst(new VarAst("x"), p, o));
+            TriplePatternAst t = TriplePatternAst.of(s, p, o);
+            assertNotEquals(t, TriplePatternAst.of(new VarAst("x"), p, o));
+        }
+    }
+
+    // ---------- PathAst ----------
+
+    @Nested
+    @DisplayName("PathAst")
+    class PathAstTest {
+
+        @Test
+        @DisplayName("negated property set rejects null excluded paths")
+        void negatedPropertySetRejectsNullExcludedPath() {
+            List<PathAst> paths = new ArrayList<>();
+            paths.add(new PredicatePathAst(new IriAst("ex:p")));
+            paths.add(null);
+
+            assertThrows(
+                    NullPointerException.class,
+                    () -> new NegatedPropertySetPathAst(paths));
+        }
+
+        @Test
+        @DisplayName("negated property set defensively copies excluded paths")
+        void negatedPropertySetDefensivelyCopiesExcludedPaths() {
+            PathAst excluded = new PredicatePathAst(new IriAst("ex:p"));
+            List<PathAst> paths = new ArrayList<>(List.of(excluded));
+
+            NegatedPropertySetPathAst negated = new NegatedPropertySetPathAst(paths);
+            paths.clear();
+
+            assertEquals(List.of(excluded), negated.excluded());
         }
     }
 
@@ -268,7 +303,7 @@ class SparqlAstTest {
     @DisplayName("BgpAst")
     class BgpAstTest {
 
-        private final TriplePatternAst triple = new TriplePatternAst(
+        private final TriplePatternAst triple = TriplePatternAst.of(
                 new VarAst("s"), new VarAst("p"), new VarAst("o"));
 
         @Test
@@ -301,7 +336,8 @@ class SparqlAstTest {
         @DisplayName("returned list is unmodifiable")
         void unmodifiable() {
             BgpAst bgp = new BgpAst(List.of(triple));
-            assertThrows(UnsupportedOperationException.class, () -> bgp.triples().add(triple));
+            List<TriplePatternAst> triples = bgp.triples();
+            assertThrows(UnsupportedOperationException.class, () -> triples.add(triple));
         }
 
         @Test
@@ -327,7 +363,7 @@ class SparqlAstTest {
     class GroupGraphPatternAstTest {
 
         private final BgpAst bgp = new BgpAst(List.of(
-                new TriplePatternAst(new VarAst("s"), new VarAst("p"), new VarAst("o"))));
+                TriplePatternAst.of(new VarAst("s"), new VarAst("p"), new VarAst("o"))));
 
         @Test
         @DisplayName("creates with empty list")
@@ -359,7 +395,8 @@ class SparqlAstTest {
         @DisplayName("returned list is unmodifiable")
         void unmodifiable() {
             GroupGraphPatternAst g = new GroupGraphPatternAst(List.of(bgp));
-            assertThrows(UnsupportedOperationException.class, () -> g.patterns().add(bgp));
+            List<PatternAst> patterns = g.patterns();
+            assertThrows(UnsupportedOperationException.class, () -> patterns.add(bgp));
         }
 
         @Test
@@ -382,7 +419,7 @@ class SparqlAstTest {
         @DisplayName("SelectQueryAst stores and returns whereClause via whereClause()")
         void whereClauseAccessor() {
             GroupGraphPatternAst where = new GroupGraphPatternAst(List.of(
-                    new BgpAst(List.of(new TriplePatternAst(
+                    new BgpAst(List.of(TriplePatternAst.of(
                             new VarAst("s"), new VarAst("p"), new VarAst("o"))))));
             SparqlQueryAst q = new SelectQueryAst(where);
             assertSame(where, q.whereClause());
@@ -449,7 +486,7 @@ class SparqlAstTest {
         @Test
         @DisplayName("TriplePatternAst toString is non-empty")
         void triplePatternAst() {
-            TriplePatternAst t = new TriplePatternAst(
+            TriplePatternAst t = TriplePatternAst.of(
                     new VarAst("s"), new VarAst("p"), new VarAst("o"));
             assertNotNull(t.toString());
             assertFalse(t.toString().isEmpty());
@@ -459,7 +496,7 @@ class SparqlAstTest {
         @DisplayName("SelectQueryAst whereClause() used in composition")
         void queryAstWithNestedStructures() {
             BgpAst bgp = new BgpAst(List.of(
-                    new TriplePatternAst(new VarAst("s"), new IriAst("a"), new VarAst("o"))));
+                    TriplePatternAst.of(new VarAst("s"), new IriAst("a"), new VarAst("o"))));
             GroupGraphPatternAst where = new GroupGraphPatternAst(List.of(bgp));
             SparqlQueryAst q = new SelectQueryAst(where);
             assertEquals(1, q.whereClause().patterns().size());

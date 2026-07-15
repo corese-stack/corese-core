@@ -69,7 +69,7 @@ class SparqlParserServiceTest extends AbstractSparqlParserFeatureTest {
             BgpAst bgp = (BgpAst) body.patterns().getFirst();
             assertEquals(1, bgp.triples().size());
             assertEquals(new VarAst("s"), bgp.triples().getFirst().subject());
-            assertEquals(expectedRdfTypeIriAst(), bgp.triples().getFirst().predicate());
+            assertEquals(expectedRdfTypeIriAst(), TriplePatternAstTestSupport.simplePredicateTerm(bgp.triples().getFirst()));
             assertEquals(new IriAst("<http://dbpedia.org/ontology/Person>"), bgp.triples().getFirst().object());
         }
     }

@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.query.impl.parser.semantic.support;
 
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
+import fr.inria.corese.core.next.query.impl.sparql.ast.path.PathAst;
 
 /**
  * Visitor interface for the AST hierarchy
@@ -25,4 +26,5 @@ public interface AstVisitor {
     void visit(PrefixDeclarationAst ast);
     void visit(ServiceAst ast);
     void visit(GraphRefAst ast);
+    void visit(PathAst ast);
 }

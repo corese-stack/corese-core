@@ -174,7 +174,7 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
      * Adds a triple to the CONSTRUCT template (inside {@code ConstructTriples}, not WHERE).
      */
     public void addConstructTriple(TermAst s, TermAst p, TermAst o) {
-        constructTriples.add(new TriplePatternAst(s, p, o));
+        constructTriples.add(TriplePatternAst.of(s, p, o));
     }
 
     /**

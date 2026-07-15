@@ -84,36 +84,22 @@ public class BgpFeature extends AbstractSparqlFeature {
 
     @Override
     public void exitTriplesSameSubjectPath(SparqlParser.TriplesSameSubjectPathContext ctx) {
-        TermAst s = builder().termFromVarOrTerm(ctx.varOrTerm());
-        var pl = ctx.propertyListPathNotEmpty();
-        if (pl == null) return;
-
-        var verbPaths = pl.verbPath();
-        var verbSimples = pl.verbSimple();
-        var objLists = pl.objectListPath();
-
-        int verbPathIdx = 0;
-        int verbSimpleIdx = 0;
-
-        for (SparqlParser.ObjectListPathContext objList : objLists) {
-            TermAst p;
-
-            boolean useVerbPath = verbPathIdx < verbPaths.size() && (
-                    verbSimpleIdx >= verbSimples.size() ||
-                            verbPaths.get(verbPathIdx).getStart().getTokenIndex()
-                                    < verbSimples.get(verbSimpleIdx).getStart().getTokenIndex()
-            );
-
-            if (useVerbPath) {
-                p = builder().termFromVerbPath(verbPaths.get(verbPathIdx++));
-            } else {
-                p = builder().termFromVerbSimple(verbSimples.get(verbSimpleIdx++));
+        SparqlAstBuilder b = builder();
+        if (ctx.varOrTerm() != null) {
+            var propertyList = ctx.propertyListPathNotEmpty();
+            if (propertyList == null) {
+                return;
             }
-
-            List<TermAst> objects = builder().termListFromObjectListPath(objList);
-            for (TermAst o : objects) {
-                builder().addTriple(s, p, o);
-            }
+            b.addTriplesFromPropertyListPath(b.termFromVarOrTerm(ctx.varOrTerm()), propertyList);
+            return;
+        }
+        if (ctx.triplesNodePath() == null) {
+            return;
+        }
+        TermAst subject = b.subjectFromTriplesNodePath(ctx.triplesNodePath());
+        SparqlParser.PropertyListPathContext propertyListPath = ctx.propertyListPath();
+        if (propertyListPath != null && propertyListPath.propertyListPathNotEmpty() != null) {
+            b.addTriplesFromPropertyListPath(subject, propertyListPath.propertyListPathNotEmpty());
         }
     }
 }

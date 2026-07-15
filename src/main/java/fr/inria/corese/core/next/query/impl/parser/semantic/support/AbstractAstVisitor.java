@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.query.impl.parser.semantic.support;
 
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
+import fr.inria.corese.core.next.query.impl.sparql.ast.path.PathAst;
 
 /**
  * Default implementation for AstVisitor
@@ -99,6 +100,11 @@ public abstract class AbstractAstVisitor implements AstVisitor {
 
     @Override
     public void visit(GraphRefAst ast) {
+
+    }
+
+    @Override
+    public void visit(PathAst ast) {
 
     }
 }
