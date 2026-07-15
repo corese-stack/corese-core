@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.query.api.exception;
 
 
-import fr.inria.corese.core.next.data.api.base.exception.CoreseException;
+import fr.inria.corese.core.next.util.exception.CoreseException;
 
 /**
  * Base exception for all query-related errors in the Corese query API.

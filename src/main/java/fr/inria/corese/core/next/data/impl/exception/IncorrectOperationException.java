@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.data.impl.exception;
 
-import fr.inria.corese.core.next.data.api.base.exception.CoreseException;
+import fr.inria.corese.core.next.util.exception.CoreseException;
 
 /**
  * Used to indicate that a function should not be used with the current object or with the object in its current state

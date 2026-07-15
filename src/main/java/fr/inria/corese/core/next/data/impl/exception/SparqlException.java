@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.data.impl.exception;
 
-import fr.inria.corese.core.next.data.api.base.exception.CoreseException;
+import fr.inria.corese.core.next.util.exception.CoreseException;
 
 public class SparqlException extends CoreseException {
     public SparqlException() { }
