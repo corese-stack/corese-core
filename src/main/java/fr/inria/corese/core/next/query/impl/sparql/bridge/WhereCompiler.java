@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
+import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.BgpAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.BindAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
@@ -57,8 +58,9 @@ public final class WhereCompiler {
             case BindAst bind -> compileBind(bind);
             case ServiceAst service -> compileService(service);
             case GroupGraphPatternAst group -> compileGroup(group);
-            default -> throw new UnsupportedOperationException(
-                    "WHERE compilation not yet supported for: " + pattern.getClass().getSimpleName());
+            default -> throw new UnsupportedQueryFeatureException(
+                    "WHERE pattern is not supported yet by the next pipeline: "
+                            + pattern.getClass().getSimpleName());
         };
     }
 
