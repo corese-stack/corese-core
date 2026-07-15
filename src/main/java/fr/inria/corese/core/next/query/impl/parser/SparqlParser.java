@@ -11,6 +11,7 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
 import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
 import fr.inria.corese.core.next.query.api.base.io.AbstractQueryParser;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
+import fr.inria.corese.core.next.query.api.exception.QueryException;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
 import fr.inria.corese.core.next.query.api.io.parser.QueryOptions;
@@ -81,7 +82,7 @@ public class SparqlParser extends AbstractQueryParser implements QueryTextValida
             }
 
             return analysisResult.ast();
-        } catch (QuerySyntaxException | QueryValidationException | QueryEvaluationException e) {
+        } catch (QueryException e) {
             throw e;
         } catch (IOException e) {
             throw new QueryEvaluationException("Failed to parse SPARQL query: " + e.getMessage(), e);

@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Builds KGRAM {@code Exp} / {@code Query} structures from Corese-next query AST nodes.
@@ -204,24 +205,24 @@ public final class CoreseAstQueryBuilder {
                         + term.getClass().getSimpleName());
     }
 
-    static TermAst simplePredicate(PathAst path) {
+    public static TermAst simplePredicate(PathAst path) {
         if (path instanceof PredicatePathAst(TermAst predicate)) {
             return predicate;
         }
-        throw new UnsupportedOperationException(
-                "Property path bridge compilation is not supported yet for: "
+        throw new UnsupportedQueryFeatureException(
+                "Property path bridge compilation is not supported yet by the next pipeline for: "
                         + path.getClass().getSimpleName());
     }
 
     private static void rejectUnsupportedAskClauses(AskQueryAst askQueryAst) {
         if (!askQueryAst.valuesClause().mappings().isEmpty()) {
             throw new UnsupportedQueryFeatureException(
-                    "Inline VALUES is not supported yet for ASK (values handling is a follow-up)");
+                    "Inline VALUES is not supported yet by the next pipeline for ASK");
         }
         SolutionModifierAst mod = askQueryAst.solutionModifier();
         if (mod.hasGroupBy() || mod.hasHaving() || mod.distinct() || mod.reduced()) {
             throw new UnsupportedQueryFeatureException(
-                    "Solution modifiers (GROUP BY, HAVING, DISTINCT, REDUCED) are not supported for ASK");
+                    "GROUP BY, HAVING, DISTINCT and REDUCED are not supported yet by the next pipeline for ASK");
         }
         // TODO(#388): inline VALUES needs a dedicated runtime mapping.
         // TODO(#388): GROUP BY / HAVING would require aggregate-aware ASK semantics, not just field copying.
@@ -230,22 +231,23 @@ public final class CoreseAstQueryBuilder {
 
     private static void rejectUnsupportedSelectClauses(SelectQueryAst selectQueryAst) {
         if (!selectQueryAst.valuesClause().mappings().isEmpty()) {
-            throw new UnsupportedQueryFeatureException("VALUES is not supported yet when building a next Query");
+            throw new UnsupportedQueryFeatureException(
+                    "Inline VALUES is not supported yet by the next pipeline for SELECT");
         }
         ProjectionAst projection = selectQueryAst.projection();
         if (!projection.expressionTerms().isEmpty() || !projection.expressionBoundVariables().isEmpty()) {
             throw new UnsupportedQueryFeatureException(
-                    "SELECT expressions are not supported yet when building a next Query");
+                    "SELECT expressions and aliases are not supported yet by the next pipeline");
         }
         SolutionModifierAst solutionModifier = selectQueryAst.solutionModifier();
         if (solutionModifier.reduced()) {
-            throw new UnsupportedQueryFeatureException("REDUCED is not supported yet when building a next Query");
+            throw new UnsupportedQueryFeatureException("REDUCED is not supported yet by the next pipeline for SELECT");
         }
         if (solutionModifier.hasGroupBy()) {
-            throw new UnsupportedQueryFeatureException("GROUP BY is not supported yet when building a next Query");
+            throw new UnsupportedQueryFeatureException("GROUP BY is not supported yet by the next pipeline for SELECT");
         }
         if (solutionModifier.hasHaving()) {
-            throw new UnsupportedQueryFeatureException("HAVING is not supported yet when building a next Query");
+            throw new UnsupportedQueryFeatureException("HAVING is not supported yet by the next pipeline for SELECT");
         }
         // TODO(#387): inline VALUES needs a dedicated runtime mapping.
         // TODO(#387): SELECT expressions need a clear runtime story for aliases and reuse in later clauses.
@@ -256,12 +258,12 @@ public final class CoreseAstQueryBuilder {
     private static void rejectUnsupportedDescribeClauses(DescribeQueryAst describeQueryAst) {
         if (!describeQueryAst.valuesClause().mappings().isEmpty()) {
             throw new UnsupportedQueryFeatureException(
-                    "Inline VALUES is not supported yet for DESCRIBE (values handling is a follow-up)");
+                    "Inline VALUES is not supported yet by the next pipeline for DESCRIBE");
         }
         SolutionModifierAst mod = describeQueryAst.solutionModifier();
         if (mod.hasGroupBy() || mod.hasHaving() || mod.distinct() || mod.reduced()) {
             throw new UnsupportedQueryFeatureException(
-                    "Solution modifiers (GROUP BY, HAVING, DISTINCT, REDUCED) are not supported for DESCRIBE");
+                    "GROUP BY, HAVING, DISTINCT and REDUCED are not supported yet by the next pipeline for DESCRIBE");
         }
         // TODO(#390): inline VALUES needs a dedicated runtime mapping.
         // TODO(#390): GROUP BY / HAVING would require aggregate-aware DESCRIBE semantics, not just field copying.
@@ -271,12 +273,12 @@ public final class CoreseAstQueryBuilder {
     private static void rejectUnsupportedConstructClauses(ConstructQueryAst constructQueryAst) {
         if (!constructQueryAst.valuesClause().mappings().isEmpty()) {
             throw new UnsupportedQueryFeatureException(
-                    "Inline VALUES is not supported yet for CONSTRUCT (values handling is a follow-up)");
+                    "Inline VALUES is not supported yet by the next pipeline for CONSTRUCT");
         }
         SolutionModifierAst mod = constructQueryAst.solutionModifier();
         if (mod.hasGroupBy() || mod.hasHaving() || mod.distinct() || mod.reduced()) {
             throw new UnsupportedQueryFeatureException(
-                    "Solution modifiers (GROUP BY, HAVING, DISTINCT, REDUCED) are not supported for CONSTRUCT");
+                    "GROUP BY, HAVING, DISTINCT and REDUCED are not supported yet by the next pipeline for CONSTRUCT");
         }
         // TODO(#473): blank nodes in CONSTRUCT templates need per-solution allocation.
         // TODO(#473): inline VALUES needs a dedicated runtime mapping.
@@ -318,7 +320,7 @@ public final class CoreseAstQueryBuilder {
     private static void rejectUnsupportedConstructTemplateTerm(TermAst term, String role) {
         if (term instanceof IriAst(String raw) && isBlankNodeLabel(raw)) {
             throw new UnsupportedQueryFeatureException(
-                    "Blank nodes in CONSTRUCT " + role + " templates are not supported yet");
+                    "Blank nodes in CONSTRUCT " + role + " templates are not supported yet by the next pipeline");
         }
     }
 
@@ -340,11 +342,10 @@ public final class CoreseAstQueryBuilder {
         } else {
             selectExpressions = new ArrayList<>();
             for (VarAst variable : projection.variables()) {
-                Node node = visibleBodyNode(query, variable.name());
-                if (node == null) {
-                    throw new IllegalArgumentException(
-                            "Projected variable ?" + variable.name() + " is not visible in the compiled query body");
-                }
+                Node node = visibleBodyNode(query, variable.name())
+                        .orElseThrow(() -> new IllegalArgumentException(
+                                "Projected variable ?" + variable.name()
+                                        + " is not visible in the compiled query body"));
                 selectExpressions.add(Exp.create(Type.NODE, node));
             }
         }
@@ -366,11 +367,9 @@ public final class CoreseAstQueryBuilder {
         List<Node> nodes = new ArrayList<>();
         for (TermAst term : describeQueryAst.described()) {
             if (term instanceof VarAst(String name)) {
-                Node node = visibleBodyNode(query, name);
-                if (node == null) {
-                    throw new IllegalArgumentException(
-                            "DESCRIBE variable ?" + name + " is not visible in the compiled query body");
-                }
+                Node node = visibleBodyNode(query, name)
+                        .orElseThrow(() -> new IllegalArgumentException(
+                                "DESCRIBE variable ?" + name + " is not visible in the compiled query body"));
                 nodes.add(node);
             } else {
                 nodes.add(toNode(term));
@@ -450,11 +449,9 @@ public final class CoreseAstQueryBuilder {
             Exp selectExpression = query.getSelectExp(name);
             Node node = selectExpression != null
                     ? selectExpression.getNode()
-                    : visibleBodyNode(query, name);
-            if (node == null) {
-                throw new IllegalArgumentException(
-                        "ORDER BY variable ?" + name + " is not visible in the compiled query");
-            }
+                    : visibleBodyNode(query, name)
+                            .orElseThrow(() -> new IllegalArgumentException(
+                                    "ORDER BY variable ?" + name + " is not visible in the compiled query"));
             return Exp.create(Type.NODE, node);
         }
         Filter filter = SparqlAstToExpression.toNextFilter(expression);
@@ -488,13 +485,13 @@ public final class CoreseAstQueryBuilder {
      * excludes nodes collected from MINUS/EXISTS bodies, which KGRAM stores as query
      * nodes for internal evaluation but which are not projectable SPARQL bindings.
      */
-    private Node visibleBodyNode(Query query, String name) {
+    private Optional<Node> visibleBodyNode(Query query, String name) {
         for (Node node : query.selectNodesFromPattern()) {
             if (node.getLabel().equals(name)) {
-                return node;
+                return Optional.of(node);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     private void applyLimitOffset(Query query, SolutionModifierAst solutionModifier) {
@@ -530,8 +527,7 @@ public final class CoreseAstQueryBuilder {
     private Node constructNode(Query query, TermAst term, String role) {
         rejectUnsupportedConstructTemplateTerm(term, role);
         if (term instanceof VarAst(String name)) {
-            Node bound = visibleBodyNode(query, name);
-            return bound != null ? bound : toNode(term);
+            return visibleBodyNode(query, name).orElseGet(() -> toNode(term));
         }
         return toNode(term);
     }

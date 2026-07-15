@@ -84,6 +84,17 @@ class NextSparqlPipelineExecutorTest {
     }
 
     @Test
+    @DisplayName("CONSTRUCT skips template triples containing unbound variables")
+    void constructSkipsTemplateTripleWithUnboundVariable() {
+        GraphQueryResult result = executor.evaluateGraph("""
+                CONSTRUCT { ?s ?p ?missing }
+                WHERE { ?s ?p ?o }
+                """);
+
+        assertTrue(result.asList().isEmpty());
+    }
+
+    @Test
     @DisplayName("CONSTRUCT templates with blank nodes fail explicitly")
     void constructBlankNodeTemplateFailsExplicitly() {
         UnsupportedQueryFeatureException error = assertThrows(

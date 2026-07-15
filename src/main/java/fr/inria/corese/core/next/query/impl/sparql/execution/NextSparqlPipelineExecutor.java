@@ -50,6 +50,7 @@ import fr.inria.corese.core.sparql.api.IDatatype;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Internal integration executor for the autonomous next SPARQL pipeline.
@@ -152,10 +153,9 @@ public final class NextSparqlPipelineExecutor {
                 if (!template.isEdge()) {
                     throw new UnsupportedQueryFeatureException("Only EDGE expressions are supported in graph templates");
                 }
-                Statement statement = statementFromTemplate(template.getEdge(), mapping);
-                if (statement != null && !statements.contains(statement)) {
-                    statements.add(statement);
-                }
+                statementFromTemplate(template.getEdge(), mapping)
+                        .filter(statement -> !statements.contains(statement))
+                        .ifPresent(statements::add);
             }
         }
         return statements;
@@ -188,12 +188,12 @@ public final class NextSparqlPipelineExecutor {
         for (Mapping mapping : mappings) {
             if (describe.isDescribeAll()) {
                 for (String variable : mapping.getVariableNames()) {
-                    addResource(resources, nullableValue(mapping.getNode(variable)));
+                    addResource(resources, valueFromNode(mapping.getNode(variable)));
                 }
             } else {
                 for (TermAst term : describe.described()) {
                     if (term instanceof VarAst(String variableName)) {
-                        addResource(resources, nullableValue(mapping.getNode(variableName)));
+                        addResource(resources, valueFromNode(mapping.getNode(variableName)));
                     } else {
                         addResource(resources, termValue(term));
                     }
@@ -209,16 +209,20 @@ public final class NextSparqlPipelineExecutor {
         }
     }
 
-    private Statement statementFromTemplate(Edge edge, Mapping mapping) {
-        Value subjectValue = nullableValue(resolve(edge.getNode(0), mapping));
-        Value predicateValue = nullableValue(resolve(predicateNode(edge), mapping));
-        Value object = nullableValue(resolve(edge.getNode(1), mapping));
-        if (subjectValue == null || predicateValue == null || object == null) {
-            return null;
+    private void addResource(List<Resource> resources, Optional<Value> value) {
+        value.ifPresent(resolved -> addResource(resources, resolved));
+    }
+
+    private Optional<Statement> statementFromTemplate(Edge edge, Mapping mapping) {
+        Optional<Value> subjectValue = valueFromNode(resolve(edge.getNode(0), mapping));
+        Optional<Value> predicateValue = valueFromNode(resolve(predicateNode(edge), mapping));
+        Optional<Value> object = valueFromNode(resolve(edge.getNode(1), mapping));
+        if (subjectValue.isEmpty() || predicateValue.isEmpty() || object.isEmpty()) {
+            return Optional.empty();
         }
-        Resource subject = asResource(subjectValue, "subject");
-        IRI predicate = asIri(predicateValue, "predicate");
-        return valueFactory.createStatement(subject, predicate, object);
+        Resource subject = asResource(subjectValue.get(), "subject");
+        IRI predicate = asIri(predicateValue.get(), "predicate");
+        return Optional.of(valueFactory.createStatement(subject, predicate, object.get()));
     }
 
     private Node resolve(Node node, Mapping mapping) {
@@ -248,7 +252,7 @@ public final class NextSparqlPipelineExecutor {
 
     private Statement statementFromAst(TriplePatternAst triple) {
         Resource subject = asResource(termValue(triple.subject()), "subject");
-        IRI predicate = asIri(termValue(triple.predicate()), "predicate");
+        IRI predicate = asIri(termValue(CoreseAstQueryBuilder.simplePredicate(triple.predicate())), "predicate");
         Value object = termValue(triple.object());
         return valueFactory.createStatement(subject, predicate, object);
     }
@@ -293,25 +297,26 @@ public final class NextSparqlPipelineExecutor {
         throw new QueryEvaluationException("Constructed " + role + " is not an IRI");
     }
 
-    private Value nullableValue(Node node) {
+    private Optional<Value> valueFromNode(Node node) {
         if (node == null) {
-            return null;
+            return Optional.empty();
         }
         IDatatype datatype = node.getDatatypeValue();
         if (datatype.isURI()) {
-            return valueFactory.createIRI(datatype.getLabel());
+            return Optional.of(valueFactory.createIRI(datatype.getLabel()));
         }
         if (datatype.isBlank()) {
-            return valueFactory.createBNode(datatype.getLabel());
+            return Optional.of(valueFactory.createBNode(datatype.getLabel()));
         }
         if (datatype.isLiteral()) {
             if (datatype.getLang() != null && !datatype.getLang().isBlank()) {
-                return valueFactory.createLiteral(datatype.getLabel(), datatype.getLang());
+                return Optional.of(valueFactory.createLiteral(datatype.getLabel(), datatype.getLang()));
             }
             if (datatype.getDatatypeURI() != null && !datatype.getDatatypeURI().isBlank()) {
-                return valueFactory.createLiteral(datatype.getLabel(), valueFactory.createIRI(datatype.getDatatypeURI()));
+                return Optional.of(
+                        valueFactory.createLiteral(datatype.getLabel(), valueFactory.createIRI(datatype.getDatatypeURI())));
             }
-            return valueFactory.createLiteral(datatype.getLabel());
+            return Optional.of(valueFactory.createLiteral(datatype.getLabel()));
         }
         throw new QueryEvaluationException("Unsupported KGRAM node datatype: " + datatype);
     }
@@ -356,13 +361,13 @@ public final class NextSparqlPipelineExecutor {
             String unquoted = lexical.substring(1, lexical.length() - 1);
             if (unquoted.contains("\\")) {
                 throw new UnsupportedQueryFeatureException(
-                        "Escaped string literals are not supported yet by the minimal next update executor");
+                        "Escaped string literals are not supported yet by the next pipeline update executor");
             }
             return unquoted;
         }
         if (lexical.contains("\\")) {
             throw new UnsupportedQueryFeatureException(
-                    "Escaped string literals are not supported yet by the minimal next update executor");
+                    "Escaped string literals are not supported yet by the next pipeline update executor");
         }
         return lexical;
     }

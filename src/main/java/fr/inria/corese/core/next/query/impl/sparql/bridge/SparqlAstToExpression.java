@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
 import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
+import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 import fr.inria.corese.core.next.query.kgram.api.core.Filter;
@@ -10,6 +11,7 @@ import fr.inria.corese.core.sparql.triple.parser.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -21,6 +23,58 @@ import java.util.Optional;
  */
 public final class SparqlAstToExpression {
 
+    private static final Map<Class<?>, String> BINARY_OPERATORS =
+            Map.ofEntries(
+                    Map.entry(AndAst.class, KeywordHolder.SEAND),
+                    Map.entry(OrAst.class, KeywordHolder.SEOR),
+                    Map.entry(EqualsAst.class, "="),
+                    Map.entry(DifferentAst.class, "!="),
+                    Map.entry(LowerThanAst.class, "<"),
+                    Map.entry(LowerOrEqualThanAst.class, "<="),
+                    Map.entry(GreaterThanAst.class, ">"),
+                    Map.entry(GreaterOrEqualThanAst.class, ">="),
+                    Map.entry(AddAst.class, "+"),
+                    Map.entry(SubtractAst.class, "-"),
+                    Map.entry(MultiplyAst.class, "*"),
+                    Map.entry(DivideAst.class, "/"));
+
+    private static final Map<Class<?>, String> UNARY_OPERATORS =
+            Map.ofEntries(
+                    Map.entry(UnaryPlusAst.class, "+"),
+                    Map.entry(UnaryMinusAst.class, "-"),
+                    Map.entry(BooleanNotAst.class, "!"));
+
+    private static final Map<Class<?>, String> UNARY_FUNCTIONS =
+            Map.ofEntries(
+                    Map.entry(BoundAst.class, Processor.BOUND),
+                    Map.entry(IsIriAst.class, "isIRI"),
+                    Map.entry(IsBlankAst.class, "isBlank"),
+                    Map.entry(IsLiteralAst.class, "isLiteral"),
+                    Map.entry(StrAst.class, "str"),
+                    Map.entry(LangAst.class, "lang"),
+                    Map.entry(DatatypeAst.class, "datatype"),
+                    Map.entry(IriFunctionAst.class, "iri"),
+                    Map.entry(LcaseAst.class, "lcase"),
+                    Map.entry(UcaseAst.class, "ucase"),
+                    Map.entry(EncodeForUriAst.class, "encode_for_uri"),
+                    Map.entry(Md5Ast.class, "md5"),
+                    Map.entry(Sha1Ast.class, "sha1"),
+                    Map.entry(Sha256Ast.class, "sha256"),
+                    Map.entry(Sha384Ast.class, "sha384"),
+                    Map.entry(Sha512Ast.class, "sha512"));
+
+    private static final Map<Class<?>, String> BINARY_FUNCTIONS =
+            Map.ofEntries(
+                    Map.entry(SameTermAst.class, "sameTerm"),
+                    Map.entry(LangMatchesAst.class, "langMatches"),
+                    Map.entry(StrStartsAst.class, "strstarts"),
+                    Map.entry(StrEndsAst.class, "strends"),
+                    Map.entry(ContainsAst.class, "contains"),
+                    Map.entry(StrBeforeAst.class, "strbefore"),
+                    Map.entry(StrAfterAst.class, "strafter"),
+                    Map.entry(StrLangAst.class, "strlang"),
+                    Map.entry(StrDtAst.class, Processor.STRDT));
+
     private SparqlAstToExpression() {
     }
 
@@ -29,9 +83,9 @@ public final class SparqlAstToExpression {
      */
     public static Expression convert(TermAst term) {
         return switch (term) {
-            case VarAst v -> Variable.create(v.name());
-            case LiteralAst l -> literalToConstant(l);
-            case IriAst i -> iriToConstant(i);
+            case VarAst(String name) -> Variable.create(name);
+            case LiteralAst(String lexical, String lang, String datatype) -> literalToConstant(lexical, lang, datatype);
+            case IriAst(String raw) -> iriToConstant(raw);
             case ConstraintAst c -> constraintToExpression(c);
             default -> throw new IllegalStateException("Unhandled TermAst: " + term.getClass());
         };
@@ -74,14 +128,14 @@ public final class SparqlAstToExpression {
         }
     }
 
-    private static Constant literalToConstant(LiteralAst l) {
-        if (l.lang() != null && !l.lang().isEmpty()) {
-            return Constant.create(unquoteLexical(l.lexical()), RDF.rdflangString, l.lang());
+    private static Constant literalToConstant(String lexical, String lang, String datatype) {
+        if (lang != null && !lang.isEmpty()) {
+            return Constant.create(unquoteLexical(lexical), RDF.rdflangString, lang);
         }
-        if (l.datatype() != null && !l.datatype().isEmpty()) {
-            return Constant.create(unquoteLexical(l.lexical()), normalizeDatatypeIri(l.datatype()), null);
+        if (datatype != null && !datatype.isEmpty()) {
+            return Constant.create(unquoteLexical(lexical), normalizeDatatypeIri(datatype), null);
         }
-        return Constant.createString(unquoteLexical(l.lexical()));
+        return Constant.createString(unquoteLexical(lexical));
     }
 
     private static String unquoteLexical(String lexical) {
@@ -102,8 +156,8 @@ public final class SparqlAstToExpression {
         return fr.inria.corese.core.sparql.triple.parser.NSManager.nsm().toNamespace(d);
     }
 
-    private static Constant iriToConstant(IriAst i) {
-        String raw = StringUtils.trimChevronIRIs(i.raw());
+    private static Constant iriToConstant(String rawIri) {
+        String raw = StringUtils.trimChevronIRIs(rawIri);
         if (raw.startsWith(IOConstants.BLANK_NODE_PREFIX)) {
             return Constant.createBlank(raw.substring(IOConstants.BLANK_NODE_PREFIX.length()));
         }
@@ -111,115 +165,68 @@ public final class SparqlAstToExpression {
     }
 
     private static Expression constraintToExpression(ConstraintAst constraint) {
+        String binaryOperator = BINARY_OPERATORS.get(constraint.getClass());
+        if (binaryOperator != null && constraint instanceof BinaryConstraintAst binary) {
+            return binaryOperatorTerm(binaryOperator, binary);
+        }
+
+        String unaryOperator = UNARY_OPERATORS.get(constraint.getClass());
+        if (unaryOperator != null && constraint instanceof UnaryConstraintAst unary) {
+            return Term.create(unaryOperator, convert(unary.argument()));
+        }
+
+        String unaryFunction = UNARY_FUNCTIONS.get(constraint.getClass());
+        if (unaryFunction != null && constraint instanceof UnaryConstraintAst unary) {
+            return functionTerm(unaryFunction, convert(unary.argument()));
+        }
+
+        String binaryFunction = BINARY_FUNCTIONS.get(constraint.getClass());
+        if (binaryFunction != null && constraint instanceof BinaryConstraintAst binary) {
+            return binaryFunctionTerm(binaryFunction, binary);
+        }
+
+        return specialConstraintToExpression(constraint);
+    }
+
+    private static Expression specialConstraintToExpression(ConstraintAst constraint) {
         return switch (constraint) {
-            case AndAst andAst ->
-                    Term.create(KeywordHolder.SEAND, convert(andAst.getLeftArgument()), convert(andAst.getRightArgument()));
-            case OrAst orAst ->
-                    Term.create(KeywordHolder.SEOR, convert(orAst.getLeftArgument()), convert(orAst.getRightArgument()));
-            case EqualsAst equalsAst ->
-                    Term.create("=", convert(equalsAst.getLeftArgument()), convert(equalsAst.getRightArgument()));
-            case DifferentAst differentAst ->
-                    Term.create("!=", convert(differentAst.getLeftArgument()), convert(differentAst.getRightArgument()));
-            case LowerThanAst lowerThanAst ->
-                    Term.create("<", convert(lowerThanAst.getLeftArgument()), convert(lowerThanAst.getRightArgument()));
-            case LowerOrEqualThanAst lowerOrEqualThanAst ->
-                    Term.create("<=", convert(lowerOrEqualThanAst.getLeftArgument()), convert(lowerOrEqualThanAst.getRightArgument()));
-            case GreaterThanAst greaterThanAst ->
-                    Term.create(">", convert(greaterThanAst.getLeftArgument()), convert(greaterThanAst.getRightArgument()));
-            case GreaterOrEqualThanAst greaterOrEqualThanAst ->
-                    Term.create(">=", convert(greaterOrEqualThanAst.getLeftArgument()), convert(greaterOrEqualThanAst.getRightArgument()));
-            case AddAst addAst ->
-                    Term.create("+", convert(addAst.getLeftArgument()), convert(addAst.getRightArgument()));
-            case SubtractAst subtractAst ->
-                    Term.create("-", convert(subtractAst.getLeftArgument()), convert(subtractAst.getRightArgument()));
-            case MultiplyAst multiplyAst ->
-                    Term.create("*", convert(multiplyAst.getLeftArgument()), convert(multiplyAst.getRightArgument()));
-            case DivideAst divideAst ->
-                    Term.create("/", convert(divideAst.getLeftArgument()), convert(divideAst.getRightArgument()));
-            case UnaryPlusAst unaryPlusAst ->
-                    Term.create("+", convert(unaryPlusAst.argument()));
-            case UnaryMinusAst unaryMinusAst ->
-                    Term.create("-", convert(unaryMinusAst.argument()));
-            case BooleanNotAst booleanNotAst ->
-                    Term.create("!", convert(booleanNotAst.argument()));
-            case BoundAst boundAst ->
-                    functionTerm(Processor.BOUND, convert(boundAst.argument()));
-            case IsIriAst isIriAst ->
-                    functionTerm("isIRI", convert(isIriAst.argument()));
-            case IsBlankAst isBlankAst ->
-                    functionTerm("isBlank", convert(isBlankAst.argument()));
-            case IsLiteralAst isLiteralAst ->
-                    functionTerm("isLiteral", convert(isLiteralAst.argument()));
-            case StrAst strAst ->
-                    functionTerm("str", convert(strAst.argument()));
-            case LangAst langAst ->
-                    functionTerm("lang", convert(langAst.argument()));
-            case DatatypeAst datatypeAst ->
-                    functionTerm("datatype", convert(datatypeAst.argument()));
-            case SameTermAst sameTermAst ->
-                    functionTerm("sameTerm", convert(sameTermAst.getLeftArgument()), convert(sameTermAst.getRightArgument()));
-            case LangMatchesAst langMatchesAst ->
-                    functionTerm("langMatches", convert(langMatchesAst.getLeftArgument()), convert(langMatchesAst.getRightArgument()));
-            case BinaryRegexAst binaryRegexAst ->
-                    regexTerm(convert(binaryRegexAst.getString()), convert(binaryRegexAst.getPattern()));
-            case TrinaryRegexAst trinaryRegexAst ->
-                    regexTerm(convert(trinaryRegexAst.getString()), convert(trinaryRegexAst.getPattern()), convert(trinaryRegexAst.getFlags()));
-            case FunctionCallAst callAst ->
-                    functionCallAst(callAst);
-            case ConcatAst concatAst ->
-                    variadicTerm("concat", concatAst.arguments());
-            case CoalesceAst coalesceAst ->
-                    variadicTerm(Processor.COALESCE, coalesceAst.arguments());
-            case IfAst ifAst ->
-                    Term.function(Processor.IF, convert(ifAst.condition()), convert(ifAst.thenExpr()), convert(ifAst.elseExpr()));
-            case ReplaceAst replaceAst ->
-                    replaceToTerm(replaceAst);
-            case SubstrAst substrAst ->
-                    substrToTerm(substrAst);
-            case BnodeAst bnodeAst ->
-                    bnodeToTerm(bnodeAst);
-            case StrStartsAst strStartsAst ->
-                    functionTerm("strstarts", convert(strStartsAst.getLeftArgument()), convert(strStartsAst.getRightArgument()));
-            case StrEndsAst strEndsAst ->
-                    functionTerm("strends", convert(strEndsAst.getLeftArgument()), convert(strEndsAst.getRightArgument()));
-            case ContainsAst containsAst ->
-                    functionTerm("contains", convert(containsAst.getLeftArgument()), convert(containsAst.getRightArgument()));
-            case StrBeforeAst strBeforeAst ->
-                    functionTerm("strbefore", convert(strBeforeAst.getLeftArgument()), convert(strBeforeAst.getRightArgument()));
-            case StrAfterAst strAfterAst ->
-                    functionTerm("strafter", convert(strAfterAst.getLeftArgument()), convert(strAfterAst.getRightArgument()));
-            case StrLangAst strLangAst ->
-                    functionTerm("strlang", convert(strLangAst.getLeftArgument()), convert(strLangAst.getRightArgument()));
-            case StrDtAst strDtAst ->
-                    functionTerm(Processor.STRDT, convert(strDtAst.getLeftArgument()), convert(strDtAst.getRightArgument()));
-            case IriFunctionAst iriFunctionAst ->
-                    functionTerm("iri", convert(iriFunctionAst.argument()));
-            case LcaseAst lcaseAst ->
-                    functionTerm("lcase", convert(lcaseAst.argument()));
-            case UcaseAst ucaseAst ->
-                    functionTerm("ucase", convert(ucaseAst.argument()));
-            case EncodeForUriAst encodeForUriAst ->
-                    functionTerm("encode_for_uri", convert(encodeForUriAst.argument()));
-            case Md5Ast md5Ast ->
-                    functionTerm("md5", convert(md5Ast.argument()));
-            case Sha1Ast sha1Ast ->
-                    functionTerm("sha1", convert(sha1Ast.argument()));
-            case Sha256Ast sha256Ast ->
-                    functionTerm("sha256", convert(sha256Ast.argument()));
-            case Sha384Ast sha384Ast ->
-                    functionTerm("sha384", convert(sha384Ast.argument()));
-            case Sha512Ast sha512Ast ->
-                    functionTerm("sha512", convert(sha512Ast.argument()));
-            case ExistsAst existsAst ->
-                    throw new UnsupportedOperationException(
-                            "EXISTS { ... } conversion requires GroupGraphPatternAst → Exp (see CoreseAstQueryBuilder)");
-            case NotExistsAst notExistsAst ->
-                    throw new UnsupportedOperationException(
-                            "NOT EXISTS { ... } conversion requires GroupGraphPatternAst → Exp (see CoreseAstQueryBuilder)");
+            case BinaryRegexAst regex ->
+                    regexTerm(convert(regex.getString()), convert(regex.getPattern()));
+            case TrinaryRegexAst regex ->
+                    regexTerm(convert(regex.getString()), convert(regex.getPattern()), convert(regex.getFlags()));
+            case FunctionCallAst call ->
+                    functionCallAst(call);
+            case ConcatAst concat ->
+                    variadicTerm("concat", concat.arguments());
+            case CoalesceAst coalesce ->
+                    variadicTerm(Processor.COALESCE, coalesce.arguments());
+            case IfAst(TermAst condition, TermAst thenExpr, TermAst elseExpr) ->
+                    Term.function(Processor.IF, convert(condition), convert(thenExpr), convert(elseExpr));
+            case ReplaceAst replace ->
+                    replaceToTerm(replace);
+            case SubstrAst substr ->
+                    substrToTerm(substr);
+            case BnodeAst bnode ->
+                    bnodeToTerm(bnode);
+            case ExistsAst ignored ->
+                    throw new UnsupportedQueryFeatureException(
+                            "EXISTS filters are not supported yet by the next pipeline");
+            case NotExistsAst ignored ->
+                    throw new UnsupportedQueryFeatureException(
+                            "NOT EXISTS filters are not supported yet by the next pipeline");
             default ->
-                    throw new UnsupportedOperationException(
-                            "Unsupported constraint AST: " + constraint.getClass().getName());
+                    throw new UnsupportedQueryFeatureException(
+                            "Filter expression is not supported yet by the next pipeline: "
+                                    + constraint.getClass().getSimpleName());
         };
+    }
+
+    private static Term binaryOperatorTerm(String operator, BinaryConstraintAst binary) {
+        return Term.create(operator, convert(binary.getLeftArgument()), convert(binary.getRightArgument()));
+    }
+
+    private static Term binaryFunctionTerm(String name, BinaryConstraintAst binary) {
+        return functionTerm(name, convert(binary.getLeftArgument()), convert(binary.getRightArgument()));
     }
 
     private static Term functionTerm(String name, Expression arg) {
