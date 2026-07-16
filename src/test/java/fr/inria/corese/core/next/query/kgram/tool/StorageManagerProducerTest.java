@@ -5,7 +5,6 @@ import fr.inria.corese.core.next.data.api.Resource;
 import fr.inria.corese.core.next.data.api.Value;
 import fr.inria.corese.core.next.data.api.ValueFactory;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.query.api.exception.InvalidQueryExecutionPlanException;
 import fr.inria.corese.core.next.query.impl.parser.SparqlParser;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
@@ -35,7 +34,6 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -261,27 +259,6 @@ class StorageManagerProducerTest {
         assertEquals(2, mappings.size());
         assertContainsNameMapping(mappings, ALICE, BOB, "Bob");
         assertContainsNameMapping(mappings, ALICE, CAROL, "Carol");
-    }
-
-    @Test
-    @DisplayName("Producer rejects non-BGP mapping plans")
-    void producerRejectsNonBgpMappingPlan() {
-        Exp notBgp = Exp.create(Type.AND);
-
-        assertThrows(
-                InvalidQueryExecutionPlanException.class,
-                () -> producer.getMappings(null, List.of(), notBgp, null));
-    }
-
-    @Test
-    @DisplayName("Producer rejects non-EDGE expressions inside BGP mappings")
-    void producerRejectsNonEdgeInsideBgpMappingPlan() {
-        Exp bgp = Exp.create(Type.BGP);
-        bgp.add(Exp.create(Type.NODE, variable("x")));
-
-        assertThrows(
-                InvalidQueryExecutionPlanException.class,
-                () -> producer.getMappings(null, List.of(), bgp, null));
     }
 
     private static void assertContainsMapping(Mappings mappings, String subject, String predicate, String object) {

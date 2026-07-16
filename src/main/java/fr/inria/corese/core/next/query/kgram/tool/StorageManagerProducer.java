@@ -5,7 +5,6 @@ import fr.inria.corese.core.next.data.api.Resource;
 import fr.inria.corese.core.next.data.api.Value;
 import fr.inria.corese.core.next.data.api.ValueFactory;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.query.api.exception.InvalidQueryExecutionPlanException;
 import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.kgram.api.core.Edge;
 import fr.inria.corese.core.next.query.kgram.api.core.Graph;
@@ -159,15 +158,14 @@ public final class StorageManagerProducer extends ProducerDefault {
     @Override
     public Mappings getMappings(Node graphNode, List<Node> from, Exp exp, Environment environment) {
         if (!exp.isBGP()) {
-            throw new InvalidQueryExecutionPlanException(
-                    "StorageManagerProducer can only materialize BGP expressions");
+            throw new IllegalArgumentException("StorageManagerProducer can only materialize BGP expressions");
         }
 
         List<BindingSet> bindings = new ArrayList<>();
         bindings.add(new BindingSet());
         for (Exp element : exp) {
             if (!element.isEdge()) {
-                throw new InvalidQueryExecutionPlanException(
+                throw new IllegalArgumentException(
                         "StorageManagerProducer can only materialize EDGE expressions inside BGP mappings");
             }
             bindings = join(graphNode, from, element.getEdge(), environment, bindings);
