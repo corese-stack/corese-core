@@ -8,7 +8,6 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.AskQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.bridge.CoreseAstQueryBuilder;
-import fr.inria.corese.core.next.query.kgram.api.query.ProcessVisitor;
 import fr.inria.corese.core.next.query.kgram.core.Eval;
 import fr.inria.corese.core.next.query.kgram.core.Mappings;
 import fr.inria.corese.core.next.query.kgram.core.Query;
@@ -105,8 +104,6 @@ public final class NextSparqlPipelineExecutor {
                     new StorageManagerProducer(storage),
                     new SparqlKgramEvaluator(),
                     new RdfTermMatcher());
-            eval.setVisitor(new ProcessVisitor() {
-            });
             return eval.query(query);
         } catch (SparqlException e) {
             throw new QueryEvaluationException("Failed to evaluate query with the next pipeline: " + e.getMessage(), e);
