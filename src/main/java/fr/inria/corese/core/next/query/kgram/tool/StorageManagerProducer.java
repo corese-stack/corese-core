@@ -5,6 +5,7 @@ import fr.inria.corese.core.next.data.api.Resource;
 import fr.inria.corese.core.next.data.api.Value;
 import fr.inria.corese.core.next.data.api.ValueFactory;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.kgram.api.core.Edge;
 import fr.inria.corese.core.next.query.kgram.api.core.Graph;
 import fr.inria.corese.core.next.query.kgram.api.core.Node;
@@ -24,7 +25,12 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
- * KGRAM producer backed by the Corese-next {@link StorageManager}.
+ * KGRAM producer backed by a Corese-next {@link StorageManager}.
+ *
+ * <p>The producer is responsible for translating KGRAM graph-pattern requests
+ * into storage-layer {@link StatementPattern} queries, then adapting returned
+ * RDF statements back into KGRAM edges. It does not decide the final RDF-term
+ * matching policy; that remains the matcher responsibility.</p>
  */
 public final class StorageManagerProducer extends ProducerDefault {
 
@@ -91,7 +97,8 @@ public final class StorageManagerProducer extends ProducerDefault {
             Node source,
             Node start,
             int index) {
-        throw new UnsupportedOperationException("StorageManagerProducer does not support path/regex edge enumeration yet");
+        throw new UnsupportedQueryFeatureException(
+                "Property path edge enumeration is not supported yet by StorageManagerProducer");
     }
 
     @Override
@@ -151,15 +158,15 @@ public final class StorageManagerProducer extends ProducerDefault {
     @Override
     public Mappings getMappings(Node graphNode, List<Node> from, Exp exp, Environment environment) {
         if (!exp.isBGP()) {
-            throw new UnsupportedOperationException("StorageManagerProducer only supports BGP mappings");
+            throw new IllegalArgumentException("StorageManagerProducer can only materialize BGP expressions");
         }
 
         List<BindingSet> bindings = new ArrayList<>();
         bindings.add(new BindingSet());
         for (Exp element : exp) {
             if (!element.isEdge()) {
-                throw new UnsupportedOperationException(
-                        "StorageManagerProducer only supports EDGE expressions inside BGP mappings");
+                throw new IllegalArgumentException(
+                        "StorageManagerProducer can only materialize EDGE expressions inside BGP mappings");
             }
             bindings = join(graphNode, from, element.getEdge(), environment, bindings);
             if (bindings.isEmpty()) {
@@ -338,7 +345,7 @@ public final class StorageManagerProducer extends ProducerDefault {
     /**
      * Extends partial bindings with the matches of one triple pattern.
      *
-     * <p>Each input binding is exposed through a temporary {@link BindingEnvironment}, so already
+     * <p>Each input binding is exposed through a layered {@link BindingEnvironment}, so already
      * bound variables are pushed into {@link #queryPattern(Node, List, Edge, Environment)} before
      * querying storage.
      *

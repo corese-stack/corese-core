@@ -13,12 +13,12 @@ import fr.inria.corese.core.next.query.kgram.api.core.Edge;
 import fr.inria.corese.core.next.query.kgram.api.core.ExpType.Type;
 import fr.inria.corese.core.next.query.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.kgram.api.query.Environment;
-import fr.inria.corese.core.next.query.kgram.api.query.Evaluator;
-import fr.inria.corese.core.next.query.kgram.api.query.Matcher;
 import fr.inria.corese.core.next.query.kgram.core.Eval;
 import fr.inria.corese.core.next.query.kgram.core.Exp;
 import fr.inria.corese.core.next.query.kgram.core.Mappings;
 import fr.inria.corese.core.next.query.kgram.core.Query;
+import fr.inria.corese.core.next.query.kgram.execution.RdfTermMatcher;
+import fr.inria.corese.core.next.query.kgram.execution.SparqlKgramEvaluator;
 import fr.inria.corese.core.next.storagemanager.impl.memory.MemoryStorageManager;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.triple.parser.Constant;
@@ -70,7 +70,7 @@ class StorageManagerProducerTest {
         Node p = variable("p");
         Node o = variable("o");
 
-        List<Edge> edges = edges(new QueryEdge(s, KgramNodes.rootProperty(), p, o));
+        List<Edge> edges = edges(new TestQueryEdge(s, KgramNodes.rootProperty(), p, o));
 
         assertEquals(4, edges.size());
         assertTrue(edges.stream().anyMatch(edge ->
@@ -85,7 +85,7 @@ class StorageManagerProducerTest {
         Node s = variable("s");
         Node o = variable("o");
 
-        List<Edge> edges = edges(new QueryEdge(s, resource(KNOWS), null, o));
+        List<Edge> edges = edges(new TestQueryEdge(s, resource(KNOWS), null, o));
 
         assertEquals(2, edges.size());
         assertTrue(edges.stream().allMatch(edge -> KNOWS.equals(edge.getEdgeNode().getLabel())));
@@ -103,7 +103,7 @@ class StorageManagerProducerTest {
         Environment environment = mock(Environment.class);
         when(environment.getNode(p)).thenReturn(resource(NAME));
 
-        List<Edge> edges = edges(new QueryEdge(s, KgramNodes.rootProperty(), p, o), null, List.of(), environment);
+        List<Edge> edges = edges(new TestQueryEdge(s, KgramNodes.rootProperty(), p, o), null, List.of(), environment);
 
         assertEquals(2, edges.size());
         assertTrue(edges.stream().allMatch(edge -> NAME.equals(edge.getEdgeNode().getLabel())));
@@ -115,7 +115,7 @@ class StorageManagerProducerTest {
         Node s = variable("s");
         Node o = variable("o");
 
-        List<Edge> edges = edges(new QueryEdge(s, resource(NAME), null, o), resource(GRAPH), List.of(), null);
+        List<Edge> edges = edges(new TestQueryEdge(s, resource(NAME), null, o), resource(GRAPH), List.of(), null);
 
         assertEquals(1, edges.size());
         Edge edge = edges.getFirst();
@@ -131,7 +131,7 @@ class StorageManagerProducerTest {
         Node o = variable("o");
 
         List<Edge> edges = edges(
-                new QueryEdge(s, resource(NAME), null, o),
+                new TestQueryEdge(s, resource(NAME), null, o),
                 resource(GRAPH),
                 List.of(resource(GRAPH)),
                 null);
@@ -147,7 +147,7 @@ class StorageManagerProducerTest {
         Node o = variable("o");
 
         List<Edge> edges = edges(
-                new QueryEdge(s, resource(NAME), null, o),
+                new TestQueryEdge(s, resource(NAME), null, o),
                 resource(GRAPH),
                 List.of(resource("http://example.org/other-graph")),
                 null);
@@ -161,7 +161,7 @@ class StorageManagerProducerTest {
         Node s = variable("s");
         Node o = variable("o");
 
-        List<Edge> edges = edges(new QueryEdge(s, resource(NAME), null, o), null, List.of(resource(GRAPH)), null);
+        List<Edge> edges = edges(new TestQueryEdge(s, resource(NAME), null, o), null, List.of(resource(GRAPH)), null);
 
         assertEquals(1, edges.size());
         assertEquals(CAROL, edges.getFirst().getNode(0).getLabel());
@@ -176,7 +176,7 @@ class StorageManagerProducerTest {
         Environment environment = mock(Environment.class);
         when(environment.getNode(p)).thenReturn(literal("not-a-predicate"));
 
-        List<Edge> edges = edges(new QueryEdge(s, KgramNodes.rootProperty(), p, o), null, List.of(), environment);
+        List<Edge> edges = edges(new TestQueryEdge(s, KgramNodes.rootProperty(), p, o), null, List.of(), environment);
 
         assertTrue(edges.isEmpty());
     }
@@ -189,7 +189,7 @@ class StorageManagerProducerTest {
         Environment environment = mock(Environment.class);
         when(environment.getNode(s)).thenReturn(literal("not-a-subject"));
 
-        List<Edge> edges = edges(new QueryEdge(s, resource(KNOWS), null, o), null, List.of(), environment);
+        List<Edge> edges = edges(new TestQueryEdge(s, resource(KNOWS), null, o), null, List.of(), environment);
 
         assertTrue(edges.isEmpty());
     }
@@ -201,7 +201,7 @@ class StorageManagerProducerTest {
         Node p = variable("p");
         Node o = variable("o");
         Query query = selectStarSpoQuery(s, p, o);
-        Eval eval = Eval.create(producer, new NoOpEvaluator(), new BasicMatcher());
+        Eval eval = Eval.create(producer, new SparqlKgramEvaluator(), new RdfTermMatcher());
 
         Mappings mappings = eval.query(query);
 
@@ -215,7 +215,7 @@ class StorageManagerProducerTest {
         QueryAst ast = new SparqlParser().parse("SELECT * WHERE { ?s ?p ?o }");
         SelectQueryAst select = assertInstanceOf(SelectQueryAst.class, ast);
         Query query = new CoreseAstQueryBuilder().toNextQuery(select);
-        Eval eval = Eval.create(producer, new NoOpEvaluator(), new BasicMatcher());
+        Eval eval = Eval.create(producer, new SparqlKgramEvaluator(), new RdfTermMatcher());
 
         Mappings mappings = eval.query(query);
 
@@ -314,14 +314,14 @@ class StorageManagerProducerTest {
 
     private static Query selectStarSpoQuery(Node s, Node p, Node o) {
         Exp bgp = Exp.create(Type.BGP);
-        bgp.add(Exp.create(Type.EDGE, new QueryEdge(s, KgramNodes.rootProperty(), p, o)));
+        bgp.add(Exp.create(Type.EDGE, new TestQueryEdge(s, KgramNodes.rootProperty(), p, o)));
         return selectQuery(bgp);
     }
 
     private static Query selectKnowsNameQuery(Node s, Node o, Node name) {
         Exp bgp = Exp.create(Type.BGP);
-        bgp.add(Exp.create(Type.EDGE, new QueryEdge(s, resource(KNOWS), null, o)));
-        bgp.add(Exp.create(Type.EDGE, new QueryEdge(o, resource(NAME), null, name)));
+        bgp.add(Exp.create(Type.EDGE, new TestQueryEdge(s, resource(KNOWS), null, o)));
+        bgp.add(Exp.create(Type.EDGE, new TestQueryEdge(o, resource(NAME), null, name)));
         return selectQuery(bgp);
     }
 
@@ -336,90 +336,7 @@ class StorageManagerProducerTest {
         return query;
     }
 
-    private static final class BasicMatcher implements Matcher {
-
-        private int mode = Matcher.UNDEF;
-
-        @Override
-        public boolean match(Edge query, Edge target, Environment environment) {
-            return match(query.getNode(0), target.getNode(0), environment)
-                    && match(query.getNode(1), target.getNode(1), environment)
-                    && match(predicateNode(query), target.getEdgeNode(), environment);
-        }
-
-        @Override
-        public boolean match(Node query, Node target, Environment environment) {
-            if (query == null || target == null) {
-                return query == target;
-            }
-            if (query.isVariable()) {
-                Node bound = environment == null ? null : environment.getNode(query);
-                return bound == null || bound.match(target);
-            }
-            return query.match(target);
-        }
-
-        @Override
-        public boolean same(Node queryNode, Node left, Node right, Environment environment) {
-            return left != null && left.same(right);
-        }
-
-        @Override
-        public int getMode() {
-            return mode;
-        }
-
-        @Override
-        public void setMode(int mode) {
-            this.mode = mode;
-        }
-
-        private static Node predicateNode(Edge edge) {
-            return edge.getEdgeVariable() == null ? edge.getEdgeNode() : edge.getEdgeVariable();
-        }
-    }
-
-    private static final class NoOpEvaluator implements Evaluator {
-
-        private Mode mode = Mode.KGRAM_MODE;
-
-        @Override
-        public Mode getMode() {
-            return mode;
-        }
-
-        @Override
-        public void setMode(Mode mode) {
-            this.mode = mode;
-        }
-
-        @Override
-        public void setProducer(fr.inria.corese.core.next.query.kgram.api.query.Producer producer) {
-            // BGP-only test support does not evaluate filters.
-        }
-
-        @Override
-        public void setKGRAM(Eval eval) {
-            // BGP-only test support does not evaluate filters.
-        }
-
-        @Override
-        public void start(Environment environment) {
-            // BGP-only test support does not evaluate filters.
-        }
-
-        @Override
-        public void finish(Environment environment) {
-            // BGP-only test support does not evaluate filters.
-        }
-
-        @Override
-        public void init(Environment environment) {
-            // BGP-only test support does not evaluate filters.
-        }
-    }
-
-    private record QueryEdge(Node subject, Node edgeNode, Node edgeVariable, Node object) implements Edge {
+    private record TestQueryEdge(Node subject, Node edgeNode, Node edgeVariable, Node object) implements Edge {
 
         @Override
         public Node getNode(int i) {
