@@ -3,6 +3,10 @@ package fr.inria.corese.core.next.query.impl.sparql.bridge;
 import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.impl.parser.SparqlParser;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.ExistsAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.NotExistsAst;
+import fr.inria.corese.core.next.query.kgram.api.core.Expr;
+import fr.inria.corese.core.next.query.kgram.api.core.ExprType;
 import fr.inria.corese.core.next.query.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.kgram.core.Exp;
 import fr.inria.corese.core.next.query.kgram.core.Query;
@@ -158,6 +162,61 @@ class CoreseAstQueryBuilderDescribeTest {
         Query query = builder.toNextQuery(describe);
 
         assertFalse(query.getOrderBy().isEmpty(), "ORDER BY applied");
+    }
+
+    @Test
+    @DisplayName("DESCRIBE WHERE { FILTER EXISTS { ... } } compiles the EXISTS pattern")
+    void filterExistsInDescribeWhere() {
+        GroupGraphPatternAst existsPattern = new GroupGraphPatternAst(List.of(
+                new BgpAst(List.of(new TriplePatternAst(new VarAst("x"), new VarAst("q"), new VarAst("z"))))));
+        FilterAst filter = new FilterAst(new ExistsAst(existsPattern));
+        GroupGraphPatternAst where = new GroupGraphPatternAst(List.of(
+                new BgpAst(List.of(new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o")))),
+                filter));
+        DescribeQueryAst describe = new DescribeQueryAst(
+                DatasetClauseAst.none(), List.of(new VarAst("x")), where);
+
+        Query query = builder.toNextQuery(describe);
+
+        assertLoweredDescribeConstruct(query, 1);
+        Exp filterExp = findFilter(query.getBody());
+        assertNotNull(filterExp, "FILTER is in the compiled body");
+        Expr expr = filterExp.getFilter().getExp();
+        assertEquals(ExprType.EXIST, expr.oper(), "FILTER operator is EXIST");
+        assertInstanceOf(Exp.class, expr.getPattern(), "EXISTS pattern is compiled");
+    }
+
+    @Test
+    @DisplayName("DESCRIBE WHERE { FILTER NOT EXISTS { ... } } compiles as NOT wrapping EXIST")
+    void filterNotExistsInDescribeWhere() {
+        GroupGraphPatternAst existsPattern = new GroupGraphPatternAst(List.of(
+                new BgpAst(List.of(new TriplePatternAst(new VarAst("x"), new VarAst("q"), new VarAst("z"))))));
+        FilterAst filter = new FilterAst(new NotExistsAst(existsPattern));
+        GroupGraphPatternAst where = new GroupGraphPatternAst(List.of(
+                new BgpAst(List.of(new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o")))),
+                filter));
+        DescribeQueryAst describe = new DescribeQueryAst(
+                DatasetClauseAst.none(), List.of(new VarAst("x")), where);
+
+        Query query = builder.toNextQuery(describe);
+
+        assertLoweredDescribeConstruct(query, 1);
+        Exp filterExp = findFilter(query.getBody());
+        assertNotNull(filterExp, "FILTER is in the compiled body");
+        Expr notExpr = filterExp.getFilter().getExp();
+        assertEquals(ExprType.NOT, notExpr.oper(), "top operator is boolean NOT");
+        Expr exist = notExpr.getExpList().getFirst();
+        assertEquals(ExprType.EXIST, exist.oper(), "inner expression is EXIST");
+        assertInstanceOf(Exp.class, exist.getPattern(), "NOT EXISTS pattern is compiled");
+    }
+
+    private static Exp findFilter(Exp body) {
+        for (int i = 0; i < body.size(); i++) {
+            if (body.get(i).isFilter()) {
+                return body.get(i);
+            }
+        }
+        return null;
     }
 
     @Test
