@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.query.api;
 
 import fr.inria.corese.core.next.data.api.Value;
 import fr.inria.corese.core.next.query.api.result.BindingSet;
-import fr.inria.corese.core.next.query.dataset.Dataset;
+import fr.inria.corese.core.next.query.api.dataset.Dataset;
 
 /**
  * A generic SPARQL operation (query or update) on a Corese repository.

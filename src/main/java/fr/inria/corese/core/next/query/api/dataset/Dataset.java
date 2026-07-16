@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.query.dataset;
+package fr.inria.corese.core.next.query.api.dataset;
 
 import java.util.Set;
 
