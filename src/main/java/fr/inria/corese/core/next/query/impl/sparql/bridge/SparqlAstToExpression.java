@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
 import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
+import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 import fr.inria.corese.core.next.query.kgram.api.core.Filter;
@@ -211,14 +212,15 @@ public final class SparqlAstToExpression {
             case Sha512Ast sha512Ast ->
                     functionTerm("sha512", convert(sha512Ast.argument()));
             case ExistsAst existsAst ->
-                    throw new UnsupportedOperationException(
-                            "EXISTS { ... } conversion requires GroupGraphPatternAst → Exp (see CoreseAstQueryBuilder)");
+                    throw new UnsupportedQueryFeatureException(
+                            "EXISTS filters are not supported yet by the next pipeline");
             case NotExistsAst notExistsAst ->
-                    throw new UnsupportedOperationException(
-                            "NOT EXISTS { ... } conversion requires GroupGraphPatternAst → Exp (see CoreseAstQueryBuilder)");
+                    throw new UnsupportedQueryFeatureException(
+                            "NOT EXISTS filters are not supported yet by the next pipeline");
             default ->
-                    throw new UnsupportedOperationException(
-                            "Unsupported constraint AST: " + constraint.getClass().getName());
+                    throw new UnsupportedQueryFeatureException(
+                            "Filter expression is not supported yet by the next pipeline: "
+                                    + constraint.getClass().getSimpleName());
         };
     }
 

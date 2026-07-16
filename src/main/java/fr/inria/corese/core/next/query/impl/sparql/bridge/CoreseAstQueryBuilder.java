@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
+import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.path.PathAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.path.PredicatePathAst;
@@ -191,20 +192,20 @@ public final class CoreseAstQueryBuilder {
         if (path instanceof PredicatePathAst(TermAst predicate)) {
             return predicate;
         }
-        throw new UnsupportedOperationException(
-                "Property path bridge compilation is not supported yet for: "
+        throw new UnsupportedQueryFeatureException(
+                "Property path bridge compilation is not supported yet by the next pipeline for: "
                         + path.getClass().getSimpleName());
     }
 
     private static void rejectUnsupportedAskClauses(AskQueryAst askQueryAst) {
         if (!askQueryAst.valuesClause().mappings().isEmpty()) {
-            throw new UnsupportedOperationException(
-                    "Inline VALUES is not supported yet for ASK (values handling is a follow-up)");
+            throw new UnsupportedQueryFeatureException(
+                    "Inline VALUES is not supported yet by the next pipeline for ASK");
         }
         SolutionModifierAst mod = askQueryAst.solutionModifier();
         if (mod.hasGroupBy() || mod.hasHaving() || mod.distinct() || mod.reduced()) {
-            throw new UnsupportedOperationException(
-                    "Solution modifiers (GROUP BY, HAVING, DISTINCT, REDUCED) are not supported for ASK");
+            throw new UnsupportedQueryFeatureException(
+                    "GROUP BY, HAVING, DISTINCT and REDUCED are not supported yet by the next pipeline for ASK");
         }
         // TODO(#388): inline VALUES needs a dedicated runtime mapping.
         // TODO(#388): GROUP BY / HAVING would require aggregate-aware ASK semantics, not just field copying.
@@ -213,22 +214,23 @@ public final class CoreseAstQueryBuilder {
 
     private static void rejectUnsupportedSelectClauses(SelectQueryAst selectQueryAst) {
         if (!selectQueryAst.valuesClause().mappings().isEmpty()) {
-            throw new UnsupportedOperationException("VALUES is not supported yet when building a next Query");
+            throw new UnsupportedQueryFeatureException(
+                    "Inline VALUES is not supported yet by the next pipeline for SELECT");
         }
         ProjectionAst projection = selectQueryAst.projection();
         if (!projection.expressionTerms().isEmpty() || !projection.expressionBoundVariables().isEmpty()) {
-            throw new UnsupportedOperationException(
-                    "SELECT expressions are not supported yet when building a next Query");
+            throw new UnsupportedQueryFeatureException(
+                    "SELECT expressions and aliases are not supported yet by the next pipeline");
         }
         SolutionModifierAst solutionModifier = selectQueryAst.solutionModifier();
         if (solutionModifier.reduced()) {
-            throw new UnsupportedOperationException("REDUCED is not supported yet when building a next Query");
+            throw new UnsupportedQueryFeatureException("REDUCED is not supported yet by the next pipeline for SELECT");
         }
         if (solutionModifier.hasGroupBy()) {
-            throw new UnsupportedOperationException("GROUP BY is not supported yet when building a next Query");
+            throw new UnsupportedQueryFeatureException("GROUP BY is not supported yet by the next pipeline for SELECT");
         }
         if (solutionModifier.hasHaving()) {
-            throw new UnsupportedOperationException("HAVING is not supported yet when building a next Query");
+            throw new UnsupportedQueryFeatureException("HAVING is not supported yet by the next pipeline for SELECT");
         }
         // TODO(#387): inline VALUES needs a dedicated runtime mapping.
         // TODO(#387): SELECT expressions need a clear runtime story for aliases and reuse in later clauses.
@@ -238,13 +240,13 @@ public final class CoreseAstQueryBuilder {
 
     private static void rejectUnsupportedDescribeClauses(DescribeQueryAst describeQueryAst) {
         if (!describeQueryAst.valuesClause().mappings().isEmpty()) {
-            throw new UnsupportedOperationException(
-                    "Inline VALUES is not supported yet for DESCRIBE (values handling is a follow-up)");
+            throw new UnsupportedQueryFeatureException(
+                    "Inline VALUES is not supported yet by the next pipeline for DESCRIBE");
         }
         SolutionModifierAst mod = describeQueryAst.solutionModifier();
         if (mod.hasGroupBy() || mod.hasHaving() || mod.distinct() || mod.reduced()) {
-            throw new UnsupportedOperationException(
-                    "Solution modifiers (GROUP BY, HAVING, DISTINCT, REDUCED) are not supported for DESCRIBE");
+            throw new UnsupportedQueryFeatureException(
+                    "GROUP BY, HAVING, DISTINCT and REDUCED are not supported yet by the next pipeline for DESCRIBE");
         }
         // TODO(#390): inline VALUES needs a dedicated runtime mapping.
         // TODO(#390): GROUP BY / HAVING would require aggregate-aware DESCRIBE semantics, not just field copying.
@@ -465,13 +467,13 @@ public final class CoreseAstQueryBuilder {
 
     private static void rejectUnsupportedConstructClauses(ConstructQueryAst constructQueryAst) {
         if (!constructQueryAst.valuesClause().mappings().isEmpty()) {
-            throw new UnsupportedOperationException(
-                    "Inline VALUES is not supported yet for CONSTRUCT (values handling is a follow-up)");
+            throw new UnsupportedQueryFeatureException(
+                    "Inline VALUES is not supported yet by the next pipeline for CONSTRUCT");
         }
         SolutionModifierAst mod = constructQueryAst.solutionModifier();
         if (mod.hasGroupBy() || mod.hasHaving() || mod.distinct() || mod.reduced()) {
-            throw new UnsupportedOperationException(
-                    "Solution modifiers (GROUP BY, HAVING, DISTINCT, REDUCED) are not supported for CONSTRUCT");
+            throw new UnsupportedQueryFeatureException(
+                    "GROUP BY, HAVING, DISTINCT and REDUCED are not supported yet by the next pipeline for CONSTRUCT");
         }
         // TODO(#389): inline VALUES needs a dedicated runtime mapping.
         // TODO(#389): GROUP BY / HAVING would require aggregate-aware CONSTRUCT semantics, not just field copying.
