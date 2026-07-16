@@ -107,7 +107,7 @@ public final class WhereCompiler {
     }
 
     private Exp compileFilter(FilterAst filter) {
-        Filter nextFilter = SparqlAstToExpression.toNextFilter(filter);
+        Filter nextFilter = SparqlAstToExpression.toNextFilter(filter, this);
         return Exp.create(Type.FILTER, nextFilter);
     }
 
@@ -143,7 +143,7 @@ public final class WhereCompiler {
      * Compiles {@code BIND(expression AS ?var)} into a KGRAM {@link Exp}.
      */
     private Exp compileBind(BindAst bind) {
-        Filter filter = SparqlAstToExpression.toNextFilter(bind.expression());
+        Filter filter = SparqlAstToExpression.toNextFilter(bind.expression(), this);
         Node variable = CoreseAstQueryBuilder.toNode(bind.variable());
         Exp exp = Exp.create(Type.BIND);
         exp.setFilter(filter);

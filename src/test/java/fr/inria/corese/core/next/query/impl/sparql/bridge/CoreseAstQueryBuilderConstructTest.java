@@ -4,7 +4,11 @@ import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureExce
 import fr.inria.corese.core.next.query.impl.parser.AbstractSparqlParserFeatureTest;
 import fr.inria.corese.core.next.query.impl.parser.SparqlParser;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.ExistsAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.NotExistsAst;
+import fr.inria.corese.core.next.query.kgram.api.core.ExprType;
 import fr.inria.corese.core.next.query.kgram.api.core.Edge;
+import fr.inria.corese.core.next.query.kgram.api.core.Expr;
 import fr.inria.corese.core.next.query.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.kgram.core.Exp;
 import fr.inria.corese.core.next.query.kgram.core.Query;
@@ -169,5 +173,98 @@ class CoreseAstQueryBuilderConstructTest extends AbstractSparqlParserFeatureTest
     @DisplayName("toNextQuery((ConstructQueryAst) null) throws NullPointerException")
     void rejectsNull() {
         assertThrows(NullPointerException.class, () -> builder.toNextQuery((ConstructQueryAst) null));
+    }
+
+
+    @Test
+    @DisplayName("CONSTRUCT WHERE { ... FILTER EXISTS { ... } } compiles the EXISTS pattern")
+    void filterExistsInConstructWhere() {
+        GroupGraphPatternAst existsPattern = new GroupGraphPatternAst(List.of(
+                new BgpAst(List.of(new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o"))))));
+        FilterAst filter = new FilterAst(new ExistsAst(existsPattern));
+        GroupGraphPatternAst where = new GroupGraphPatternAst(List.of(
+                new BgpAst(List.of(new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o")))),
+                filter));
+        ConstructQueryAst construct = new ConstructQueryAst(
+                template(new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o"))),
+                where);
+
+        Query query = builder.toNextQuery(construct);
+
+        assertTrue(query.isConstruct(), "query is CONSTRUCT");
+        Exp filterExp = findFilter(query.getBody());
+        assertNotNull(filterExp, "FILTER is in the compiled body");
+        Expr expr = filterExp.getFilter().getExp();
+        assertEquals(ExprType.EXIST, expr.oper(), "FILTER operator is EXIST");
+        assertInstanceOf(Exp.class, expr.getPattern(), "EXISTS pattern is compiled");
+    }
+
+    @Test
+    @DisplayName("CONSTRUCT WHERE { ... FILTER NOT EXISTS { ... } } compiles as NOT wrapping EXIST")
+    void filterNotExistsInConstructWhere() {
+        GroupGraphPatternAst existsPattern = new GroupGraphPatternAst(List.of(
+                new BgpAst(List.of(new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o"))))));
+        FilterAst filter = new FilterAst(new NotExistsAst(existsPattern));
+        GroupGraphPatternAst where = new GroupGraphPatternAst(List.of(
+                new BgpAst(List.of(new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o")))),
+                filter));
+        ConstructQueryAst construct = new ConstructQueryAst(
+                template(new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o"))),
+                where);
+
+        Query query = builder.toNextQuery(construct);
+
+        assertTrue(query.isConstruct(), "query is CONSTRUCT");
+        Exp filterExp = findFilter(query.getBody());
+        assertNotNull(filterExp, "FILTER is in the compiled body");
+        Expr notExpr = filterExp.getFilter().getExp();
+        assertEquals(ExprType.NOT, notExpr.oper(), "top operator is boolean NOT");
+        Expr exist = notExpr.getExpList().getFirst();
+        assertEquals(ExprType.EXIST, exist.oper(), "inner expression is EXIST");
+        assertInstanceOf(Exp.class, exist.getPattern(), "NOT EXISTS pattern is compiled");
+    }
+
+    @Test
+    @DisplayName("Parser -> CONSTRUCT WHERE { FILTER EXISTS } produces compiled EXISTS pattern")
+    void parsedConstructWithFilterExists() {
+        SparqlParser parser = newParserDefault();
+        ConstructQueryAst construct = assertInstanceOf(ConstructQueryAst.class,
+                parser.parse("CONSTRUCT { ?x ?p ?o } WHERE { ?x ?p ?o . FILTER EXISTS { ?x <http://example.org/type> ?t } }"));
+
+        Query query = builder.toNextQuery(construct);
+
+        assertTrue(query.isConstruct());
+        Exp filterExp = findFilter(query.getBody());
+        assertNotNull(filterExp, "FILTER EXISTS compiled into body");
+        assertEquals(ExprType.EXIST, filterExp.getFilter().getExp().oper(), "operator is EXIST");
+    }
+
+    @Test
+    @DisplayName("Parser -> CONSTRUCT WHERE { FILTER NOT EXISTS } produces NOT wrapping EXIST")
+    void parsedConstructWithFilterNotExists() {
+        SparqlParser parser = newParserDefault();
+        ConstructQueryAst construct = assertInstanceOf(ConstructQueryAst.class,
+                parser.parse("CONSTRUCT { ?x ?p ?o } WHERE { ?x ?p ?o . FILTER NOT EXISTS { ?x <http://example.org/type> ?t } }"));
+
+        Query query = builder.toNextQuery(construct);
+
+        assertTrue(query.isConstruct());
+        Exp filterExp = findFilter(query.getBody());
+        assertNotNull(filterExp, "FILTER NOT EXISTS compiled into body");
+        Expr notExpr = filterExp.getFilter().getExp();
+        assertEquals(ExprType.NOT, notExpr.oper(), "top operator is boolean NOT");
+        assertEquals(ExprType.EXIST, notExpr.getExpList().getFirst().oper(), "inner expression is EXIST");
+    }
+
+    /**
+     * Finds the first FILTER {@link Exp} in a compiled AND body, or {@code null} if none.
+     */
+    private static Exp findFilter(Exp body) {
+        for (int i = 0; i < body.size(); i++) {
+            if (body.get(i).isFilter()) {
+                return body.get(i);
+            }
+        }
+        return null;
     }
 }

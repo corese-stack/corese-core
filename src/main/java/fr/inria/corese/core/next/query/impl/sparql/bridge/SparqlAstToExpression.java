@@ -30,9 +30,10 @@ public final class SparqlAstToExpression {
      */
     public static Expression convert(TermAst term) {
         return switch (term) {
-            case VarAst v -> Variable.create(v.name());
-            case LiteralAst l -> literalToConstant(l);
-            case IriAst i -> iriToConstant(i);
+            case VarAst(String name) -> Variable.create(name);
+            case LiteralAst(String lexical, String lang, String datatype) ->
+                    literalToConstant(lexical, lang, datatype);
+            case IriAst(String raw) -> iriToConstant(raw);
             case ConstraintAst c -> constraintToExpression(c);
             default -> throw new IllegalStateException("Unhandled TermAst: " + term.getClass());
         };
@@ -43,10 +44,21 @@ public final class SparqlAstToExpression {
      * {@link #toNextFilter(TermAst)}.
      *
      * <p>Prefer {@link CoreseAstQueryBuilder#toNextFilter(FilterAst)} at call sites that build queries.
+     * A filter containing {@code EXISTS} / {@code NOT EXISTS} requires
+     * {@link #toNextFilter(FilterAst, WhereCompiler)} so its graph pattern can be compiled.
      */
     public static Filter toNextFilter(FilterAst filterClause) {
         Objects.requireNonNull(filterClause, "filterClause");
         return toNextFilter(filterClause.operator());
+    }
+
+    /**
+     * Converts a {@code FILTER} clause, compiling the graph pattern of any embedded
+     * {@code EXISTS} / {@code NOT EXISTS} with the given {@link WhereCompiler}.
+     */
+    public static Filter toNextFilter(FilterAst filterClause, WhereCompiler whereCompiler) {
+        Objects.requireNonNull(filterClause, "filterClause");
+        return toNextFilter(filterClause.operator(), whereCompiler);
     }
 
     /**
@@ -55,12 +67,45 @@ public final class SparqlAstToExpression {
      *
      * <p>Prefer {@link CoreseAstQueryBuilder#toNextFilter(TermAst)} at call sites that build queries; this
      * method is the shared implementation. For a full {@link FilterAst} node, use {@link #toNextFilter(FilterAst)}.
+     * Filters containing {@code EXISTS} / {@code NOT EXISTS} require
+     * {@link #toNextFilter(TermAst, WhereCompiler)} so their graph pattern can be compiled.
      */
     public static Filter toNextFilter(TermAst filterExpression) {
+        return toNextFilter(filterExpression, null);
+    }
+
+    /**
+     * Converts a filter {@link TermAst}, then compiles the graph pattern of every embedded
+     * {@code EXISTS} / {@code NOT EXISTS} with the given {@link WhereCompiler}.
+     *
+     */
+    public static Filter toNextFilter(TermAst filterExpression, WhereCompiler whereCompiler) {
         Expression exprTree = convert(filterExpression);
+        compileExists(exprTree, whereCompiler);
         initializeExpList(exprTree);
         AstBackedExpr expr = new AstBackedExpr(exprTree, Optional.of(filterExpression));
         return expr.getFilter();
+    }
+
+    /**
+     * Second pass: compiles the graph pattern carried by every {@link AstBackedExistTerm} of the
+     * expression tree. Mirrors {@code compileExist} of the historical pipeline.
+     */
+    private static void compileExists(Expression expression, WhereCompiler whereCompiler) {
+        if (expression instanceof AstBackedExistTerm exist) {
+            if (whereCompiler == null) {
+                throw new IllegalArgumentException(
+                        "EXISTS / NOT EXISTS filter conversion requires a WhereCompiler "
+                                + "to compile its graph pattern");
+            }
+            exist.setCompiledPattern(whereCompiler.compile(exist.patternAst()));
+            return;
+        }
+        if (expression instanceof Term term) {
+            for (Expression arg : term.getArgs()) {
+                compileExists(arg, whereCompiler);
+            }
+        }
     }
 
     /**
@@ -75,14 +120,14 @@ public final class SparqlAstToExpression {
         }
     }
 
-    private static Constant literalToConstant(LiteralAst l) {
-        if (l.lang() != null && !l.lang().isEmpty()) {
-            return Constant.create(unquoteLexical(l.lexical()), RDF.rdflangString, l.lang());
+    private static Constant literalToConstant(String lexical, String lang, String datatype) {
+        if (lang != null && !lang.isEmpty()) {
+            return Constant.create(unquoteLexical(lexical), RDF.rdflangString, lang);
         }
-        if (l.datatype() != null && !l.datatype().isEmpty()) {
-            return Constant.create(unquoteLexical(l.lexical()), normalizeDatatypeIri(l.datatype()), null);
+        if (datatype != null && !datatype.isEmpty()) {
+            return Constant.create(unquoteLexical(lexical), normalizeDatatypeIri(datatype), null);
         }
-        return Constant.createString(unquoteLexical(l.lexical()));
+        return Constant.createString(unquoteLexical(lexical));
     }
 
     private static String unquoteLexical(String lexical) {
@@ -103,8 +148,8 @@ public final class SparqlAstToExpression {
         return fr.inria.corese.core.sparql.triple.parser.NSManager.nsm().toNamespace(d);
     }
 
-    private static Constant iriToConstant(IriAst i) {
-        String raw = StringUtils.trimChevronIRIs(i.raw());
+    private static Constant iriToConstant(String rawIri) {
+        String raw = StringUtils.trimChevronIRIs(rawIri);
         if (raw.startsWith(IOConstants.BLANK_NODE_PREFIX)) {
             return Constant.createBlank(raw.substring(IOConstants.BLANK_NODE_PREFIX.length()));
         }
@@ -142,7 +187,7 @@ public final class SparqlAstToExpression {
             case UnaryMinusAst unaryMinusAst ->
                     Term.create("-", convert(unaryMinusAst.argument()));
             case BooleanNotAst booleanNotAst ->
-                    Term.create("!", convert(booleanNotAst.argument()));
+                    notTerm(convert(booleanNotAst.argument()));
             case BoundAst boundAst ->
                     functionTerm(Processor.BOUND, convert(boundAst.argument()));
             case IsIriAst isIriAst ->
@@ -165,14 +210,14 @@ public final class SparqlAstToExpression {
                     regexTerm(convert(binaryRegexAst.getString()), convert(binaryRegexAst.getPattern()));
             case TrinaryRegexAst trinaryRegexAst ->
                     regexTerm(convert(trinaryRegexAst.getString()), convert(trinaryRegexAst.getPattern()), convert(trinaryRegexAst.getFlags()));
-            case FunctionCallAst callAst ->
-                    functionCallAst(callAst);
+            case FunctionCallAst(TermAst functionName, List<TermAst> arguments) ->
+                    functionCallAst(functionName, arguments);
             case ConcatAst concatAst ->
                     variadicTerm("concat", concatAst.arguments());
             case CoalesceAst coalesceAst ->
                     variadicTerm(Processor.COALESCE, coalesceAst.arguments());
-            case IfAst ifAst ->
-                    Term.function(Processor.IF, convert(ifAst.condition()), convert(ifAst.thenExpr()), convert(ifAst.elseExpr()));
+            case IfAst(TermAst condition, TermAst thenExpr, TermAst elseExpr) ->
+                    Term.function(Processor.IF, convert(condition), convert(thenExpr), convert(elseExpr));
             case ReplaceAst replaceAst ->
                     replaceToTerm(replaceAst);
             case SubstrAst substrAst ->
@@ -211,17 +256,29 @@ public final class SparqlAstToExpression {
                     functionTerm("sha384", convert(sha384Ast.argument()));
             case Sha512Ast sha512Ast ->
                     functionTerm("sha512", convert(sha512Ast.argument()));
-            case ExistsAst existsAst ->
-                    throw new UnsupportedQueryFeatureException(
-                            "EXISTS filters are not supported yet by the next pipeline");
-            case NotExistsAst notExistsAst ->
-                    throw new UnsupportedQueryFeatureException(
-                            "NOT EXISTS filters are not supported yet by the next pipeline");
+            case ExistsAst(GroupGraphPatternAst pattern) ->
+                    new AstBackedExistTerm(pattern);
+            case NotExistsAst(GroupGraphPatternAst pattern) ->
+                    notTerm(new AstBackedExistTerm(pattern));
             default ->
                     throw new UnsupportedQueryFeatureException(
                             "Filter expression is not supported yet by the next pipeline: "
                                     + constraint.getClass().getSimpleName());
         };
+    }
+
+    /**
+     * Builds a boolean negation with the runtime operator code already set.
+     *
+     * <p>The interpreter resolves operator codes in a later compilation phase
+     * ({@code Processor.type(Term, ASTQuery)}) that this bridge never runs, so {@code oper()} is set
+     * explicitly here. This keeps {@code !EXISTS { ... }} and {@code NOT EXISTS { ... }}
+     * equivalent to KGRAM.</p>
+     */
+    private static Term notTerm(Expression expression) {
+        Term not = Term.create("!", expression);
+        not.setOper(fr.inria.corese.core.next.query.kgram.api.core.ExprType.NOT);
+        return not;
     }
 
     private static Term functionTerm(String name, Expression arg) {
@@ -252,10 +309,10 @@ public final class SparqlAstToExpression {
         return t;
     }
 
-    private static Term functionCallAst(FunctionCallAst f) {
-        String name = SparqlBuiltinFunctionNameResolver.fromFunctionTerm(f.functionName());
+    private static Term functionCallAst(TermAst functionName, List<TermAst> arguments) {
+        String name = SparqlBuiltinFunctionNameResolver.fromFunctionTerm(functionName);
         Term t = Term.function(name);
-        for (TermAst arg : f.arguments()) {
+        for (TermAst arg : arguments) {
             t.add(convert(arg));
         }
         return t;

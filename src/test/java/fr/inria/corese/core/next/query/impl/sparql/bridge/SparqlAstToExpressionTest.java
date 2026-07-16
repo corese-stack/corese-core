@@ -1,11 +1,11 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
-import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.ExistsAst;
+import fr.inria.corese.core.next.query.kgram.api.core.ExprType;
 import fr.inria.corese.core.sparql.triple.parser.Constant;
 import fr.inria.corese.core.sparql.triple.parser.Expression;
 import fr.inria.corese.core.sparql.triple.parser.Variable;
@@ -40,21 +40,33 @@ class SparqlAstToExpressionTest {
 
     @Test
     void varAstToExpression() {
-        VarAst var = new VarAst("var1");
-        Expression varNode = SparqlAstToExpression.convert(var);
+        VarAst variableAst = new VarAst("var1");
+        Expression varNode = SparqlAstToExpression.convert(variableAst);
         assertNotNull(varNode);
         assertInstanceOf(Variable.class, varNode);
         assertEquals("var1", varNode.getLabel());
     }
 
     @Test
-    void existsFilterFailsWithUnsupportedQueryFeatureException() {
+    void existsFilterConvertsToExistTerm() {
         ExistsAst exists = new ExistsAst(new GroupGraphPatternAst(List.of()));
 
-        UnsupportedQueryFeatureException error = assertThrows(
-                UnsupportedQueryFeatureException.class,
-                () -> SparqlAstToExpression.convert(exists));
+        Expression term = SparqlAstToExpression.convert(exists);
 
-        assertTrue(error.getMessage().contains("EXISTS filters"));
+        assertNotNull(term);
+        assertEquals(ExprType.EXIST, term.oper());
+        assertTrue(term.isExist());
+        assertTrue(term.isRecExist());
+    }
+
+    @Test
+    void existsFilterRequiresWhereCompilerWhenConvertedToFilter() {
+        ExistsAst exists = new ExistsAst(new GroupGraphPatternAst(List.of()));
+
+        IllegalArgumentException error = assertThrows(
+                IllegalArgumentException.class,
+                () -> SparqlAstToExpression.toNextFilter(exists));
+
+        assertTrue(error.getMessage().contains("WhereCompiler"));
     }
 }

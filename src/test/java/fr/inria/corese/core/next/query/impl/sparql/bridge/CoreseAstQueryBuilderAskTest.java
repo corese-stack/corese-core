@@ -15,8 +15,12 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ValueMappingAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ValuesAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.ExistsAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.GreaterThanAst;
+import fr.inria.corese.core.next.query.kgram.api.core.Expr;
+import fr.inria.corese.core.next.query.kgram.api.core.ExprType;
 import fr.inria.corese.core.next.query.kgram.api.core.Node;
+import fr.inria.corese.core.next.query.kgram.core.Exp;
 import fr.inria.corese.core.next.query.kgram.core.Query;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -166,6 +170,51 @@ class CoreseAstQueryBuilderAskTest extends AbstractSparqlParserFeatureTest {
         assertEquals(1, query.getOrderBy().size());
         assertEquals("s", query.getOrderBy().getFirst().getNode().getLabel());
         assertFalse(query.getOrderBy().getFirst().status());
+    }
+
+    @Test
+    @DisplayName("ASK WHERE { FILTER EXISTS { ... } } compiles the EXISTS pattern")
+    void filterExistsInAskWhere() {
+        GroupGraphPatternAst existsPattern = new GroupGraphPatternAst(List.of(
+                new BgpAst(List.of(new TriplePatternAst(new VarAst("s"), new VarAst("p"), new VarAst("o"))))));
+        FilterAst filter = new FilterAst(new ExistsAst(existsPattern));
+        GroupGraphPatternAst where = new GroupGraphPatternAst(List.of(
+                new BgpAst(List.of(new TriplePatternAst(new VarAst("s"), new VarAst("p"), new VarAst("o")))),
+                filter));
+        AskQueryAst ask = new AskQueryAst(DatasetClauseAst.none(), where);
+
+        Query query = builder.toNextQuery(ask);
+
+        assertTrue(query.isAsk());
+        Exp filterExp = findFilter(query.getBody());
+        assertNotNull(filterExp, "FILTER is in the compiled body");
+        assertEquals(ExprType.EXIST, filterExp.getFilter().getExp().oper(), "operator is EXIST");
+        assertInstanceOf(Exp.class, filterExp.getFilter().getExp().getPattern(), "EXISTS pattern is compiled");
+    }
+
+    @Test
+    @DisplayName("Parser -> ASK WHERE { FILTER NOT EXISTS } produces NOT wrapping EXIST")
+    void parsedAskWithFilterNotExists() {
+        AskQueryAst ask = assertInstanceOf(AskQueryAst.class,
+                newParserDefault().parse("ASK WHERE { ?s ?p ?o . FILTER NOT EXISTS { ?s <http://example.org/type> ?t } }"));
+
+        Query query = builder.toNextQuery(ask);
+
+        assertTrue(query.isAsk());
+        Exp filterExp = findFilter(query.getBody());
+        assertNotNull(filterExp, "FILTER NOT EXISTS compiled into body");
+        Expr notExpr = filterExp.getFilter().getExp();
+        assertEquals(ExprType.NOT, notExpr.oper(), "top operator is boolean NOT");
+        assertEquals(ExprType.EXIST, notExpr.getExpList().getFirst().oper(), "inner expression is EXIST");
+    }
+
+    private static Exp findFilter(Exp body) {
+        for (int i = 0; i < body.size(); i++) {
+            if (body.get(i).isFilter()) {
+                return body.get(i);
+            }
+        }
+        return null;
     }
 
     private static List<String> labels(List<Node> nodes) {

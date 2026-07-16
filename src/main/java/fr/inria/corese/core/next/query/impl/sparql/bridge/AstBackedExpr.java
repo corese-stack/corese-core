@@ -70,6 +70,9 @@ public final class AstBackedExpr implements Expr {
 
     @Override
     public Object getPattern() {
+        if (delegate instanceof AstBackedExistTerm exist) {
+            return exist.compiledPattern();
+        }
         return delegate.getPattern();
     }
 
