@@ -40,8 +40,8 @@ class SparqlAstToExpressionTest {
 
     @Test
     void varAstToExpression() {
-        VarAst var = new VarAst("var1");
-        Expression varNode = SparqlAstToExpression.convert(var);
+        VarAst variableAst = new VarAst("var1");
+        Expression varNode = SparqlAstToExpression.convert(variableAst);
         assertNotNull(varNode);
         assertInstanceOf(Variable.class, varNode);
         assertEquals("var1", varNode.getLabel());
@@ -55,5 +55,18 @@ class SparqlAstToExpressionTest {
 
         assertNotNull(term);
         assertEquals(ExprType.EXIST, term.oper());
+        assertTrue(term.isExist());
+        assertTrue(term.isRecExist());
+    }
+
+    @Test
+    void existsFilterRequiresWhereCompilerWhenConvertedToFilter() {
+        ExistsAst exists = new ExistsAst(new GroupGraphPatternAst(List.of()));
+
+        IllegalArgumentException error = assertThrows(
+                IllegalArgumentException.class,
+                () -> SparqlAstToExpression.toNextFilter(exists));
+
+        assertTrue(error.getMessage().contains("WhereCompiler"));
     }
 }

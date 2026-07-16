@@ -6,15 +6,17 @@ import fr.inria.corese.core.next.query.kgram.core.Exp;
 import fr.inria.corese.core.sparql.triple.parser.ASTBuffer;
 import fr.inria.corese.core.sparql.triple.parser.Term;
 
+import java.util.Objects;
+
 final class AstBackedExistTerm extends Term {
 
-    private final transient GroupGraphPatternAst patternAst;
-    private transient Exp compiledPattern;
+    private final GroupGraphPatternAst patternAst;
+    private Exp compiledPattern;
 
     AstBackedExistTerm(GroupGraphPatternAst patternAst) {
         super("exists");
         setOper(ExprType.EXIST);
-        this.patternAst = patternAst;
+        this.patternAst = Objects.requireNonNull(patternAst, "patternAst");
     }
 
     GroupGraphPatternAst patternAst() {
@@ -37,6 +39,11 @@ final class AstBackedExistTerm extends Term {
      */
     @Override
     public boolean isTermExist() {
+        return true;
+    }
+
+    @Override
+    public boolean isExist() {
         return true;
     }
 
