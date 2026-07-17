@@ -12,19 +12,19 @@ import javax.xml.transform.OutputKeys;
 
 import java.io.StringWriter;
 
-import static fr.inria.corese.core.next.query.impl.sparql.io.serializer.xml.XMLSerializerConstants.YES_PROPERTY_VALUE;
+import static fr.inria.corese.core.next.query.impl.sparql.io.serializer.xml.XmlResultConstants.YES_PROPERTY_VALUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class XMLSerializerTest extends AbstractResultSerializerTest implements LinksSerializerTest {
+public class XmlTupleResultSerializerTest extends AbstractResultSerializerTest implements LinksSerializerTest {
     @Override
     protected ResultSerializer getResultSerializer(TupleQueryResult results) {
-        XMLSerializerOptions options = new XMLSerializerOptions.Builder().setXMLSetting(OutputKeys.STANDALONE, YES_PROPERTY_VALUE).build();
-        return new XMLSerializer(results, options);
+        XmlResultSerializerOptions options = new XmlResultSerializerOptions.Builder().setXMLSetting(OutputKeys.STANDALONE, YES_PROPERTY_VALUE).build();
+        return new XmlTupleResultSerializer(results, options);
     }
 
     @Override
     protected ResultSerializer getResultSerializer(TupleQueryResult results, IOOptions options) {
-        return new XMLSerializer(results, options);
+        return new XmlTupleResultSerializer(results, options);
     }
 
     @Override

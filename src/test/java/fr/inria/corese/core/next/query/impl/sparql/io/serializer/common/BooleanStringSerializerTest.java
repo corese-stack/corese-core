@@ -1,17 +1,18 @@
 package fr.inria.corese.core.next.query.impl.sparql.io.serializer.common;
 
 import fr.inria.corese.core.next.data.api.io.IOOptions;
+import fr.inria.corese.core.next.query.api.io.ResultFormat;
 import fr.inria.corese.core.next.query.api.io.serializer.BooleanResultSerializer;
 
 public class BooleanStringSerializerTest extends AbstractBooleanResultSerializerTest {
     @Override
     protected BooleanResultSerializer getSerializer(boolean result) {
-        return new BooleanStringSerializer(result);
+        return new BooleanStringSerializer(result, ResultFormat.CSV);
     }
 
     @Override
     protected BooleanResultSerializer getSerializer(boolean result, IOOptions options) {
-        return new BooleanStringSerializer(result, options);
+        return new BooleanStringSerializer(result, ResultFormat.CSV);
     }
 
     @Override

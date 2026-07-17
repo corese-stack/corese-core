@@ -18,15 +18,15 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static fr.inria.corese.core.next.query.impl.sparql.io.serializer.common.ResultSerializerTestUtils.MockQueryResults;
 
-public class JSONSerializerTest extends AbstractResultSerializerTest implements LinksSerializerTest {
+public class JsonTupleResultSerializerTest extends AbstractResultSerializerTest implements LinksSerializerTest {
     @Override
     protected ResultSerializer getResultSerializer(TupleQueryResult results) {
-        return new JSONSerializer(results);
+        return new JsonTupleResultSerializer(results);
     }
 
     @Override
     protected ResultSerializer getResultSerializer(TupleQueryResult results, IOOptions options) {
-        return new JSONSerializer(results, options);
+        return new JsonTupleResultSerializer(results, options);
     }
 
     @Override
@@ -272,7 +272,7 @@ public class JSONSerializerTest extends AbstractResultSerializerTest implements 
     @Test
     @DisplayName("Tests the serialization of the results used as example in the SPARQL result JSON format recommendation")
     public void JSONStandardResultsTest() {
-        JSONSerializerOptions options = new JSONSerializerOptions.Builder().addLink("http://www.w3.org/TR/rdf-sparql-XMLres/example.rq").build();
+        JsonResultSerializerOptions options = new JsonResultSerializerOptions.Builder().addLink("http://www.w3.org/TR/rdf-sparql-XMLres/example.rq").build();
         ResultSerializer serializer = getResultSerializer(getJSONStandardResults(), options);
         StringWriter writer = new StringWriter();
         serializer.write(writer);

@@ -9,7 +9,7 @@ import fr.inria.corese.core.next.data.api.io.IOOptions;
 import fr.inria.corese.core.next.data.impl.common.literal.RDF;
 import fr.inria.corese.core.next.data.impl.common.literal.XSD;
 import fr.inria.corese.core.next.data.impl.exception.SerializationException;
-import fr.inria.corese.core.next.query.api.base.io.ResultFormat;
+import fr.inria.corese.core.next.query.api.io.ResultFormat;
 import fr.inria.corese.core.next.query.api.io.serializer.LinksOptions;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
 import fr.inria.corese.core.next.query.api.result.BindingSet;
@@ -21,18 +21,18 @@ import java.io.Writer;
 /**
  * Serializer for SPARQL results in JSON as described in <a href="https://www.w3.org/TR/2013/REC-sparql11-results-json-20130321/">the W3C recommendation<a/>
  */
-public class JSONSerializer  implements ResultSerializer {
+public class JsonTupleResultSerializer  implements ResultSerializer {
 
     private final TupleQueryResult results;
     private final IOOptions config;
 
-    public JSONSerializer(TupleQueryResult results, IOOptions options) {
+    public JsonTupleResultSerializer(TupleQueryResult results, IOOptions options) {
         this.config = options;
         this.results = results;
     }
 
-    public JSONSerializer(TupleQueryResult results) {
-        this(results, new JSONSerializerOptions.Builder().build());
+    public JsonTupleResultSerializer(TupleQueryResult results) {
+        this(results, new JsonResultSerializerOptions.Builder().build());
     }
 
     @Override
@@ -41,15 +41,15 @@ public class JSONSerializer  implements ResultSerializer {
 
         // header
         JsonObjectBuilder headerbuilder = Json.createObjectBuilder()
-                .add(JSONSerializerConstants.VARS, Json.createArrayBuilder(this.results.getBindingNames()));
+                .add(JsonResultConstants.VARS, Json.createArrayBuilder(this.results.getBindingNames()));
         if(this.config instanceof LinksOptions linksOptions && ! linksOptions.links().isEmpty() ) {
-            headerbuilder.add(JSONSerializerConstants.LINK, Json.createArrayBuilder(linksOptions.links()));
+            headerbuilder.add(JsonResultConstants.LINK, Json.createArrayBuilder(linksOptions.links()));
         }
-        resultBuilder.add(JSONSerializerConstants.HEAD, headerbuilder.build());
+        resultBuilder.add(JsonResultConstants.HEAD, headerbuilder.build());
 
         // Result bindings
-        resultBuilder.add(JSONSerializerConstants.RESULTS, Json.createObjectBuilder()
-                .add(JSONSerializerConstants.BINDINGS, Json.createArrayBuilder(this.results.stream().map(this::bindingSetToJson).toList()))
+        resultBuilder.add(JsonResultConstants.RESULTS, Json.createObjectBuilder()
+                .add(JsonResultConstants.BINDINGS, Json.createArrayBuilder(this.results.stream().map(this::bindingSetToJson).toList()))
         );
 
         JsonWriter jsonWriter = Json.createWriter(writer);
@@ -77,13 +77,13 @@ public class JSONSerializer  implements ResultSerializer {
     private JsonObject valueToJson(Value value) {
         if(value instanceof IRI iriValue) {
             return Json.createObjectBuilder()
-                    .add(JSONSerializerConstants.TYPE, JSONSerializerConstants.URI)
-                    .add(JSONSerializerConstants.VALUE, iriValue.stringValue())
+                    .add(JsonResultConstants.TYPE, JsonResultConstants.URI)
+                    .add(JsonResultConstants.VALUE, iriValue.stringValue())
                 .build();
         } else if (value instanceof BNode bnodeValue) {
             return Json.createObjectBuilder()
-                    .add(JSONSerializerConstants.TYPE, JSONSerializerConstants.BNODE)
-                    .add(JSONSerializerConstants.VALUE, bnodeValue.getID())
+                    .add(JsonResultConstants.TYPE, JsonResultConstants.BNODE)
+                    .add(JsonResultConstants.VALUE, bnodeValue.getID())
                     .build();
         } else if (value instanceof Literal literalValue) {
             JsonObjectBuilder literalBuilder = Json.createObjectBuilder();
@@ -91,13 +91,13 @@ public class JSONSerializer  implements ResultSerializer {
                     && literalValue.getDatatype() != null
                     && literalValue.getDatatype() != XSD.STRING.getIRI()
                     && literalValue.getDatatype() != RDF.LANGSTRING.getIRI()){
-                literalBuilder.add(JSONSerializerConstants.DATATYPE, literalValue.getDatatype().stringValue());
+                literalBuilder.add(JsonResultConstants.DATATYPE, literalValue.getDatatype().stringValue());
             }
             String literalStringValue = literalValue.stringValue();
-            literalBuilder.add(JSONSerializerConstants.TYPE, JSONSerializerConstants.LITERAL)
-                    .add(JSONSerializerConstants.VALUE, literalStringValue);
+            literalBuilder.add(JsonResultConstants.TYPE, JsonResultConstants.LITERAL)
+                    .add(JsonResultConstants.VALUE, literalStringValue);
             if(literalValue.getLanguage().isPresent()) {
-                literalBuilder.add(JSONSerializerConstants.LANG, literalValue.getLanguage().get());
+                literalBuilder.add(JsonResultConstants.LANG, literalValue.getLanguage().get());
             }
             return literalBuilder.build();
         }

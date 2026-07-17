@@ -1,22 +1,22 @@
 package fr.inria.corese.core.next.query.impl.sparql.io.serializer.csv;
 
 import fr.inria.corese.core.next.data.api.io.IOOptions;
-import fr.inria.corese.core.next.query.api.base.io.ResultFormat;
+import fr.inria.corese.core.next.query.api.io.ResultFormat;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
-import fr.inria.corese.core.next.query.impl.sparql.io.serializer.ResultSerializerFactory;
+import fr.inria.corese.core.next.query.impl.sparql.io.serializer.DefaultResultSerializerFactory;
 import fr.inria.corese.core.next.query.impl.sparql.io.serializer.common.AbstractResultSerializerTest;
 
-public class CSVSerializerTest extends AbstractResultSerializerTest {
+public class CsvTupleResultSerializerTest extends AbstractResultSerializerTest {
 
     @Override
     protected ResultSerializer getResultSerializer(TupleQueryResult results) {
-        return new ResultSerializerFactory().createSerializer(ResultFormat.CSV, results);
+        return new DefaultResultSerializerFactory().createTupleSerializer(ResultFormat.CSV, results);
     }
 
     @Override
     protected ResultSerializer getResultSerializer(TupleQueryResult results, IOOptions options) {
-        return new ResultSerializerFactory().createSerializer(ResultFormat.CSV, results, options);
+        return new DefaultResultSerializerFactory().createTupleSerializer(ResultFormat.CSV, results, options);
     }
 
     @Override

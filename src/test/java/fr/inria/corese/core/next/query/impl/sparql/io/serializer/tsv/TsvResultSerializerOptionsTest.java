@@ -4,11 +4,11 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class TSVSerializerOptionsTest {
+class TsvResultSerializerOptionsTest {
 
     @Test
     void getLineEnding() {
-        TSVSerializerOptions options = new TSVSerializerOptions.Builder().setLineEnding("tata").build();
+        TsvResultSerializerOptions options = new TsvResultSerializerOptions.Builder().setLineEnding("tata").build();
 
         assertEquals("tata", options.getLineEnding());
     }

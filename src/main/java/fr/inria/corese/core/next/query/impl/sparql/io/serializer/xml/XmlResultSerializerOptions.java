@@ -9,10 +9,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class XMLSerializerOptions  extends AbstractIOOptions implements LinksOptions {
-    private final XMLSerializerOptions.Builder builder;
+public class XmlResultSerializerOptions  extends AbstractIOOptions implements LinksOptions {
+    private final XmlResultSerializerOptions.Builder builder;
 
-    protected XMLSerializerOptions(XMLSerializerOptions.Builder builder) {
+    protected XmlResultSerializerOptions(XmlResultSerializerOptions.Builder builder) {
         this.builder = builder;
     }
 
@@ -25,13 +25,13 @@ public class XMLSerializerOptions  extends AbstractIOOptions implements LinksOpt
         return this.builder.links;
     }
 
-    public static class Builder extends AbstractIOOptions.Builder<XMLSerializerOptions> {
+    public static class Builder extends AbstractIOOptions.Builder<XmlResultSerializerOptions> {
         private final Map<String, String> xmlSettings;
         private final Collection<String> links;
 
         public Builder() {
             this.xmlSettings = new HashMap<>();
-            this.xmlSettings.put(OutputKeys.STANDALONE, XMLSerializerConstants.YES_PROPERTY_VALUE);
+            this.xmlSettings.put(OutputKeys.STANDALONE, XmlResultConstants.YES_PROPERTY_VALUE);
             this.links = new ArrayList<>();
         }
 
@@ -51,7 +51,7 @@ public class XMLSerializerOptions  extends AbstractIOOptions implements LinksOpt
          * @param link preferably a URI
          * @return this
          */
-        public XMLSerializerOptions.Builder addLink(String link) {
+        public XmlResultSerializerOptions.Builder addLink(String link) {
             this.links.add(link);
             return this;
         }
@@ -61,14 +61,14 @@ public class XMLSerializerOptions  extends AbstractIOOptions implements LinksOpt
          * @param links preferably a set of URIs
          * @return this
          */
-        public XMLSerializerOptions.Builder addLinks(Collection<String> links) {
+        public XmlResultSerializerOptions.Builder addLinks(Collection<String> links) {
             this.links.addAll(links);
             return this;
         }
 
         @Override
-        public XMLSerializerOptions build() {
-            return new XMLSerializerOptions(this);
+        public XmlResultSerializerOptions build() {
+            return new XmlResultSerializerOptions(this);
         }
     }
 }

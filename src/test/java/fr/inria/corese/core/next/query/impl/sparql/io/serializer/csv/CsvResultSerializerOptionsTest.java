@@ -4,11 +4,11 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class CSVSerializerOptionsTest {
+class CsvResultSerializerOptionsTest {
 
     @Test
     void getLineEnding() {
-        CSVSerializerOptions options = new CSVSerializerOptions.Builder().setLineEnding("tata").build();
+        CsvResultSerializerOptions options = new CsvResultSerializerOptions.Builder().setLineEnding("tata").build();
 
         assertEquals("tata", options.getLineEnding());
     }

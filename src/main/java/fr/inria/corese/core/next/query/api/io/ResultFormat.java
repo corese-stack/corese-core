@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.query.api.base.io;
+package fr.inria.corese.core.next.query.api.io;
 
 import fr.inria.corese.core.next.data.api.base.io.FileFormat;
 
@@ -7,7 +7,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 /**
- * Describes the SPARQL results serialization formats. Defines the static constants representing the standard formats for result representation.
+ * Describes the standard SPARQL result serialization formats.
  */
 public class ResultFormat extends FileFormat {
 
@@ -65,10 +65,10 @@ public class ResultFormat extends FileFormat {
     }
 
     /**
-     * Finds a known RDF format by file extension (case-insensitive).
+     * Finds a known SPARQL result format by file extension (case-insensitive).
      *
-     * @param extension The file extension (e.g., "ttl").
-     * @return An Optional containing the matching RdfFormat if found.
+     * @param extension The file extension (for example, {@code "srx"}).
+     * @return an optional containing the matching result format
      */
     public static Optional<ResultFormat> byExtension(String extension) {
         String ext = extension.toLowerCase(Locale.ROOT);
@@ -79,10 +79,10 @@ public class ResultFormat extends FileFormat {
     }
 
     /**
-     * Finds a known RDF format by MIME type (case-insensitive).
+     * Finds a known SPARQL result format by MIME type (case-insensitive).
      *
-     * @param mimeType The MIME type (e.g., "text/turtle").
-     * @return An Optional containing the matching RdfFormat if found.
+     * @param mimeType The MIME type (for example, {@code "application/sparql-results+json"}).
+     * @return an optional containing the matching result format
      */
     public static Optional<ResultFormat> byMimeType(String mimeType) {
         String mime = mimeType.toLowerCase(Locale.ROOT);
@@ -93,9 +93,9 @@ public class ResultFormat extends FileFormat {
     }
 
     /**
-     * Returns a list of all known RDF formats.
+     * Returns all known SPARQL result formats.
      *
-     * @return An unmodifiable List of all RdfFormat constants.
+     * @return an unmodifiable list of result formats
      */
     public static List<ResultFormat> all() {
         return List.of(CSV, TSV, JSON, XML);

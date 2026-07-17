@@ -1,8 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.io.serializer.common;
 
-import fr.inria.corese.core.next.data.api.base.io.FileFormat;
-import fr.inria.corese.core.next.data.api.io.IOOptions;
 import fr.inria.corese.core.next.data.impl.exception.SerializationException;
+import fr.inria.corese.core.next.query.api.io.ResultFormat;
 import fr.inria.corese.core.next.query.api.io.serializer.BooleanResultSerializer;
 
 import java.io.IOException;
@@ -14,13 +13,11 @@ import java.io.Writer;
 public class BooleanStringSerializer implements BooleanResultSerializer {
 
     private final boolean result;
+    private final ResultFormat format;
 
-    public BooleanStringSerializer(boolean result) {
+    public BooleanStringSerializer(boolean result, ResultFormat format) {
         this.result = result;
-    }
-
-    BooleanStringSerializer(boolean result, IOOptions options) {
-        this.result = result;
+        this.format = format;
     }
 
     @Override
@@ -33,7 +30,7 @@ public class BooleanStringSerializer implements BooleanResultSerializer {
     }
 
     @Override
-    public FileFormat getFormat() {
-        return FileFormat.PLAIN_TEXT;
+    public ResultFormat getFormat() {
+        return format;
     }
 }

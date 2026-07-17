@@ -1,11 +1,11 @@
 package fr.inria.corese.core.next.query.impl.sparql.io.serializer.xml;
 
-public class XMLSerializerConstants {
+final class XmlResultConstants {
 
     /**
      * Forbids instantiation
      */
-    private XMLSerializerConstants() {}
+    private XmlResultConstants() {}
 
     public static final String SPARQL_RESULT_NS = "http://www.w3.org/2005/sparql-results#";
     public static final String XSI_NS = "http://www.w3.org/2001/XMLSchema-instance";

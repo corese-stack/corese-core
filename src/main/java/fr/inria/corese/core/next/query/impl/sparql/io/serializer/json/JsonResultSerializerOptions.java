@@ -9,10 +9,10 @@ import java.util.Collection;
 /**
  * Options to configure the SPARQL results JSON serializer
  */
-public class JSONSerializerOptions extends AbstractIOOptions implements LinksOptions {
-    private final JSONSerializerOptions.Builder builder;
+public class JsonResultSerializerOptions extends AbstractIOOptions implements LinksOptions {
+    private final JsonResultSerializerOptions.Builder builder;
 
-    protected JSONSerializerOptions(JSONSerializerOptions.Builder builder) {
+    protected JsonResultSerializerOptions(JsonResultSerializerOptions.Builder builder) {
         this.builder = builder;
     }
 
@@ -21,7 +21,7 @@ public class JSONSerializerOptions extends AbstractIOOptions implements LinksOpt
         return this.builder.links;
     }
 
-    public static class Builder extends AbstractIOOptions.Builder<JSONSerializerOptions> {
+    public static class Builder extends AbstractIOOptions.Builder<JsonResultSerializerOptions> {
         private final Collection<String> links;
 
         public Builder() {
@@ -29,8 +29,8 @@ public class JSONSerializerOptions extends AbstractIOOptions implements LinksOpt
         }
 
         @Override
-        public JSONSerializerOptions build() {
-            return new JSONSerializerOptions(this);
+        public JsonResultSerializerOptions build() {
+            return new JsonResultSerializerOptions(this);
         }
 
         /**

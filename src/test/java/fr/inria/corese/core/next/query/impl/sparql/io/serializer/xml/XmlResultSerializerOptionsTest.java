@@ -12,19 +12,19 @@ import java.util.List;
 import static fr.inria.corese.core.next.query.impl.sparql.io.serializer.common.ResultSerializerTestUtils.MockQueryResults;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class XMLSerializerOptionsTest {
+public class XmlResultSerializerOptionsTest {
 
     @Test
     @DisplayName("Tests the application of the indent XML option to the serializer")
     void xmlSerializerIndentPropertyTest() {
         StringWriter outputWriter = new StringWriter();
 
-        IOOptions options = new XMLSerializerOptions.Builder()
-                .setXMLSetting(OutputKeys.INDENT, XMLSerializerConstants.YES_PROPERTY_VALUE)
+        IOOptions options = new XmlResultSerializerOptions.Builder()
+                .setXMLSetting(OutputKeys.INDENT, XmlResultConstants.YES_PROPERTY_VALUE)
                 .build();
 
         MockQueryResults results = new MockQueryResults(List.of("x"), List.of());
-        ResultSerializer serializer = new XMLSerializer(results, options);
+        ResultSerializer serializer = new XmlTupleResultSerializer(results, options);
         serializer.write(outputWriter);
 
         String expected =
@@ -46,9 +46,9 @@ public class XMLSerializerOptionsTest {
     @DisplayName("Tests the application of the standalone XML options to the serializer")
     void xmlSerializerStandalonePropertyTest() {
         StringWriter outputWriter = new StringWriter();
-        IOOptions options = new XMLSerializerOptions.Builder().setXMLSetting(OutputKeys.STANDALONE, XMLSerializerConstants.NO_PROPERTY_VALUE).build();
+        IOOptions options = new XmlResultSerializerOptions.Builder().setXMLSetting(OutputKeys.STANDALONE, XmlResultConstants.NO_PROPERTY_VALUE).build();
         MockQueryResults results = new MockQueryResults(List.of("x"), List.of());
-        ResultSerializer serializer = new XMLSerializer(results, options);
+        ResultSerializer serializer = new XmlTupleResultSerializer(results, options);
         serializer.write(outputWriter);
 
         assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
@@ -64,9 +64,9 @@ public class XMLSerializerOptionsTest {
     @DisplayName("Tests the application of the declaration XML options to the serializer")
     void xmlSerializerOmitDeclarationPropertyTest() {
         StringWriter outputWriter = new StringWriter();
-        IOOptions options = new XMLSerializerOptions.Builder().setXMLSetting(OutputKeys.OMIT_XML_DECLARATION, XMLSerializerConstants.YES_PROPERTY_VALUE).build();
+        IOOptions options = new XmlResultSerializerOptions.Builder().setXMLSetting(OutputKeys.OMIT_XML_DECLARATION, XmlResultConstants.YES_PROPERTY_VALUE).build();
         MockQueryResults results = new MockQueryResults(List.of("x"), List.of());
-        ResultSerializer serializer = new XMLSerializer(results, options);
+        ResultSerializer serializer = new XmlTupleResultSerializer(results, options);
         serializer.write(outputWriter);
 
         assertEquals("<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">" +
@@ -81,9 +81,9 @@ public class XMLSerializerOptionsTest {
     @DisplayName("Tests the application of the declaration XML options to the serializer")
     void xmlSerializerMediaTypePropertyTest() {
         StringWriter outputWriter = new StringWriter();
-        IOOptions options = new XMLSerializerOptions.Builder().setXMLSetting(OutputKeys.OMIT_XML_DECLARATION, XMLSerializerConstants.YES_PROPERTY_VALUE).build();
+        IOOptions options = new XmlResultSerializerOptions.Builder().setXMLSetting(OutputKeys.OMIT_XML_DECLARATION, XmlResultConstants.YES_PROPERTY_VALUE).build();
         MockQueryResults results = new MockQueryResults(List.of("x"), List.of());
-        ResultSerializer serializer = new XMLSerializer(results, options);
+        ResultSerializer serializer = new XmlTupleResultSerializer(results, options);
         serializer.write(outputWriter);
 
         assertEquals("<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">" +

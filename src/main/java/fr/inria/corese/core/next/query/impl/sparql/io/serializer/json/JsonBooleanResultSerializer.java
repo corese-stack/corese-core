@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.query.impl.sparql.io.serializer.json;
 import fr.inria.corese.core.next.data.api.base.io.FileFormat;
 import fr.inria.corese.core.next.data.api.io.IOOptions;
 import fr.inria.corese.core.next.data.impl.exception.SerializationException;
-import fr.inria.corese.core.next.query.api.base.io.ResultFormat;
+import fr.inria.corese.core.next.query.api.io.ResultFormat;
 import fr.inria.corese.core.next.query.api.io.serializer.BooleanResultSerializer;
 import fr.inria.corese.core.next.query.api.io.serializer.LinksOptions;
 import jakarta.json.Json;
@@ -15,16 +15,16 @@ import java.io.Writer;
 /**
  * Serializer class for boolean results (ASK results) for JSON
  */
-public class JSONBooleanSerializer implements BooleanResultSerializer {
+public class JsonBooleanResultSerializer implements BooleanResultSerializer {
 
     private final boolean result;
     private final IOOptions config;
 
-    public JSONBooleanSerializer(boolean result) {
-        this(result, new JSONSerializerOptions.Builder().build());
+    public JsonBooleanResultSerializer(boolean result) {
+        this(result, new JsonResultSerializerOptions.Builder().build());
     }
 
-    public JSONBooleanSerializer(boolean result, IOOptions options) {
+    public JsonBooleanResultSerializer(boolean result, IOOptions options) {
         this.config = options;
         this.result = result;
     }
@@ -35,11 +35,11 @@ public class JSONBooleanSerializer implements BooleanResultSerializer {
 
         if(this.config instanceof LinksOptions linksOptions && ! linksOptions.links().isEmpty() ) {
             JsonObjectBuilder headerBuilder = Json.createObjectBuilder();
-            headerBuilder.add(JSONSerializerConstants.LINK, Json.createArrayBuilder(linksOptions.links()));
-            resultBuilder.add(JSONSerializerConstants.HEAD, headerBuilder.build());
+            headerBuilder.add(JsonResultConstants.LINK, Json.createArrayBuilder(linksOptions.links()));
+            resultBuilder.add(JsonResultConstants.HEAD, headerBuilder.build());
         }
 
-        resultBuilder.add(JSONSerializerConstants.BOOLEAN, String.valueOf(this.result));
+        resultBuilder.add(JsonResultConstants.BOOLEAN, this.result);
 
         JsonWriter jsonWriter = Json.createWriter(writer);
         jsonWriter.writeObject( resultBuilder.build());

@@ -9,7 +9,7 @@ import fr.inria.corese.core.next.data.api.io.IOOptions;
 import fr.inria.corese.core.next.data.impl.common.literal.RDF;
 import fr.inria.corese.core.next.data.impl.common.literal.XSD;
 import fr.inria.corese.core.next.data.impl.io.serialization.util.SerializationConstants;
-import fr.inria.corese.core.next.query.api.base.io.ResultFormat;
+import fr.inria.corese.core.next.query.api.io.ResultFormat;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 import fr.inria.corese.core.next.query.impl.sparql.io.serializer.common.CharacterSeparatedValuesSerializer;
 
@@ -19,14 +19,14 @@ import java.util.List;
  * TSV serializer for the CSV format of SPARQL results.
  * @see <a href="https://www.w3.org/TR/sparql11-results-csv-tsv/">TSV SPARQL result format recommendation</a>
  */
-public class TSVSerializer extends CharacterSeparatedValuesSerializer {
+public class TsvTupleResultSerializer extends CharacterSeparatedValuesSerializer {
 
-    public TSVSerializer(TupleQueryResult results, IOOptions options) {
+    public TsvTupleResultSerializer(TupleQueryResult results, IOOptions options) {
         super(SerializationConstants.TAB, results, options);
     }
 
-    public TSVSerializer(TupleQueryResult results) {
-        this(results, new TSVSerializerOptions.Builder().build());
+    public TsvTupleResultSerializer(TupleQueryResult results) {
+        this(results, new TsvResultSerializerOptions.Builder().build());
     }
 
     @Override

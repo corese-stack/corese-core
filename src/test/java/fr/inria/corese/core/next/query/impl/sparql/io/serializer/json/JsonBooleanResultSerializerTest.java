@@ -12,25 +12,25 @@ import java.io.StringWriter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class JSONBooleanSerializerTest extends AbstractBooleanResultSerializerTest implements LinksSerializerTest {
+public class JsonBooleanResultSerializerTest extends AbstractBooleanResultSerializerTest implements LinksSerializerTest {
     @Override
     protected BooleanResultSerializer getSerializer(boolean result) {
-        return new JSONBooleanSerializer(result);
+        return new JsonBooleanResultSerializer(result);
     }
 
     @Override
     protected BooleanResultSerializer getSerializer(boolean result, IOOptions options) {
-        return new JSONBooleanSerializer(result, options);
+        return new JsonBooleanResultSerializer(result, options);
     }
 
     @Override
     protected String getTrueResultString() {
-        return "{\"boolean\":\"true\"}";
+        return "{\"boolean\":true}";
     }
 
     @Override
     protected String getFalseResultString() {
-        return "{\"boolean\":\"false\"}";
+        return "{\"boolean\":false}";
     }
     
     private String getLinksTestResultsString() {
@@ -41,7 +41,7 @@ public class JSONBooleanSerializerTest extends AbstractBooleanResultSerializerTe
                     "\"mailto:bob@corese-test.com\"" +
                 "]" +
             "}," +
-            "\"boolean\":\"true\"" +
+            "\"boolean\":true" +
         "}";
     }
 

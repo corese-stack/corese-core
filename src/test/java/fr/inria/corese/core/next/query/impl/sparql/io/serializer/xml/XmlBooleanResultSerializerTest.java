@@ -12,15 +12,15 @@ import java.io.StringWriter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class XMLBooleanSerializerTest extends AbstractBooleanResultSerializerTest implements LinksSerializerTest {
+public class XmlBooleanResultSerializerTest extends AbstractBooleanResultSerializerTest implements LinksSerializerTest {
     @Override
     protected BooleanResultSerializer getSerializer(boolean result) {
-        return new XMLBooleanSerializer(result);
+        return new XmlBooleanResultSerializer(result);
     }
 
     @Override
     protected BooleanResultSerializer getSerializer(boolean result, IOOptions options) {
-        return new XMLBooleanSerializer(result, options);
+        return new XmlBooleanResultSerializer(result, options);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class XMLBooleanSerializerTest extends AbstractBooleanResultSerializerTes
     @DisplayName("Tests the serialization of results including several links")
     public void linksTest() {
         IOOptions options = getOptionsWithLinks();
-        ResultSerializer serializer = new XMLBooleanSerializer(true, options);
+        ResultSerializer serializer = new XmlBooleanResultSerializer(true, options);
         StringWriter writer = new StringWriter();
         serializer.write(writer);
         assertEquals(getLinksTestResultsString(), writer.toString());

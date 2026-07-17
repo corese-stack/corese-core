@@ -3,12 +3,12 @@ package fr.inria.corese.core.next.query.impl.sparql.io.serializer.json;
 /**
  * Constants used in the serialization of SPARQL results to JSON
  */
-public class JSONSerializerConstants {
+final class JsonResultConstants {
 
     /**
      * Forbids instantiation
      */
-    private JSONSerializerConstants() {}
+    private JsonResultConstants() {}
 
     public static final String HEAD = "head";
     public static final String VARS = "vars";
