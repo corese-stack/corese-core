@@ -20,10 +20,9 @@ import fr.inria.corese.core.next.storagemanager.api.StorageManager;
 import java.util.Objects;
 
 /**
- * Internal executor for the first autonomous Corese-next SPARQL query path.
+ * Internal orchestrator for the Corese-next SPARQL query path.
  *
- * <p>This class is intentionally small and transitional. It validates the
- * autonomous execution path:</p>
+ * <p>It connects the current pipeline stages:</p>
  *
  * <pre>
  * SPARQL string -> next parser -> next AST -> next KGRAM -> StorageManagerProducer -> StorageManager
@@ -53,7 +52,7 @@ public final class NextSparqlPipelineExecutor {
      * Creates an executor with explicit collaborators.
      *
      * <p>This constructor is package-private so tests can inject parser or bridge
-     * variants without exposing these transitional wiring details as public API.</p>
+     * variants without exposing wiring details as public API.</p>
      */
     NextSparqlPipelineExecutor(
             StorageManager storage,
@@ -65,7 +64,7 @@ public final class NextSparqlPipelineExecutor {
     }
 
     /**
-     * Evaluates a SELECT query through the autonomous next pipeline.
+     * Evaluates a SELECT query through the next pipeline.
      *
      * @param sparql SPARQL query string to parse and evaluate
      * @return tuple result backed by the KGRAM mappings produced from next storage
@@ -82,7 +81,7 @@ public final class NextSparqlPipelineExecutor {
     }
 
     /**
-     * Evaluates an ASK query through the autonomous next pipeline.
+     * Evaluates an ASK query through the next pipeline.
      *
      * @param sparql SPARQL query string to parse and evaluate
      * @return {@code true} when at least one mapping matches the ASK pattern
