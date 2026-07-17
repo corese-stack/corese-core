@@ -47,11 +47,11 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
     protected final List<ValueMappingAst> values = new ArrayList<>();
 
     /**
-     * SELECT projection (* or explicit variables). Set by SelectQueryFeature in enterSelectQuery.
+     * SELECT projection (* or explicit variables). Set by SelectQueryAstListener in enterSelectQuery.
      */
     private ProjectionAst projection = ProjectionAsts.selectAll();
 
-    /** SELECT DISTINCT / REDUCED. Set by SelectQueryFeature when parsing SELECT (DISTINCT | REDUCED)? ... */
+    /** SELECT DISTINCT / REDUCED. Set by SelectQueryAstListener when parsing SELECT (DISTINCT | REDUCED)? ... */
     private boolean distinct;
     private boolean reduced;
 
@@ -72,7 +72,7 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
     private GroupByAst groupBy = new GroupByAst(List.of());
 
     /**
-     * DESCRIBE resources (IRIs or variables). Set by DescribeQueryFeature.
+     * DESCRIBE resources (IRIs or variables). Set by DescribeQueryAstListener.
      */
     private final List<TermAst> describeResources = new ArrayList<>();
 
@@ -282,7 +282,7 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
     }
 
     /**
-     * Sets SELECT DISTINCT. Called by SelectQueryFeature when {@code DISTINCT} is present.
+     * Sets SELECT DISTINCT. Called by SelectQueryAstListener when {@code DISTINCT} is present.
      */
     public void setDistinct(boolean distinct) {
         if (hasCurrentSelect()) {
@@ -292,7 +292,7 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
     }
 
     /**
-     * Sets SELECT REDUCED. Called by SelectQueryFeature when {@code REDUCED} is present.
+     * Sets SELECT REDUCED. Called by SelectQueryAstListener when {@code REDUCED} is present.
      */
     public void setReduced(boolean reduced) {
         if (hasCurrentSelect()) {

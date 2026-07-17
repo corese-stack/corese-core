@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Integration tests for SPARQL {@code SERVICE} graph pattern parsing.
  *
- * <p>Exercises the full pipeline: ANTLR grammar → {@code SparqlListener} → {@code ServiceFeature}
+ * <p>Exercises the full pipeline: ANTLR grammar → {@code SparqlListenerDispatcher} → {@code ServiceAstListener}
  * → {@code SparqlAstBuilder} → {@link ServiceAst}.
  */
 class SparqlParserServiceTest extends AbstractSparqlParserFeatureTest {

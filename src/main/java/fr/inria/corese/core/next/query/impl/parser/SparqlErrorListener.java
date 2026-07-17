@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
-import fr.inria.corese.core.next.query.api.sparql.options.SparqlAstError;
+import fr.inria.corese.core.next.query.impl.parser.options.SparqlAstError;
 import org.antlr.v4.runtime.*;
 
 import java.util.ArrayList;

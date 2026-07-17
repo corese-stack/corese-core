@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
-import fr.inria.corese.core.next.query.api.io.parser.QueryParser;
+import fr.inria.corese.core.next.query.impl.parser.QueryParser;
 import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.LoadRequestAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;

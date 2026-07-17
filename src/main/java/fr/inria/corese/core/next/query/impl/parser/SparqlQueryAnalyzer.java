@@ -4,7 +4,7 @@ import fr.inria.corese.core.next.impl.parser.antlr.SparqlLexer;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
-import fr.inria.corese.core.next.query.api.sparql.options.SparqlAstError;
+import fr.inria.corese.core.next.query.impl.parser.options.SparqlAstError;
 import fr.inria.corese.core.next.query.api.validation.QueryDiagnostic;
 import fr.inria.corese.core.next.query.api.validation.QueryValidationResult;
 import fr.inria.corese.core.next.query.impl.parser.listener.*;
@@ -133,22 +133,22 @@ final class SparqlQueryAnalyzer {
         if (root.queryUnit() != null) {
             SparqlQueryAstBuilder queryBuilder = new SparqlQueryAstBuilder(options);
             queryBuilder.reserveBlankNodeLabels(blankNodeLabels);
-            SparqlListener queryListener = new SparqlListener(List.of(
-                    new AskQueryFeature(queryBuilder),
-                    new ConstructQueryFeature(queryBuilder),
-                    new DescribeQueryFeature(queryBuilder),
-                    new SelectQueryFeature(queryBuilder),
-                    new DatasetClauseFeature(queryBuilder),
-                    new HavingFeature(queryBuilder),
-                    new SolutionModifierFeature(queryBuilder),
-                    new ValuesFeature(queryBuilder),
-                    new BgpFeature(queryBuilder),
-                    new FilterFeature(queryBuilder),
-                    new UnionFeature(queryBuilder),
-                    new MinusFeature(queryBuilder),
-                    new PrologueFeature(queryBuilder),
-                    new BindFeature(queryBuilder),
-                    new ServiceFeature(queryBuilder)
+            SparqlListenerDispatcher queryListener = new SparqlListenerDispatcher(List.of(
+                    new AskQueryAstListener(queryBuilder),
+                    new ConstructQueryAstListener(queryBuilder),
+                    new DescribeQueryAstListener(queryBuilder),
+                    new SelectQueryAstListener(queryBuilder),
+                    new DatasetClauseAstListener(queryBuilder),
+                    new HavingAstListener(queryBuilder),
+                    new SolutionModifierAstListener(queryBuilder),
+                    new ValuesAstListener(queryBuilder),
+                    new BgpAstListener(queryBuilder),
+                    new FilterAstListener(queryBuilder),
+                    new UnionAstListener(queryBuilder),
+                    new MinusAstListener(queryBuilder),
+                    new PrologueAstListener(queryBuilder),
+                    new BindAstListener(queryBuilder),
+                    new ServiceAstListener(queryBuilder)
             ));
             walker.walk(queryListener, root.queryUnit());
             return queryBuilder.getResult();
@@ -157,17 +157,17 @@ final class SparqlQueryAnalyzer {
         if (root.updateUnit() != null) {
             SparqlUpdateAstBuilder updateBuilder = new SparqlUpdateAstBuilder(options);
             updateBuilder.reserveBlankNodeLabels(blankNodeLabels);
-            SparqlListener updateListener = new SparqlListener(List.of(
-                    new ClearRequestFeature(updateBuilder),
-                    new CreateRequestFeature(updateBuilder),
-                    new LoadRequestFeature(updateBuilder),
-                    new BgpFeature(updateBuilder),
-                    new BindFeature(updateBuilder),
-                    new FilterFeature(updateBuilder),
-                    new MinusFeature(updateBuilder),
-                    new PrologueFeature(updateBuilder),
-                    new ServiceFeature(updateBuilder),
-                    new UnionFeature(updateBuilder)
+            SparqlListenerDispatcher updateListener = new SparqlListenerDispatcher(List.of(
+                    new ClearUpdateAstListener(updateBuilder),
+                    new CreateUpdateAstListener(updateBuilder),
+                    new LoadUpdateAstListener(updateBuilder),
+                    new BgpAstListener(updateBuilder),
+                    new BindAstListener(updateBuilder),
+                    new FilterAstListener(updateBuilder),
+                    new MinusAstListener(updateBuilder),
+                    new PrologueAstListener(updateBuilder),
+                    new ServiceAstListener(updateBuilder),
+                    new UnionAstListener(updateBuilder)
             ));
             walker.walk(updateListener, root.updateUnit());
             return updateBuilder.getResult();

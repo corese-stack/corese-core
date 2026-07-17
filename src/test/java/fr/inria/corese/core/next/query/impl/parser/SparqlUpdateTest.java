@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
-import fr.inria.corese.core.next.query.api.io.parser.QueryParser;
+import fr.inria.corese.core.next.query.impl.parser.QueryParser;
 import fr.inria.corese.core.next.query.impl.sparql.ast.LoadRequestAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.UpdateRequestAst;
