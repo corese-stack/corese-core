@@ -58,6 +58,19 @@ public class SparqlUpdateAstBuilder extends SparqlAstBuilder{
         }
     }
 
+    public DropRequestAst droptoAst(SparqlParser.DropContext ctx) {
+        GraphRefAst targetGraphRef = null;
+        boolean silentFlag = ctx.SILENT() != null;
+        if (ctx.graphRefAll() != null) {
+            targetGraphRef = this.graphRefFromGraphRefAll(ctx.graphRefAll());
+        }
+        if (targetGraphRef != null) {
+            return new DropRequestAst(targetGraphRef, silentFlag);
+        } else {
+            throw new QueryEvaluationException("No target graph reference found in DROP query");
+        }
+    }
+
     public CreateRequestAst createToAst(SparqlParser.CreateContext ctx) {
         boolean silentFlag = ctx.SILENT() != null;
         if (ctx.graphRef() != null) {
