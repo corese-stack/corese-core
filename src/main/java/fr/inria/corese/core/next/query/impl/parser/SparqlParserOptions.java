@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.data.impl.io.parser.util.ParserConstants;
-import fr.inria.corese.core.next.query.api.sparql.options.*;
+import fr.inria.corese.core.next.query.impl.parser.options.*;
 
 import java.util.ArrayList;
 import java.util.Collections;

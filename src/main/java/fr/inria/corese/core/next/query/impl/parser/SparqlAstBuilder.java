@@ -24,9 +24,7 @@ public abstract class SparqlAstBuilder {
 
     private static final String GENERATED_BLANK_NODE_PREFIX = IOConstants.BLANK_NODE_PREFIX + "b";
 
-    /**
-     * Parser options (e.g. for future use: strict mode, base IRI).
-     */
+    /** Parser options shared by syntax and AST construction. */
     protected final SparqlParserOptions options;
 
     /**
@@ -50,9 +48,7 @@ public abstract class SparqlAstBuilder {
      */
     protected final VariableScopeAnalyzer variableScopeAnalyzer = new VariableScopeAnalyzer();
 
-    /**
-     * Stack of groups; each group is a list of patterns (BgpAst now, later OptionalAst/UnionAst/...)
-     */
+    /** Stack of graph-pattern groups currently being built. */
     protected final Deque<List<PatternAst>> groupStack = new ArrayDeque<>();
 
     /**

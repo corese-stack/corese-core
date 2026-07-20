@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
-import fr.inria.corese.core.next.query.api.sparql.options.SparqlAstError;
+import fr.inria.corese.core.next.query.impl.parser.options.SparqlAstError;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

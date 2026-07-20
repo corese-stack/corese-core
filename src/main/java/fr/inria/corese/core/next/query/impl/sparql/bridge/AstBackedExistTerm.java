@@ -32,8 +32,9 @@ final class AstBackedExistTerm extends Term {
     }
 
     /**
-     * The legacy {@code Term} reports an existence test through {@code getExist() != null}, but this
-     * bridge carries the pattern as a next-KGRAM {@link Exp} instead. Reporting it here keeps
+     * The established {@code Term} contract reports an existence test through
+     * {@code getExist() != null}, but this bridge carries the pattern as a next-KGRAM
+     * {@link Exp} instead. Reporting it here keeps
      * {@code isRecExist()} true, which the engine relies on to place FILTER EXISTS correctly
      * (QuerySorter, in-scope filters of OPTIONAL/MINUS).
      */

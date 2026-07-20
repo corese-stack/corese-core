@@ -20,11 +20,11 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
-import fr.inria.corese.core.next.query.api.io.parser.QueryOptions;
+import fr.inria.corese.core.next.query.impl.parser.QueryOptions;
 import fr.inria.corese.core.next.query.api.validation.QueryDiagnostic;
 import fr.inria.corese.core.next.query.api.validation.QueryTextValidator;
 import fr.inria.corese.core.next.query.api.validation.QueryValidationResult;
-import fr.inria.corese.core.next.query.api.validation.QueryValidators;
+import fr.inria.corese.core.next.query.impl.parser.SparqlValidators;
 import fr.inria.corese.core.next.query.impl.sparql.ast.BgpAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
@@ -590,7 +590,7 @@ class SparqlParserTest {
 
     @Test
     void queryValidatorsFactoryReturnsWorkingSparqlValidator() {
-        QueryTextValidator validator = QueryValidators.sparql();
+        QueryTextValidator validator = SparqlValidators.sparql();
 
         QueryValidationResult result = validator.validate(VALID_SELECT_QUERY);
 
