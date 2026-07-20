@@ -21,7 +21,7 @@ public interface ResultSerializerFactory {
      * Creates a serializer for the given boolean result in the given {@link ResultFormat format}
      *
      * @param format  The {@link ResultFormat} to use for serialization.
-     * @param results The boolean result to be serialized
+     * @param result The boolean result to be serialized
      * @return a new instance of {@link ResultSerializer} with default configuration.
      */
     BooleanResultSerializer createBooleanSerializer(ResultFormat format, boolean result);
@@ -42,7 +42,7 @@ public interface ResultSerializerFactory {
      * Creates a serializer for the given boolean result in the given {@link ResultFormat format}
      *
      * @param format  The {@link ResultFormat} to use for serialization.
-     * @param results The boolean result to be serialized
+     * @param result The boolean result to be serialized
      * @param options Options to configure the serialization
      * @return a new instance of {@link ResultSerializer} with default configuration.
      */
