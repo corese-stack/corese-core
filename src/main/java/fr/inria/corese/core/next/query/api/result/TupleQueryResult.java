@@ -69,18 +69,6 @@ public interface TupleQueryResult extends Closeable, Iterable<BindingSet> {
     }
 
     /**
-     * Returns all remaining results as a {@link List}.
-     *
-     * @return a list containing all remaining binding sets (never {@code null})
-     * @throws IllegalStateException if this result has been closed
-     */
-    default List<BindingSet> asList() {
-        List<BindingSet> list = new ArrayList<>();
-        this.forEach(list::add);
-        return list;
-    }
-
-    /**
      * Returns a sequential {@link Stream} over the query results.
      *
      * @return a sequential stream over the binding sets in this result

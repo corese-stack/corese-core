@@ -33,8 +33,4 @@ public enum PointerType {
         name = DT + n;
     }
 
-    public String getName() {
-        return name;
-    }
-
 }

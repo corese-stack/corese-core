@@ -18,11 +18,9 @@ import java.util.Set;
  * In {@link #enterSelectQuery(SparqlParser.SelectQueryContext)} we:
  * 1. Call {@link SparqlQueryAstBuilder#enterSelectQuery()} to set query type.
  * 2. Extract the projection from the parse context (grammar: {@code (var_+ | '*')}) and call
- *    {@link SparqlQueryAstBuilder#setProjectionAll()} or {@link SparqlQueryAstBuilder#setProjectionVariables(List)}.
+ *    {@link SparqlQueryAstBuilder#setProjectionAll()}.
  * <p>
  * The WHERE clause is built by {@link BgpAstListener} (enter/exit GroupGraphPattern, TriplesBlock, addTriple).
- * At {@link SparqlAstBuilder#getResult()}, the builder produces a {@link fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst}
- * with both {@link fr.inria.corese.core.next.query.impl.sparql.ast.ProjectionAst} and the WHERE group.
  * <p>
  * Grammar {@code subSelect} (nested {@code SELECT} in a group) uses the same {@link SparqlAstBuilder} stack frames as a top-level SELECT.
  * <p>

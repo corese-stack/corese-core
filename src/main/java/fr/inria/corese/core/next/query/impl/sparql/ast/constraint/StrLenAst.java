@@ -1,7 +1,5 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast.constraint;
 
-import java.util.List;
-
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 
 /**
@@ -12,10 +10,6 @@ public class StrLenAst extends AbstractUnaryConstraintAst implements NumericExpr
 
     public StrLenAst(TermAst arg) {
         super(arg);
-    }
-
-    public StrLenAst(List<TermAst> args) {
-        super(args);
     }
 
     @Override

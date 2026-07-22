@@ -1,7 +1,6 @@
 package fr.inria.corese.core.next.query.kgram.path;
 
 
-import fr.inria.corese.core.next.query.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.kgram.api.query.Environment;
 
 /**
@@ -31,9 +30,4 @@ public class GraphPath extends Thread {
 		this.mem = mem;
     }
 	
-	void process(){
-            Node cstart = finder.get(mem, finder.getIndex());
-            finder.process(cstart, mem);
-	}
-
 }

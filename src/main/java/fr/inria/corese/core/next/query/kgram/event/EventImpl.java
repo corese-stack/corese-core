@@ -21,10 +21,6 @@ public class EventImpl implements Event {
 	boolean isSuccess = true;
 	Object object, arg, arg2;
 	
-	EventImpl(int n){
-		type = n;
-	}
-	
 	EventImpl(int n, Object o){
 		type = n;
 		object = o;

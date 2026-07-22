@@ -49,7 +49,6 @@ public interface Node extends Pointerable<Object>, Comparable<Node> {
         return getDatatypeValue().compareTo(node.getDatatypeValue());
     }
 
-
     String getLabel();
 
     boolean isVariable();
@@ -91,15 +90,6 @@ public interface Node extends Pointerable<Object>, Comparable<Node> {
     // tagged as triple reference
     default boolean isTriple() {
         return getDatatypeValue().isTriple();
-    }
-
-    // triple reference with edge inside
-    default boolean isTripleWithEdge() {
-        return isTriple() && getEdge() != null;
-    }
-
-    default void setEdge(Edge e) {
-        getDatatypeValue().setEdge((fr.inria.corese.core.kgram.api.core.Edge) e);
     }
 
 }

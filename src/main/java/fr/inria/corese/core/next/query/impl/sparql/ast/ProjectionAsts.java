@@ -27,15 +27,6 @@ public final class ProjectionAsts {
     }
 
     /**
-     * SELECT ?v1 (expr AS ?v2) ... : project plain variables and expression-bound variables.
-     * Expression-bound variables are those introduced by {@code (expr AS ?var)} in the SELECT clause;
-     * they are included in {@code variables} but are not required to be visible in the WHERE clause.
-     */
-    public static ProjectionAst of(List<VarAst> variables, Set<String> expressionBoundVariables) {
-        return of(variables, expressionBoundVariables, Map.of(), Map.of());
-    }
-
-    /**
      * SELECT ?v1 (expr AS ?v2) ... with expression metadata retained for expression-bound projections.
      */
     public static ProjectionAst of(

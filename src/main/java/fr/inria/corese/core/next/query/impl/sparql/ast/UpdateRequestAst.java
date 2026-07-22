@@ -14,10 +14,6 @@ public record UpdateRequestAst(QueryPrologueAst prologue, List<UpdateRequestUnit
         operations = operations != null ? List.copyOf(operations) : List.of();
     }
 
-    public void addQuery(UpdateRequestUnitAst updateQuery) {
-        this.operations.add(updateQuery);
-    }
-
     @Override
     public void accept(AstVisitor visitor) {
         visitor.visit(this);

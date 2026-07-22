@@ -40,19 +40,6 @@ public final class SparqlAstToExpression {
     }
 
     /**
-     * Converts the operator of a SPARQL {@code FILTER} clause ({@link FilterAst}) the same way as
-     * {@link #toNextFilter(TermAst)}.
-     *
-     * <p>Prefer {@link CoreseAstQueryBuilder#toNextFilter(FilterAst)} at call sites that build queries.
-     * A filter containing {@code EXISTS} / {@code NOT EXISTS} requires
-     * {@link #toNextFilter(FilterAst, WhereCompiler)} so its graph pattern can be compiled.
-     */
-    public static Filter toNextFilter(FilterAst filterClause) {
-        Objects.requireNonNull(filterClause, "filterClause");
-        return toNextFilter(filterClause.operator());
-    }
-
-    /**
      * Converts a {@code FILTER} clause, compiling the graph pattern of any embedded
      * {@code EXISTS} / {@code NOT EXISTS} with the given {@link WhereCompiler}.
      */
@@ -65,8 +52,7 @@ public final class SparqlAstToExpression {
      * Converts a filter {@link TermAst} to an {@link Expression}, then wraps it as a
      * {@link Filter} with {@link Filter#coreseNextSource()} set to {@code filterExpression}.
      *
-     * <p>Prefer {@link CoreseAstQueryBuilder#toNextFilter(TermAst)} at call sites that build queries; this
-     * method is the shared implementation. For a full {@link FilterAst} node, use {@link #toNextFilter(FilterAst)}.
+     * For a full {@link FilterAst} node, use {@link #toNextFilter(FilterAst)}.
      * Filters containing {@code EXISTS} / {@code NOT EXISTS} require
      * {@link #toNextFilter(TermAst, WhereCompiler)} so their graph pattern can be compiled.
      */

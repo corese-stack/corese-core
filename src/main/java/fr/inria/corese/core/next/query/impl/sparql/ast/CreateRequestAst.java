@@ -22,15 +22,6 @@ public record CreateRequestAst(GraphRefAst graphRef, boolean silent) implements 
         }
     }
 
-    /**
-     * Construct a CREATE query with the silent flag set to false.
-     *
-     * @param graphRef the named graph to create
-     */
-    public CreateRequestAst(GraphRefAst graphRef) {
-        this(graphRef, false);
-    }
-
     @Override
     public void accept(AstVisitor visitor) {
         visitor.visit(this);

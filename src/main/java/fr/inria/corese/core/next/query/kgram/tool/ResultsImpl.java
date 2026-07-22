@@ -16,11 +16,7 @@ public class ResultsImpl implements Results {
 	ResultsImpl(Mappings ms){
 		maps = ms;
 	}
-	
-	public static ResultsImpl create(Mappings ms){
-        return new ResultsImpl(ms);
-	}
-	
+
 	public List<Node> getSelect() {
 		return maps.getSelect();
 	}

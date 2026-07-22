@@ -261,18 +261,6 @@ public class Memory extends PointerObject implements Environment {
     }
 
     /**
-     * Use case: exists {} in aggregate Copy Mapping into this fresh Memory
-     * similar to copyInto
-     */
-    void copy(Mapping map, Exp exp) {
-        if (map.hasBind()) {
-            copy(map.getBind(), exp);
-        }
-        share(getBind(), map.getBind());
-        push(map, -1);
-    }
-
-    /**
      * exists { }
      * PRAGMA: when exists is in function, this memory is empty
      */
@@ -939,10 +927,6 @@ public class Memory extends PointerObject implements Environment {
         return result[qEdge.getEdgeIndex()];
     }
 
-    public Edge[] getQueryEdges() {
-        return qEdges;
-    }
-
     @Override
     public Edge[] getEdges() {
         return result;
@@ -1108,10 +1092,6 @@ public class Memory extends PointerObject implements Environment {
     @Override
     public void setObject(Object o) {
         object = o;
-    }
-
-    boolean isFake() {
-        return isFake;
     }
 
     public void setFake(boolean isFake) {

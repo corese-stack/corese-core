@@ -347,11 +347,6 @@ public class QuerySorter implements ExpType {
         return exp.varBind();
     }
 
-    
-    public void setSorter(Sorter sort) {
-        this.sort = sort;
-    }
-
     /**
      * JOIN service
      */

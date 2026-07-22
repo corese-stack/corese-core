@@ -8,13 +8,7 @@ import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
  * @param silent Determine if the resolution of the query must be resolved silently or not.
  */
 public record ClearRequestAst(GraphRefAst graphRef, boolean silent) implements UpdateRequestUnitAst {
-    /**
-     * Construct CLEAR query with empty prologue and a silent flag to false.
-     * @param graphRef targeted graph to be cleared
-     */
-    public ClearRequestAst(GraphRefAst graphRef) {
-        this( graphRef, false);
-    }
+
 
     @Override
     public void accept(AstVisitor visitor) {

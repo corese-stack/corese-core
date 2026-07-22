@@ -18,10 +18,6 @@ public interface Pointerable<T> extends Loopable<T> {
         return PointerType.UNDEF;
     }
 
-    default Object getPointerObject() {
-        return this;
-    }
-
     default Mappings getMappings() {
         return null;
     }

@@ -143,15 +143,6 @@ public final class CoreseAstQueryBuilder {
     }
 
     /**
-     * Converts a SPARQL {@code FILTER} clause by converting {@link FilterAst#operator()} the same way as
-     * {@link #toNextFilter(TermAst)}.
-     */
-    public Filter toNextFilter(FilterAst filterClause) {
-        Objects.requireNonNull(filterClause, "filterClause");
-        return toNextFilter(filterClause.operator());
-    }
-
-    /**
      * Converts a filter expression carried as {@link TermAst}: must be a {@link ConstraintAst}.
      */
     public Filter toNextFilter(TermAst filterExpression) {
