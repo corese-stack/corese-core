@@ -30,6 +30,15 @@ class AddUpdateAstBuilderTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
+    @DisplayName("ADD accepts the SPARQL shorthand graph IRI form without GRAPH")
+    void addAcceptsGraphIriShorthand() {
+        AddRequestAst add = assertInstanceOf(AddRequestAst.class,
+                parseUnit("ADD <http://example.org/s> TO <http://example.org/d>"));
+        assertEquals("<http://example.org/s>", add.source().graph().raw());
+        assertEquals("<http://example.org/d>", add.destination().graph().raw());
+    }
+
+    @Test
     @DisplayName("ADD SILENT DEFAULT TO GRAPH <d>: silent, source is DEFAULT")
     void addSilentDefaultToGraph() {
         AddRequestAst add = assertInstanceOf(AddRequestAst.class,
