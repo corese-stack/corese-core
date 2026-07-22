@@ -58,7 +58,7 @@ public class SparqlUpdateAstBuilder extends SparqlAstBuilder{
         }
     }
 
-    public DropRequestAst droptoAst(SparqlParser.DropContext ctx) {
+    public DropRequestAst dropToAst(SparqlParser.DropContext ctx) {
         GraphRefAst targetGraphRef = null;
         boolean silentFlag = ctx.SILENT() != null;
         if (ctx.graphRefAll() != null) {

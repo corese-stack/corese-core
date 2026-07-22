@@ -14,7 +14,7 @@ public class DropUpdateAstListener extends AbstractSparqlUpdateAstListener {
 
     @Override
     public void enterDrop(SparqlParser.DropContext ctx) {
-        DropRequestAst dropRequestAst = this.updateBuilder().droptoAst(ctx);
+        DropRequestAst dropRequestAst = this.updateBuilder().dropToAst(ctx);
         this.updateBuilder().addRequest(dropRequestAst);
     }
 }
