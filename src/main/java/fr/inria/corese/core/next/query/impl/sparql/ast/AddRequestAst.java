@@ -10,7 +10,7 @@ import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
  */
 public record AddRequestAst(GraphRefAst source, GraphRefAst destination, boolean silent) implements UpdateRequestUnitAst {
     /**
-     * Construct a ADD query with a silent flag to false.
+     * Construct an ADD query with the silent flag set to false.
      * @param source source graph
      * @param destination destination graph
      */

@@ -14,7 +14,7 @@ public class AddUpdateAstListener extends AbstractSparqlUpdateAstListener {
 
     @Override
     public void enterAdd(SparqlParser.AddContext ctx) {
-        AddRequestAst ast = this.updateBuilder().addtoAst(ctx);
+        AddRequestAst ast = this.updateBuilder().addToAst(ctx);
         this.updateBuilder().addRequest(ast);
     }
 }
