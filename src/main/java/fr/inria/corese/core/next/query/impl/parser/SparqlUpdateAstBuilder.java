@@ -83,4 +83,11 @@ public class SparqlUpdateAstBuilder extends SparqlAstBuilder{
     public void addRequest(UpdateRequestUnitAst ast) {
         this.updateRequestAst.add(ast);
     }
+
+    public AddRequestAst addToAst(SparqlParser.AddContext ctx) {
+        return new AddRequestAst(
+                graphRefFromGraphOrDefault(ctx.graphOrDefault(0)),
+                graphRefFromGraphOrDefault(ctx.graphOrDefault(1)),
+                ctx.SILENT() != null);
+    }
 }

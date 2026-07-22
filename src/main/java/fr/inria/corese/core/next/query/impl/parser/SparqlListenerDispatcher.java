@@ -312,4 +312,14 @@ final class SparqlListenerDispatcher extends SparqlParserBaseListener {
     public void exitDrop(SparqlParser.DropContext ctx) {
         for (var d : delegates) d.exitDrop(ctx);
     }
+
+    @Override
+    public void enterAdd(SparqlParser.AddContext ctx) {
+        for (var d : delegates) d.enterAdd(ctx);
+    }
+
+    @Override
+    public void exitAdd(SparqlParser.AddContext ctx) {
+        for (var d : delegates) d.exitAdd(ctx);
+    }
 }
