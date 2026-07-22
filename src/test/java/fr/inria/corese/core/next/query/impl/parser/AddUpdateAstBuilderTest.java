@@ -15,7 +15,7 @@ class AddUpdateAstBuilderTest {
         QueryAst ast = new SparqlParser().parse(query);
         UpdateRequestAst update = assertInstanceOf(UpdateRequestAst.class, ast);
         assertEquals(1, update.operations().size(), "one update operation");
-        return update.operations().get(0);
+        return update.operations().getFirst();
     }
 
     @Test
