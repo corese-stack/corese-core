@@ -35,14 +35,4 @@ public enum IsolationLevel {
         this.level = level;
     }
 
-    /**
-     * Returns the numeric isolation level.
-     * Higher number means stricter isolation.
-     *
-     * @return Numeric level
-     */
-    public int getLevel() {
-        return level;
-    }
-
 }

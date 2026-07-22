@@ -30,15 +30,6 @@ public class StorageException extends RuntimeException {
         this.code = code;
     }
 
-    /**
-     * Returns the error code.
-     *
-     * @return Error code
-     */
-    public ErrorCode getCode() {
-        return code;
-    }
-
     @Override
     public String toString() {
         return "StorageException{" +

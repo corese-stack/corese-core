@@ -332,10 +332,6 @@ public final class MutationResult {
             return this;
         }
 
-        public void incrementSuccess() {
-            this.successCount++;
-        }
-
 
         public BulkBuilder addSuccess(Statement statement) {
             if (statement != null) {

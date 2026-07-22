@@ -63,15 +63,6 @@ public final class StorageConfig {
     }
 
     /**
-     * Returns whether transaction support is enabled.
-     *
-     * @return {@code true} if transaction support is enabled
-     */
-    public boolean hasTransactionSupport() {
-        return transactionSupport;
-    }
-
-    /**
      * Returns the storage type from properties.
      *
      * <p>This is a convenience method for {@code getProperty("type", String.class)}.
@@ -132,17 +123,6 @@ public final class StorageConfig {
                 throw new IllegalArgumentException("Property value cannot be null");
             }
             properties.put(key, value);
-            return this;
-        }
-
-        /**
-         * Enables or disables transaction support.
-         *
-         * @param enable {@code true} to enable transaction support
-         * @return this builder for method chaining
-         */
-        public Builder transactionSupport(boolean enable) {
-            this.transactionSupport = enable;
             return this;
         }
 

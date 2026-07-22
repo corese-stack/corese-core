@@ -61,17 +61,6 @@ public record GraphAdapter(Graph graph, ValueFactory valueFactory) {
     }
 
     /**
-     * Checks if a statement exists in the underlying Graph.
-     *
-     * @param stmt the statement to check
-     * @return true if the statement exists
-     */
-    public boolean contains(Statement stmt) {
-        Edge edge = statementToEdge(stmt);
-        return graph.exist(edge);
-    }
-
-    /**
      * Finds all statements matching the given pattern.
      *
      * @param s        subject filter, or null for any
