@@ -160,6 +160,7 @@ final class SparqlQueryAnalyzer {
             SparqlListenerDispatcher updateListener = new SparqlListenerDispatcher(List.of(
                     new ClearUpdateAstListener(updateBuilder),
                     new CreateUpdateAstListener(updateBuilder),
+                    new DropUpdateAstListener(updateBuilder),
                     new LoadUpdateAstListener(updateBuilder),
                     new BgpAstListener(updateBuilder),
                     new BindAstListener(updateBuilder),
