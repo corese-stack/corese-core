@@ -61,36 +61,6 @@ public interface MutationOperations {
             throws StorageException;
 
     /**
-     * Updates a statement (delete + insert in one operation).
-     *
-     * @param oldStatement Statement to delete
-     * @param newStatement Statement to insert
-     * @return Mutation result
-     * @throws StorageException     if operation fails
-     * @throws IllegalArgumentException if oldStatement or newStatement is null
-     */
-    default MutationResult updateStatement(Statement oldStatement, Statement newStatement)
-            throws StorageException {
-        if (oldStatement == null || newStatement == null) {
-            throw new IllegalArgumentException("Both oldStatement and newStatement must be non-null");
-        }
-
-        MutationResult deleteResult = deleteStatement(oldStatement);
-        if (deleteResult.isFailure()) {
-            return deleteResult;
-        }
-
-        MutationResult insertResult = insertStatement(newStatement);
-        if (insertResult.isFailure()) {
-            return MutationResult.failure(
-                    "Insert failed after delete: " + insertResult.getMessage()
-            );
-        }
-
-        return insertResult;
-    }
-
-    /**
      * Clears statements from the specified contexts.
      *
      * @param contexts Array of contexts to clear (empty for all)

@@ -46,15 +46,6 @@ public interface TransactionManager {
     Optional<Transaction> getCurrentTransaction();
 
     /**
-     * Checks if a transaction is active on the current thread.
-     *
-     * @return true if a transaction is active
-     */
-    default boolean hasActiveTransaction() {
-        return getCurrentTransaction().map(Transaction::isActive).orElse(false);
-    }
-
-    /**
      * Returns the default isolation level used for new transactions.
      *
      * @return Default isolation level

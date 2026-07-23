@@ -84,12 +84,4 @@ public class ExternalPluginLoader {
         return count;
     }
 
-
-    /**
-     * Clears all loaded class loaders.
-     */
-    public static void clear() {
-        logger.info("Clearing {} loaded class loaders", loadedClassLoaders.size());
-        loadedClassLoaders.clear();
-    }
 }

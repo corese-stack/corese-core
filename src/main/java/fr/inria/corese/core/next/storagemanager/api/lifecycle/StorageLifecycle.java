@@ -40,12 +40,4 @@ public interface StorageLifecycle {
      */
     StorageConfig getConfig();
 
-    /**
-     * Checks whether the storage has been successfully initialized and is running.
-     *
-     * @return {@code true} if the storage is in {@link LifecycleState#RUNNING} state
-     */
-    default boolean isInitialized() {
-        return getState() == LifecycleState.RUNNING;
-    }
 }
