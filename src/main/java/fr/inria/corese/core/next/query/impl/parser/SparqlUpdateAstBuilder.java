@@ -97,4 +97,11 @@ public class SparqlUpdateAstBuilder extends SparqlAstBuilder{
                 graphRefFromGraphOrDefault(ctx.graphOrDefault(1)),
                 ctx.SILENT() != null);
     }
+
+    public MoveRequestAst moveToAst(SparqlParser.MoveContext ctx) {
+        return new MoveRequestAst(
+                graphRefFromGraphOrDefault(ctx.graphOrDefault(0)),
+                graphRefFromGraphOrDefault(ctx.graphOrDefault(1)),
+                ctx.SILENT() != null);
+    }
 }
