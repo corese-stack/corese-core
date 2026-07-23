@@ -164,6 +164,7 @@ final class SparqlQueryAnalyzer {
                     new LoadUpdateAstListener(updateBuilder),
                     new AddUpdateAstListener(updateBuilder),
                     new CopyUpdateAstListener(updateBuilder),
+                    new MoveUpdateAstListener(updateBuilder),
                     new BgpAstListener(updateBuilder),
                     new BindAstListener(updateBuilder),
                     new FilterAstListener(updateBuilder),

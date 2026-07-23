@@ -332,4 +332,14 @@ final class SparqlListenerDispatcher extends SparqlParserBaseListener {
     public void exitCopy(SparqlParser.CopyContext ctx) {
         for (var d : delegates) d.exitCopy(ctx);
     }
+
+    @Override
+    public void enterMove(SparqlParser.MoveContext ctx) {
+        for (var d : delegates) d.enterMove(ctx);
+    }
+
+    @Override
+    public void exitMove(SparqlParser.MoveContext ctx) {
+        for (var d : delegates) d.exitMove(ctx);
+    }
 }
