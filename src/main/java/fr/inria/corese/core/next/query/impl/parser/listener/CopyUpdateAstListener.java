@@ -14,7 +14,7 @@ public class CopyUpdateAstListener extends AbstractSparqlUpdateAstListener {
 
     @Override
     public void enterCopy(SparqlParser.CopyContext ctx) {
-        CopyRequestAst ast = this.updateBuilder().copytoAst(ctx);
+        CopyRequestAst ast = this.updateBuilder().copyToAst(ctx);
         this.updateBuilder().addRequest(ast);
     }
 }
