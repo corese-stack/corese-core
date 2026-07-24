@@ -27,4 +27,6 @@ public interface AstVisitor {
     void visit(ServiceAst ast);
     void visit(GraphRefAst ast);
     void visit(PathAst ast);
+    void visit(QuadsAst ast);
+    void visit(NamedGraphQuadsAst ast);
 }

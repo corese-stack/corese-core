@@ -107,4 +107,14 @@ public abstract class AbstractAstVisitor implements AstVisitor {
     public void visit(PathAst ast) {
 
     }
+
+    @Override
+    public void visit(QuadsAst ast) {
+
+    }
+
+    @Override
+    public void visit(NamedGraphQuadsAst ast) {
+
+    }
 }
