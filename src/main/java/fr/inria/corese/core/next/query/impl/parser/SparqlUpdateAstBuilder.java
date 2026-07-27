@@ -104,4 +104,57 @@ public class SparqlUpdateAstBuilder extends SparqlAstBuilder{
                 graphRefFromGraphOrDefault(ctx.graphOrDefault(1)),
                 ctx.SILENT() != null);
     }
+
+    public InsertDataRequestAst insertDataToAst(SparqlParser.InsertDataContext ctx) {
+        return new InsertDataRequestAst(quadsFromQuads(ctx.quadData().quads()));
+    }
+
+    public DeleteDataRequestAst deleteDataToAst(SparqlParser.DeleteDataContext ctx) {
+        return new DeleteDataRequestAst(quadsFromQuads(ctx.quadData().quads()));
+    }
+
+    public DeleteWhereRequestAst deleteWhereToAst(SparqlParser.DeleteWhereContext ctx) {
+        return new DeleteWhereRequestAst(quadsFromQuads(ctx.quadPattern().quads()));
+    }
+
+    private QuadsAst quadsFromQuads(SparqlParser.QuadsContext ctx) {
+        List<TriplePatternAst> defaultTriples = new ArrayList<>();
+        List<NamedGraphQuadsAst> namedGraphBlocks = new ArrayList<>();
+
+        for (SparqlParser.TriplesTemplateContext tt : ctx.triplesTemplate()) {
+            defaultTriples.addAll(triplesFromTriplesTemplate(tt));
+        }
+
+        for (SparqlParser.QuadsNotTriplesContext qnt : ctx.quadsNotTriples()) {
+            TermAst graph = termFromVarOrIriRef(qnt.varOrIri());
+            List<TriplePatternAst> graphTriples = new ArrayList<>();
+            if (qnt.triplesTemplate() != null) {
+                graphTriples.addAll(triplesFromTriplesTemplate(qnt.triplesTemplate()));
+            }
+            namedGraphBlocks.add(new NamedGraphQuadsAst(graph, graphTriples));
+        }
+
+        return new QuadsAst(defaultTriples, namedGraphBlocks);
+    }
+
+    private List<TriplePatternAst> triplesFromTriplesTemplate(SparqlParser.TriplesTemplateContext ctx) {
+        List<TriplePatternAst> triples = new ArrayList<>();
+        SparqlParser.TriplesTemplateContext current = ctx;
+        while (current != null) {
+            SparqlParser.TriplesSameSubjectContext tss = current.triplesSameSubject();
+            if (tss != null && tss.varOrTerm() != null && tss.propertyListNotEmpty() != null) {
+                TermAst subject = termFromVarOrTerm(tss.varOrTerm());
+                var propertyList = tss.propertyListNotEmpty();
+                for (int verbIndex = 0; verbIndex < propertyList.verb().size(); verbIndex++) {
+                    TermAst predicate = termFromVerb(propertyList.verb(verbIndex));
+                    List<TermAst> objects = termListFromObjectList(propertyList.objectList(verbIndex));
+                    for (TermAst object : objects) {
+                        triples.add(new TriplePatternAst(subject, predicate, object));
+                    }
+                }
+            }
+            current = current.triplesTemplate();
+        }
+        return triples;
+    }
 }

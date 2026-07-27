@@ -342,4 +342,34 @@ final class SparqlListenerDispatcher extends SparqlParserBaseListener {
     public void exitMove(SparqlParser.MoveContext ctx) {
         for (var d : delegates) d.exitMove(ctx);
     }
+
+    @Override
+    public void enterInsertData(SparqlParser.InsertDataContext ctx) {
+        for (var d : delegates) d.enterInsertData(ctx);
+    }
+
+    @Override
+    public void exitInsertData(SparqlParser.InsertDataContext ctx) {
+        for (var d : delegates) d.exitInsertData(ctx);
+    }
+
+    @Override
+    public void enterDeleteData(SparqlParser.DeleteDataContext ctx) {
+        for (var d : delegates) d.enterDeleteData(ctx);
+    }
+
+    @Override
+    public void exitDeleteData(SparqlParser.DeleteDataContext ctx) {
+        for (var d : delegates) d.exitDeleteData(ctx);
+    }
+
+    @Override
+    public void enterDeleteWhere(SparqlParser.DeleteWhereContext ctx) {
+        for (var d : delegates) d.enterDeleteWhere(ctx);
+    }
+
+    @Override
+    public void exitDeleteWhere(SparqlParser.DeleteWhereContext ctx) {
+        for (var d : delegates) d.exitDeleteWhere(ctx);
+    }
 }

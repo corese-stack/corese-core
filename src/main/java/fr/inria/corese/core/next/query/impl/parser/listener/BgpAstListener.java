@@ -67,6 +67,9 @@ public class BgpAstListener extends AbstractSparqlAstListener {
         if (ctx.getParent() instanceof SparqlParser.ConstructTriplesContext) {
             return;
         }
+        if (ctx.getParent() instanceof SparqlParser.TriplesTemplateContext) {
+            return;
+        }
         if (ctx.varOrTerm() == null || ctx.propertyListNotEmpty() == null) {
             return;
         }
