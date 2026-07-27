@@ -51,8 +51,6 @@ public final class SparqlAstToExpression {
     /**
      * Converts a filter {@link TermAst} to an {@link Expression}, then wraps it as a
      * {@link Filter} with {@link Filter#coreseNextSource()} set to {@code filterExpression}.
-     *
-     * For a full {@link FilterAst} node, use {@link #toNextFilter(FilterAst)}.
      * Filters containing {@code EXISTS} / {@code NOT EXISTS} require
      * {@link #toNextFilter(TermAst, WhereCompiler)} so their graph pattern can be compiled.
      */

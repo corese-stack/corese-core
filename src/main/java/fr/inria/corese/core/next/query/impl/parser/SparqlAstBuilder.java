@@ -1591,6 +1591,17 @@ public abstract class SparqlAstBuilder {
         throw new QueryEvaluationException("Unexpected value for Graph reference or default or named or all " + ctx.getText());
     }
 
+    public GraphRefAst graphRefFromGraphOrDefault(SparqlParser.GraphOrDefaultContext ctx) {
+        if (ctx.DEFAULT() != null) {
+            return GraphRefAsts.defaultGraph();
+        }
+        if (ctx.iriRef() != null) {
+            IriAst graphIri = (IriAst) termFromIriRef(ctx.iriRef());
+            return GraphRefAsts.graph(graphIri);
+        }
+        throw new QueryEvaluationException("Unexpected value for graphOrDefault: " + ctx.getText());
+    }
+
     /**
      * Per-SELECT frame used to support nested SELECT subqueries.
      */
