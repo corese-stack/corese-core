@@ -8,7 +8,8 @@ import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
 import fr.inria.corese.core.next.query.impl.parser.semantic.support.VariableScopeAnalyzer;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
-import fr.inria.corese.core.next.query.impl.sparql.ast.path.*;
+import fr.inria.corese.core.next.query.impl.sparql.ast.path.PathAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.path.PredicatePathAst;
 
 import java.util.*;
 

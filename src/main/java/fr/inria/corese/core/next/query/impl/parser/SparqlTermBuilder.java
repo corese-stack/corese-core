@@ -56,8 +56,6 @@ public final class SparqlTermBuilder {
         });
     }
 
-    // --- Primitive factories ---
-
     /**
      * Variable token text can be "?s" or "$s" depending on grammar.
      */

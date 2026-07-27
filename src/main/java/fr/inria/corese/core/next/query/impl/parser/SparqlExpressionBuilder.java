@@ -331,43 +331,6 @@ public final class SparqlExpressionBuilder {
      * Converts a {@code builtInCall} parse-tree node to the corresponding
      * {@link TermAst} / {@link ConstraintAst}.
      *
-     * <h3>Dispatch order</h3>
-     * <ol>
-     *   <li><strong>Aggregates</strong> ({@code COUNT}, {@code SUM}, {@code AVG},
-     *       {@code MIN}, {@code MAX}, {@code SAMPLE}, {@code GROUP_CONCAT}) —
-     *       handled first via {@link #termFromAggregate}.</li>
-     *   <li><strong>EXISTS / NOT EXISTS</strong> — these two forms must be checked
-     *       immediately after aggregates because the inner graph-pattern has already
-     *       been captured into {@code capturedExistsStack} by the time this method is
-     *       called (the ANTLR listener exits the nested group <em>before</em> exiting
-     *       the built-in call).  Consuming the captured pattern via
-     *       {@code existsPatternSupplier.get()} here ensures correct ordering;
-     *       delaying the check could cause the pattern to be consumed by the wrong
-     *       call site.</li>
-     *   <li><strong>REGEX / REPLACE</strong> — delegated to their own parse-context
-     *       helpers {@link #termFromRegex} and {@link #termFromReplace}.</li>
-     *   <li><strong>Zero-arg functions</strong> — {@code BOUND}, {@code BNODE} (0 or 1
-     *       arg), {@code IF}, {@code RAND}, {@code UUID}, {@code STRUUID},
-     *       {@code CONCAT}, {@code COALESCE}, {@code SUBSTR} (via
-     *       {@code subStringExpression}), {@code NOW}.</li>
-     *   <li><strong>String functions</strong> — {@code STR}, {@code UCASE},
-     *       {@code LCASE}, {@code ENCODE_FOR_URI}, {@code LANG},
-     *       {@code LANGMATCHES}, {@code CONTAINS}, {@code STRSTARTS},
-     *       {@code STRENDS}, {@code STRDT}, {@code STRLANG}, {@code STRBEFORE},
-     *       {@code STRAFTER}, {@code STRLEN}.</li>
-     *   <li><strong>Date/time functions</strong> — {@code YEAR}, {@code MONTH},
-     *       {@code DAY}, {@code HOURS}, {@code MINUTES}, {@code SECONDS},
-     *       {@code TIMEZONE}, {@code TZ}.</li>
-     *   <li><strong>Type accessors</strong> — {@code DATATYPE}, {@code IRI} /
-     *       {@code URI}.</li>
-     *   <li><strong>Type tests</strong> — {@code sameTerm}, {@code isIRI} /
-     *       {@code isURI}, {@code isBlank}, {@code isLiteral}.</li>
-     *   <li><strong>Hash functions</strong> — {@code MD5}, {@code SHA1},
-     *       {@code SHA256}, {@code SHA384}, {@code SHA512}.</li>
-     *   <li><strong>Math functions</strong> — {@code ABS}, {@code CEIL},
-     *       {@code FLOOR}, {@code ROUND}.</li>
-     * </ol>
-     *
      * @param ctx the ANTLR parse-tree node for a {@code builtInCall} rule
      * @return the AST node representing the built-in call
      * @throws QueryEvaluationException if the function keyword is unknown or the
