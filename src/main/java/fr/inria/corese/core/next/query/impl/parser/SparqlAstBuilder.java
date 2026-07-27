@@ -181,9 +181,6 @@ public abstract class SparqlAstBuilder {
         return this.prefixDeclarations;
     }
 
-    // --- Abstract query creation class ---
-    public abstract QueryAst getResult();
-
     // --- Pattern creation ---
 
     protected boolean hasCurrentGroup() {
@@ -736,14 +733,6 @@ public abstract class SparqlAstBuilder {
             return this.iri("()");
         } // NIL = () in SPARQL
         return this.iri(ctx.getText());
-    }
-
-    public TermAst termFromGraphRef(SparqlParser.GraphRefContext ctx) {
-        if (ctx.iriRef() != null) {
-            return termFromIriRef(ctx.iriRef());
-        } else {
-            throw new QueryEvaluationException("Expecting an IRIRef in the Graph clause");
-        }
     }
 
     public List<TermAst> termListFromObjectList(SparqlParser.ObjectListContext ctx) {
@@ -1576,17 +1565,6 @@ public abstract class SparqlAstBuilder {
         }
 
         throw new QueryEvaluationException("Unsupported aggregate: " + ctx.getText());
-    }
-
-    public GraphRefAst graphRefFromGraphOrDefault(SparqlParser.GraphOrDefaultContext ctx) {
-        if (ctx.DEFAULT() != null) {
-            return GraphRefAsts.defaultGraph();
-        }
-        if(ctx.iriRef() != null) {
-            IriAst graphIri = (IriAst) termFromIriRef(ctx.iriRef());
-            return GraphRefAsts.graph(graphIri);
-        }
-        throw new QueryEvaluationException("Unexpected value for Graph reference or default " + ctx.getText());
     }
 
     public GraphRefAst graphRefFromGraphRef(SparqlParser.GraphRefContext ctx) {

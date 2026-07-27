@@ -76,24 +76,6 @@ public class QuerySyntaxException extends QueryException {
     }
 
     /**
-     * Checks whether line information is available for this syntax error.
-     *
-     * @return {@code true} if the line number is known (>= 1), {@code false} otherwise
-     */
-    public boolean hasLineInfo() {
-        return line >= 1;
-    }
-
-    /**
-     * Checks whether column information is available for this syntax error.
-     *
-     * @return {@code true} if the column number is known (>= 1), {@code false} otherwise
-     */
-    public boolean hasColumnInfo() {
-        return column >= 1;
-    }
-
-    /**
      * Formats the error message to include line and column information when available.
      *
      * @param message the base error message

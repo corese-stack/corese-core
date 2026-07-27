@@ -43,14 +43,5 @@ public class JsonResultSerializerOptions extends AbstractIOOptions implements Li
             return this;
         }
 
-        /**
-         * Adds a set of links to be added to the header of the SPARQL results.
-         * @param links preferably a set of URIs
-         * @return this
-         */
-        public Builder addLinks(Collection<String> links) {
-            this.links.addAll(links);
-            return this;
-        }
     }
 }

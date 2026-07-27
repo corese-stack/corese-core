@@ -226,10 +226,6 @@ public class Mapping
         return getSelectNodes();
     }
 
-    public void setSelect(Node[] nodes) {
-        setSelectNodes(nodes);
-    }
-
     @Override
     public Path getPath(Node qNode) {
         Node node = getNode(qNode);
@@ -237,20 +233,6 @@ public class Mapping
             return null;
         }
         return node.getPath();
-    }
-
-    /**
-     * Index of qNode in mapping (not in stack)
-     */
-    int getIndex(Node qNode) {
-        int i = 0;
-        for (Node node : getQueryNodes()) {
-            if (qNode == node) {
-                return i;
-            }
-            i++;
-        }
-        return i;
     }
 
 
@@ -291,10 +273,6 @@ public class Mapping
         return sb.toString();
     }
 
-    public List<Node> getNodes(String varString) {
-        return getNodes(varString, false);
-    }
-
     public List<Node> getNodes(String varString, boolean distinct) {
         List<Node> list = new ArrayList<>();
         if (getMappings() != null) {
@@ -322,16 +300,6 @@ public class Mapping
     void computeDistinct(List<Node> list) {
         setDistinctNodes(new Node[list.size()]);
         set(list, getDistinctNodes());
-    }
-
-    void prepareModify(Query q) {
-        if (!q.getOrderBy().isEmpty()) {
-            setOrderBy(new Node[q.getOrderBy().size()]);
-        }
-        if (!q.getGroupBy().isEmpty()) {
-            // group by node retrieved in variable hashmap 
-            setGroupBy(new Node[0]);
-        }
     }
 
     void set(List<Node> list, Node[] array) {
@@ -385,22 +353,6 @@ public class Mapping
         return create(q, value);
     }
 
-    /**
-     * use case: bind(sparql('select ?x ?y where { ... }') as (?z, ?t)) rename
-     * ?x as ?z and ?y as ?t in all Mapping as well as in Mappings select
-     */
-    public void rename(List<Node> oselect, List<Node> nselect) {
-        int size = Math.min(oselect.size(), nselect.size());
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < getQueryNodes().length; j++) {
-                if (oselect.get(i).equals(getQueryNodes()[j])) {
-                    getQueryNodes()[j] = nselect.get(i);
-                    break;
-                }
-            }
-        }
-    }
-
     // TODO: manage Node isPath
     public void fixQueryNodes(Query q) {
         for (int i = 0; i < getQueryNodes().length; i++) {
@@ -442,14 +394,6 @@ public class Mapping
     @Override
     public Node getQueryNode(int n) {
         return getQueryNodes()[n];
-    }
-
-    public Object getNodeObject(String name) {
-        Node node = getNode(name);
-        if (node == null) {
-            return null;
-        }
-        return node.getNodeObject();
     }
 
     // variable name only
@@ -585,18 +529,6 @@ public class Mapping
     @Override
     public Node[] getNodes() {
         return getTargetNodes();
-    }
-
-    /**
-     * rename query nodes Used by Producer.map() to return Mappings
-     */
-    public void setNodes(List<Node> lNodes) {
-        int n = 0;
-        for (Node qNode : lNodes) {
-            if (n < getQueryNodes().length) {
-                getQueryNodes()[n++] = qNode;
-            }
-        }
     }
 
     public Edge[] getQueryEdges() {
@@ -882,13 +814,6 @@ public class Mapping
             }
         }
         return false;
-    }
-
-    Mappings getAggregateMappings() {
-        if (getMappings() == null) {
-            return new Mappings().add(this);
-        }
-        return getMappings();
     }
 
     @Override

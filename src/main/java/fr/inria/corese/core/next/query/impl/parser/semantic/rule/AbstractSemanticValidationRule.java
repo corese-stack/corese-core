@@ -6,7 +6,6 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.AskQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ConstructQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.DescribeQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.GroupByAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.SolutionModifierAst;
@@ -42,10 +41,6 @@ public abstract class AbstractSemanticValidationRule implements SemanticValidati
 
     protected final Set<String> collectVisibleVariables(QueryAst queryAst) {
         return variableScopeAnalyzer.collectVisibleVariables(queryAst);
-    }
-
-    protected final Set<String> collectVisibleVariables(GroupGraphPatternAst whereClause) {
-        return variableScopeAnalyzer.collectVisibleVariables(whereClause);
     }
 
     protected final Set<String> collectReferencedVariables(TermAst term) {
@@ -113,10 +108,6 @@ public abstract class AbstractSemanticValidationRule implements SemanticValidati
 
     protected QueryDiagnostic buildOutOfScopeDiagnostic(String variableName, ScopeClause clause) {
         return buildOutOfScopeDiagnostic(getDiagnosticSource(), variableName, clause.label());
-    }
-
-    protected QueryDiagnostic buildOutOfScopeDiagnostic(String variableName, String clause) {
-        return buildOutOfScopeDiagnostic(getDiagnosticSource(), variableName, clause);
     }
 
     public static QueryDiagnostic buildOutOfScopeDiagnostic(String source, String variableName, String clause) {

@@ -46,26 +46,6 @@ public class XmlResultSerializerOptions  extends AbstractIOOptions implements Li
             return this;
         }
 
-        /**
-         * Adds a link to be added to the header of the SPARQL results.
-         * @param link preferably a URI
-         * @return this
-         */
-        public XmlResultSerializerOptions.Builder addLink(String link) {
-            this.links.add(link);
-            return this;
-        }
-
-        /**
-         * Adds a set of links to be added to the header of the SPARQL results.
-         * @param links preferably a set of URIs
-         * @return this
-         */
-        public XmlResultSerializerOptions.Builder addLinks(Collection<String> links) {
-            this.links.addAll(links);
-            return this;
-        }
-
         @Override
         public XmlResultSerializerOptions build() {
             return new XmlResultSerializerOptions(this);

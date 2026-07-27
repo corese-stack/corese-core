@@ -18,35 +18,12 @@ public interface ProcessVisitor extends Pointerable<Object> {
 
     int SLICE_DEFAULT = 20;
 
-    default boolean isActive() {
-        return true;
-    }
-
-    default void setActive(boolean b) {
-    }
-
     default boolean isShareable() {
         return false;
     }
 
-    default Eval getProcessor() {
-        return null;
-    }
-
-    default void setProcessor(Eval e) {
-    }
-
     default IDatatype defaultValue() {
         return null;
-    }
-
-    // before query and before lock graph
-    default IDatatype prepare() {
-        return defaultValue();
-    }
-
-    default IDatatype init() {
-        return defaultValue();
     }
 
     default IDatatype init(Query q) {
@@ -58,18 +35,6 @@ public interface ProcessVisitor extends Pointerable<Object> {
     }
 
     default IDatatype after(Mappings map) {
-        return defaultValue();
-    }
-
-    default IDatatype construct(Mappings map) {
-        return defaultValue();
-    }
-
-    default boolean entailment() {
-        return false;
-    }
-
-    default IDatatype entailment(Query rule, List<Edge> construct, List<Edge> where) {
         return defaultValue();
     }
 
@@ -93,16 +58,7 @@ public interface ProcessVisitor extends Pointerable<Object> {
         return true;
     }
 
-    default int timeout(Node serv) {
-        return 0;
-    }
-
     default int slice() {
-        return SLICE_DEFAULT;
-    }
-
-    @Deprecated
-    default int slice(Node serv, Mappings map) {
         return SLICE_DEFAULT;
     }
 
@@ -187,19 +143,6 @@ public interface ProcessVisitor extends Pointerable<Object> {
         return val;
     }
 
-    default IDatatype function(Eval eval, Expr funcall, Expr fundef) {
-        return defaultValue();
-    }
-
-
-    default IDatatype error(Eval eval, Expr exp, IDatatype... param) {
-        return null;
-    }
-
-    default IDatatype overload(Eval eval, Expr exp, IDatatype res, IDatatype... param) {
-        return null;
-    }
-
     default boolean produce() {
         return false;
     }
@@ -216,29 +159,8 @@ public interface ProcessVisitor extends Pointerable<Object> {
         return false;
     }
 
-    default boolean overload(Expr exp, IDatatype res, IDatatype dt1, IDatatype dt2) {
-        return false;
-    }
-
     default int compare(Eval eval, int res, IDatatype dt1, IDatatype dt2) {
         return res;
     }
-
-    default IDatatype datatype(IDatatype type, IDatatype sup) {
-        return type;
-    }
-
-    default IDatatype insert(IDatatype path, Edge edge) {
-        return defaultValue();
-    }
-
-    default IDatatype delete(Edge edge) {
-        return defaultValue();
-    }
-
-    default IDatatype update(Query q, List<Edge> delete, List<Edge> insert) {
-        return defaultValue();
-    }
-
 
 }

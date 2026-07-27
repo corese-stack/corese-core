@@ -30,13 +30,6 @@ public enum QueryLanguage {
 
     QueryLanguage(String name) { this.name = name; }
 
-    /**
-     * Returns the canonical name of the query language.
-     *
-     * @return the language name as a string
-     */
-    public String getName() { return name; }
-
     @Override
     public String toString() { return name; }
 }

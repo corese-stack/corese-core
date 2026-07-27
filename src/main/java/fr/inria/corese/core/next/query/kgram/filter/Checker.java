@@ -35,14 +35,6 @@ public class Checker implements ExprType {
 	}
 	
 	/**
-	 * var1=cst || var2=cst
-	 */
-	public boolean check(String v1, String v2, Expr ee){
-		Pattern p = path(v1, v2);
-		return matcher.match(p, ee);
-	}
-	
-	/**
 	 * Check one filter 
 	 */
 	public boolean check(Expr ee){
@@ -51,18 +43,7 @@ public class Checker implements ExprType {
 		// hence return false (check correctness is false)
 		return ! b;
 	}
-	
-	/**
-	 * Check two filters for contradiction:
-	 * ?x = ?y vs ?x != ?y
-	 */
-	
-	public boolean check(Expr e1, Expr e2){
-		// fake a AND using a pattern
-		Pattern and = new Pattern(BOOL, AND, e1, e2);
-		return check(and);
-	}
-	
+
 	
 	/**
 	 * Return true if a false pattern matches

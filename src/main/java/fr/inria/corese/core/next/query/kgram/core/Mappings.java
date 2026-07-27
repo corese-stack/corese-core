@@ -8,7 +8,6 @@ import fr.inria.corese.core.next.query.kgram.event.Event;
 import fr.inria.corese.core.next.query.kgram.event.EventImpl;
 import fr.inria.corese.core.next.query.kgram.event.EventManager;
 import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 
 import java.util.*;
 
@@ -117,10 +116,6 @@ public class Mappings extends PointerObject
         return String.format("[Mappings: size=%s]", size());
     }
 
-    public void init(Query q) {
-        init(q, false);
-    }
-
     void init(Query q, boolean subEval) {
         initiate(q, !subEval && q.isDistinct());
     }
@@ -188,10 +183,6 @@ public class Mappings extends PointerObject
         return isDistinct;
     }
 
-    int count() {
-        return count;
-    }
-
     void setCount(int n) {
         count = n;
     }
@@ -249,13 +240,6 @@ public class Mappings extends PointerObject
     public Mappings setQuery(Query q) {
         query = q;
         return this;
-    }
-
-    public ASTQuery getAST() {
-        if (getQuery() == null) {
-            return null;
-        }
-        return getQuery().getAST();
     }
 
     @Override

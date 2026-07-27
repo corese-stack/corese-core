@@ -188,13 +188,6 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
     }
 
     /**
-     * Sets explicit SELECT variables (e.g. SELECT ?s ?p). Variable names may include ? or $ prefix.
-     */
-    public void setProjectionVariables(List<String> variableNames) {
-        setProjectionVariables(variableNames, List.of());
-    }
-
-    /**
      * Sets explicit SELECT variables where some may be introduced by {@code (expr AS ?var)}.
      * Variable names may include ? or $ prefix.
      *
@@ -264,17 +257,6 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
             getCurrentSelectFrame().projection = newProjection;
         }
         else this.projection = newProjection;
-    }
-
-    /**
-     * Sets the projection from an existing AST.
-     */
-    public void setProjection(ProjectionAst projection) {
-        ProjectionAst effectiveProjection = projection != null ? projection : ProjectionAsts.selectAll();
-        if (hasCurrentSelect()) {
-            getCurrentSelectFrame().projection = effectiveProjection;
-        }
-        else this.projection = effectiveProjection;
     }
 
     public void addValues(List<ValueMappingAst> mappings) {
@@ -470,13 +452,6 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
                 new HavingAst(List.copyOf(frame.havingConditions)),
                 frame.limit,
                 frame.offset);
-    }
-
-    public boolean isOrdered() {
-        if (hasCurrentSelect()) {
-            return !getCurrentSelectFrame().orderConditions.isEmpty();
-        }
-        return !this.orderConditions.isEmpty();
     }
 
     /**

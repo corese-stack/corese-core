@@ -59,22 +59,6 @@ public interface BindingContext {
     }
 
     /**
-     * Clears all variables defined in this context.
-     */
-    default void clear() {
-        getBindings().clear();
-    }
-
-    /**
-     * Returns the number of defined variables.
-     *
-     * @return the number of bindings
-     */
-    default int size() {
-        return getBindings().size();
-    }
-
-    /**
      * Tests if the context is empty.
      *
      * @return true if no variable is defined

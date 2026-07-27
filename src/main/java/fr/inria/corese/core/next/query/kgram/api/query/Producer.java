@@ -6,9 +6,7 @@ import fr.inria.corese.core.next.query.kgram.core.Mappings;
 import fr.inria.corese.core.next.query.kgram.core.Query;
 import fr.inria.corese.core.next.query.kgram.core.SparqlException;
 import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -72,34 +70,6 @@ public interface Producer {
      * @return Candidate edge iterator
      */
     Iterable<Edge> getEdges(Node gNode, List<Node> from, Edge qEdge, Environment env);
-
-    @SuppressWarnings("unused")
-    default Iterable<Edge> getEdges(Node s, Node p, Node o, List<Node> from) {
-        return new ArrayList<>(0);
-    }
-
-    @SuppressWarnings("unused")
-    default Edge insert(Node g, Node s, Node p, Node o) {
-        return null;
-    }
-
-    @SuppressWarnings("unused")
-    default Iterable<Edge> delete(Node g, Node s, Node p, Node o) {
-        return null;
-    }
-
-
-    //return IDatatype list of IDatatype edge
-    // ldscript iterator
-    default IDatatype getEdges(Iterable<Edge> it) {
-        ArrayList<IDatatype> list = new ArrayList<>();
-        for (Edge edge : it) {
-            if (edge != null) {
-                list.add(DatatypeMap.createObject(edge));
-            }
-        }
-        return DatatypeMap.newList(list);
-    }
 
     Mappings getMappings(Node gNode, List<Node> from, Exp exp, Environment env) throws SparqlException;
 

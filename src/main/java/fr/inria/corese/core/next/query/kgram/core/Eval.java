@@ -183,10 +183,6 @@ public class Eval implements ExpType, Plugin {
         return query(null, q, null);
     }
 
-    public Mappings query(Query q, Mapping m) throws SparqlException {
-        return query(null, q, m);
-    }
-
     public Mappings query(Node graphNode, Query q, Mapping m) throws SparqlException {
         return queryBasic(graphNode, q, m);
     }

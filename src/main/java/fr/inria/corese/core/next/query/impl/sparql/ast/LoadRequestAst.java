@@ -17,16 +17,6 @@ public record LoadRequestAst(GraphRefAst fromClause, GraphRefAst toClause, boole
     }
 
 
-    /**
-     * Construct a LOAD query with an empty prologue and a silent flag to false.
-     * @param fromClause From clause, set of graphs IRIs
-     * @param toClause To clause. Set of Graph IRIs
-     */
-    public LoadRequestAst(GraphRefAst fromClause, GraphRefAst toClause) {
-        this(fromClause, toClause, false);
-    }
-
-
     @Override
     public void accept(AstVisitor visitor) {
         visitor.visit(this);

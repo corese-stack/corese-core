@@ -19,30 +19,6 @@ public class ExpEdge extends Exp {
         super(t);
     }
 
-    /*
-     ?s ope cst | cst ope ?s  ope ::= = < <= > >=
-      
-     fun(?s, cst)   fun ::= contains, strstarts, strends, regex
-      
-     node ::= subject, predicate, object
-     
-     getFilter(node, type) getFilters(node, type) 
-     getFilter(node)       getFilters(node) 
-     getFilters()
-    
-    ?x p ?y  filters (?y < 12) (?x = <test>)
-    getFilter(object) = (?y < 12)
-
-     */
-    
-    public Filter getFilter(int node, int type) {
-        List<Filter> list = getFilters(node, type);
-        if (list.isEmpty()) {
-            return null;
-        }
-        return list.getFirst();
-    }
-    
     /**
      * node: subject|predicate|object
      * type: operator or function or any

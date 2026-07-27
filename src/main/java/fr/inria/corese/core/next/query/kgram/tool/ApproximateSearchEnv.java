@@ -2,7 +2,6 @@ package fr.inria.corese.core.next.query.kgram.tool;
 
 import fr.inria.corese.core.next.query.kgram.api.core.Expr;
 import fr.inria.corese.core.next.query.kgram.api.core.Node;
-import fr.inria.corese.core.next.query.kgram.api.query.Environment;
 
 import java.util.*;
 
@@ -53,46 +52,10 @@ public class ApproximateSearchEnv {
         return sb.toString();
     }
 
-    private Double aggregate(Environment env, List<Expr> lv) {
-        if (lv.isEmpty()) {
-            return 1.0;
-        }
-
-        double sim = 1;
-
-        //calculate similarity
-        for (Expr var : lv) {
-            Node node = env.getNode(var);
-            if (node == null) {
-                continue;
-            }
-
-            Double s = this.getSimilarity(var, (Node) node.getValue());
-            if (s != null) {
-                sim *= s;
-            }
-        }
-        return sim;
-    }
-
-    public List<Expr> getVariables() {
-        List<Expr> lv = new ArrayList<>();
-        for (Key k : this.all.keySet()) {
-            lv.add(k.getVar());
-        }
-
-        return lv;
-    }
-
     static class Key {
 
         private final Expr var;
         private Node uri;
-
-        public Key(Expr var, Node uri) {
-            this(var);
-            this.uri = uri;
-        }
 
         public Key(Expr var) {
             this.var = var;
@@ -130,11 +93,6 @@ public class ApproximateSearchEnv {
         private final Node node;
         private double similarity = -1;
         private final String algorithms;
-
-        public Value(Node node, String algorithms, double sim) {
-            this(node, algorithms);
-            this.similarity = sim;
-        }
 
         public Value(Node node, String algorithms) {
             this.node = node;

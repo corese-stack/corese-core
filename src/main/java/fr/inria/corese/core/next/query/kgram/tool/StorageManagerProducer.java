@@ -7,7 +7,6 @@ import fr.inria.corese.core.next.data.api.ValueFactory;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.kgram.api.core.Edge;
-import fr.inria.corese.core.next.query.kgram.api.core.Graph;
 import fr.inria.corese.core.next.query.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.kgram.api.core.Regex;
 import fr.inria.corese.core.next.query.kgram.api.query.Environment;
@@ -126,11 +125,6 @@ public final class StorageManagerProducer extends ProducerDefault {
     }
 
     @Override
-    public IDatatype getValue(Object value) {
-        return getDatatypeValue(value);
-    }
-
-    @Override
     public IDatatype getDatatypeValue(Object value) {
         if (value instanceof Node node) {
             return node.getDatatypeValue();
@@ -179,11 +173,6 @@ public final class StorageManagerProducer extends ProducerDefault {
             mappings.add(binding.toMapping());
         }
         return mappings;
-    }
-
-    @Override
-    public Graph getGraph() {
-        return null;
     }
 
     /**

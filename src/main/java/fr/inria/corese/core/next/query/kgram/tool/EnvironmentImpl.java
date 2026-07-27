@@ -19,11 +19,7 @@ public class EnvironmentImpl implements Environment {
 	
 	public EnvironmentImpl(){
 	}
-	
-	EnvironmentImpl(Query q){
-		query = q;
-	}
-	
+
         @Override
 	public int count() {
 		return 0;

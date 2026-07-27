@@ -5,8 +5,6 @@ import fr.inria.corese.core.next.query.api.GraphQuery;
 
 import java.io.Closeable;
 import java.util.*;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 /**
  * Represents the result of evaluating a SPARQL CONSTRUCT or DESCRIBE query.
@@ -53,34 +51,6 @@ public interface GraphQueryResult extends Closeable, Iterable<Statement> {
                 return GraphQueryResult.this.next();
             }
         };
-    }
-
-    /**
-     * Returns all remaining statements as a {@link List}.
-     *
-     * @return a list containing all remaining statements (never {@code null})
-     * @throws IllegalStateException if this result has been closed
-     */
-    default List<Statement> asList() {
-        List<Statement> list = new ArrayList<>();
-        this.forEach(list::add);
-        return list;
-    }
-
-    /**
-     * Returns a sequential {@link Stream} over the statements in this result.
-     *
-     * @return a sequential stream over the statements in this result
-     * @throws IllegalStateException if this result has been closed
-     */
-    default Stream<Statement> stream() {
-        return StreamSupport.stream(
-                Spliterators.spliteratorUnknownSize(
-                        iterator(),
-                        Spliterator.ORDERED | Spliterator.NONNULL
-                ),
-                false
-        );
     }
 
     /**

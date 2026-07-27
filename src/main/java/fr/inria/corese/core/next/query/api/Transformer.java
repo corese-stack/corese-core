@@ -29,25 +29,4 @@ public interface Transformer {
     Update compileUpdate(String updateString, QueryLanguage queryLanguage)
             throws QuerySyntaxException;
 
-    /**
-     * Convenience method to compile a SPARQL query.
-     *
-     * @param queryString the SPARQL query text
-     * @return the compiled query
-     * @throws QuerySyntaxException if the query string is syntactically invalid
-     */
-    default Query<?> compileSPARQL(String queryString) throws QuerySyntaxException {
-        return compileQuery(queryString, QueryLanguage.SPARQL);
-    }
-
-    /**
-     * Convenience method to compile a SPARQL UPDATE.
-     *
-     * @param updateString the SPARQL UPDATE text
-     * @return the compiled update
-     * @throws QuerySyntaxException if the update string is syntactically invalid
-     */
-    default Update compileSPARQLUpdate(String updateString) throws QuerySyntaxException {
-        return compileUpdate(updateString, QueryLanguage.SPARQL);
-    }
 }
