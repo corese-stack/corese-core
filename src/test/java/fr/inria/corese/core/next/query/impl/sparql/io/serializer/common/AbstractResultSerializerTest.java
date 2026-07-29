@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.query.impl.sparql.io.serializer.common;
 import fr.inria.corese.core.next.data.api.Value;
 import fr.inria.corese.core.next.data.api.ValueFactory;
 import fr.inria.corese.core.next.data.api.io.IOOptions;
-import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.data.impl.temp.CoreseValueFactory;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
 import fr.inria.corese.core.next.query.api.result.BindingSet;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public abstract class AbstractResultSerializerTest {
 
-    private final ValueFactory factory = new CoreseAdaptedValueFactory();
+    private final ValueFactory factory = new CoreseValueFactory();
 
     protected abstract ResultSerializer getResultSerializer(TupleQueryResult results);
     protected abstract ResultSerializer getResultSerializer(TupleQueryResult results, IOOptions options);

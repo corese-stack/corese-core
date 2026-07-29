@@ -11,7 +11,7 @@ import java.util.Iterator;
  * @author Olivier Corby, Edelweiss, INRIA 2010
  *
  */
-public class Buffer implements Iterable<Mapping>, Iterator<Mapping> {
+public class PathMappingBuffer implements Iterable<Mapping>, Iterator<Mapping> {
 
 	private Mapping map;
 	private boolean hasNext = true;

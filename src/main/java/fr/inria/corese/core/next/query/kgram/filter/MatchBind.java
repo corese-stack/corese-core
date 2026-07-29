@@ -40,7 +40,7 @@ public class MatchBind {
 	}
         	
 	void setValue(Expr qe, Expr te){
-		if (qe instanceof Pattern){
+		if (qe instanceof FilterPattern){
 			table.put(qe, te);
 			stack.add(qe);
 		}

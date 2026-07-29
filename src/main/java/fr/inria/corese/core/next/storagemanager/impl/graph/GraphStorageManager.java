@@ -17,7 +17,7 @@ import fr.inria.corese.core.next.storagemanager.api.transaction.TransactionManag
  */
 public class GraphStorageManager implements StorageManager {
 
-    private final GraphAdapter adapter;
+    private final CoreseGraphStatementStore adapter;
     private final QueryOperations queryOps;
     private final MutationOperations mutationOps;
     private final MetadataOperations metadataOps;
@@ -33,7 +33,7 @@ public class GraphStorageManager implements StorageManager {
             throw new IllegalArgumentException("ValueFactory cannot be null");
         }
 
-        this.adapter = new GraphAdapter(builder.graph, builder.valueFactory);
+        this.adapter = new CoreseGraphStatementStore(builder.graph, builder.valueFactory);
         this.queryOps = new GraphQueryOperations(adapter);
         this.mutationOps = new GraphMutationOperations(adapter);
         this.metadataOps = new GraphMetadataOperations(adapter);

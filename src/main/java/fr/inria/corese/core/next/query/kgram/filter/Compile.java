@@ -91,7 +91,7 @@ public class Compile implements ExprType {
 		Expr ee = ff.getExp();
 
 		// ?x = ?y
-		Pattern pat = new Pattern(TERM, EQ, VARIABLE, VARIABLE);
+		FilterPattern pat = new FilterPattern(TERM, EQ, VARIABLE, VARIABLE);
 		if (matcher.match(pat, ee)){
 			// compute Node list corresponding to variables
 			List<Node> lNode = query.getNodes(exp);
@@ -105,7 +105,7 @@ public class Compile implements ExprType {
 			}
 		}
 		// ?x = 'constant'
-		else if (matcher.match(new Pattern(TERM, EQ, VARIABLE, CONSTANT), ee)){
+		else if (matcher.match(new FilterPattern(TERM, EQ, VARIABLE, CONSTANT), ee)){
 			Exp bind = buildCst(exp, ExpType.Type.OPT_BIND);
 			if (bind != null){
 				exp.add(bind);		
@@ -150,14 +150,14 @@ public class Compile implements ExprType {
 	void gl(Exp exp){
 		Filter ff = exp.getFilter();
 		Expr ee = ff.getExp();
-		Pattern pat = new Pattern(TERM, GL, VARIABLE, CONSTANT);
+		FilterPattern pat = new FilterPattern(TERM, GL, VARIABLE, CONSTANT);
 		if (matcher.match(pat, ee)){
 			Exp test = buildCst(exp, ExpType.Type.TEST);
 			if (test!=null)
 				exp.add(test);
 		}
 		else {
-			pat = new Pattern(TERM, GL, VARIABLE, VARIABLE);
+			pat = new FilterPattern(TERM, GL, VARIABLE, VARIABLE);
 			if (matcher.match(pat, ee)){
 				Exp test = buildVar(exp);
 				if (test!=null)
@@ -173,7 +173,7 @@ public class Compile implements ExprType {
 	void or(Exp exp){
 		Filter ff = exp.getFilter();
 		Expr ee = ff.getExp();
-		Pattern pat = new Pattern(BOOLEAN, OR, new Pattern(TERM, EQ, VARIABLE, CONSTANT));
+		FilterPattern pat = new FilterPattern(BOOLEAN, OR, new FilterPattern(TERM, EQ, VARIABLE, CONSTANT));
 		pat.setRec();
 		pat.setMatchConstant();
 		if (matcher.match(pat, ee)) {

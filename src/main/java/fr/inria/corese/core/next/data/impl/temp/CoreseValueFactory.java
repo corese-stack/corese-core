@@ -37,13 +37,13 @@ import fr.inria.corese.core.next.data.impl.temp.literal.CoreseTyped;
 /**
  * Factory for all the Corese adapted values.
  */
-public class CoreseAdaptedValueFactory implements ValueFactory {
+public class CoreseValueFactory implements ValueFactory {
 
     private static final SecureRandom secureRandom = new SecureRandom();
 
     private final AtomicLong nodeID = new AtomicLong(secureRandom.nextLong());
 
-    public CoreseAdaptedValueFactory() {
+    public CoreseValueFactory() {
     }
 
     /**

@@ -8,7 +8,7 @@ import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
 import fr.inria.corese.core.next.data.impl.io.serialization.DataSerializerFactory;
 import fr.inria.corese.core.next.data.impl.io.serialization.turtle.TurtleSerializerOptions;
 import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
-import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.data.impl.temp.CoreseValueFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,7 +51,7 @@ class TurtleCircularTest extends ParserTestBase {
 
     @BeforeEach
     void setUp() {
-        valueFactory = new CoreseAdaptedValueFactory();
+        valueFactory = new CoreseValueFactory();
         serializerFactory = new DataSerializerFactory();
         parserFactory = new ParserFactory();
         defaultConfig = TurtleSerializerOptions.defaultConfig();

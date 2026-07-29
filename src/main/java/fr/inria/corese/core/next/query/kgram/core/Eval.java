@@ -5,7 +5,7 @@ import fr.inria.corese.core.next.query.kgram.api.core.*;
 import fr.inria.corese.core.next.query.kgram.api.query.*;
 import fr.inria.corese.core.next.query.kgram.event.Event;
 import fr.inria.corese.core.next.query.kgram.event.EventImpl;
-import fr.inria.corese.core.next.query.kgram.event.EventManager;
+import fr.inria.corese.core.next.query.kgram.event.KgramEventDispatcher;
 import fr.inria.corese.core.next.query.kgram.event.ResultListener;
 import fr.inria.corese.core.next.query.kgram.path.PathFinder;
 import fr.inria.corese.core.sparql.api.IDatatype;
@@ -52,7 +52,7 @@ public class Eval implements ExpType, Plugin {
         setNewMappingsVersion(true);
     }
 
-    EventManager manager;
+    KgramEventDispatcher manager;
     boolean hasEvent = false;
     // Edge and Node producer
     Producer saveProducer;
@@ -1798,7 +1798,7 @@ public class Eval implements ExpType, Plugin {
 
     public void createManager() {
         if (manager == null) {
-            setEventManager(new EventManager());
+            setEventManager(new KgramEventDispatcher());
             if (memory != null) {
                 memory.setEventManager(manager);
             }
@@ -1808,11 +1808,11 @@ public class Eval implements ExpType, Plugin {
         }
     }
 
-    public EventManager getEventManager() {
+    public KgramEventDispatcher getEventManager() {
         return manager;
     }
 
-    public void setEventManager(EventManager man) {
+    public void setEventManager(KgramEventDispatcher man) {
         manager = man;
         hasEvent = true;
     }

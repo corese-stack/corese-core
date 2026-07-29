@@ -5,7 +5,7 @@ import fr.inria.corese.core.next.query.kgram.api.core.Edge;
 import fr.inria.corese.core.next.query.kgram.api.core.Expr;
 import fr.inria.corese.core.next.query.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.kgram.core.*;
-import fr.inria.corese.core.next.query.kgram.event.EventManager;
+import fr.inria.corese.core.next.query.kgram.event.KgramEventDispatcher;
 import fr.inria.corese.core.next.query.kgram.path.Path;
 import fr.inria.corese.core.next.query.kgram.tool.ApproximateSearchEnv;
 import fr.inria.corese.core.sparql.api.IDatatype;
@@ -95,7 +95,7 @@ public interface Environment {
 
     int count();
 
-    EventManager getEventManager();
+    KgramEventDispatcher getEventManager();
 
     Object getObject();
 

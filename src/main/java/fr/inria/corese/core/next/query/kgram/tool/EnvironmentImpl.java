@@ -7,7 +7,7 @@ import fr.inria.corese.core.next.query.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.kgram.api.query.Environment;
 import fr.inria.corese.core.next.query.kgram.api.query.ProcessVisitor;
 import fr.inria.corese.core.next.query.kgram.core.*;
-import fr.inria.corese.core.next.query.kgram.event.EventManager;
+import fr.inria.corese.core.next.query.kgram.event.KgramEventDispatcher;
 import fr.inria.corese.core.next.query.kgram.path.Path;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
@@ -80,7 +80,7 @@ public class EnvironmentImpl implements Environment {
 	}
 
 	@Override
-	public EventManager getEventManager() {
+	public KgramEventDispatcher getEventManager() {
 		// TODO Auto-generated method stub
 		return null;
 	}

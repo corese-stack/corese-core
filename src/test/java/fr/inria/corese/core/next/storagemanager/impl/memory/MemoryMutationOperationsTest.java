@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 class MemoryMutationOperationsTest {
 
     @Mock
-    private MemoryAdapter mockAdapter;
+    private InMemoryStatementStore mockAdapter;
 
     @Mock
     private Statement mockStatement;

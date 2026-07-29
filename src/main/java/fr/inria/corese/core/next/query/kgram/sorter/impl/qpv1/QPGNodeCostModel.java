@@ -9,9 +9,9 @@ import fr.inria.corese.core.next.query.kgram.sorter.core.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static fr.inria.corese.core.kgram.sorter.core.Const.*;
-import static fr.inria.corese.core.kgram.sorter.core.IEstimate.MAX_COST;
-import static fr.inria.corese.core.kgram.sorter.core.IEstimate.MIN_COST_0;
+import static fr.inria.corese.core.next.query.kgram.sorter.core.QuerySorterConst.*;
+import static fr.inria.corese.core.next.query.kgram.sorter.core.IEstimate.MAX_COST;
+import static fr.inria.corese.core.next.query.kgram.sorter.core.IEstimate.MIN_COST_0;
 
 /**
  * Class for constructing the pattern of a triple, including many parameters
@@ -252,7 +252,7 @@ public class QPGNodeCostModel extends AbstractCostModel {
 
     @Override
     public boolean estimatable() {
-        return Const.evaluable(this.node.getType());
+        return QuerySorterConst.evaluable(this.node.getType());
     }
 
     }

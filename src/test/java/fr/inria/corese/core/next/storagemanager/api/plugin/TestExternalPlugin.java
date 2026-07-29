@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.storagemanager.api.plugin;
 import fr.inria.corese.core.next.data.api.IRI;
 import fr.inria.corese.core.next.data.api.Statement;
 import fr.inria.corese.core.next.data.api.ValueFactory;
-import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.data.impl.temp.CoreseValueFactory;
 import fr.inria.corese.core.next.storagemanager.api.StorageManager;
 import fr.inria.corese.core.next.storagemanager.api.support.config.StorageConfig;
 import fr.inria.corese.core.next.storagemanager.api.support.model.StatementPattern;
@@ -116,7 +116,7 @@ public class TestExternalPlugin {
         logger.info("StorageManager created via StoragePluginManager");
 
         // 3. Create test data
-        ValueFactory vf = new CoreseAdaptedValueFactory();
+        ValueFactory vf = new CoreseValueFactory();
         IRI alice = vf.createIRI("http://example.org/Alice");
         IRI knows = vf.createIRI("http://xmlns.com/foaf/0.1/knows");
         IRI bob = vf.createIRI("http://example.org/Bob");

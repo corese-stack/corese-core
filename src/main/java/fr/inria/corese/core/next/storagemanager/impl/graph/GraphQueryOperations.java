@@ -14,16 +14,16 @@ import java.util.stream.Stream;
  */
 public class GraphQueryOperations implements QueryOperations {
 
-    private final GraphAdapter adapter;
+    private final CoreseGraphStatementStore adapter;
 
     /**
      * Constructs a new GraphQueryOperations.
      *
-     * @param adapter the GraphAdapter for Graph access (must not be null)
+     * @param adapter the CoreseGraphStatementStore for Graph access (must not be null)
      * @throws IllegalArgumentException if adapter is null
      */
-    public GraphQueryOperations(GraphAdapter adapter) {
-        if (adapter == null) throw new IllegalArgumentException("GraphAdapter cannot be null");
+    public GraphQueryOperations(CoreseGraphStatementStore adapter) {
+        if (adapter == null) throw new IllegalArgumentException("CoreseGraphStatementStore cannot be null");
         this.adapter = adapter;
     }
 

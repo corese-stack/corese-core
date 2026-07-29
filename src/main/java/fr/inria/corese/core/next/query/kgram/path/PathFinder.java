@@ -9,7 +9,7 @@ import fr.inria.corese.core.next.query.kgram.api.query.Evaluator;
 import fr.inria.corese.core.next.query.kgram.api.query.Matcher;
 import fr.inria.corese.core.next.query.kgram.api.query.Producer;
 import fr.inria.corese.core.next.query.kgram.core.*;
-import fr.inria.corese.core.next.query.kgram.event.EventManager;
+import fr.inria.corese.core.next.query.kgram.event.KgramEventDispatcher;
 import fr.inria.corese.core.next.query.kgram.event.ResultListener;
 import fr.inria.corese.core.next.query.kgram.tool.EdgeInv;
 import org.slf4j.Logger;
@@ -53,7 +53,7 @@ public class PathFinder {
     public static long cedge = 0, cresult = 0, ctest = 0;
 
     // synchronized buffer between this and projection
-    private Buffer mbuffer;
+    private PathMappingBuffer mbuffer;
     private Environment memory;
     private ResultListener listener;
     private Eval kgram;
@@ -136,7 +136,7 @@ public class PathFinder {
     }
 
     @SuppressWarnings("unused")
-    public void set(EventManager man) {
+    public void set(KgramEventDispatcher man) {
     }
 
     public void set(ResultListener rl) {
@@ -302,7 +302,7 @@ public class PathFinder {
 
     void mstart(Environment mem) {
         // buffer store path enumeration
-        mbuffer = new Buffer();
+        mbuffer = new PathMappingBuffer();
         // path enumeration in a thread
         GraphPath graphPath = new GraphPath(this, mem);
         // launch path computing (one by one) eg launch process() below

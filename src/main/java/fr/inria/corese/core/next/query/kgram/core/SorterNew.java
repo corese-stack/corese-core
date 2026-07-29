@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import static fr.inria.corese.core.next.query.kgram.sorter.core.Const.plannable;
+import static fr.inria.corese.core.next.query.kgram.sorter.core.QuerySorterConst.plannable;
 
 /**
  * A new sorter for QP

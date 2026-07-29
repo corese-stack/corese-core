@@ -9,7 +9,9 @@ import fr.inria.corese.core.next.query.kgram.api.query.Producer;
  */
 public interface IEstimate {
 
+    double MAX_COST = 1.0;
     //approximate minimum value, but not equal to 0
+    double MIN_COST_0 = 1.0 / Double.MAX_VALUE;
     double NA_COST = -1;
 
     /**

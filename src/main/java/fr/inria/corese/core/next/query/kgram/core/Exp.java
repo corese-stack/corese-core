@@ -1004,7 +1004,7 @@ public class Exp extends PointerObject
      * inSubScope = true : collect nodes of left of optional and surely bound by union
      * optional = true :  we are inside an optional
      */
-    void getNodes(ExpHandler h) {
+    void getNodes(ExpNodeCollector h) {
         switch (type()) {
             case FILTER:
                 // get exists {} nodes
@@ -1125,7 +1125,7 @@ public class Exp extends PointerObject
     /**
      * complete handler selectList with this query selectList
      */
-    void queryNodeList(ExpHandler h) {
+    void queryNodeList(ExpNodeCollector h) {
         List<Node> selectList = h.getSelectNodeList();
         List<Node> subSelectList = getQuery().getSelect();
 
@@ -1156,7 +1156,7 @@ public class Exp extends PointerObject
     /**
      * This is a filter get exists{} nodes if any
      */
-    void getExistNodes(Expr exp, ExpHandler h, List<Node> lExistNode) {
+    void getExistNodes(Expr exp, ExpNodeCollector h, List<Node> lExistNode) {
         if (exp.oper() == ExprType.EXIST) {
             Exp pat = getPattern(exp);
             List<Node> lNode = pat.getTheNodes(h.copy());
@@ -1211,13 +1211,13 @@ public class Exp extends PointerObject
         return getTheNodes(handler(true, bind).sample());
     }
 
-    public List<Node> getTheNodes(ExpHandler h) {
+    public List<Node> getTheNodes(ExpNodeCollector h) {
         getNodes(h);
         return h.getNodes();
     }
 
-    ExpHandler handler(boolean inSubScope, boolean bind) {
-        return new ExpHandler(inSubScope, bind);
+    ExpNodeCollector handler(boolean inSubScope, boolean bind) {
+        return new ExpNodeCollector(inSubScope, bind);
     }
 
     void add(List<Node> lNode, Node node) {

@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static fr.inria.corese.core.kgram.sorter.core.Const.*;
+import static fr.inria.corese.core.next.query.kgram.sorter.core.QuerySorterConst.*;
 
 /**
  * The node for triple pattern graph, which encapsualtes an expression (contain

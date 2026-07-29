@@ -8,7 +8,7 @@ import fr.inria.corese.core.next.data.impl.StorageModel;
 import fr.inria.corese.core.next.data.impl.exception.SerializationException;
 import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
 import fr.inria.corese.core.next.data.impl.io.serialization.DataSerializerFactory;
-import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.data.impl.temp.CoreseValueFactory;
 import fr.inria.corese.core.next.storagemanager.api.plugin.StoragePluginManager;
 import fr.inria.corese.core.next.storagemanager.api.support.config.StorageConfig;
 import org.junit.jupiter.api.AfterEach;
@@ -328,7 +328,7 @@ class RDFC10SerializerTest {
     }
 
     private String serializeToRdfCanonical(String resourcePath) {
-        ValueFactory valueFactory = new CoreseAdaptedValueFactory();
+        ValueFactory valueFactory = new CoreseValueFactory();
         StorageConfig config = StorageConfig.builder()
                 .property("type", "memory")
                 .build();

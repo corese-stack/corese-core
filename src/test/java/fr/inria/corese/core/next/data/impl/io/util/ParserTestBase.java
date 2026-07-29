@@ -4,7 +4,7 @@ import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.next.data.api.Model;
 import fr.inria.corese.core.next.data.api.ValueFactory;
 import fr.inria.corese.core.next.data.impl.StorageModel;
-import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.data.impl.temp.CoreseValueFactory;
 import fr.inria.corese.core.next.storagemanager.api.plugin.StoragePluginManager;
 import fr.inria.corese.core.next.storagemanager.api.support.config.StorageConfig;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +18,7 @@ public abstract class ParserTestBase {
 
     @BeforeEach
     void setUpBase() {
-        valueFactory = new CoreseAdaptedValueFactory();
+        valueFactory = new CoreseValueFactory();
     }
 
     /**

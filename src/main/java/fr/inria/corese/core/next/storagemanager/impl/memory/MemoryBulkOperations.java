@@ -13,16 +13,16 @@ import java.util.List;
  */
 public class MemoryBulkOperations implements BulkOperations {
 
-    private final MemoryAdapter adapter;
+    private final InMemoryStatementStore adapter;
 
     /**
      * Constructs a new MemoryBulkOperations.
      *
-     * @param adapter the MemoryAdapter for data access (must not be null)
+     * @param adapter the InMemoryStatementStore for data access (must not be null)
      * @throws IllegalArgumentException if adapter is null
      */
-    public MemoryBulkOperations(MemoryAdapter adapter) {
-        if (adapter == null) throw new IllegalArgumentException("MemoryAdapter cannot be null");
+    public MemoryBulkOperations(InMemoryStatementStore adapter) {
+        if (adapter == null) throw new IllegalArgumentException("InMemoryStatementStore cannot be null");
         this.adapter = adapter;
     }
 

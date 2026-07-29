@@ -14,7 +14,7 @@ import fr.inria.corese.core.next.storagemanager.api.transaction.TransactionManag
  */
 public class MemoryStorageManager implements StorageManager {
 
-    private final MemoryAdapter adapter;
+    private final InMemoryStatementStore adapter;
     private final QueryOperations queryOps;
     private final MutationOperations mutationOps;
     private final MetadataOperations metadataOps;
@@ -28,7 +28,7 @@ public class MemoryStorageManager implements StorageManager {
      * @param builder the builder with configuration
      */
     protected MemoryStorageManager(Builder builder) {
-        this.adapter = new MemoryAdapter();
+        this.adapter = new InMemoryStatementStore();
         this.queryOps = new MemoryQueryOperations(adapter);
         this.mutationOps = new MemoryMutationOperations(adapter);
         this.metadataOps = new MemoryMetadataOperations(adapter);

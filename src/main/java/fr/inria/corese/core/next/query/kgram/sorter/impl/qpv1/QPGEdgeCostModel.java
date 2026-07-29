@@ -5,8 +5,8 @@ import fr.inria.corese.core.next.query.kgram.sorter.core.*;
 
 import java.util.List;
 
-import static fr.inria.corese.core.kgram.sorter.core.Const.*;
-import static fr.inria.corese.core.kgram.sorter.core.IEstimate.MAX_COST;
+import static fr.inria.corese.core.next.query.kgram.sorter.core.QuerySorterConst.*;
+import static fr.inria.corese.core.next.query.kgram.sorter.core.IEstimate.MAX_COST;
 
 /**
  * Cost model for QPG edge 
@@ -66,7 +66,7 @@ public class QPGEdgeCostModel extends AbstractCostModel {
 
         ExpType.Type tNode1 = node1.getType(), tNode2 = node2.getType();
         //1. type of one of them is FILTER or VALUES or BIND, ne assign pas le weight
-        if (!Const.evaluable(tNode1) && !Const.evaluable(tNode2)) {
+        if (!QuerySorterConst.evaluable(tNode1) && !QuerySorterConst.evaluable(tNode2)) {
             this.edge.setCost(MAX_COST);
             return;
         }
@@ -106,6 +106,6 @@ public class QPGEdgeCostModel extends AbstractCostModel {
 
     @Override
     final public boolean estimatable() {
-        return Const.evaluable(this.edge.get(0).getType()) && Const.evaluable(this.edge.get(1).getType());
+        return QuerySorterConst.evaluable(this.edge.get(0).getType()) && QuerySorterConst.evaluable(this.edge.get(1).getType());
     }
 }

@@ -4,7 +4,7 @@ import fr.inria.corese.core.next.data.api.IRI;
 import fr.inria.corese.core.next.data.api.Literal;
 import fr.inria.corese.core.next.data.api.Model;
 import fr.inria.corese.core.next.data.api.ValueFactory;
-import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.data.impl.temp.CoreseValueFactory;
 import fr.inria.corese.core.next.storagemanager.api.plugin.PluginException;
 import fr.inria.corese.core.next.storagemanager.api.plugin.PluginNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +30,7 @@ class ModelFactoryTest {
 
     @BeforeEach
     void setUp() {
-        valueFactory = new CoreseAdaptedValueFactory();
+        valueFactory = new CoreseValueFactory();
         factory = new ModelFactory(valueFactory);
 
         // Create test data
@@ -292,8 +292,8 @@ class ModelFactoryTest {
         @Test
         @DisplayName("Should work with different ValueFactory implementations")
         void shouldWorkWithDifferentValueFactoryImplementations() throws PluginException {
-            // This test assumes CoreseAdaptedValueFactory works
-            ValueFactory vf = new CoreseAdaptedValueFactory();
+            // This test assumes CoreseValueFactory works
+            ValueFactory vf = new CoreseValueFactory();
             ModelFactory factory = new ModelFactory(vf);
 
             Model model = factory.createMemoryModel();

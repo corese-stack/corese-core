@@ -153,7 +153,7 @@ public interface Producer {
     boolean isBindable(Node node);
 
 
-    DatatypeValueFactory getDatatypeValueFactory();
+    DatatypeNodeFactory getDatatypeNodeFactory();
 
     /**
      * Given an object resulting from the evaluation of an extension function,

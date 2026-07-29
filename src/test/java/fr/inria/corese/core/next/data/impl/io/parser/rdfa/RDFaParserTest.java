@@ -9,7 +9,7 @@ import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
 import fr.inria.corese.core.next.data.impl.io.serialization.DataSerializerFactory;
 import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
-import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.data.impl.temp.CoreseValueFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -27,7 +27,7 @@ class RDFaParserTest extends ParserTestBase {
     private static final Logger logger = LoggerFactory.getLogger(RDFaParserTest.class);
 
     private ParserFactory parserFactory = new ParserFactory();
-    private ValueFactory valueFactory = new CoreseAdaptedValueFactory();
+    private ValueFactory valueFactory = new CoreseValueFactory();
     private final String defaultTurtlePrefixes = """
             @prefix bibo: 	<http://purl.org/ontology/bibo/> .
             @prefix cc: 	<http://creativecommons.org/ns#> .
@@ -48,7 +48,7 @@ class RDFaParserTest extends ParserTestBase {
     @Test
     void getRDFFormat() {
         Model model = createTestModel();
-        ValueFactory factory = new CoreseAdaptedValueFactory();
+        ValueFactory factory = new CoreseValueFactory();
         RDFParser parser = new RDFaParser(model, factory);
         assertEquals(RDFFormat.RDFA, parser.getRDFFormat());
     }
@@ -74,7 +74,7 @@ class RDFaParserTest extends ParserTestBase {
 
         Model parsedModel = createTestModel();
         Model resultModel = createTestModel();
-        ValueFactory factory = new CoreseAdaptedValueFactory();
+        ValueFactory factory = new CoreseValueFactory();
         RDFParser testedParser = new RDFaParser(parsedModel, factory);
         RDFParser resultParser = parserFactory.createRDFParser(RDFFormat.TURTLE, resultModel, valueFactory);
 
@@ -118,7 +118,7 @@ class RDFaParserTest extends ParserTestBase {
 
         Model parsedModel = createTestModel();
         Model resultModel = createTestModel();
-        ValueFactory factory = new CoreseAdaptedValueFactory();
+        ValueFactory factory = new CoreseValueFactory();
         RDFParser testedParser = new RDFaParser(parsedModel, factory);
         RDFParser resultParser = parserFactory.createRDFParser(RDFFormat.TURTLE, resultModel, valueFactory);
 

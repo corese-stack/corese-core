@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 class GraphQueryOperationsTest {
 
     @Mock
-    private GraphAdapter mockAdapter;
+    private CoreseGraphStatementStore mockAdapter;
 
     private GraphQueryOperations queryOps;
 

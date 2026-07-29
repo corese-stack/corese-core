@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.data.impl.temp;
 import java.time.Duration;
 
 import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
-import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.data.impl.temp.CoreseValueFactory;
 import fr.inria.corese.core.next.data.impl.temp.CoreseIRI;
 import fr.inria.corese.core.next.data.impl.temp.CoreseNodeAdapter;
 import fr.inria.corese.core.next.data.impl.temp.CoreseStatement;
@@ -20,7 +20,7 @@ import fr.inria.corese.core.next.data.impl.temp.literal.CoreseTyped;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CoreseAdaptedValueFactoryTest extends ValueFactoryTest {
+public class CoreseValueFactoryTest extends ValueFactoryTest {
 
     private String stringTestValue;
     private IRI xsdStringIRI;
@@ -32,7 +32,7 @@ public class CoreseAdaptedValueFactoryTest extends ValueFactoryTest {
     @BeforeEach
     @Override
     public void setUp() {
-        this.valueFactory = new CoreseAdaptedValueFactory();
+        this.valueFactory = new CoreseValueFactory();
         stringTestValue = "String value";
         xsdStringIRI = fr.inria.corese.core.next.data.impl.common.literal.XSD.STRING.getIRI();
         subject = new CoreseIRI("http://corese.com/subject");

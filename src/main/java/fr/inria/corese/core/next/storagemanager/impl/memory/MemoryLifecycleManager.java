@@ -17,11 +17,11 @@ public class MemoryLifecycleManager implements StorageLifecycle {
     /**
      * Constructs a new MemoryLifecycleManager.
      *
-     * @param adapter the MemoryAdapter to manage (must not be null)
+     * @param adapter the InMemoryStatementStore to manage (must not be null)
      * @throws IllegalArgumentException if adapter is null
      */
-    public MemoryLifecycleManager(MemoryAdapter adapter) {
-        if (adapter == null) throw new IllegalArgumentException("MemoryAdapter cannot be null");
+    public MemoryLifecycleManager(InMemoryStatementStore adapter) {
+        if (adapter == null) throw new IllegalArgumentException("InMemoryStatementStore cannot be null");
     }
 
     /**

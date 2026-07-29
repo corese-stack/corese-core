@@ -6,7 +6,7 @@ import fr.inria.corese.core.next.data.api.ValueFactory;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.RDFS;
 import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
-import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.data.impl.temp.CoreseValueFactory;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,7 @@ public class TurtleParserTest extends ParserTestBase {
 
     private static final Logger logger = LoggerFactory.getLogger(TurtleParserTest.class);
 
-    private ValueFactory factory = new CoreseAdaptedValueFactory();
+    private ValueFactory factory = new CoreseValueFactory();
 
     @Test
     public void testParseWithPrefixAndTriple() {

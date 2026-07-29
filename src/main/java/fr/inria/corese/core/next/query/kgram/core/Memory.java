@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.query.kgram.core;
 import fr.inria.corese.core.next.query.kgram.adapter.BindingAdapter;
 import fr.inria.corese.core.next.query.kgram.api.core.*;
 import fr.inria.corese.core.next.query.kgram.api.query.*;
-import fr.inria.corese.core.next.query.kgram.event.EventManager;
+import fr.inria.corese.core.next.query.kgram.event.KgramEventDispatcher;
 import fr.inria.corese.core.next.query.kgram.path.Path;
 import fr.inria.corese.core.next.query.kgram.tool.ApproximateSearchEnv;
 import fr.inria.corese.core.sparql.api.IDatatype;
@@ -53,7 +53,7 @@ public class Memory extends PointerObject implements Environment {
     Mapping mapping;
     // true when processing aggregate at the end
     boolean isAggregate = false;
-    EventManager manager;
+    KgramEventDispatcher manager;
     boolean hasEvent = false;
     int nbEdge = 0;
     int nbNode = 0;
@@ -75,14 +75,14 @@ public class Memory extends PointerObject implements Environment {
     }
 
     @Override
-    public EventManager getEventManager() {
+    public KgramEventDispatcher getEventManager() {
         if (manager == null) {
             kgram.createManager();
         }
         return manager;
     }
 
-    void setEventManager(EventManager man) {
+    void setEventManager(KgramEventDispatcher man) {
         manager = man;
         hasEvent = true;
     }
@@ -559,13 +559,13 @@ public class Memory extends PointerObject implements Environment {
         for (int j = i; j < edge.nbNode(); j++) {
             list.add(edge.getNode(j));
         }
-        Node target = (p == null) ? node : p.getDatatypeValueFactory().nodeList(list);
+        Node target = (p == null) ? node : p.getDatatypeNodeFactory().nodeList(list);
         return push(node, target, i);
     }
 
     boolean pushCardinality(Producer p, Node node, Edge edge, int i) {
         int n = edge.nbNode() - i;
-        Node target = (p == null) ? node : p.getDatatypeValueFactory().nodeValue(n);
+        Node target = (p == null) ? node : p.getDatatypeNodeFactory().nodeValue(n);
         return push(node, target, i);
     }
 
