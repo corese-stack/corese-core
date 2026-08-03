@@ -5,7 +5,7 @@ import fr.inria.corese.core.next.data.api.base.model.AbstractModel;
 import fr.inria.corese.core.next.data.impl.exception.IncorrectOperationException;
 import fr.inria.corese.core.next.data.impl.exception.ModelException;
 import fr.inria.corese.core.next.data.impl.exception.ModelException.ModelOperation;
-import fr.inria.corese.core.next.data.impl.temp.FilteredModel;
+import fr.inria.corese.core.next.data.impl.model.FilteredModel;
 import fr.inria.corese.core.next.storagemanager.api.StorageManager;
 import fr.inria.corese.core.next.storagemanager.api.support.exception.StorageException;
 import fr.inria.corese.core.next.storagemanager.api.support.model.StatementPattern;

@@ -5,7 +5,7 @@ import fr.inria.corese.core.next.data.api.*;
 import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
 import fr.inria.corese.core.next.data.impl.StorageModel;
 import fr.inria.corese.core.next.data.impl.io.common.JSONLDOptions;
-import fr.inria.corese.core.next.data.impl.temp.CoreseValueFactory;
+import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
 import fr.inria.corese.core.next.storagemanager.api.plugin.StoragePluginManager;
 import fr.inria.corese.core.next.storagemanager.api.support.config.StorageConfig;
 import jakarta.json.Json;

@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.query.impl.sparql.io.serializer.common;
 import fr.inria.corese.core.next.data.api.Value;
 import fr.inria.corese.core.next.data.api.ValueFactory;
 import fr.inria.corese.core.next.data.api.io.IOOptions;
-import fr.inria.corese.core.next.data.impl.temp.CoreseValueFactory;
+import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
 import fr.inria.corese.core.next.query.api.result.BindingSet;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;

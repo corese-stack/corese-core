@@ -9,7 +9,7 @@ import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
 import fr.inria.corese.core.next.data.impl.io.serialization.DataSerializerFactory;
 import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
-import fr.inria.corese.core.next.data.impl.temp.CoreseValueFactory;
+import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;

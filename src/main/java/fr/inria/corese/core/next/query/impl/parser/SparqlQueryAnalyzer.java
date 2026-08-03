@@ -133,7 +133,7 @@ final class SparqlQueryAnalyzer {
         if (root.queryUnit() != null) {
             SparqlQueryAstBuilder queryBuilder = new SparqlQueryAstBuilder(options);
             queryBuilder.reserveBlankNodeLabels(blankNodeLabels);
-            SparqlListenerDispatcher queryListener = new SparqlListenerDispatcher(List.of(
+            SparqlAntlrDispatcher queryListener = new SparqlAntlrDispatcher(List.of(
                     new AskQueryAstListener(queryBuilder),
                     new ConstructQueryAstListener(queryBuilder),
                     new DescribeQueryAstListener(queryBuilder),
@@ -157,7 +157,7 @@ final class SparqlQueryAnalyzer {
         if (root.updateUnit() != null) {
             SparqlUpdateAstBuilder updateBuilder = new SparqlUpdateAstBuilder(options);
             updateBuilder.reserveBlankNodeLabels(blankNodeLabels);
-            SparqlListenerDispatcher updateListener = new SparqlListenerDispatcher(List.of(
+            SparqlAntlrDispatcher updateListener = new SparqlAntlrDispatcher(List.of(
                     new ClearUpdateAstListener(updateBuilder),
                     new CreateUpdateAstListener(updateBuilder),
                     new DropUpdateAstListener(updateBuilder),

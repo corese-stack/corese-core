@@ -4,7 +4,7 @@ import fr.inria.corese.core.next.data.api.IRI;
 import fr.inria.corese.core.next.data.api.Resource;
 import fr.inria.corese.core.next.data.api.Value;
 import fr.inria.corese.core.next.data.api.ValueFactory;
-import fr.inria.corese.core.next.data.impl.temp.CoreseValueFactory;
+import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
 import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.kgram.api.core.Edge;
 import fr.inria.corese.core.next.query.kgram.api.core.Node;

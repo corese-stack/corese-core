@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.storagemanager.impl.memory;
 
 import fr.inria.corese.core.next.data.api.*;
-import fr.inria.corese.core.next.data.impl.temp.CoreseValueFactory;
+import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
 import org.junit.jupiter.api.*;
 
 import java.util.*;
