@@ -22,7 +22,7 @@ import static org.mockito.Mockito.*;
 class GraphMutationOperationsTest {
 
     @Mock
-    private GraphAdapter mockAdapter;
+    private CoreseGraphStatementStore mockAdapter;
     
     @Mock
     private Statement mockStatement;

@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 class GraphBulkOperationsTest {
 
     @Mock
-    private GraphAdapter mockAdapter;
+    private CoreseGraphStatementStore mockAdapter;
 
     private GraphBulkOperations bulkOps;
 

@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * @author Olivier Corby, Wimmics, INRIA 2019
  */
-public interface DatatypeValueFactory {
+public interface DatatypeNodeFactory {
 
     Node nodeList(List<Node> list);
 

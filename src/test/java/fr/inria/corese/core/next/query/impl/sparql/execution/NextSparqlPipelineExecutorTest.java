@@ -4,7 +4,7 @@ import fr.inria.corese.core.next.data.api.IRI;
 import fr.inria.corese.core.next.data.api.Resource;
 import fr.inria.corese.core.next.data.api.Value;
 import fr.inria.corese.core.next.data.api.ValueFactory;
-import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.data.impl.temp.CoreseValueFactory;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 import fr.inria.corese.core.next.storagemanager.impl.memory.MemoryStorageManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,7 +38,7 @@ class NextSparqlPipelineExecutorTest {
 
     @BeforeEach
     void setUp() {
-        valueFactory = new CoreseAdaptedValueFactory();
+        valueFactory = new CoreseValueFactory();
         storage = MemoryStorageManager.builder().build();
         executor = new NextSparqlPipelineExecutor(storage);
 

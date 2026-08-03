@@ -14,14 +14,14 @@ import java.util.stream.Collectors;
 /**
  * In-memory storage backend using {@link ConcurrentHashMap} for thread-safe operations.
  */
-public class MemoryAdapter {
+public class InMemoryStatementStore {
 
     private final Set<Statement> statements;
 
     /**
-     * Constructs a new MemoryAdapter with an empty statement set.
+     * Constructs a new InMemoryStatementStore with an empty statement set.
      */
-    public MemoryAdapter() {
+    public InMemoryStatementStore() {
         this.statements = ConcurrentHashMap.newKeySet();
     }
 

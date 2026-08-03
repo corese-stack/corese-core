@@ -6,7 +6,7 @@ import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.data.impl.io.common.JSONLDOptions;
 import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
 import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
-import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.data.impl.temp.CoreseValueFactory;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class JSONLDParserTest extends ParserTestBase {
 
     private final ParserFactory factory = new ParserFactory();
-    private final ValueFactory valueFactory = new CoreseAdaptedValueFactory();
+    private final ValueFactory valueFactory = new CoreseValueFactory();
 
 
 

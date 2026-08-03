@@ -19,7 +19,7 @@ import static org.mockito.Mockito.*;
 class MemoryQueryOperationsTest {
 
     @Mock
-    private MemoryAdapter mockAdapter;
+    private InMemoryStatementStore mockAdapter;
     
     private MemoryQueryOperations queryOps;
     

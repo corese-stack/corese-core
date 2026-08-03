@@ -19,7 +19,7 @@ import static org.mockito.Mockito.*;
 class MemoryBulkOperationsTest {
 
     @Mock
-    private MemoryAdapter mockAdapter;
+    private InMemoryStatementStore mockAdapter;
     
     private MemoryBulkOperations bulkOps;
     

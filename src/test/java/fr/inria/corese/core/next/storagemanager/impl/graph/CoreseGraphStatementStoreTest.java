@@ -15,9 +15,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for GraphAdapter.
+ * Unit tests for CoreseGraphStatementStore.
  */
-class GraphAdapterTest {
+class CoreseGraphStatementStoreTest {
 
     @Mock
     private Graph mockGraph;
@@ -25,12 +25,12 @@ class GraphAdapterTest {
     @Mock
     private ValueFactory mockFactory;
 
-    private GraphAdapter adapter;
+    private CoreseGraphStatementStore adapter;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        adapter = new GraphAdapter(mockGraph, mockFactory);
+        adapter = new CoreseGraphStatementStore(mockGraph, mockFactory);
     }
 
     @Nested
@@ -41,20 +41,20 @@ class GraphAdapterTest {
         @DisplayName("Should throw when graph is null")
         void shouldThrowWhenGraphIsNull() {
             assertThrows(IllegalArgumentException.class,
-                    () -> new GraphAdapter(null, mockFactory));
+                    () -> new CoreseGraphStatementStore(null, mockFactory));
         }
 
         @Test
         @DisplayName("Should throw when valueFactory is null")
         void shouldThrowWhenValueFactoryIsNull() {
             assertThrows(IllegalArgumentException.class,
-                    () -> new GraphAdapter(mockGraph, null));
+                    () -> new CoreseGraphStatementStore(mockGraph, null));
         }
 
         @Test
         @DisplayName("Should create adapter with valid parameters")
         void shouldCreateAdapterWithValidParameters() {
-            GraphAdapter adapter = new GraphAdapter(mockGraph, mockFactory);
+            CoreseGraphStatementStore adapter = new CoreseGraphStatementStore(mockGraph, mockFactory);
             assertNotNull(adapter);
             assertEquals(mockGraph, adapter.graph());
             assertEquals(mockFactory, adapter.valueFactory());

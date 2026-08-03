@@ -165,7 +165,7 @@ public class QPGraph {
      * @param type EDGE, VALUES, FILTER, GRAPH, otherwise return all
      */
     public List<QPGNode> getAllNodes(ExpType.Type type) {
-        if (Const.plannable(type)) {
+        if (QuerySorterConst.plannable(type)) {
             List<QPGNode> list = new ArrayList<>();
             for (QPGNode node : this.nodes) {
                 if (node.getType() == type) {

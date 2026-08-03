@@ -13,14 +13,14 @@ import java.util.Set;
 /**
  * Adapter between legacy {@link Graph} and new Storage API.
  */
-public record GraphAdapter(Graph graph, ValueFactory valueFactory) {
+public record CoreseGraphStatementStore(Graph graph, ValueFactory valueFactory) {
 
     /**
      * Compact constructor with validation.
      *
      * @throws IllegalArgumentException if graph or valueFactory is null
      */
-    public GraphAdapter {
+    public CoreseGraphStatementStore {
         if (graph == null) throw new IllegalArgumentException("Graph cannot be null");
         if (valueFactory == null) throw new IllegalArgumentException("ValueFactory cannot be null");
     }

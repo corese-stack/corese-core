@@ -10,7 +10,7 @@ import java.util.List;
  * @author Olivier Corby, Edelweiss, INRIA 2010
  *
  */
-public class EventManager implements Iterable<EventListener> {
+public class KgramEventDispatcher implements Iterable<EventListener> {
 
     boolean isEval = false;
 

@@ -23,7 +23,7 @@ public class Checker implements ExprType {
 	
 	static final int BOOL = BOOLEAN;
 
-	static List<Pattern> alwaysFalse;
+	static List<FilterPattern> alwaysFalse;
 	
 
 	Matcher matcher;
@@ -56,10 +56,10 @@ public class Checker implements ExprType {
 	}
 
 
-	boolean match(Expr ee, List<Pattern> pat) {
+	boolean match(Expr ee, List<FilterPattern> pat) {
 		boolean suc = false, b;
 		
-		for (Pattern p : pat){
+		for (FilterPattern p : pat){
 			b = matcher.match(p, ee);
 			if (b){
 				suc = true;
@@ -76,9 +76,9 @@ public class Checker implements ExprType {
 	 * 
 	 */
 	
-	List<Pattern> alwaysFalse(){
+	List<FilterPattern> alwaysFalse(){
 		if (alwaysFalse == null){
-			List<Pattern> pat = new ArrayList<>();
+			List<FilterPattern> pat = new ArrayList<>();
 			pat.add(neqSelf());
 			pat.add(ltSelf());
 			pat.add(notEqSelf());
@@ -101,53 +101,53 @@ public class Checker implements ExprType {
 	/**
 	 * ?from=cst || ?to=cst
 	 */
-	Pattern path(String v1, String v2){
-		Pattern e1 = term(EQ, Pattern.variable(v1), constant());
-		Pattern e2 = term(EQ, Pattern.variable(v2), constant());
+	FilterPattern path(String v1, String v2){
+		FilterPattern e1 = term(EQ, FilterPattern.variable(v1), constant());
+		FilterPattern e2 = term(EQ, FilterPattern.variable(v2), constant());
 		return or(e1, e2);
 	}
 	
 	// always false
-	Pattern neqSelf(){
+	FilterPattern neqSelf(){
 		// EXP != EXP
-		Pattern exp = pat();
+		FilterPattern exp = pat();
 		return term(NE, exp, exp);
 		
 	}
 	
-	Pattern ltSelf(){
+	FilterPattern ltSelf(){
 		// EXP < EXP
-		Pattern exp = pat();
+		FilterPattern exp = pat();
 		return term(LT, exp, exp);
 		
 	}
 	
-	Pattern notEqSelf(){
+	FilterPattern notEqSelf(){
 		// !(EXP = EXP)
-		Pattern exp = pat();
+		FilterPattern exp = pat();
 		return not(term(EQ, exp, exp));
 		
 	}
 	
-	Pattern notGeSelf(){
+	FilterPattern notGeSelf(){
 		// !(EXP >= EXP)
-		Pattern exp = pat();
+		FilterPattern exp = pat();
 		return not(term(GE, exp, exp));
 		
 	}
 	
 	
 	
-	Pattern patNotPat(){
+	FilterPattern patNotPat(){
 		// EXP && ! EXP
-		Pattern exp = pat();
+		FilterPattern exp = pat();
 		return and(exp, not(exp));
 	}
 	
 	
-	Pattern notOr(){
+	FilterPattern notOr(){
 		// ! (EXP || ! EXP)
-		Pattern exp = pat();
+		FilterPattern exp = pat();
 		return not(or(exp, not(exp)));
 	}
 
@@ -155,74 +155,74 @@ public class Checker implements ExprType {
 	// TODO:
 	// we can have both with list of values 
 	//  ?x = xpath() && ?x != xpath()
-	Pattern eqNeq(){
+	FilterPattern eqNeq(){
 		// EXP1 = EXP2 && EXP1 != EXP2
-		Pattern e1 = pat();
-		Pattern e2 = pat();
+		FilterPattern e1 = pat();
+		FilterPattern e2 = pat();
         return and(term(EQ, e1, e2), term(NE, e1, e2));
 	}
 	
 	
-	Pattern eqGt(){
+	FilterPattern eqGt(){
 		// EXP1 = EXP2 && EXP1 > EXP2
-		Pattern e1 = pat();
-		Pattern e2 = pat();
+		FilterPattern e1 = pat();
+		FilterPattern e2 = pat();
 		return and(term(EQ, e1, e2), term(GT, e1, e2));
 	}
 	
-	Pattern ltGt(){
+	FilterPattern ltGt(){
 		// EXP1 > EXP2 && EXP1 < EXP2
-		Pattern e1 = pat();
-		Pattern e2 = pat();
+		FilterPattern e1 = pat();
+		FilterPattern e2 = pat();
 		return and(term(GT, e1, e2), term(LT, e1, e2));
 	}
 	
 
-	Pattern gtNotGe(){
+	FilterPattern gtNotGe(){
 		// EXP1 > EXP2 && ! (EXP1 >= EXP2)
-		Pattern e1 = pat();
-		Pattern e2 = pat();
+		FilterPattern e1 = pat();
+		FilterPattern e2 = pat();
 		return and(term(GT, e1, e2), not(term(GE, e1, e2)));
 	}
 
-	Pattern eqNotGe(){
+	FilterPattern eqNotGe(){
 		// EXP1 = EXP2 && ! (EXP1 >= EXP2)
-		Pattern e1 = pat();
-		Pattern e2 = pat();
+		FilterPattern e1 = pat();
+		FilterPattern e2 = pat();
 		return and(term(EQ, e1, e2), not(term(GE, e1, e2)));
 	}
 
 
-	Pattern constant(){
-		return Pattern.constant();
+	FilterPattern constant(){
+		return FilterPattern.constant();
 	}
 
 
-	Pattern pat() {
-		return new Pattern(ExprType.JOKER);
+	FilterPattern pat() {
+		return new FilterPattern(ExprType.JOKER);
 	}
 
-	Pattern pat(Pattern e1) {
-		return new Pattern(ExprType.BOOLEAN, ExprType.NOT, e1);
+	FilterPattern pat(FilterPattern e1) {
+		return new FilterPattern(ExprType.BOOLEAN, ExprType.NOT, e1);
 	}
 	
-	Pattern pat(int type, int ope, Pattern e1, Pattern e2){
-		return new Pattern(type, ope, e1, e2);
+	FilterPattern pat(int type, int ope, FilterPattern e1, FilterPattern e2){
+		return new FilterPattern(type, ope, e1, e2);
 	}
 	
-	Pattern not(Pattern e){
+	FilterPattern not(FilterPattern e){
 		return pat(e);
 	}
 	
-	Pattern and(Pattern e1, Pattern e2){
+	FilterPattern and(FilterPattern e1, FilterPattern e2){
 		return pat(BOOLEAN, AND, e1, e2);
 	}
 	
-	Pattern or(Pattern e1, Pattern e2){
+	FilterPattern or(FilterPattern e1, FilterPattern e2){
 		return pat(BOOLEAN, OR, e1, e2);
 	}
 	
-	Pattern term(int ope, Pattern e1, Pattern e2){
+	FilterPattern term(int ope, FilterPattern e1, FilterPattern e2){
 		return pat(TERM, ope, e1, e2);
 	}
 	

@@ -13,16 +13,16 @@ import java.util.List;
  */
 public class GraphBulkOperations implements BulkOperations {
 
-    private final GraphAdapter adapter;
+    private final CoreseGraphStatementStore adapter;
 
     /**
      * Constructs a new GraphBulkOperations.
      *
-     * @param adapter the GraphAdapter for Graph access (must not be null)
+     * @param adapter the CoreseGraphStatementStore for Graph access (must not be null)
      * @throws IllegalArgumentException if adapter is null
      */
-    public GraphBulkOperations(GraphAdapter adapter) {
-        if (adapter == null) throw new IllegalArgumentException("GraphAdapter cannot be null");
+    public GraphBulkOperations(CoreseGraphStatementStore adapter) {
+        if (adapter == null) throw new IllegalArgumentException("CoreseGraphStatementStore cannot be null");
         this.adapter = adapter;
     }
 

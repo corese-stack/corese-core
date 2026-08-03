@@ -4,7 +4,7 @@ import fr.inria.corese.core.next.data.api.IRI;
 import fr.inria.corese.core.next.data.api.Resource;
 import fr.inria.corese.core.next.data.api.Value;
 import fr.inria.corese.core.next.data.api.ValueFactory;
-import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.data.impl.temp.CoreseValueFactory;
 import fr.inria.corese.core.next.query.impl.parser.SparqlParser;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
@@ -53,7 +53,7 @@ class StorageManagerProducerTest {
 
     @BeforeEach
     void setUp() {
-        valueFactory = new CoreseAdaptedValueFactory();
+        valueFactory = new CoreseValueFactory();
         storage = MemoryStorageManager.builder().build();
         producer = new StorageManagerProducer(storage);
 

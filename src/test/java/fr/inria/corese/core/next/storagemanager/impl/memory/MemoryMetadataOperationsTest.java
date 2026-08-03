@@ -26,7 +26,7 @@ import static org.mockito.Mockito.*;
 class MemoryMetadataOperationsTest {
 
     @Mock
-    private MemoryAdapter mockAdapter;
+    private InMemoryStatementStore mockAdapter;
 
     private MemoryMetadataOperations metadataOps;
 

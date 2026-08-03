@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.query.kgram.sorter.impl.qpv1;
 
 import fr.inria.corese.core.next.query.kgram.sorter.core.IProducerQP;
 
-import static fr.inria.corese.core.kgram.sorter.core.Const.*;
+import static fr.inria.corese.core.next.query.kgram.sorter.core.QuerySorterConst.*;
 
 /**
  * Generate the basic patterns ordering by the selectivity acorrding to the size

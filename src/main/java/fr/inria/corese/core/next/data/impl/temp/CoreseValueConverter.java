@@ -18,7 +18,7 @@ import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 public class CoreseValueConverter {
 
     // Factory for creating Corese-compatible Value instances
-    private final ValueFactory factory = new CoreseAdaptedValueFactory();
+    private final ValueFactory factory = new CoreseValueFactory();
 
     // Constant representing the default Corese graph context
     private static final Node DEFAULT_CORESE_CONTEXT = DatatypeMap.createResource(ExpType.DEFAULT_GRAPH);

@@ -6,7 +6,7 @@ import fr.inria.corese.core.next.query.kgram.api.query.Evaluator;
 import fr.inria.corese.core.next.query.kgram.api.query.Producer;
 import fr.inria.corese.core.next.query.kgram.event.Event;
 import fr.inria.corese.core.next.query.kgram.event.EventImpl;
-import fr.inria.corese.core.next.query.kgram.event.EventManager;
+import fr.inria.corese.core.next.query.kgram.event.KgramEventDispatcher;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
 import java.util.*;
@@ -39,7 +39,7 @@ public class Mappings extends PointerObject
     boolean isListGroup = false;
     boolean sortWithDesc = true;
     List<Mapping> reject;
-    EventManager manager;
+    KgramEventDispatcher manager;
     int count = 0;
     private Query query;
     private final List<Mapping> list;
@@ -101,7 +101,7 @@ public class Mappings extends PointerObject
     }
 
 
-    void setEventManager(EventManager man) {
+    void setEventManager(KgramEventDispatcher man) {
         manager = man;
         hasEvent = true;
     }

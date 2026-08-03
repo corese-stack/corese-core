@@ -13,12 +13,12 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("MemoryLifecycleManager tests")
 class MemoryLifecycleManagerTests {
 
-    private MemoryAdapter adapter;
+    private InMemoryStatementStore adapter;
     private MemoryLifecycleManager lifecycleManager;
 
     @BeforeEach
     void setUp() {
-        adapter = new MemoryAdapter();
+        adapter = new InMemoryStatementStore();
         lifecycleManager = new MemoryLifecycleManager(adapter);
     }
 

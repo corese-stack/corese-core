@@ -14,16 +14,16 @@ import fr.inria.corese.core.next.storagemanager.api.support.model.MutationResult
  */
 public class MemoryMutationOperations implements MutationOperations {
 
-    private final MemoryAdapter adapter;
+    private final InMemoryStatementStore adapter;
 
     /**
      * Constructs a new MemoryMutationOperations.
      *
-     * @param adapter the MemoryAdapter for data access (must not be null)
+     * @param adapter the InMemoryStatementStore for data access (must not be null)
      * @throws IllegalArgumentException if adapter is null
      */
-    public MemoryMutationOperations(MemoryAdapter adapter) {
-        if (adapter == null) throw new IllegalArgumentException("MemoryAdapter cannot be null");
+    public MemoryMutationOperations(InMemoryStatementStore adapter) {
+        if (adapter == null) throw new IllegalArgumentException("InMemoryStatementStore cannot be null");
         this.adapter = adapter;
     }
 

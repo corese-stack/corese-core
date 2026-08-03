@@ -4,7 +4,7 @@ import fr.inria.corese.core.next.data.api.IRI;
 import fr.inria.corese.core.next.data.api.Resource;
 import fr.inria.corese.core.next.data.api.Value;
 import fr.inria.corese.core.next.data.api.ValueFactory;
-import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.data.impl.temp.CoreseValueFactory;
 import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.kgram.api.core.Edge;
 import fr.inria.corese.core.next.query.kgram.api.core.Node;
@@ -42,7 +42,7 @@ public final class StorageManagerProducer extends ProducerDefault {
      * @param storage storage manager queried by this producer
      */
     public StorageManagerProducer(StorageManager storage) {
-        this(storage, new CoreseAdaptedValueFactory());
+        this(storage, new CoreseValueFactory());
     }
 
     /**
@@ -561,7 +561,7 @@ public final class StorageManagerProducer extends ProducerDefault {
         }
 
         @Override
-        public fr.inria.corese.core.next.query.kgram.event.EventManager getEventManager() {
+        public fr.inria.corese.core.next.query.kgram.event.KgramEventDispatcher getEventManager() {
             return delegate == null ? null : delegate.getEventManager();
         }
 

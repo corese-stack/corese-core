@@ -7,13 +7,14 @@ import fr.inria.corese.core.next.query.kgram.api.core.ExpType;
  *
  * @author Fuqi Song, Wimmics Inria I3S
  */
-public final class Const {
+public final class QuerySorterConst {
 
     public static final int ALL = 0;
     public static final int SUBJECT = 1;
     public static final int PREDICATE = 2;
     public static final int OBJECT = 3;
     public static final int TRIPLE = 4;
+    public static final int NA = -1;
 
     public final static int BOUND = 0, LIST = 0, UNBOUND = Integer.MAX_VALUE;
 

@@ -16,12 +16,12 @@ public class Matcher implements ExprType {
 		matchConstant = true;
 	
 	
-	public boolean match(Pattern qe, Expr te){
+	public boolean match(FilterPattern qe, Expr te){
 		MatchBind bind =  MatchBind.create();
 		return match(qe, te, bind);
 	}
 
-	boolean match(Pattern qe, Expr te, MatchBind bind){
+	boolean match(FilterPattern qe, Expr te, MatchBind bind){
 		rec = qe.isRec();
 		matchConstant = qe.isMatchConstant();
         return process(qe, te, bind);
@@ -230,7 +230,7 @@ public class Matcher implements ExprType {
 	 * Is it a Pattern constant
 	 */
 	boolean isBindable(Expr exp){
-		return exp instanceof Pattern;
+		return exp instanceof FilterPattern;
 	}
 		
 	boolean symmetric(Expr qe){

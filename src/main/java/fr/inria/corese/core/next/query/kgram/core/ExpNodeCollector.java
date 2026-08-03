@@ -8,7 +8,7 @@ import java.util.List;
 /**
  *
  */
-public class ExpHandler {
+public class ExpNodeCollector {
 
     private List<Node> nodeList;
     private final List<Node> selectNodeList;
@@ -22,19 +22,19 @@ public class ExpHandler {
     // when false, return nodes from first exp
     private boolean all = true;
 
-    public ExpHandler() {
+    public ExpNodeCollector() {
         nodeList = new ArrayList<>();
         selectNodeList = new ArrayList<>();
         existNodeList = new ArrayList<>();
     }
 
-    public ExpHandler(boolean inSubScope, boolean bind) {
+    public ExpNodeCollector(boolean inSubScope, boolean bind) {
         this();
         setInSubScope(inSubScope).setBind(bind);
     }
 
-    public ExpHandler copy() {
-        ExpHandler h = new ExpHandler();
+    public ExpNodeCollector copy() {
+        ExpNodeCollector h = new ExpNodeCollector();
         h.setAll(isAll()).setBind(isBind())
                 .setBlank(isBlank()).setExist(isExist())
                 .setInSubScope(isInSubScope());
@@ -116,7 +116,7 @@ public class ExpHandler {
         return inSubScope;
     }
 
-    public ExpHandler setInSubScope(boolean inSubScope) {
+    public ExpNodeCollector setInSubScope(boolean inSubScope) {
         this.inSubScope = inSubScope;
         return this;
     }
@@ -129,7 +129,7 @@ public class ExpHandler {
         return bind;
     }
 
-    public ExpHandler setBind(boolean bind) {
+    public ExpNodeCollector setBind(boolean bind) {
         this.bind = bind;
         return this;
     }
@@ -138,7 +138,7 @@ public class ExpHandler {
         return blank;
     }
 
-    public ExpHandler setBlank(boolean blank) {
+    public ExpNodeCollector setBlank(boolean blank) {
         this.blank = blank;
         return this;
     }
@@ -147,7 +147,7 @@ public class ExpHandler {
         return optional;
     }
 
-    public ExpHandler setOptional(boolean optional) {
+    public ExpNodeCollector setOptional(boolean optional) {
         this.optional = optional;
         return this;
     }
@@ -156,7 +156,7 @@ public class ExpHandler {
         return exist;
     }
 
-    public ExpHandler setExist(boolean exist) {
+    public ExpNodeCollector setExist(boolean exist) {
         this.exist = exist;
         return this;
     }
@@ -165,20 +165,20 @@ public class ExpHandler {
         return all;
     }
 
-    public ExpHandler setAll(boolean all) {
+    public ExpNodeCollector setAll(boolean all) {
         this.all = all;
         return this;
     }
 
     // return nodes from first exp of BGP
     // use case: compute relevant variable bindings
-    public ExpHandler sample() {
+    public ExpNodeCollector sample() {
         setAll(false);
         return this;
     }
 
     // return all nodes
-    public ExpHandler all() {
+    public ExpNodeCollector all() {
         setAll(true);
         return this;
     }

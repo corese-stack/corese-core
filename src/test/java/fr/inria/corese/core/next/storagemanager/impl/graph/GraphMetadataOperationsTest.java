@@ -18,7 +18,7 @@ import static org.mockito.Mockito.*;
 class GraphMetadataOperationsTest {
 
     @Mock
-    private GraphAdapter mockAdapter;
+    private CoreseGraphStatementStore mockAdapter;
 
     private GraphMetadataOperations metadataOps;
 

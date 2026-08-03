@@ -16,7 +16,7 @@ import fr.inria.corese.core.next.data.impl.io.serialization.ntriples.NTriplesSer
 import fr.inria.corese.core.next.data.impl.io.serialization.rdfxml.RDFXMLSerializer;
 import fr.inria.corese.core.next.data.impl.io.serialization.trig.TriGSerializer;
 import fr.inria.corese.core.next.data.impl.io.serialization.turtle.TurtleSerializer;
-import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.data.impl.temp.CoreseValueFactory;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -55,7 +55,7 @@ public class DataSerializerFactory implements SerializerFactory {
      * it falls back to the format's default configuration.
      */
     public DataSerializerFactory() {
-        this.coreseValueFactory = new CoreseAdaptedValueFactory();
+        this.coreseValueFactory = new CoreseValueFactory();
 
         Map<RDFFormat, BiFunction<Model, IOOptions, RDFSerializer>> tempRegistry = new HashMap<>();
         Map<RDFFormat, Function<Model, RDFSerializer>> tempDefaultRegistry = new HashMap<>();

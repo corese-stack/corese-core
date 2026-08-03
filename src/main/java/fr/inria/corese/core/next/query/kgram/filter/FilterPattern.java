@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author Olivier Corby, Edelweiss, INRIA 2010
  */
-public class Pattern implements ExprType, Expr {
+public class FilterPattern implements ExprType, Expr {
 	int type, oper;
 	String label;
 	// recursive pattern, ako *
@@ -26,42 +26,42 @@ public class Pattern implements ExprType, Expr {
 	List<Expr> args;
 	Expr exp;
 
-	Pattern(int t) {
+	FilterPattern(int t) {
 		type = t;
 		oper = JOKER;
 		args = new ArrayList<>();
 	}
 
-	Pattern(int t, int o) {
+	FilterPattern(int t, int o) {
 		this(t);
 		oper = o;
 	}
 
-	Pattern(int t, int o, Expr e1) {
+	FilterPattern(int t, int o, Expr e1) {
 		this(t, o);
 		add(e1);
 	}
 
-	Pattern(int t, int o, Expr e1, Expr e2) {
+	FilterPattern(int t, int o, Expr e1, Expr e2) {
 		this(t, o, e1);
 		add(e2);
 	}
 
 
-	public Pattern(int t, int o, int e1, int e2){
+	public FilterPattern(int t, int o, int e1, int e2){
 		this(t, o);
-		add(new Pattern(e1));
-		add(new Pattern(e2));
+		add(new FilterPattern(e1));
+		add(new FilterPattern(e2));
 	}
 
-	static Pattern variable(String label) {
-		Pattern p = new Pattern(VARIABLE);
+	static FilterPattern variable(String label) {
+		FilterPattern p = new FilterPattern(VARIABLE);
 		p.setLabel(label);
 		return p;
 	}
 
-	static Pattern constant() {
-		return new Pattern(CONSTANT);
+	static FilterPattern constant() {
+		return new FilterPattern(CONSTANT);
 	}
 
 	void add(Expr exp) {

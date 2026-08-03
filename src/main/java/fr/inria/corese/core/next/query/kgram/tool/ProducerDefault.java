@@ -140,7 +140,7 @@ public class ProducerDefault implements Producer {
     }
 
     @Override
-    public DatatypeValueFactory getDatatypeValueFactory() {
+    public DatatypeNodeFactory getDatatypeNodeFactory() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

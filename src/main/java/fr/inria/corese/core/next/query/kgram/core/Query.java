@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.query.kgram.core;
 
 import fr.inria.corese.core.next.query.kgram.api.core.*;
 import fr.inria.corese.core.next.query.kgram.api.core.Filter;
-import fr.inria.corese.core.next.query.kgram.api.query.DQPFactory;
+import fr.inria.corese.core.next.query.kgram.api.query.DistributedQueryPlanFactory;
 import fr.inria.corese.core.next.query.kgram.api.query.Matcher;
 import fr.inria.corese.core.next.query.kgram.api.query.Producer;
 import fr.inria.corese.core.next.query.kgram.filter.Compile;
@@ -44,12 +44,12 @@ public class Query extends Exp  {
     public static boolean testJoin = false;
     public static boolean isOptional = true;
     
-    private static DQPFactory factory;
+    private static DistributedQueryPlanFactory factory;
 
     /**
      * @return the factory
      */
-    public static DQPFactory getFactory() {
+    public static DistributedQueryPlanFactory getFactory() {
         return factory;
     }
 

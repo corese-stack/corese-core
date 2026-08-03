@@ -14,16 +14,16 @@ import fr.inria.corese.core.next.storagemanager.api.support.model.MutationResult
  */
 public class GraphMutationOperations implements MutationOperations {
 
-    private final GraphAdapter adapter;
+    private final CoreseGraphStatementStore adapter;
 
     /**
      * Constructs a new GraphMutationOperations.
      *
-     * @param adapter the GraphAdapter for Graph access (must not be null)
+     * @param adapter the CoreseGraphStatementStore for Graph access (must not be null)
      * @throws IllegalArgumentException if adapter is null
      */
-    public GraphMutationOperations(GraphAdapter adapter) {
-        if (adapter == null) throw new IllegalArgumentException("GraphAdapter cannot be null");
+    public GraphMutationOperations(CoreseGraphStatementStore adapter) {
+        if (adapter == null) throw new IllegalArgumentException("CoreseGraphStatementStore cannot be null");
         this.adapter = adapter;
     }
 

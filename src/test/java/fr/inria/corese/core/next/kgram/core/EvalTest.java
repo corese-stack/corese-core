@@ -5,7 +5,7 @@ import fr.inria.corese.core.next.query.kgram.api.query.*;
 import fr.inria.corese.core.next.query.kgram.core.Eval;
 import fr.inria.corese.core.next.query.kgram.core.Mappings;
 import fr.inria.corese.core.next.query.kgram.core.Memory;
-import fr.inria.corese.core.next.query.kgram.event.EventManager;
+import fr.inria.corese.core.next.query.kgram.event.KgramEventDispatcher;
 import fr.inria.corese.core.next.query.kgram.event.ResultListener;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -225,7 +225,7 @@ class EvalTest {
         @Test
         @DisplayName("Should set and get event manager")
         void testSetAndGetEventManager() {
-            EventManager mockManager = mock(EventManager.class);
+            KgramEventDispatcher mockManager = mock(KgramEventDispatcher.class);
             eval.setEventManager(mockManager);
             assertEquals(mockManager, eval.getEventManager(),
                     "Event manager should match");

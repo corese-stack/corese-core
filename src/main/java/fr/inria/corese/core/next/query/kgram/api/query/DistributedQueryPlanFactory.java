@@ -5,7 +5,7 @@ import fr.inria.corese.core.next.query.kgram.core.BgpGenerator;
 /**
  * @author corby
  */
-public interface DQPFactory {
+public interface DistributedQueryPlanFactory {
 
     BgpGenerator instance();
 

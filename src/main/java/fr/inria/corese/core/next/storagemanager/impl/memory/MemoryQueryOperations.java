@@ -14,16 +14,16 @@ import java.util.stream.Stream;
  */
 public class MemoryQueryOperations implements QueryOperations {
 
-    private final MemoryAdapter adapter;
+    private final InMemoryStatementStore adapter;
 
     /**
      * Constructs a new MemoryQueryOperations.
      *
-     * @param adapter the MemoryAdapter for data access (must not be null)
+     * @param adapter the InMemoryStatementStore for data access (must not be null)
      * @throws IllegalArgumentException if adapter is null
      */
-    public MemoryQueryOperations(MemoryAdapter adapter) {
-        if (adapter == null) throw new IllegalArgumentException("MemoryAdapter cannot be null");
+    public MemoryQueryOperations(InMemoryStatementStore adapter) {
+        if (adapter == null) throw new IllegalArgumentException("InMemoryStatementStore cannot be null");
         this.adapter = adapter;
     }
 
