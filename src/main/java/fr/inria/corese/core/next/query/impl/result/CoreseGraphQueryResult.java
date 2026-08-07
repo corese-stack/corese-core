@@ -6,11 +6,15 @@ import fr.inria.corese.core.next.query.api.result.GraphQueryResult;
 import java.util.Iterator;
 
 /**
- * Basic implementation around a Model
+ * Basic implementation backed by a pre-built list of statements.
  */
 public class CoreseGraphQueryResult implements GraphQueryResult {
 
-    private Iterator<Statement> iterator;
+    private final Iterator<Statement> iterator;
+
+    public CoreseGraphQueryResult(Iterator<Statement> iterator) {
+        this.iterator = iterator;
+    }
 
     @Override
     public boolean hasNext() {

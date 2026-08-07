@@ -5,8 +5,12 @@ import fr.inria.corese.core.next.query.api.result.GraphQueryResult;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 
 /**
- * A query on a repository that can be formulated in one of the supported query languages (for example SPARQL).
- * It should hold kgram.core.Query + ASTQuery
+ * A prepared SPARQL query that can be evaluated against a repository.
+ *
+ * <p>Concrete subtypes are {@link TupleQuery} (SELECT), {@link BooleanQuery} (ASK),
+ * and {@link GraphQuery} (CONSTRUCT / DESCRIBE).
+ * All evaluation state (bindings, dataset, timeout) is carried by the
+ * {@link Operation} supertype and propagated on each {@link #evaluate()} call.</p>
  */
 
 public interface Query<T> extends Operation {
@@ -42,10 +46,14 @@ public interface Query<T> extends Operation {
      */
     QueryLanguage getLanguage();
 
-    // Execution options
     /**
-     * Set the execution timeout for the query regarding remote operations (i.e. for SERVICE clauses)
-     * @param timeoutMillis time in milliseconds
+     * Sets a fine-grained execution timeout for this specific query, expressed in milliseconds.
+     *
+     * <p>When both this value and {@link Operation#setMaxExecutionTime(int)} are set,
+     * the shorter of the two limits is enforced. A value of {@code 0} disables this
+     * query-level timeout.</p>
+     *
+     * @param timeoutMillis maximum evaluation time in milliseconds; 0 means no limit
      * @return this
      */
     Query<T> setTimeout(long timeoutMillis);
