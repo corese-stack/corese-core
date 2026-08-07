@@ -6,7 +6,7 @@ import fr.inria.corese.core.next.data.api.ValueFactory;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.RDFS;
 import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
-import fr.inria.corese.core.next.data.impl.temp.CoreseValueFactory;
+import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

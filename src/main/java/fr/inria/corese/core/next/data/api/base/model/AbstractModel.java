@@ -16,7 +16,7 @@ import fr.inria.corese.core.next.data.api.Namespace;
 import fr.inria.corese.core.next.data.api.Resource;
 import fr.inria.corese.core.next.data.api.Statement;
 import fr.inria.corese.core.next.data.api.Value;
-import fr.inria.corese.core.next.data.impl.temp.ModelNamespace;
+import fr.inria.corese.core.next.data.impl.model.ModelNamespace;
 
 /**
  * Abstract class that implements the Model interface.

@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.storagemanager.api.plugin;
 import fr.inria.corese.core.next.data.api.IRI;
 import fr.inria.corese.core.next.data.api.Statement;
 import fr.inria.corese.core.next.data.api.ValueFactory;
-import fr.inria.corese.core.next.data.impl.temp.CoreseValueFactory;
+import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
 import fr.inria.corese.core.next.storagemanager.api.StorageManager;
 import fr.inria.corese.core.next.storagemanager.api.support.config.StorageConfig;
 import fr.inria.corese.core.next.storagemanager.api.support.model.StatementPattern;

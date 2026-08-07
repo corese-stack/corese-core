@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.query.impl.result;
 
 import fr.inria.corese.core.next.data.api.Value;
-import fr.inria.corese.core.next.data.impl.temp.CoreseValueConverter;
+import fr.inria.corese.core.next.data.impl.adapter.CoreseValueConverter;
 import fr.inria.corese.core.next.query.api.result.Binding;
 import fr.inria.corese.core.next.query.api.result.BindingSet;
 import fr.inria.corese.core.next.query.kgram.core.Mapping;

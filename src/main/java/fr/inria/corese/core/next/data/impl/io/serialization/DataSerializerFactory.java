@@ -16,7 +16,7 @@ import fr.inria.corese.core.next.data.impl.io.serialization.ntriples.NTriplesSer
 import fr.inria.corese.core.next.data.impl.io.serialization.rdfxml.RDFXMLSerializer;
 import fr.inria.corese.core.next.data.impl.io.serialization.trig.TriGSerializer;
 import fr.inria.corese.core.next.data.impl.io.serialization.turtle.TurtleSerializer;
-import fr.inria.corese.core.next.data.impl.temp.CoreseValueFactory;
+import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
 
 import java.util.Collections;
 import java.util.HashMap;
