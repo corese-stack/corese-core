@@ -23,6 +23,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.DescribeQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.bridge.CoreseAstQueryBuilder;
+import fr.inria.corese.core.next.query.impl.sparql.bridge.KgramNodeConverter;
 import fr.inria.corese.core.next.query.kgram.api.core.Edge;
 import fr.inria.corese.core.next.query.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.kgram.core.Eval;
@@ -36,10 +37,6 @@ import fr.inria.corese.core.next.query.kgram.execution.SparqlKgramEvaluator;
 import fr.inria.corese.core.next.query.kgram.tool.NodeImpl;
 import fr.inria.corese.core.next.query.kgram.tool.StorageManagerProducer;
 import fr.inria.corese.core.next.storagemanager.api.StorageManager;
-import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.datatype.DatatypeMap;
-import fr.inria.corese.core.sparql.triple.parser.Constant;
-import fr.inria.corese.core.sparql.triple.parser.Variable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -348,28 +345,13 @@ public final class NextSparqlPipelineExecutor {
     /**
      * Converts a KGRAM constant {@link Node} to the corresponding API {@link Value}.
      *
-     * @return the API value, or {@code null} when the datatype kind is not supported
+     * <p>Delegates to {@link KgramNodeConverter} so that this class does not depend on
+     * {@code IDatatype} directly.</p>
+     *
+     * @return the API value, or {@code null} when the node kind is not supported
      */
     private Value kgramNodeToApiValue(Node node, CoreseValueFactory factory) {
-        IDatatype dt = node.getDatatypeValue();
-        if (dt.isURI()) {
-            return factory.createIRI(dt.getLabel());
-        }
-        if (dt.isBlank()) {
-            return factory.createBNode(dt.getLabel());
-        }
-        if (dt.isLiteral()) {
-            String lang = dt.getLang();
-            if (lang != null && !lang.isEmpty()) {
-                return factory.createLiteral(dt.getLabel(), lang);
-            }
-            String datatypeUri = dt.getDatatypeURI();
-            if (datatypeUri != null) {
-                return factory.createLiteral(dt.getLabel(), factory.createIRI(datatypeUri));
-            }
-            return factory.createLiteral(dt.getLabel());
-        }
-        return null;
+        return KgramNodeConverter.nodeToValue(node, factory);
     }
 
     // -------------------------------------------------------------------------
@@ -399,7 +381,7 @@ public final class NextSparqlPipelineExecutor {
     private List<Node> urisToKgramNodes(List<String> uris) {
         List<Node> nodes = new ArrayList<>(uris.size());
         for (String uri : uris) {
-            nodes.add(new NodeImpl(Constant.create(DatatypeMap.newResource(uri))));
+            nodes.add(NodeImpl.forIRI(uri));
         }
         return nodes;
     }
@@ -429,7 +411,7 @@ public final class NextSparqlPipelineExecutor {
         for (Binding b : bindings) {
             Node targetNode = valueToKgramNode(b.value());
             if (targetNode != null) {
-                queryNodes.add(new NodeImpl(new Variable(b.name())));
+                queryNodes.add(NodeImpl.forVariable(b.name()));
                 targetNodes.add(targetNode);
             }
         }
@@ -442,24 +424,20 @@ public final class NextSparqlPipelineExecutor {
      * @return a constant node, or {@code null} when the value type is not supported
      */
     private Node valueToKgramNode(Value value) {
-        IDatatype dt;
         if (value instanceof IRI iri) {
-            dt = DatatypeMap.newResource(iri.stringValue());
+            return NodeImpl.forIRI(iri.stringValue());
         } else if (value instanceof BNode bNode) {
-            dt = DatatypeMap.createBlank(bNode.getID());
+            return NodeImpl.forBlank(bNode.getID());
         } else if (value instanceof Literal literal) {
             String lang = literal.getLanguage().orElse(null);
             if (lang != null && !lang.isEmpty()) {
-                dt = DatatypeMap.createLiteral(literal.getLabel(), null, lang);
-            } else {
-                String datatypeUri = literal.getDatatype() != null
-                        ? literal.getDatatype().stringValue()
-                        : null;
-                dt = DatatypeMap.createLiteral(literal.getLabel(), datatypeUri, null);
+                return NodeImpl.forLiteral(literal.getLabel(), null, lang);
             }
-        } else {
-            return null;
+            String datatypeUri = literal.getDatatype() != null
+                    ? literal.getDatatype().stringValue()
+                    : null;
+            return NodeImpl.forLiteral(literal.getLabel(), datatypeUri, null);
         }
-        return new NodeImpl(Constant.create(dt));
+        return null;
     }
 }

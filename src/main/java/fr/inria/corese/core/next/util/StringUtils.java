@@ -1,7 +1,5 @@
 package fr.inria.corese.core.next.util;
 
-import fr.inria.corese.core.sparql.triple.parser.Processor;
-
 public class StringUtils {
 
     public static String trimChevronIRIs(String uri) {
@@ -101,7 +99,7 @@ public class StringUtils {
 
     /**
      * Strips angle brackets if present, then returns the local part after {@code #}, {@code /}, or {@code :},
-     * lowercased for {@link Processor} lookup.
+     * lowercased.
      */
     public static String localNameFromIriToken(String raw) {
         String t = raw.trim();

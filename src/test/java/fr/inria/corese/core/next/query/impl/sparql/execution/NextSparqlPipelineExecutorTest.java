@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.query.impl.sparql.execution;
 
 import fr.inria.corese.core.next.data.api.IRI;
 import fr.inria.corese.core.next.data.api.Resource;
+import fr.inria.corese.core.next.data.api.Statement;
 import fr.inria.corese.core.next.data.api.Value;
 import fr.inria.corese.core.next.data.api.ValueFactory;
 import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
@@ -9,6 +10,7 @@ import fr.inria.corese.core.next.query.api.dataset.Dataset;
 import fr.inria.corese.core.next.query.api.exception.QueryTimeoutException;
 import fr.inria.corese.core.next.query.api.result.Binding;
 import fr.inria.corese.core.next.query.api.result.BindingSet;
+import fr.inria.corese.core.next.query.api.result.GraphQueryResult;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 import fr.inria.corese.core.next.query.impl.dataset.CoreseDataset;
 import fr.inria.corese.core.next.storagemanager.impl.memory.MemoryStorageManager;
@@ -192,6 +194,65 @@ class NextSparqlPipelineExecutorTest {
                 null, dataset, 0L);
 
         assertFalse(result.hasNext(), "No results expected for an empty named graph");
+    }
+
+    // -------------------------------------------------------------------------
+    // CONSTRUCT / graph evaluation
+    // -------------------------------------------------------------------------
+
+    @Test
+    @DisplayName("CONSTRUCT query materialises triples from WHERE bindings")
+    void constructQueryMaterialisesTriples() {
+        GraphQueryResult result = executor.evaluateGraph("""
+                CONSTRUCT { ?s <http://example.org/knows> ?o }
+                WHERE     { ?s <http://example.org/knows> ?o }
+                """);
+
+        assertTrue(result.hasNext());
+        Statement stmt = result.next();
+        assertEquals(ALICE, stmt.getSubject().stringValue());
+        assertEquals(KNOWS, stmt.getPredicate().stringValue());
+        assertEquals(BOB,   stmt.getObject().stringValue());
+        assertFalse(result.hasNext());
+    }
+
+    @Test
+    @DisplayName("CONSTRUCT with no matching WHERE returns empty graph result")
+    void constructWithNoMatchReturnsEmptyResult() {
+        GraphQueryResult result = executor.evaluateGraph("""
+                CONSTRUCT { ?s <http://example.org/knows> ?o }
+                WHERE     { ?s <http://example.org/likes> ?o }
+                """);
+
+        assertFalse(result.hasNext());
+    }
+
+    @Test
+    @DisplayName("Graph evaluation rejects non-CONSTRUCT/DESCRIBE queries")
+    void graphEvaluationRejectsSelectQuery() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> executor.evaluateGraph("SELECT * WHERE { ?s ?p ?o }"));
+    }
+
+    // -------------------------------------------------------------------------
+    // Initial bindings — literal and blank-node values
+    // -------------------------------------------------------------------------
+
+    @Test
+    @DisplayName("SELECT with literal initial binding filters results by literal value")
+    void selectWithLiteralInitialBindingFiltersResults() {
+        insert(iri(BOB),   iri(NAME), valueFactory.createLiteral("Bob"));
+        insert(iri(ALICE), iri(NAME), valueFactory.createLiteral("Alice"));
+
+        BindingSet bindings = singleBinding("name", valueFactory.createLiteral("Bob"));
+        TupleQueryResult result = executor.evaluateTuple(
+                "SELECT ?s WHERE { ?s <" + NAME + "> ?name }",
+                bindings, null, 0L);
+
+        assertTrue(result.hasNext());
+        assertEquals(BOB, result.next().getValue("s").stringValue());
+        assertFalse(result.hasNext(), "Only the triple with literal 'Bob' should match");
     }
 
     // -------------------------------------------------------------------------

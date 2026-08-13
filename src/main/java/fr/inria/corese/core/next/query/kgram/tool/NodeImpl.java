@@ -5,8 +5,10 @@ import fr.inria.corese.core.next.query.kgram.api.core.Edge;
 import fr.inria.corese.core.next.query.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.kgram.api.core.TripleStore;
 import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.triple.parser.Atom;
 import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.sparql.triple.parser.Variable;
 
 public class NodeImpl implements Node {
 
@@ -17,6 +19,32 @@ public class NodeImpl implements Node {
 
     public NodeImpl(Atom at) {
         atom = at;
+    }
+
+    /** Creates a constant node for an IRI. */
+    public static NodeImpl forIRI(String iri) {
+        return new NodeImpl(Constant.create(DatatypeMap.newResource(iri)));
+    }
+
+    /** Creates a constant node for a blank node. */
+    public static NodeImpl forBlank(String id) {
+        return new NodeImpl(Constant.create(DatatypeMap.createBlank(id)));
+    }
+
+    /**
+     * Creates a constant node for a literal.
+     *
+     * @param label       lexical value
+     * @param datatypeUri datatype IRI, or {@code null}
+     * @param lang        language tag, or {@code null}
+     */
+    public static NodeImpl forLiteral(String label, String datatypeUri, String lang) {
+        return new NodeImpl(Constant.create(DatatypeMap.createLiteral(label, datatypeUri, lang)));
+    }
+
+    /** Creates a variable node with the given name. */
+    public static NodeImpl forVariable(String name) {
+        return new NodeImpl(new Variable(name));
     }
 
     @Override
