@@ -141,4 +141,12 @@ public interface RepositoryConnection extends AutoCloseable {
      * @throws IllegalStateException if the connection is closed
      */
     void rollback() throws RepositoryException;
+
+    /**
+     * Closes this connection and releases any resources it holds.
+     *
+     * @throws RepositoryException if closing the connection fails
+     */
+    @Override
+    void close() throws RepositoryException;
 }

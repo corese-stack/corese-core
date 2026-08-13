@@ -1,9 +1,24 @@
 /**
- * Query-facing contracts, result types, validation entry points, and I/O
- * abstractions.
+ * Public SPARQL query API for Corese.
  *
- * <p>The final public SPARQL request API is not defined yet. Parser, AST,
- * bridge, and execution wiring remain outside this package so they cannot be
- * mistaken for that future contract.</p>
+ * <p>Entry point: obtain a {@link fr.inria.corese.core.next.query.api.repository.RepositoryConnection}
+ * from a {@link fr.inria.corese.core.next.query.api.repository.Repository}, then prepare
+ * one of the four query types:</p>
+ *
+ * <ul>
+ *   <li>{@link fr.inria.corese.core.next.query.api.TupleQuery} — SPARQL SELECT</li>
+ *   <li>{@link fr.inria.corese.core.next.query.api.BooleanQuery} — SPARQL ASK</li>
+ *   <li>{@link fr.inria.corese.core.next.query.api.GraphQuery} — SPARQL CONSTRUCT / DESCRIBE</li>
+ *   <li>{@link fr.inria.corese.core.next.query.api.Update} — SPARQL 1.1 UPDATE</li>
+ * </ul>
+ *
+ * <p>All types implement {@link fr.inria.corese.core.next.query.api.Operation}, which provides
+ * initial bindings ({@code setBinding}), dataset override ({@code setDataset}),
+ * and execution-time limit ({@code setMaxExecutionTime}).
+ * Query types additionally expose {@code setTimeout(long millis)} for millisecond precision.</p>
+ *
+ * <p>No internal types (parser, AST, bridge, KGRAM) appear in this package or its sub-packages.
+ * All errors are reported via the exception hierarchy rooted at
+ * {@link fr.inria.corese.core.next.query.api.exception.QueryException}.</p>
  */
 package fr.inria.corese.core.next.query.api;

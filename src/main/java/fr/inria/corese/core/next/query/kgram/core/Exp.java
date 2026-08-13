@@ -465,7 +465,7 @@ public class Exp extends PointerObject
         return args;
     }
 
-    void getEdgeList(List<Edge> list) {
+    public void getEdgeList(List<Edge> list) {
         for (Exp exp : getExpList()) {
             if (exp.isEdge()) {
                 list.add(exp.getEdge());
