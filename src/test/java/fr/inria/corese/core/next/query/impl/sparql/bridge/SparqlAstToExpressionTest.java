@@ -24,7 +24,7 @@ class SparqlAstToExpressionTest {
         assertNotNull(iriNode);
         assertInstanceOf(Constant.class, iriNode);
         assertTrue(iriNode.isURI());
-        assertEquals("http://ns.inria.fr/test/iri", ((Constant)iriNode).getLabel());
+        assertEquals("http://ns.inria.fr/test/iri", iriNode.getLabel());
     }
 
     @Test

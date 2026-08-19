@@ -11,6 +11,7 @@ import fr.inria.corese.core.sparql.triple.parser.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -21,6 +22,25 @@ import java.util.Optional;
  *
  */
 public final class SparqlAstToExpression {
+
+    /**
+     * Per-thread prefix map for the query currently being compiled.
+     * Set by {@link #setPrefixes}/{@link #clearPrefixes} in {@link CoreseAstQueryBuilder}.
+     */
+    private static final ThreadLocal<Map<String, String>> QUERY_PREFIXES = new ThreadLocal<>();
+
+    /** Package-private: called by {@link CoreseAstQueryBuilder} before building each query. */
+    static void setPrefixes(Map<String, String> prefixes) {
+        QUERY_PREFIXES.set(prefixes);
+    }
+
+    /** Package-private: called by {@link CoreseAstQueryBuilder} after building each query. */
+    static void clearPrefixes() {
+        QUERY_PREFIXES.remove();
+    }
+
+    private static final String BLANK_NODE_VAR_PREFIX = "__bn_";
+
 
     private SparqlAstToExpression() {
     }
@@ -33,6 +53,8 @@ public final class SparqlAstToExpression {
             case VarAst(String name) -> Variable.create(name);
             case LiteralAst(String lexical, String lang, String datatype) ->
                     literalToConstant(lexical, lang, datatype);
+            case IriAst(String raw) when raw.startsWith(IOConstants.BLANK_NODE_PREFIX) ->
+                    Variable.create(BLANK_NODE_VAR_PREFIX + raw.substring(IOConstants.BLANK_NODE_PREFIX.length()));
             case IriAst(String raw) -> iriToConstant(raw);
             case ConstraintAst c -> constraintToExpression(c);
             default -> throw new IllegalStateException("Unhandled TermAst: " + term.getClass());
@@ -54,8 +76,8 @@ public final class SparqlAstToExpression {
      * Filters containing {@code EXISTS} / {@code NOT EXISTS} require
      * {@link #toNextFilter(TermAst, WhereCompiler)} so their graph pattern can be compiled.
      */
-    public static Filter toNextFilter(TermAst filterExpression) {
-        return toNextFilter(filterExpression, null);
+    public static void toNextFilter(TermAst filterExpression) {
+        toNextFilter(filterExpression, null);
     }
 
     /**
@@ -136,6 +158,16 @@ public final class SparqlAstToExpression {
         String raw = StringUtils.trimChevronIRIs(rawIri);
         if (raw.startsWith(IOConstants.BLANK_NODE_PREFIX)) {
             return Constant.createBlank(raw.substring(IOConstants.BLANK_NODE_PREFIX.length()));
+        }
+        Map<String, String> prefixes = QUERY_PREFIXES.get();
+        if (prefixes != null) {
+            int colonIdx = raw.indexOf(':');
+            if (colonIdx > 0) {
+                String ns = prefixes.get(raw.substring(0, colonIdx));
+                if (ns != null) {
+                    raw = ns + raw.substring(colonIdx + 1);
+                }
+            }
         }
         return Constant.createResource(raw);
     }

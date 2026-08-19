@@ -14,10 +14,7 @@ import fr.inria.corese.core.sparql.triple.parser.Atom;
 import fr.inria.corese.core.sparql.triple.parser.Expression;
 import fr.inria.corese.core.sparql.triple.parser.Variable;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Builds KGRAM {@code Exp} / {@code Query} structures from Corese-next query AST nodes.
@@ -59,14 +56,18 @@ public final class CoreseAstQueryBuilder {
     public Query toNextQuery(AskQueryAst askQueryAst) {
         Objects.requireNonNull(askQueryAst, "askQueryAst");
         rejectUnsupportedAskClauses(askQueryAst);
-
-        Query query = createQuery(
-                askQueryAst.whereClause(),
-                askQueryAst.datasetClause(),
-                askQueryAst.solutionModifier());
-        applyOrderBy(query, askQueryAst.solutionModifier());
-        query.setAsk(true);
-        return query;
+        SparqlAstToExpression.setPrefixes(buildPrefixMap(askQueryAst.prologue().prefixDeclarations()));
+        try {
+            Query query = createQuery(
+                    askQueryAst.whereClause(),
+                    askQueryAst.datasetClause(),
+                    askQueryAst.solutionModifier());
+            applyOrderBy(query, askQueryAst.solutionModifier());
+            query.setAsk(true);
+            return query;
+        } finally {
+            SparqlAstToExpression.clearPrefixes();
+        }
     }
 
     /**
@@ -81,15 +82,19 @@ public final class CoreseAstQueryBuilder {
     public Query toNextQuery(SelectQueryAst selectQueryAst) {
         Objects.requireNonNull(selectQueryAst, "selectQueryAst");
         rejectUnsupportedSelectClauses(selectQueryAst);
-
-        Query query = createQuery(
-                selectQueryAst.whereClause(),
-                selectQueryAst.datasetClause(),
-                selectQueryAst.solutionModifier());
-        applyProjection(query, selectQueryAst.projection());
-        query.setDistinct(selectQueryAst.solutionModifier().distinct());
-        applyOrderBy(query, selectQueryAst.solutionModifier());
-        return query;
+        SparqlAstToExpression.setPrefixes(buildPrefixMap(selectQueryAst.prologue().prefixDeclarations()));
+        try {
+            Query query = createQuery(
+                    selectQueryAst.whereClause(),
+                    selectQueryAst.datasetClause(),
+                    selectQueryAst.solutionModifier());
+            applyProjection(query, selectQueryAst.projection());
+            query.setDistinct(selectQueryAst.solutionModifier().distinct());
+            applyOrderBy(query, selectQueryAst.solutionModifier());
+            return query;
+        } finally {
+            SparqlAstToExpression.clearPrefixes();
+        }
     }
 
     /**
@@ -105,15 +110,19 @@ public final class CoreseAstQueryBuilder {
     public Query toNextQuery(DescribeQueryAst describeQueryAst) {
         Objects.requireNonNull(describeQueryAst, "describeQueryAst");
         rejectUnsupportedDescribeClauses(describeQueryAst);
-
-        Query query = createQuery(
-                describeQueryAst.whereClause(),
-                describeQueryAst.datasetClause(),
-                describeQueryAst.solutionModifier());
-        applyOrderBy(query, describeQueryAst.solutionModifier());
-        List<Node> describedNodes = describeNodes(query, describeQueryAst);
-        lowerDescribeToConstructQuery(query, describedNodes);
-        return query;
+        SparqlAstToExpression.setPrefixes(buildPrefixMap(describeQueryAst.prologue().prefixDeclarations()));
+        try {
+            Query query = createQuery(
+                    describeQueryAst.whereClause(),
+                    describeQueryAst.datasetClause(),
+                    describeQueryAst.solutionModifier());
+            applyOrderBy(query, describeQueryAst.solutionModifier());
+            List<Node> describedNodes = describeNodes(query, describeQueryAst);
+            lowerDescribeToConstructQuery(query, describedNodes);
+            return query;
+        } finally {
+            SparqlAstToExpression.clearPrefixes();
+        }
     }
 
     /**
@@ -129,38 +138,23 @@ public final class CoreseAstQueryBuilder {
     public Query toNextQuery(ConstructQueryAst constructQueryAst) {
         Objects.requireNonNull(constructQueryAst, "constructQueryAst");
         rejectUnsupportedConstructClauses(constructQueryAst);
-
-        Query query = createQuery(
-                constructQueryAst.whereClause(),
-                constructQueryAst.datasetClause(),
-                constructQueryAst.solutionModifier());
-        applyOrderBy(query, constructQueryAst.solutionModifier());
-        Exp template = compileConstructTemplate(query, constructQueryAst.constructTemplate());
-        query.setConstruct(true);
-        query.setConstruct(template);
-        query.setConstructNodes(template.getNodes());
-        return query;
-    }
-
-    /**
-     * Converts a filter expression carried as {@link TermAst}: must be a {@link ConstraintAst}.
-     */
-    public Filter toNextFilter(TermAst filterExpression) {
-        Objects.requireNonNull(filterExpression, "filterExpression");
-        if (!(filterExpression instanceof ConstraintAst constraint)) {
-            throw new IllegalArgumentException(
-                    "FILTER expects a ConstraintAst, got: " + filterExpression.getClass().getName());
+        SparqlAstToExpression.setPrefixes(buildPrefixMap(constructQueryAst.prologue().prefixDeclarations()));
+        try {
+            Query query = createQuery(
+                    constructQueryAst.whereClause(),
+                    constructQueryAst.datasetClause(),
+                    constructQueryAst.solutionModifier());
+            applyOrderBy(query, constructQueryAst.solutionModifier());
+            Exp template = compileConstructTemplate(query, constructQueryAst.constructTemplate());
+            query.setConstruct(true);
+            query.setConstruct(template);
+            query.setConstructNodes(template.getNodes());
+            return query;
+        } finally {
+            SparqlAstToExpression.clearPrefixes();
         }
-        return toNextFilter(constraint);
     }
 
-    /**
-     * Converts a constraint tree (boolean filter expression) into a KGRAM {@link Filter}.
-     */
-    public Filter toNextFilter(ConstraintAst filterExpression) {
-        Objects.requireNonNull(filterExpression, "filterExpression");
-        return SparqlAstToExpression.toNextFilter(filterExpression, whereCompiler);
-    }
 
     /**
      * Converts a query term used as subject, predicate, object, or variable reference
@@ -186,6 +180,14 @@ public final class CoreseAstQueryBuilder {
         throw new UnsupportedQueryFeatureException(
                 "Property path bridge compilation is not supported yet by the next pipeline for: "
                         + path.getClass().getSimpleName());
+    }
+
+    private static Map<String, String> buildPrefixMap(List<PrefixDeclarationAst> decls) {
+        Map<String, String> map = new HashMap<>(decls.size() * 2);
+        for (PrefixDeclarationAst decl : decls) {
+            map.put(decl.prefix(), decl.namespace().raw());
+        }
+        return map;
     }
 
     private static void rejectUnsupportedAskClauses(AskQueryAst askQueryAst) {
