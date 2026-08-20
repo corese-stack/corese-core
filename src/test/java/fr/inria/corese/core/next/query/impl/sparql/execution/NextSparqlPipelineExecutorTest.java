@@ -196,6 +196,26 @@ class NextSparqlPipelineExecutorTest {
         assertFalse(result.hasNext(), "No results expected for an empty named graph");
     }
 
+    @Test
+    @DisplayName("Inline FROM restricts results to the selected graph")
+    void selectWithInlineFromRestrictsToNamedGraph() {
+        String graph1 = "http://example.org/graph1";
+        String graph2 = "http://example.org/graph2";
+        String carol = "http://example.org/carol";
+        insertInGraph(iri(ALICE), iri(KNOWS), iri(BOB), iri(graph1));
+        insertInGraph(iri(ALICE), iri(KNOWS), iri(carol), iri(graph2));
+
+        TupleQueryResult result = executor.evaluateTuple("""
+                SELECT ?o
+                FROM <http://example.org/graph1>
+                WHERE { <http://example.org/alice> <http://example.org/knows> ?o }
+                """);
+
+        assertTrue(result.hasNext());
+        assertEquals(BOB, result.next().getValue("o").stringValue());
+        assertFalse(result.hasNext());
+    }
+
     // -------------------------------------------------------------------------
     // CONSTRUCT / graph evaluation
     // -------------------------------------------------------------------------
@@ -256,6 +276,62 @@ class NextSparqlPipelineExecutorTest {
     }
 
     // -------------------------------------------------------------------------
+    // Current executable solution-modifier scope
+    // -------------------------------------------------------------------------
+
+    @Test
+    @DisplayName("DISTINCT executes end-to-end in the next runtime")
+    void distinctRunsEndToEnd() {
+        String carol = "http://example.org/carol";
+        insert(iri(BOB), iri(KNOWS), iri(carol));
+        insert(iri(carol), iri(NAME), valueFactory.createLiteral("Carol"));
+
+        TupleQueryResult result = executor.evaluateTuple("""
+                SELECT DISTINCT ?p WHERE { ?s ?p ?o }
+                """);
+
+        List<String> predicates = result.stream()
+                .map(binding -> binding.getValue("p").stringValue())
+                .toList();
+        assertEquals(2, predicates.size());
+        assertEquals(Set.of(KNOWS, NAME), Set.copyOf(predicates));
+    }
+
+    @Test
+    @DisplayName("LIMIT and OFFSET execute end-to-end in the next runtime")
+    void limitAndOffsetRunEndToEnd() {
+        insert(iri(BOB), iri(KNOWS), iri("http://example.org/carol"));
+
+        TupleQueryResult result = executor.evaluateTuple("""
+                SELECT ?s WHERE { ?s ?p ?o }
+                ORDER BY ?s
+                LIMIT 1
+                OFFSET 1
+                """);
+
+        assertTrue(result.hasNext());
+        assertEquals(BOB, result.next().getValue("s").stringValue());
+        assertFalse(result.hasNext());
+    }
+
+    @Test
+    @DisplayName("ORDER BY variable executes end-to-end in the next runtime")
+    void orderByVariableRunsEndToEnd() {
+        String aaron = "http://example.org/aaron";
+        insert(iri(ALICE), iri(KNOWS), iri(aaron));
+
+        TupleQueryResult result = executor.evaluateTuple("""
+                SELECT ?o WHERE { ?s <http://example.org/knows> ?o }
+                ORDER BY ?o
+                """);
+
+        List<String> objects = result.stream()
+                .map(binding -> binding.getValue("o").stringValue())
+                .toList();
+        assertEquals(List.of(aaron, BOB), objects);
+    }
+
+    // -------------------------------------------------------------------------
     // Timeout
     // -------------------------------------------------------------------------
 
@@ -293,9 +369,7 @@ class NextSparqlPipelineExecutorTest {
         assertThrows(QueryTimeoutException.class, () ->
                 executor.evaluateTuple(
                         "SELECT * WHERE { ?s1 ?p1 ?o1 . ?s2 ?p2 ?o2 }",
-                        null, null, 1L) // 1 ms
-                        .stream()
-                        .count());
+                        null, null, 1L)); // 1 ms
     }
 
     // -------------------------------------------------------------------------
