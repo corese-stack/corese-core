@@ -13,9 +13,8 @@ public interface BNode extends Resource {
 	String getID();
 
 	/**
-	 *
-	 * @param o
-	 * @return true if o is a BNode and that has the same identifier as this BNode.
+	 * @param o the object to compare for equality
+	 * @return true if o is a BNode and has the same identifier as this BNode.
 	 */
 	@Override
 	boolean equals(Object o);

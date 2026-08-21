@@ -8,6 +8,12 @@ public final class RdfText {
     private RdfText() {
     }
 
+    /**
+     * Strips enclosing angle brackets {@code <...>} from an IRI string if present.
+     *
+     * @param value the IRI string to strip
+     * @return the IRI string without enclosing angle brackets
+     */
     public static String stripAngleBrackets(String value) {
         String trimmed = value.trim();
         if (trimmed.length() >= 2 && trimmed.startsWith("<") && trimmed.endsWith(">")) {
@@ -16,6 +22,12 @@ public final class RdfText {
         return trimmed;
     }
 
+    /**
+     * Strips a trailing colon {@code :} from a prefix string if present.
+     *
+     * @param prefix the prefix string to strip
+     * @return the prefix string without trailing colon
+     */
     public static String stripTrailingColon(String prefix) {
         String trimmed = prefix.trim();
         if (trimmed.endsWith(":")) {

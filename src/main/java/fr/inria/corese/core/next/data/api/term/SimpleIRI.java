@@ -9,6 +9,7 @@ import fr.inria.corese.core.next.data.api.exception.IncorrectFormatException;
 public final class SimpleIRI extends AbstractIRI {
 
     private static final long serialVersionUID = -2444556019914696994L;
+
     /**
      * Creates an IRI from its complete string representation.
      *
