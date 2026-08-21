@@ -4,6 +4,7 @@
 package fr.inria.corese.core.next.data.api.literal;
 
 import fr.inria.corese.core.next.data.api.term.IRI;
+
 public enum XSDDatatype implements CoreDatatype {
     /**
      * true, false
