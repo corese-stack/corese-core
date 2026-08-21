@@ -36,7 +36,7 @@ Model graphModel = factory.createGraphModel();    // Production Graph backend
 ### Using External Plugins
 
 ```java
-import fr.inria.corese.core.next.storagemanager.api.plugin.ExternalPluginLoader;
+import fr.inria.corese.core.next.storage.api.plugin.ExternalPluginLoader;
 import java.io.File;
 
 // 1. Load external plugin JAR
@@ -96,7 +96,7 @@ custom-plugin/
     │   ├── CustomStoragePlugin.java
     │   └── CustomStorageManager.java
     └── resources/META-INF/services/
-        └── fr.inria.corese.core.next.storagemanager.api.plugin.StoragePlugin
+        └── fr.inria.corese.core.next.storage.api.plugin.StoragePlugin
 ```
 
 
@@ -119,7 +119,7 @@ public class CustomStoragePlugin implements StoragePlugin {
 
 Create file:
 ```
-src/main/resources/META-INF/services/fr.inria.corese.core.next.storagemanager.api.plugin.StoragePlugin
+src/main/resources/META-INF/services/fr.inria.corese.core.next.storage.api.plugin.StoragePlugin
 ```
 
 Content (fully qualified class name):
