@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.data.api.io.serializer;
 
-import fr.inria.corese.core.next.data.api.base.io.FileFormat;
-import fr.inria.corese.core.next.data.impl.exception.SerializationException;
+import fr.inria.corese.core.next.data.api.io.format.FileFormat;
+import fr.inria.corese.core.next.data.api.exception.SerializationException;
 
 import java.io.Writer;
 

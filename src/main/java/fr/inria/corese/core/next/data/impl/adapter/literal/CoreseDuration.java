@@ -1,10 +1,10 @@
 package fr.inria.corese.core.next.data.impl.adapter.literal;
 
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.next.data.api.IRI;
+import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
-import fr.inria.corese.core.next.data.impl.common.literal.XSD;
-import fr.inria.corese.core.next.data.api.base.model.literal.AbstractDuration;
+import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
+import fr.inria.corese.core.next.data.api.support.term.literal.AbstractDuration;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.CoreseUndefLiteral;
 
@@ -15,7 +15,9 @@ import java.time.temporal.TemporalAmount;
  * @ImplNote Legacy corese do not have a class dedicated to the storage of duration. The object is stored as a string literal.
  */
 public class CoreseDuration extends AbstractDuration implements CoreseDatatypeAdapter {
-    private CoreseUndefLiteral coreseObject;
+    private final String lexicalValue;
+    private final String legacyDatatypeIri;
+    private transient volatile CoreseUndefLiteral coreseObject;
 
     /**
      * Constructor for CoreseDuration.
@@ -23,8 +25,10 @@ public class CoreseDuration extends AbstractDuration implements CoreseDatatypeAd
      * @param coreseObject  the CoreseUndefLiteral object
      */
     public CoreseDuration(IDatatype coreseObject) {
-        if (coreseObject instanceof CoreseUndefLiteral) {
-            this.coreseObject = (CoreseUndefLiteral) coreseObject;
+        if (coreseObject instanceof CoreseUndefLiteral undefLiteral) {
+            this.coreseObject = undefLiteral;
+            this.lexicalValue = undefLiteral.getLabel();
+            this.legacyDatatypeIri = undefLiteral.getDatatypeURI();
         } else {
             throw new UnsupportedOperationException("Cannot create CoreseDuration from a non-undef Corese object.");
         }
@@ -36,7 +40,7 @@ public class CoreseDuration extends AbstractDuration implements CoreseDatatypeAd
      * @param duration the duration in string format
      */
     public CoreseDuration(String duration) {
-        this(new CoreseUndefLiteral(duration, XSD.DURATION.getIRI().stringValue()));
+        this(new CoreseUndefLiteral(duration, XSDDatatype.DURATION.getIRI().stringValue()));
     }
 
     /**
@@ -59,7 +63,7 @@ public class CoreseDuration extends AbstractDuration implements CoreseDatatypeAd
      */
     public CoreseDuration(String value, IRI datatype, CoreDatatype coreDatatype) {
         this(value, datatype);
-        if(coreDatatype != null && coreDatatype != XSD.DURATION) {
+        if(coreDatatype != null && coreDatatype != XSDDatatype.DURATION) {
             throw new UnsupportedOperationException("Cannot create CoreseDuration with a core datatype other than xsd:duration.");
         }
     }
@@ -75,22 +79,22 @@ public class CoreseDuration extends AbstractDuration implements CoreseDatatypeAd
 
     @Override
     public String getLabel() {
-        return coreseObject.getLabel();
+        return lexicalValue;
     }
 
     @Override
     public String stringValue() {
-        return coreseObject.stringValue();
+        return lexicalValue;
     }
 
     @Override
     public Node getCoreseNode() {
-        return this.coreseObject;
+        return coreseObject();
     }
 
     @Override
     public IDatatype getIDatatype() {
-        return this.coreseObject;
+        return coreseObject();
     }
 
     @Override
@@ -100,13 +104,13 @@ public class CoreseDuration extends AbstractDuration implements CoreseDatatypeAd
 
     @Override
     public CoreDatatype getCoreDatatype() {
-        return XSD.DURATION;
+        return XSDDatatype.DURATION;
     }
 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof CoreseDuration coreseDuration) {
-            return this.coreseObject.equals(coreseDuration.coreseObject);
+            return this.coreseObject().equals(coreseDuration.coreseObject());
         } else if (obj instanceof AbstractDuration) {
             return super.equals(obj);
         }
@@ -115,6 +119,15 @@ public class CoreseDuration extends AbstractDuration implements CoreseDatatypeAd
 
     @Override
     public int hashCode() {
-        return this.coreseObject.hashCode();
+        return this.coreseObject().hashCode();
+    }
+
+    private CoreseUndefLiteral coreseObject() {
+        CoreseUndefLiteral result = coreseObject;
+        if (result == null) {
+            result = new CoreseUndefLiteral(lexicalValue, legacyDatatypeIri);
+            coreseObject = result;
+        }
+        return result;
     }
 }

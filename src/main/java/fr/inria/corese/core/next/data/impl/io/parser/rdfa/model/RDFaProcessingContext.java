@@ -1,8 +1,8 @@
 package fr.inria.corese.core.next.data.impl.io.parser.rdfa.model;
 
-import fr.inria.corese.core.next.data.api.IRI;
-import fr.inria.corese.core.next.data.api.Resource;
-import fr.inria.corese.core.next.data.api.Value;
+import fr.inria.corese.core.next.data.api.term.IRI;
+import fr.inria.corese.core.next.data.api.term.Resource;
+import fr.inria.corese.core.next.data.api.term.Value;
 import org.xml.sax.Attributes;
 
 import java.util.HashMap;

@@ -9,7 +9,7 @@ import fr.inria.corese.core.kgram.core.Exp;
 import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.kgram.tool.NodeImpl;
-import fr.inria.corese.core.next.query.impl.parser.AbstractSparqlParserFeatureTest;
+import fr.inria.corese.core.next.query.impl.sparql.parser.AbstractSparqlParserFeatureTest;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
 import fr.inria.corese.core.query.QueryProcess;
@@ -162,7 +162,7 @@ class CoreseAstQueryBuilderLegacyExecutionTest extends AbstractSparqlParserFeatu
     private Mappings execute(String sparql, Graph graph) throws EngineException {
         QueryAst ast = newParserDefault().parse(sparql);
         SelectQueryAst select = assertInstanceOf(SelectQueryAst.class, ast);
-        fr.inria.corese.core.next.query.kgram.core.Query nextQuery =
+        fr.inria.corese.core.next.query.impl.kgram.core.Query nextQuery =
                 new CoreseAstQueryBuilder().toNextQuery(select);
         Query query = TestLegacyQueryAdapter.convert(nextQuery);
         return QueryProcess.create(graph).query(query);
@@ -211,11 +211,11 @@ class CoreseAstQueryBuilderLegacyExecutionTest extends AbstractSparqlParserFeatu
         private TestLegacyQueryAdapter() {
         }
 
-        private static Query convert(fr.inria.corese.core.next.query.kgram.core.Query nextQuery) {
+        private static Query convert(fr.inria.corese.core.next.query.impl.kgram.core.Query nextQuery) {
             return new TestLegacyQueryAdapter().convertQuery(nextQuery);
         }
 
-        private Query convertQuery(fr.inria.corese.core.next.query.kgram.core.Query nextQuery) {
+        private Query convertQuery(fr.inria.corese.core.next.query.impl.kgram.core.Query nextQuery) {
             rejectUnsupportedQueryShape(nextQuery);
 
             Query query = Query.create(convertBody(nextQuery.getBody()));
@@ -227,7 +227,7 @@ class CoreseAstQueryBuilderLegacyExecutionTest extends AbstractSparqlParserFeatu
             return query;
         }
 
-        private static void rejectUnsupportedQueryShape(fr.inria.corese.core.next.query.kgram.core.Query nextQuery) {
+        private static void rejectUnsupportedQueryShape(fr.inria.corese.core.next.query.impl.kgram.core.Query nextQuery) {
             if (nextQuery.getSelect().isEmpty()) {
                 throw new IllegalArgumentException("Test adapter expects SELECT variables from the next bridge");
             }
@@ -240,19 +240,19 @@ class CoreseAstQueryBuilderLegacyExecutionTest extends AbstractSparqlParserFeatu
             return ast;
         }
 
-        private Exp convertBody(fr.inria.corese.core.next.query.kgram.core.Exp nextBody) {
+        private Exp convertBody(fr.inria.corese.core.next.query.impl.kgram.core.Exp nextBody) {
             if (!nextBody.isAnd()) {
                 throw new IllegalArgumentException(
                         "Test adapter expects an AND query body, got: " + nextBody.type());
             }
             Exp body = Exp.create(Type.AND);
-            for (fr.inria.corese.core.next.query.kgram.core.Exp expression : nextBody) {
+            for (fr.inria.corese.core.next.query.impl.kgram.core.Exp expression : nextBody) {
                 body.add(convertExpression(expression));
             }
             return body;
         }
 
-        private Exp convertExpression(fr.inria.corese.core.next.query.kgram.core.Exp expression) {
+        private Exp convertExpression(fr.inria.corese.core.next.query.impl.kgram.core.Exp expression) {
             if (expression.isAnd()) {
                 return convertBody(expression);
             }
@@ -293,9 +293,9 @@ class CoreseAstQueryBuilderLegacyExecutionTest extends AbstractSparqlParserFeatu
                     "Test adapter does not support expression type: " + expression.type());
         }
 
-        private Exp convertBgp(fr.inria.corese.core.next.query.kgram.core.Exp nextBgp) {
+        private Exp convertBgp(fr.inria.corese.core.next.query.impl.kgram.core.Exp nextBgp) {
             Exp exp = Exp.create(Type.BGP);
-            for (fr.inria.corese.core.next.query.kgram.core.Exp expression : nextBgp) {
+            for (fr.inria.corese.core.next.query.impl.kgram.core.Exp expression : nextBgp) {
                 if (!expression.isEdge()) {
                     throw new IllegalArgumentException(
                             "Test adapter supports only EDGE expressions inside BGP, got: " + expression.type());
@@ -305,7 +305,7 @@ class CoreseAstQueryBuilderLegacyExecutionTest extends AbstractSparqlParserFeatu
             return exp;
         }
 
-        private Edge edge(fr.inria.corese.core.next.query.kgram.api.core.Edge nextEdge) {
+        private Edge edge(fr.inria.corese.core.next.query.impl.kgram.api.core.Edge nextEdge) {
             return new TestLegacyEdge(
                     node(nextEdge.getNode(0)),
                     node(nextEdge.getEdgeNode()),
@@ -313,22 +313,22 @@ class CoreseAstQueryBuilderLegacyExecutionTest extends AbstractSparqlParserFeatu
                     node(nextEdge.getNode(1)));
         }
 
-        private Node node(fr.inria.corese.core.next.query.kgram.api.core.Node nextNode) {
+        private Node node(fr.inria.corese.core.next.query.impl.kgram.api.core.Node nextNode) {
             if (nextNode.isVariable()) {
                 return variables.computeIfAbsent(nextNode.getLabel(), label -> new NodeImpl(Variable.create(label)));
             }
             return new NodeImpl(Constant.create(nextNode.getDatatypeValue()));
         }
 
-        private static Filter filter(fr.inria.corese.core.next.query.kgram.api.core.Filter nextFilter) {
+        private static Filter filter(fr.inria.corese.core.next.query.impl.kgram.api.core.Filter nextFilter) {
             return nextFilter.getFilterExpression();
         }
 
         private void applySelect(
                 Query legacyQuery,
-                fr.inria.corese.core.next.query.kgram.core.Query nextQuery) {
+                fr.inria.corese.core.next.query.impl.kgram.core.Query nextQuery) {
             List<Exp> selectExpressions = new ArrayList<>();
-            for (fr.inria.corese.core.next.query.kgram.api.core.Node nextNode : nextQuery.getSelect()) {
+            for (fr.inria.corese.core.next.query.impl.kgram.api.core.Node nextNode : nextQuery.getSelect()) {
                 selectExpressions.add(Exp.create(Type.NODE, node(nextNode)));
             }
 
@@ -338,23 +338,23 @@ class CoreseAstQueryBuilderLegacyExecutionTest extends AbstractSparqlParserFeatu
 
         private void applyDataset(
                 Query legacyQuery,
-                fr.inria.corese.core.next.query.kgram.core.Query nextQuery) {
+                fr.inria.corese.core.next.query.impl.kgram.core.Query nextQuery) {
             legacyQuery.setFrom(nodeList(nextQuery.getFrom()));
             legacyQuery.setNamed(nodeList(nextQuery.getNamed()));
         }
 
         private void applySolutionModifiers(
                 Query legacyQuery,
-                fr.inria.corese.core.next.query.kgram.core.Query nextQuery) {
+                fr.inria.corese.core.next.query.impl.kgram.core.Query nextQuery) {
             legacyQuery.setDistinct(nextQuery.isDistinct());
             legacyQuery.setLimit(nextQuery.getLimit());
             legacyQuery.setOffset(nextQuery.getOffset());
             legacyQuery.setOrderBy(orderByList(nextQuery.getOrderBy()));
         }
 
-        private List<Exp> orderByList(List<fr.inria.corese.core.next.query.kgram.core.Exp> nextOrderBy) {
+        private List<Exp> orderByList(List<fr.inria.corese.core.next.query.impl.kgram.core.Exp> nextOrderBy) {
             List<Exp> legacyOrderBy = new ArrayList<>();
-            for (fr.inria.corese.core.next.query.kgram.core.Exp nextExpression : nextOrderBy) {
+            for (fr.inria.corese.core.next.query.impl.kgram.core.Exp nextExpression : nextOrderBy) {
                 Exp expression = Exp.create(Type.NODE, node(nextExpression.getNode()));
                 if (nextExpression.getFilter() != null) {
                     expression.setFilter(filter(nextExpression.getFilter()));
@@ -373,9 +373,9 @@ class CoreseAstQueryBuilderLegacyExecutionTest extends AbstractSparqlParserFeatu
             return new ArrayList<>(nodes);
         }
 
-        private List<Node> nodeList(List<fr.inria.corese.core.next.query.kgram.api.core.Node> nextNodes) {
+        private List<Node> nodeList(List<fr.inria.corese.core.next.query.impl.kgram.api.core.Node> nextNodes) {
             List<Node> nodes = new ArrayList<>();
-            for (fr.inria.corese.core.next.query.kgram.api.core.Node nextNode : nextNodes) {
+            for (fr.inria.corese.core.next.query.impl.kgram.api.core.Node nextNode : nextNodes) {
                 nodes.add(node(nextNode));
             }
             return nodes;

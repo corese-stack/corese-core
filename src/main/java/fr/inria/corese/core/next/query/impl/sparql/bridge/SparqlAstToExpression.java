@@ -1,11 +1,11 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
-import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
+import fr.inria.corese.core.next.data.api.support.io.IOConstants;
 import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
-import fr.inria.corese.core.next.query.kgram.api.core.Filter;
-import fr.inria.corese.core.next.util.StringUtils;
+import fr.inria.corese.core.next.query.impl.kgram.api.core.Filter;
+import fr.inria.corese.core.next.common.text.RdfText;
 import fr.inria.corese.core.sparql.datatype.RDF;
 import fr.inria.corese.core.sparql.triple.parser.*;
 
@@ -17,7 +17,7 @@ import java.util.Optional;
 /**
  * Converts Corese-next {@link TermAst} nodes (including {@link ConstraintAst}) into
  * {@link Expression} trees for the SPARQL interpreter, consumable from KGRAM “next” via
- * {@link fr.inria.corese.core.next.query.kgram.api.core.Filter} / {@link AstBackedExpr}.
+ * {@link fr.inria.corese.core.next.query.impl.kgram.api.core.Filter} / {@link AstBackedExpr}.
  *
  */
 public final class SparqlAstToExpression {
@@ -128,12 +128,12 @@ public final class SparqlAstToExpression {
     }
 
     private static String normalizeDatatypeIri(String dt) {
-        String d =  StringUtils.trimChevronIRIs(dt);
+        String d =  RdfText.stripAngleBrackets(dt);
         return fr.inria.corese.core.sparql.triple.parser.NSManager.nsm().toNamespace(d);
     }
 
     private static Constant iriToConstant(String rawIri) {
-        String raw = StringUtils.trimChevronIRIs(rawIri);
+        String raw = RdfText.stripAngleBrackets(rawIri);
         if (raw.startsWith(IOConstants.BLANK_NODE_PREFIX)) {
             return Constant.createBlank(raw.substring(IOConstants.BLANK_NODE_PREFIX.length()));
         }
@@ -261,7 +261,7 @@ public final class SparqlAstToExpression {
      */
     private static Term notTerm(Expression expression) {
         Term not = Term.create("!", expression);
-        not.setOper(fr.inria.corese.core.next.query.kgram.api.core.ExprType.NOT);
+        not.setOper(fr.inria.corese.core.next.query.impl.kgram.api.core.ExprType.NOT);
         return not;
     }
 

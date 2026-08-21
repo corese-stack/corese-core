@@ -1,8 +1,8 @@
 package fr.inria.corese.core.next.data.impl.io.parser.rdfxml;
 
-import fr.inria.corese.core.next.data.api.base.io.AbstractIOOptions;
-import fr.inria.corese.core.next.data.api.io.common.BaseIRIOptions;
-import fr.inria.corese.core.next.data.impl.io.parser.util.ParserConstants;
+import fr.inria.corese.core.next.data.api.support.io.AbstractIOOptions;
+import fr.inria.corese.core.next.data.api.io.option.BaseIRIOptions;
+import fr.inria.corese.core.next.data.impl.io.parser.support.ParserConstants;
 
 /**
  * Configuration class for the parsing of RDF/XML documents

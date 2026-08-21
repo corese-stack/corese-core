@@ -1,8 +1,8 @@
 /**
- * Model variant implementations: filtered views and supporting value types.
+ * Model implementations: structural views and storage-backed variants.
  *
- * <p>Base model logic belongs in {@code api/base/model}; concrete storage-backed
- * models belong in {@code inmemory} or the storage manager. Only structural
- * variants (filtering, empty sentinel) belong here.</p>
+ * <p>Base model logic belongs in {@code api.support.model}. Structural variants
+ * (filtering and the empty sentinel) live directly in this package; concrete
+ * storage-backed models live in dedicated subpackages.</p>
  */
 package fr.inria.corese.core.next.data.impl.model;

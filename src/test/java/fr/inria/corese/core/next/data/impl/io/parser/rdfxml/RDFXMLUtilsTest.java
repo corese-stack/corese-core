@@ -1,10 +1,10 @@
 package fr.inria.corese.core.next.data.impl.io.parser.rdfxml;
 
-import fr.inria.corese.core.next.data.api.Model;
-import fr.inria.corese.core.next.data.api.Resource;
-import fr.inria.corese.core.next.data.impl.common.literal.XSD;
-import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
-import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
+import fr.inria.corese.core.next.data.api.model.Model;
+import fr.inria.corese.core.next.data.api.term.Resource;
+import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
+import fr.inria.corese.core.next.data.api.vocabulary.RDF;
+import fr.inria.corese.core.next.data.impl.io.parser.support.ParserTestBase;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -36,7 +36,7 @@ public class RDFXMLUtilsTest extends ParserTestBase {
      */
     @Test
     public void testResolveDatatype() {
-        assertEquals(Optional.of(XSD.STRING), RDFXMLUtils.resolveDatatype(XSD.STRING.getIRI().stringValue()));
+        assertEquals(Optional.of(XSDDatatype.STRING), RDFXMLUtils.resolveDatatype(XSDDatatype.STRING.getIRI().stringValue()));
         assertTrue(RDFXMLUtils.resolveDatatype("http://nonexistentdatatype").isEmpty());
     }
 

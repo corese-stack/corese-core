@@ -1,12 +1,12 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
 import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
-import fr.inria.corese.core.next.query.impl.parser.AbstractSparqlParserFeatureTest;
+import fr.inria.corese.core.next.query.impl.sparql.parser.AbstractSparqlParserFeatureTest;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.FunctionCallAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.GreaterThanAst;
-import fr.inria.corese.core.next.query.kgram.core.Exp;
-import fr.inria.corese.core.next.query.kgram.tool.KgramNodes;
+import fr.inria.corese.core.next.query.impl.kgram.core.Exp;
+import fr.inria.corese.core.next.query.impl.kgram.tool.KgramNodes;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

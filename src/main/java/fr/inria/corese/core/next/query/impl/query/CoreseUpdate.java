@@ -1,15 +1,15 @@
 package fr.inria.corese.core.next.query.impl.query;
 
-import fr.inria.corese.core.next.data.api.IRI;
-import fr.inria.corese.core.next.data.api.Resource;
-import fr.inria.corese.core.next.data.api.Statement;
-import fr.inria.corese.core.next.data.api.Value;
+import fr.inria.corese.core.next.data.api.term.IRI;
+import fr.inria.corese.core.next.data.api.term.Resource;
+import fr.inria.corese.core.next.data.api.model.Statement;
+import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
 import fr.inria.corese.core.next.query.api.QueryLanguage;
 import fr.inria.corese.core.next.query.api.Update;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
-import fr.inria.corese.core.next.query.impl.parser.SparqlParser;
+import fr.inria.corese.core.next.query.impl.sparql.parser.SparqlParser;
 import fr.inria.corese.core.next.query.impl.sparql.ast.DeleteDataRequestAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.InsertDataRequestAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
@@ -21,9 +21,9 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.UpdateRequestAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.UpdateRequestUnitAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.path.PredicatePathAst;
-import fr.inria.corese.core.next.storagemanager.api.StorageManager;
-import fr.inria.corese.core.next.storagemanager.api.operations.MutationOperations;
-import fr.inria.corese.core.next.util.StringUtils;
+import fr.inria.corese.core.next.storage.api.StorageManager;
+import fr.inria.corese.core.next.storage.api.operations.MutationOperations;
+import fr.inria.corese.core.next.common.text.RdfText;
 
 import java.util.Objects;
 
@@ -120,7 +120,7 @@ public final class CoreseUpdate extends AbstractCoreseOperation implements Updat
 
     private Value termToValue(TermAst term, CoreseValueFactory factory) {
         return switch (term) {
-            case IriAst iri -> factory.createIRI(StringUtils.trimChevronIRIs(iri.raw()));
+            case IriAst iri -> factory.createIRI(RdfText.stripAngleBrackets(iri.raw()));
             case LiteralAst lit -> {
                 if (lit.lang() != null && !lit.lang().isBlank()) {
                     yield factory.createLiteral(lit.lexical(), lit.lang());

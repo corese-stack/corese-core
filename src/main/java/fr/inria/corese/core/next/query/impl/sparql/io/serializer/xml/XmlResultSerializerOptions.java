@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.io.serializer.xml;
 
-import fr.inria.corese.core.next.data.api.base.io.AbstractIOOptions;
+import fr.inria.corese.core.next.data.api.support.io.AbstractIOOptions;
 import fr.inria.corese.core.next.query.api.io.serializer.LinksOptions;
 
 import javax.xml.transform.OutputKeys;

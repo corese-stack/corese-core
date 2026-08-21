@@ -1,10 +1,10 @@
 package fr.inria.corese.core.next.query.impl.sparql.io.serializer.json;
 
-import fr.inria.corese.core.next.data.api.io.IOOptions;
+import fr.inria.corese.core.next.data.api.io.option.IOOptions;
 import fr.inria.corese.core.next.query.api.io.serializer.BooleanResultSerializer;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
-import fr.inria.corese.core.next.query.impl.sparql.io.serializer.common.AbstractBooleanResultSerializerTest;
-import fr.inria.corese.core.next.query.impl.sparql.io.serializer.common.LinksSerializerTest;
+import fr.inria.corese.core.next.query.impl.sparql.io.serializer.support.AbstractBooleanResultSerializerTest;
+import fr.inria.corese.core.next.query.impl.sparql.io.serializer.support.LinksSerializerTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +32,7 @@ public class JsonBooleanResultSerializerTest extends AbstractBooleanResultSerial
     protected String getFalseResultString() {
         return "{\"boolean\":false}";
     }
-    
+
     private String getLinksTestResultsString() {
         return "{" +
             "\"head\":{" +

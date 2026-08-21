@@ -1,9 +1,10 @@
 package fr.inria.corese.core.next.data.impl.io.parser.rdfxml;
 
-import fr.inria.corese.core.next.data.api.*;
-import fr.inria.corese.core.next.data.impl.common.literal.XSD;
-import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
-import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
+import fr.inria.corese.core.next.data.api.term.*;
+import fr.inria.corese.core.next.data.api.model.*;
+import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
+import fr.inria.corese.core.next.data.api.vocabulary.RDF;
+import fr.inria.corese.core.next.data.impl.io.parser.support.ParserTestBase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.helpers.AttributesImpl;
@@ -82,7 +83,7 @@ public class RDFXMLStatementEmitterTest extends ParserTestBase {
     public void testEmitLiteral_withDatatype() {
         Resource subject = valueFactory.createBNode();
         IRI predicate = valueFactory.createIRI("http://example.org/age");
-        emitter.emitLiteral(subject, predicate, "42", XSD.INTEGER.getIRI().stringValue(), null);
+        emitter.emitLiteral(subject, predicate, "42", XSDDatatype.INTEGER.getIRI().stringValue(), null);
 
         Value obj = model.objects().iterator().next();
         assertTrue(obj.isLiteral());

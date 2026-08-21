@@ -1,24 +1,25 @@
 package fr.inria.corese.core.next.query.impl.result;
 
-import fr.inria.corese.core.next.data.api.Value;
+import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.data.impl.adapter.CoreseValueConverter;
 import fr.inria.corese.core.next.query.api.result.Binding;
 import fr.inria.corese.core.next.query.api.result.BindingSet;
-import fr.inria.corese.core.next.query.kgram.core.Mapping;
+import fr.inria.corese.core.next.query.impl.kgram.core.Mapping;
 
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
 
 /**
  * Wrapper around Mapping
  */
-public class CoreseBindingSet implements BindingSet {
+public final class CoreseBindingSet implements BindingSet {
 
     private final Mapping mapping;
-    private static final CoreseValueConverter converter = new CoreseValueConverter();
+    private static final CoreseValueConverter CONVERTER = new CoreseValueConverter();
 
     public CoreseBindingSet(Mapping mapping) {
-        this.mapping = mapping;
+        this.mapping = Objects.requireNonNull(mapping, "mapping");
     }
 
     @Override
@@ -34,13 +35,17 @@ public class CoreseBindingSet implements BindingSet {
     @Override
     public Value getValue(String name) {
         if(this.hasBinding(name)) {
-            return converter.toRdf4jValue(this.mapping.getValue(name));
+            return CONVERTER.fromCoreseNode(this.mapping.getValue(name));
         }
         return null;
     }
 
     @Override
     public Iterator<Binding> iterator() {
-        return this.mapping.getMap().entrySet().stream().map((entry) -> (Binding) new CoreseBinding(entry.getKey(), converter.toRdf4jValue(entry.getValue()))).iterator();
+        return this.mapping.getMap().entrySet().stream()
+                .<Binding>map(entry -> new CoreseBinding(
+                        entry.getKey(),
+                        CONVERTER.fromCoreseNode(entry.getValue())))
+                .iterator();
     }
 }

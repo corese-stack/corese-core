@@ -1,12 +1,12 @@
 package fr.inria.corese.core.next.data.impl.io.parser.turtle;
 
-import fr.inria.corese.core.next.data.api.Model;
-import fr.inria.corese.core.next.data.api.ValueFactory;
-import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.data.api.base.io.parser.AbstractRDFParser;
-import fr.inria.corese.core.next.data.api.io.IOOptions;
-import fr.inria.corese.core.next.data.impl.exception.ParsingErrorException;
-import fr.inria.corese.core.next.impl.parser.antlr.TurtleLexer;
+import fr.inria.corese.core.next.data.api.model.Model;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
+import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
+import fr.inria.corese.core.next.data.api.support.io.parser.AbstractRDFParser;
+import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.api.exception.ParsingException;
+import fr.inria.corese.core.next.generated.antlr.TurtleLexer;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -54,7 +54,7 @@ public class TurtleParser extends AbstractRDFParser {
     }
 
     @Override
-    public void parse(InputStream in, String baseURI) throws ParsingErrorException {
+    public void parse(InputStream in, String baseURI) throws ParsingException {
         parse(new InputStreamReader(in, StandardCharsets.UTF_8), baseURI);
     }
 
@@ -63,10 +63,10 @@ public class TurtleParser extends AbstractRDFParser {
      *
      * @param reader  The {@link Reader} to read the RDF data.
      * @param baseURI The base URI.
-     * @throws ParsingErrorException if a parsing or I/O error occurs.
+     * @throws ParsingException if a parsing or I/O error occurs.
      */
     @Override
-    public void parse(Reader reader, String baseURI) throws ParsingErrorException {
+    public void parse(Reader reader, String baseURI) throws ParsingException {
         try {
             CharStream charStream = CharStreams.fromReader(reader);
             TurtleLexer turtleLexer = new TurtleLexer(charStream);
@@ -76,7 +76,7 @@ public class TurtleParser extends AbstractRDFParser {
             turtleLexer.addErrorListener(turtleErrorListener);
 
             CommonTokenStream tokens = new CommonTokenStream(turtleLexer);
-            fr.inria.corese.core.next.impl.parser.antlr.TurtleParser turtleParser = new fr.inria.corese.core.next.impl.parser.antlr.TurtleParser(tokens);
+            fr.inria.corese.core.next.generated.antlr.TurtleParser turtleParser = new fr.inria.corese.core.next.generated.antlr.TurtleParser(tokens);
 
             turtleParser.removeErrorListeners();
             turtleParser.addErrorListener(turtleErrorListener);
@@ -92,10 +92,10 @@ public class TurtleParser extends AbstractRDFParser {
                     if (errorMsg == null || errorMsg.trim().isEmpty()) {
                         errorMsg = "Unknown syntax error detected";
                     }
-                    throw new ParsingErrorException("Syntax error in Turtle document: " + errorMsg);
+                    throw new ParsingException("Syntax error in Turtle document: " + errorMsg);
                 }
             } catch (RecognitionException e) {
-                throw new ParsingErrorException("Recognition error in Turtle document: " + e.getMessage());
+                throw new ParsingException("Recognition error in Turtle document: " + e.getMessage());
             }
             IOOptions optionsWithBaseURI = new TurtleParserOptions.Builder()
                     .baseIRI(baseURI)
@@ -103,12 +103,12 @@ public class TurtleParser extends AbstractRDFParser {
             TurtleListener listener = new TurtleListener(getModel(), getValueFactory(), optionsWithBaseURI);
             walker.walk(listener, tree);
 
-        } catch (ParsingErrorException e) {
+        } catch (ParsingException e) {
             throw e;
         } catch (IOException e) {
-            throw new ParsingErrorException("Failed to parse Turtle RDF: " + e.getMessage(), e);
+            throw new ParsingException("Failed to parse Turtle RDF: " + e.getMessage(), e);
         } catch (Exception e) {
-            throw new ParsingErrorException("Unexpected error during Turtle parsing: " + e.getMessage(), e);
+            throw new ParsingException("Unexpected error during Turtle parsing: " + e.getMessage(), e);
         }
     }
 

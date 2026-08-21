@@ -1,12 +1,12 @@
 package fr.inria.corese.core.next.data.impl.io.parser.nquads;
 
-import fr.inria.corese.core.next.data.api.Model;
-import fr.inria.corese.core.next.data.api.ValueFactory;
-import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.data.api.base.io.parser.AbstractRDFParser;
-import fr.inria.corese.core.next.data.api.io.IOOptions;
-import fr.inria.corese.core.next.data.impl.exception.ParsingErrorException;
-import fr.inria.corese.core.next.impl.parser.antlr.NQuadsLexer;
+import fr.inria.corese.core.next.data.api.model.Model;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
+import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
+import fr.inria.corese.core.next.data.api.support.io.parser.AbstractRDFParser;
+import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.api.exception.ParsingException;
+import fr.inria.corese.core.next.generated.antlr.NQuadsLexer;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -51,7 +51,7 @@ public class NQuadsParser extends AbstractRDFParser {
     }
 
     @Override
-    public void parse(InputStream in, String baseURI) throws ParsingErrorException {
+    public void parse(InputStream in, String baseURI) throws ParsingException {
         parse(new InputStreamReader(in, StandardCharsets.UTF_8), baseURI);
     }
 
@@ -60,10 +60,10 @@ public class NQuadsParser extends AbstractRDFParser {
      *
      * @param reader  The Reader to read RDF data from.
      * @param baseURI The base URI (ignored for N-Quads as all URIs are absolute).
-     * @throws ParsingErrorException if a parsing or I/O error occurs.
+     * @throws ParsingException if a parsing or I/O error occurs.
      */
     @Override
-    public void parse(Reader reader, String baseURI) throws ParsingErrorException {
+    public void parse(Reader reader, String baseURI) throws ParsingException {
         try {
             CharStream charStream = CharStreams.fromReader(reader);
 
@@ -71,7 +71,7 @@ public class NQuadsParser extends AbstractRDFParser {
             configureErrorHandling(lexer);
 
             CommonTokenStream tokens = new CommonTokenStream(lexer);
-            fr.inria.corese.core.next.impl.parser.antlr.NQuadsParser parser = new fr.inria.corese.core.next.impl.parser.antlr.NQuadsParser(tokens);
+            fr.inria.corese.core.next.generated.antlr.NQuadsParser parser = new fr.inria.corese.core.next.generated.antlr.NQuadsParser(tokens);
             configureErrorHandling(parser);
 
             ParseTree tree = parser.nquadsDoc();
@@ -80,10 +80,10 @@ public class NQuadsParser extends AbstractRDFParser {
             NQuadsListener listener = new NQuadsListener(getModel(), getValueFactory(), getConfig());
             walker.walk(listener, tree);
 
-        } catch (ParsingErrorException e) {
+        } catch (ParsingException e) {
             throw e;
         } catch (IOException e) {
-            throw new ParsingErrorException("Failed to read N-Quads input: " + e.getMessage(), e);
+            throw new ParsingException("Failed to read N-Quads input: " + e.getMessage(), e);
         } catch (Exception e) {
             throw unwrapException(e);
         }
@@ -101,27 +101,27 @@ public class NQuadsParser extends AbstractRDFParser {
     }
 
     /**
-     * Unwraps nested exceptions to find and re-throw ParsingErrorException.
+     * Unwraps nested exceptions to find and re-throw ParsingException.
      *
      * @param exception Exception to unwrap
-     * @return ParsingErrorException if found in cause chain
-     * @throws ParsingErrorException always, either original or wrapped
+     * @return ParsingException if found in cause chain
+     * @throws ParsingException always, either original or wrapped
      */
-    private ParsingErrorException unwrapException(Exception exception) {
+    private ParsingException unwrapException(Exception exception) {
         Throwable current = exception;
         while (current != null) {
-            if (current instanceof ParsingErrorException) {
-                return (ParsingErrorException) current;
+            if (current instanceof ParsingException) {
+                return (ParsingException) current;
             }
             current = current.getCause();
         }
-        return new ParsingErrorException(
+        return new ParsingException(
                 "Unexpected error during N-Quads parsing: " + exception.getMessage(),
                 exception);
     }
 
     /**
-     * Custom ANTLR ErrorListener that throws a ParsingErrorException on any syntax error.
+     * Custom ANTLR ErrorListener that throws a ParsingException on any syntax error.
      * This ensures that parsing failures are immediately reported as application-specific exceptions.
      */
     private static class NQuadsErrorListener extends BaseErrorListener {
@@ -135,7 +135,7 @@ public class NQuadsParser extends AbstractRDFParser {
                                 int charPositionInLine,
                                 String msg,
                                 RecognitionException e) {
-            throw new ParsingErrorException(
+            throw new ParsingException(
                     String.format("Syntax error in N-Quads at line %d:%d - %s",
                             line, charPositionInLine, msg));
         }

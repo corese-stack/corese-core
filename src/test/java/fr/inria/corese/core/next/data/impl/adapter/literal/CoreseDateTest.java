@@ -1,7 +1,6 @@
 package fr.inria.corese.core.next.data.impl.adapter.literal;
 
-import fr.inria.corese.core.next.data.impl.common.literal.XSD;
-import fr.inria.corese.core.next.data.impl.adapter.literal.CoreseDate;
+import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 import org.junit.jupiter.api.Test;
 
 import javax.xml.datatype.DatatypeFactory;
@@ -21,8 +20,8 @@ public class CoreseDateTest {
         CoreseDate newAPICoreseDate = new CoreseDate(coreseDate);
 
         assertEquals(calendar, newAPICoreseDate.calendarValue());
-        assertEquals(XSD.DATE.getIRI().stringValue(), newAPICoreseDate.getDatatype().stringValue());
-        assertEquals(XSD.DATE, newAPICoreseDate.getCoreDatatype());
+        assertEquals(XSDDatatype.DATE.getIRI().stringValue(), newAPICoreseDate.getDatatype().stringValue());
+        assertEquals(XSDDatatype.DATE, newAPICoreseDate.getCoreDatatype());
     }
 
     /**
@@ -34,8 +33,8 @@ public class CoreseDateTest {
         CoreseDate newAPICoreseDate = new CoreseDate("2000-01-15T00:00:00");
 
         assertEquals(calendar.toXMLFormat(), newAPICoreseDate.calendarValue().toXMLFormat());
-        assertEquals(XSD.DATE.getIRI().stringValue(), newAPICoreseDate.getDatatype().stringValue());
-        assertEquals(XSD.DATE, newAPICoreseDate.getCoreDatatype());
+        assertEquals(XSDDatatype.DATE.getIRI().stringValue(), newAPICoreseDate.getDatatype().stringValue());
+        assertEquals(XSDDatatype.DATE, newAPICoreseDate.getCoreDatatype());
     }
 
     /**
@@ -47,8 +46,8 @@ public class CoreseDateTest {
         CoreseDate newAPICoreseDate = new CoreseDate(calendar);
 
         assertEquals(calendar.toXMLFormat(), newAPICoreseDate.calendarValue().toXMLFormat()); // Converted to string format because of freak Xerces cast exception
-        assertEquals(XSD.DATE.getIRI().stringValue(), newAPICoreseDate.getDatatype().stringValue());
-        assertEquals(XSD.DATE, newAPICoreseDate.getCoreDatatype());
+        assertEquals(XSDDatatype.DATE.getIRI().stringValue(), newAPICoreseDate.getDatatype().stringValue());
+        assertEquals(XSDDatatype.DATE, newAPICoreseDate.getCoreDatatype());
     }
 
     /**

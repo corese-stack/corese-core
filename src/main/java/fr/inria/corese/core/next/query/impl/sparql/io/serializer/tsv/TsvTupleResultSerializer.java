@@ -1,17 +1,17 @@
 package fr.inria.corese.core.next.query.impl.sparql.io.serializer.tsv;
 
-import fr.inria.corese.core.next.data.api.BNode;
-import fr.inria.corese.core.next.data.api.IRI;
-import fr.inria.corese.core.next.data.api.Literal;
-import fr.inria.corese.core.next.data.api.Value;
-import fr.inria.corese.core.next.data.api.base.io.FileFormat;
-import fr.inria.corese.core.next.data.api.io.IOOptions;
-import fr.inria.corese.core.next.data.impl.common.literal.RDF;
-import fr.inria.corese.core.next.data.impl.common.literal.XSD;
-import fr.inria.corese.core.next.data.impl.io.serialization.util.SerializationConstants;
+import fr.inria.corese.core.next.data.api.term.BNode;
+import fr.inria.corese.core.next.data.api.term.IRI;
+import fr.inria.corese.core.next.data.api.term.Literal;
+import fr.inria.corese.core.next.data.api.term.Value;
+import fr.inria.corese.core.next.data.api.io.format.FileFormat;
+import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.api.literal.RDFDatatype;
+import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
+import fr.inria.corese.core.next.data.api.support.io.IOConstants;
 import fr.inria.corese.core.next.query.api.io.ResultFormat;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
-import fr.inria.corese.core.next.query.impl.sparql.io.serializer.common.CharacterSeparatedValuesSerializer;
+import fr.inria.corese.core.next.query.impl.sparql.io.serializer.support.CharacterSeparatedValuesSerializer;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ import java.util.List;
 public class TsvTupleResultSerializer extends CharacterSeparatedValuesSerializer {
 
     public TsvTupleResultSerializer(TupleQueryResult results, IOOptions options) {
-        super(SerializationConstants.TAB, results, options);
+        super(IOConstants.TAB, results, options);
     }
 
     public TsvTupleResultSerializer(TupleQueryResult results) {
@@ -40,36 +40,36 @@ public class TsvTupleResultSerializer extends CharacterSeparatedValuesSerializer
     @Override
     protected String valuetoString(Value value) {
         if(value instanceof IRI iriValue) {
-            return SerializationConstants.IRI_START + iriValue.stringValue() + SerializationConstants.IRI_END;
+            return IOConstants.IRI_START + iriValue.stringValue() + IOConstants.IRI_END;
         }
         if(value instanceof BNode bnodeValue) {
-            return SerializationConstants.BLANK_NODE_PREFIX + bnodeValue.getID();
+            return IOConstants.BLANK_NODE_PREFIX + bnodeValue.getID();
         }
         if(value instanceof Literal literalValue) {
-            String delimiter = SerializationConstants.QUOTE;
+            String delimiter = IOConstants.QUOTE;
             String stringValue = literalValue.stringValue();
             stringValue = stringValue.replace("\"", "\\\"");
             if(literalValue.getLanguage().isPresent()) {
-                return delimiter + stringValue + delimiter + SerializationConstants.AT + literalValue.getLanguage().get();
+                return delimiter + stringValue + delimiter + IOConstants.AT + literalValue.getLanguage().get();
             } else if(literalValue.getDatatype() != null
-                    && literalValue.getDatatype() != XSD.STRING.getIRI()
-                    && literalValue.getDatatype() != RDF.LANGSTRING.getIRI()) {
-                if(literalValue.getCoreDatatype() == XSD.UNSIGNED_INT
-                        || literalValue.getCoreDatatype() == XSD.POSITIVE_INTEGER
-                        || literalValue.getCoreDatatype() == XSD.NEGATIVE_INTEGER
-                        || literalValue.getCoreDatatype() == XSD.NON_NEGATIVE_INTEGER
-                        || literalValue.getCoreDatatype() == XSD.NON_POSITIVE_INTEGER
-                        || literalValue.getCoreDatatype() == XSD.INT
-                        || literalValue.getCoreDatatype() == XSD.INTEGER) {
+                    && literalValue.getDatatype() != XSDDatatype.STRING.getIRI()
+                    && literalValue.getDatatype() != RDFDatatype.LANGSTRING.getIRI()) {
+                if(literalValue.getCoreDatatype() == XSDDatatype.UNSIGNED_INT
+                        || literalValue.getCoreDatatype() == XSDDatatype.POSITIVE_INTEGER
+                        || literalValue.getCoreDatatype() == XSDDatatype.NEGATIVE_INTEGER
+                        || literalValue.getCoreDatatype() == XSDDatatype.NON_NEGATIVE_INTEGER
+                        || literalValue.getCoreDatatype() == XSDDatatype.NON_POSITIVE_INTEGER
+                        || literalValue.getCoreDatatype() == XSDDatatype.INT
+                        || literalValue.getCoreDatatype() == XSDDatatype.INTEGER) {
                     return String.valueOf(literalValue.integerValue());
                 }
-                if(literalValue.getCoreDatatype() == XSD.DOUBLE) {
+                if(literalValue.getCoreDatatype() == XSDDatatype.DOUBLE) {
                     return String.valueOf(literalValue.doubleValue());
                 }
-                if(literalValue.getCoreDatatype() == XSD.DECIMAL) {
+                if(literalValue.getCoreDatatype() == XSDDatatype.DECIMAL) {
                     return String.valueOf(literalValue.decimalValue());
                 }
-                return delimiter + stringValue + delimiter + SerializationConstants.DATATYPE_SEPARATOR + SerializationConstants.IRI_START + literalValue.getDatatype().stringValue() + SerializationConstants.IRI_END;
+                return delimiter + stringValue + delimiter + IOConstants.DATATYPE_SEPARATOR + IOConstants.IRI_START + literalValue.getDatatype().stringValue() + IOConstants.IRI_END;
             }
             return delimiter + stringValue + delimiter;
         }
@@ -79,6 +79,6 @@ public class TsvTupleResultSerializer extends CharacterSeparatedValuesSerializer
     @Override
     protected String headerString() {
         List<String> variableList = this.getResults().getBindingNames().stream().map(variableName -> "?" + variableName).toList();
-        return String.join(SerializationConstants.TAB, variableList);
+        return String.join(IOConstants.TAB, variableList);
     }
 }

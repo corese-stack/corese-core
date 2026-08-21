@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.query.api.result;
 
-import fr.inria.corese.core.next.data.api.Statement;
+import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.query.api.GraphQuery;
 
 import java.io.Closeable;

@@ -1,7 +1,6 @@
 package fr.inria.corese.core.next.data.impl.adapter.literal;
 
-import fr.inria.corese.core.next.data.impl.common.literal.XSD;
-import fr.inria.corese.core.next.data.impl.adapter.literal.CoreseDatetime;
+import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 import org.junit.jupiter.api.Test;
 
 import javax.xml.datatype.DatatypeFactory;
@@ -21,8 +20,8 @@ public class CoreseDatetimeTest {
         CoreseDatetime newAPICoreseDatetime = new CoreseDatetime(coreseDateTime);
 
         assertEquals(calendar, newAPICoreseDatetime.calendarValue());
-        assertEquals(XSD.DATETIME.getIRI().stringValue(), newAPICoreseDatetime.getDatatype().stringValue());
-        assertEquals(XSD.DATETIME, newAPICoreseDatetime.getCoreDatatype());
+        assertEquals(XSDDatatype.DATETIME.getIRI().stringValue(), newAPICoreseDatetime.getDatatype().stringValue());
+        assertEquals(XSDDatatype.DATETIME, newAPICoreseDatetime.getCoreDatatype());
     }
 
     /**
@@ -34,8 +33,8 @@ public class CoreseDatetimeTest {
         CoreseDatetime newAPICoreseDate = new CoreseDatetime("2000-01-15T00:00:00");
 
         assertEquals(calendar.toXMLFormat(), newAPICoreseDate.calendarValue().toXMLFormat());
-        assertEquals(XSD.DATETIME.getIRI().stringValue(), newAPICoreseDate.getDatatype().stringValue());
-        assertEquals(XSD.DATETIME, newAPICoreseDate.getCoreDatatype());
+        assertEquals(XSDDatatype.DATETIME.getIRI().stringValue(), newAPICoreseDate.getDatatype().stringValue());
+        assertEquals(XSDDatatype.DATETIME, newAPICoreseDate.getCoreDatatype());
     }
 
     /**
@@ -47,8 +46,8 @@ public class CoreseDatetimeTest {
         CoreseDatetime newAPICoreseDate = new CoreseDatetime(calendar);
 
         assertEquals(calendar.toXMLFormat(), newAPICoreseDate.calendarValue().toXMLFormat()); // Converted to string format because of freak Xerces cast exception
-        assertEquals(XSD.DATETIME.getIRI().stringValue(), newAPICoreseDate.getDatatype().stringValue());
-        assertEquals(XSD.DATETIME, newAPICoreseDate.getCoreDatatype());
+        assertEquals(XSDDatatype.DATETIME.getIRI().stringValue(), newAPICoreseDate.getDatatype().stringValue());
+        assertEquals(XSDDatatype.DATETIME, newAPICoreseDate.getCoreDatatype());
     }
 
     /**

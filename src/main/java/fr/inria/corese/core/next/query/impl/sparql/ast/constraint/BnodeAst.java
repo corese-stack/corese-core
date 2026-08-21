@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast.constraint;
 
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
-import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
+import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.AstVisitor;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ExprAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 

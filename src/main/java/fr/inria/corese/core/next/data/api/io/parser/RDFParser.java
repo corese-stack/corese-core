@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.data.api.io.parser;
 
-import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.data.api.io.IOOptions;
+import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
+import fr.inria.corese.core.next.data.api.io.option.IOOptions;
 
 import java.io.InputStream;
 import java.io.Reader;

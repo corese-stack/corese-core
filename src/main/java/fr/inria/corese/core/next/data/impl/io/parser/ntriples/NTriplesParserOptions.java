@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.data.impl.io.parser.ntriples;
 
-import fr.inria.corese.core.next.data.api.base.io.AbstractIOOptions;
+import fr.inria.corese.core.next.data.api.support.io.AbstractIOOptions;
 
 /**
  * Options used to configure a NTriples parser

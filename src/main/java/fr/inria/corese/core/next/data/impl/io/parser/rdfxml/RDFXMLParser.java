@@ -1,15 +1,14 @@
 package fr.inria.corese.core.next.data.impl.io.parser.rdfxml;
 
-import fr.inria.corese.core.next.data.api.IRI;
-import fr.inria.corese.core.next.data.api.Model;
-import fr.inria.corese.core.next.data.api.Resource;
-import fr.inria.corese.core.next.data.api.ValueFactory;
-import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.data.api.base.io.parser.AbstractRDFParser;
-import fr.inria.corese.core.next.data.api.io.IOOptions;
-import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
-import fr.inria.corese.core.next.data.impl.exception.ParsingErrorException;
-import fr.inria.corese.core.next.data.impl.io.parser.rdfxml.context.RDFXMLContext;
+import fr.inria.corese.core.next.data.api.term.IRI;
+import fr.inria.corese.core.next.data.api.model.Model;
+import fr.inria.corese.core.next.data.api.term.Resource;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
+import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
+import fr.inria.corese.core.next.data.api.support.io.parser.AbstractRDFParser;
+import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.api.vocabulary.RDF;
+import fr.inria.corese.core.next.data.api.exception.ParsingException;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -87,12 +86,12 @@ public class RDFXMLParser extends AbstractRDFParser {
 
 
     @Override
-    public void parse(InputStream in, String baseURI) throws ParsingErrorException {
+    public void parse(InputStream in, String baseURI) throws ParsingException {
         parse(new InputStreamReader(in, StandardCharsets.UTF_8), baseURI);
     }
 
     @Override
-    public void parse(Reader reader, String baseURI) throws ParsingErrorException {
+    public void parse(Reader reader, String baseURI) throws ParsingException {
         // Initialize context and state for a new parse operation
         ctx.baseURI = baseURI;
         usedIDs.clear();
@@ -108,15 +107,15 @@ public class RDFXMLParser extends AbstractRDFParser {
             // Parse the input using the custom handler
             saxParser.parse(inputSource, new RdfXmlSaxHandler());
         } catch (SAXException e) {
-            // Unpack custom ParsingErrorException if it was wrapped in SAXException
-            if (e.getCause() instanceof ParsingErrorException) {
-                throw (ParsingErrorException) e.getCause();
+            // Unpack custom ParsingException if it was wrapped in SAXException
+            if (e.getCause() instanceof ParsingException) {
+                throw (ParsingException) e.getCause();
             }
-            throw new ParsingErrorException("Unexpected error during RDF/XML parsing: " + e.getMessage(), e);
+            throw new ParsingException("Unexpected error during RDF/XML parsing: " + e.getMessage(), e);
         } catch (IOException e) {
-            throw new ParsingErrorException("Failed to parse RDF/XML input stream: " + e.getMessage(), e);
+            throw new ParsingException("Failed to parse RDF/XML input stream: " + e.getMessage(), e);
         } catch (Exception e) {
-            throw new ParsingErrorException("Unexpected error during RDF/XML parsing: " + e.getMessage(), e);
+            throw new ParsingException("Unexpected error during RDF/XML parsing: " + e.getMessage(), e);
         }
     }
 
@@ -137,7 +136,7 @@ public class RDFXMLParser extends AbstractRDFParser {
             try {
                 // Delegates start element processing
                 handleStartElement(uri, localName, qName, attrs);
-            } catch (ParsingErrorException e) {
+            } catch (ParsingException e) {
                 // Re-throw as SAXException to halt parsing process
                 throw new SAXException(e);
             }
@@ -148,7 +147,7 @@ public class RDFXMLParser extends AbstractRDFParser {
             try {
                 // Delegates end element processing
                 handleEndElement(uri, localName);
-            } catch (ParsingErrorException e) {
+            } catch (ParsingException e) {
                 // Re-throw as SAXException to halt parsing process
                 throw new SAXException(e);
             }
@@ -162,7 +161,7 @@ public class RDFXMLParser extends AbstractRDFParser {
         }
 
         private void handleStartElement(String uri, String localName, String qName, Attributes attrs)
-                throws ParsingErrorException {
+                throws ParsingException {
 
             if (qName.equals(lastElementQName)) {
                 String rdfId = attrs.getValue(RDF.type.getNamespace(), "ID");
@@ -179,7 +178,7 @@ public class RDFXMLParser extends AbstractRDFParser {
             if (RDFXMLUtils.isRdfRDF(uri, localName)) {
                 rdfDepth++;
                 if (rdfDepth > 1) {
-                    throw new ParsingErrorException(
+                    throw new ParsingException(
                             "rdf:RDF cannot be used as a node element. Nested rdf:RDF elements are not allowed.");
                 }
                 return;
@@ -207,7 +206,7 @@ public class RDFXMLParser extends AbstractRDFParser {
         /**
          * Handles the end of an XML element, processing accumulated literal content or cleaning up context stacks.
          */
-        private void handleEndElement(String uri, String localName) throws ParsingErrorException {
+        private void handleEndElement(String uri, String localName) throws ParsingException {
             // Handle <rdf:RDF> closing tag cleanup.
             if (RDFXMLUtils.isRdfRDF(uri, localName)) {
                 rdfDepth--;
@@ -222,7 +221,7 @@ public class RDFXMLParser extends AbstractRDFParser {
 
                 // CRITICAL FIX: Ensure a subject exists before creating a triple.
                 if (ctx.subjectStack.isEmpty()) {
-                    throw new ParsingErrorException(
+                    throw new ParsingException(
                             "Cannot emit literal: no subject available for predicate " + predicate);
                 }
 
@@ -277,7 +276,7 @@ public class RDFXMLParser extends AbstractRDFParser {
         }
 
         private boolean processCollectionStart(String localName, String uri, String qName, Attributes attrs)
-                throws ParsingErrorException {
+                throws ParsingException {
             String parseType = getParseType(attrs);
             // Checks for rdf:parseType="Collection"
             if (!"Collection".equals(parseType)) return false;
@@ -295,7 +294,7 @@ public class RDFXMLParser extends AbstractRDFParser {
         }
 
         private boolean processCollectionItem(String localName, String uri, Attributes attrs)
-                throws ParsingErrorException {
+                throws ParsingException {
             // Checks if we are inside a collection and the current element is a node element (rdf:Description or typed node).
             if (!ctx.inCollection || !RDFXMLUtils.isDescription(localName, uri)) return false;
 
@@ -308,7 +307,7 @@ public class RDFXMLParser extends AbstractRDFParser {
         }
 
         private boolean processContainerElement(String localName, String uri, String qName, Attributes attrs)
-                throws ParsingErrorException {
+                throws ParsingException {
 
             if (isContainer(localName, uri)) {
                 Resource subject = extractSubject(attrs, ctx.factory, ctx.baseURI, usedIDs);
@@ -323,7 +322,7 @@ public class RDFXMLParser extends AbstractRDFParser {
                 if ("li".equals(localName)) {
                     Resource currentContainer = ctx.subjectStack.isEmpty() ? null : ctx.subjectStack.peek();
                     if (currentContainer == null) {
-                        throw new ParsingErrorException("Container item found without a container subject");
+                        throw new ParsingException("Container item found without a container subject");
                     }
 
                     // Generate rdf:_n predicate
@@ -348,7 +347,7 @@ public class RDFXMLParser extends AbstractRDFParser {
                     if (ctx.inContainer) {
                         Resource currentContainer = ctx.subjectStack.isEmpty() ? null : ctx.subjectStack.peek();
                         if (currentContainer == null) {
-                            throw new ParsingErrorException("Container item found without a container subject");
+                            throw new ParsingException("Container item found without a container subject");
                         }
 
                         String pred = RDF.type.getNamespace() + localName;
@@ -371,7 +370,7 @@ public class RDFXMLParser extends AbstractRDFParser {
         }
 
         private boolean processNodeElement(String localName, String uri, String qName, Attributes attrs)
-                throws ParsingErrorException {
+                throws ParsingException {
             boolean hasParentSubject = !ctx.subjectStack.isEmpty();
 
             if (hasParentSubject) {
@@ -416,7 +415,7 @@ public class RDFXMLParser extends AbstractRDFParser {
         }
 
         private void processPropertyElement(String localName, String uri, String qName, Attributes attrs)
-                throws ParsingErrorException {
+                throws ParsingException {
 
             // CRITICAL FIX: Validate property element name against RDF/XML constraints.
             RDFXMLUtils.validatePropertyElementName(uri, localName);
@@ -433,37 +432,37 @@ public class RDFXMLParser extends AbstractRDFParser {
 
             // Validate rdf:bagID usage (only allowed on Node Elements).
             if (bagID != null) {
-                throw new ParsingErrorException(
+                throw new ParsingException(
                         "rdf:bagID cannot be used on property elements. " +
                                 "It can only be used on node elements (typed nodes or rdf:Description).");
             }
 
             // Validate mutually exclusive attributes (resource, nodeID, parseType).
             if (resource != null && nodeID != null) {
-                throw new ParsingErrorException(
+                throw new ParsingException(
                         "Both rdf:resource and rdf:nodeID cannot be present on the same property element");
             }
 
             if (resource != null && parseType != null) {
-                throw new ParsingErrorException(
+                throw new ParsingException(
                         "rdf:resource and rdf:parseType cannot be used together on the same property element");
             }
 
             if (nodeID != null && parseType != null) {
-                throw new ParsingErrorException(
+                throw new ParsingException(
                         "rdf:nodeID and rdf:parseType cannot be used together on the same property element");
             }
 
             // --- Case 1: Property Element with rdf:resource (Object is a Resource) ---
             if (resource != null) {
                 if (ctx.subjectStack.isEmpty()) {
-                    throw new ParsingErrorException("Property element with rdf:resource has no subject");
+                    throw new ParsingException("Property element with rdf:resource has no subject");
                 }
 
                 // CRITICAL FIX: rdf:resource cannot coexist with rdf:datatype on property elements.
                 String datatype = attrs.getValue(RDF.type.getNamespace(), "datatype");
                 if (datatype != null) {
-                    throw new ParsingErrorException(
+                    throw new ParsingException(
                             "rdf:resource and rdf:datatype cannot be used together on the same property element");
                 }
 
@@ -483,11 +482,11 @@ public class RDFXMLParser extends AbstractRDFParser {
             // --- Case 2: Property Element with rdf:nodeID (Object is a Blank Node) ---
             if (nodeID != null) {
                 if (ctx.subjectStack.isEmpty()) {
-                    throw new ParsingErrorException("Property element with rdf:nodeID has no subject");
+                    throw new ParsingException("Property element with rdf:nodeID has no subject");
                 }
 
                 if (RDFXMLUtils.isInvalidXMLName(nodeID, false)) {
-                    throw new ParsingErrorException(
+                    throw new ParsingException(
                             "rdf:nodeID value '" + nodeID + "' is not a valid NCName. " +
                                     "NCNames cannot contain colons and must start with a letter or underscore.");
                 }
@@ -495,7 +494,7 @@ public class RDFXMLParser extends AbstractRDFParser {
                 // rdf:nodeID cannot coexist with rdf:datatype on property elements.
                 String datatype = attrs.getValue(RDF.type.getNamespace(), "datatype");
                 if (datatype != null) {
-                    throw new ParsingErrorException(
+                    throw new ParsingException(
                             "rdf:nodeID and rdf:datatype cannot be used together on the same property element");
                 }
 
@@ -567,10 +566,10 @@ public class RDFXMLParser extends AbstractRDFParser {
             return false;
         }
 
-        private Resource emitBNodePredicateObject(IRI predicate) throws ParsingErrorException {
+        private Resource emitBNodePredicateObject(IRI predicate) throws ParsingException {
             // Creates a new anonymous blank node and emits a triple from the current subject using the given predicate.
             if (ctx.subjectStack.isEmpty()) {
-                throw new ParsingErrorException("Cannot create blank node object: no subject available");
+                throw new ParsingException("Cannot create blank node object: no subject available");
             }
             Resource parent = ctx.subjectStack.peek();
             Resource bNode = ctx.factory.createBNode();

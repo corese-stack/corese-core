@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.query.impl.sparql.ast.constraint;
 import java.util.List;
 import java.util.Objects;
 
-import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
+import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.AstVisitor;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 
 /**

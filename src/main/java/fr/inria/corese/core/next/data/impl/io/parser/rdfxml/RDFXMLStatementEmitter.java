@@ -1,9 +1,11 @@
 package fr.inria.corese.core.next.data.impl.io.parser.rdfxml;
 
-import fr.inria.corese.core.next.data.api.*;
-import fr.inria.corese.core.next.data.impl.common.literal.XSD;
-import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
-import fr.inria.corese.core.next.data.impl.exception.ParsingErrorException;
+import fr.inria.corese.core.next.data.api.term.*;
+import fr.inria.corese.core.next.data.api.model.*;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
+import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
+import fr.inria.corese.core.next.data.api.vocabulary.RDF;
+import fr.inria.corese.core.next.data.api.exception.ParsingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -45,20 +47,20 @@ public class RDFXMLStatementEmitter {
      */
     public void emitLiteral(Resource subject, IRI predicate, String text, String datatypeUri, String lang) {
         if (subject == null) {
-            throw new ParsingErrorException(
+            throw new ParsingException(
                     "Cannot emit literal statement: subject is null. " +
                             "This may indicate malformed RDF/XML structure.");
         }
 
         if (predicate == null) {
-            throw new ParsingErrorException(
+            throw new ParsingException(
                     "Cannot emit literal statement: predicate is null.");
         }
 
         Value literal;
         if (datatypeUri != null && !datatypeUri.isEmpty()) {
-            Optional<XSD> known = RDFXMLUtils.resolveDatatype(datatypeUri);
-            IRI dtype = known.map(XSD::getIRI).orElseGet(() -> {
+            Optional<XSDDatatype> known = RDFXMLUtils.resolveDatatype(datatypeUri);
+            IRI dtype = known.map(XSDDatatype::getIRI).orElseGet(() -> {
                 logger.error("[Warning] Unknown datatype: %s%n {} ", datatypeUri);
                 return factory.createIRI(datatypeUri);
             });
@@ -86,7 +88,7 @@ public class RDFXMLStatementEmitter {
      */
     public void emitType(Resource subject, String expandedQName) {
         if (subject == null) {
-            throw new ParsingErrorException(
+            throw new ParsingException(
                     "Cannot emit type statement: subject is null.");
         }
 
@@ -115,7 +117,7 @@ public class RDFXMLStatementEmitter {
      */
     public void emitPropertyAttribute(Resource subject, Attributes attrs) {
         if (subject == null) {
-            throw new ParsingErrorException(
+            throw new ParsingException(
                     "Cannot emit property attributes: subject is null.");
         }
 
@@ -134,12 +136,12 @@ public class RDFXMLStatementEmitter {
             // VALIDATION: rdf:li and rdf:_n CANNOT be used as property attributes
             if (RDF.type.getNamespace().equals(attrURI)) {
                 if ("li".equals(attrLocal)) {
-                    throw new ParsingErrorException(
+                    throw new ParsingException(
                             "rdf:li cannot be used as property attribute. " +
                                     "It can only be used as property element inside containers.");
                 }
                 if (attrLocal.matches("^_\\d+$")) {
-                    throw new ParsingErrorException(
+                    throw new ParsingException(
                             "rdf:" + attrLocal + " cannot be used as property attribute. " +
                                     "Container membership properties can only be used as property elements.");
                 }

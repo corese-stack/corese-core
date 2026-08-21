@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.query.api;
 
-import fr.inria.corese.core.next.data.api.Value;
+import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.query.api.result.BindingSet;
 import fr.inria.corese.core.next.query.api.dataset.Dataset;
 
@@ -70,7 +70,7 @@ public interface Operation {
     /**
      * @return {@code true} if inferred statements are included in evaluation, {@code false} otherwise
      */
-    boolean getIncludeInferred();
+    boolean isIncludeInferred();
 
     /**
      * Specifies the maximum time that this operation is allowed to run.

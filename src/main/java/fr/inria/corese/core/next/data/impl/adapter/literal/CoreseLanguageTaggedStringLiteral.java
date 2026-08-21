@@ -3,12 +3,12 @@ package fr.inria.corese.core.next.data.impl.adapter.literal;
 import java.util.Optional;
 
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.next.data.api.IRI;
-import fr.inria.corese.core.next.data.api.base.model.literal.AbstractStringLiteral;
+import fr.inria.corese.core.next.data.api.term.IRI;
+import fr.inria.corese.core.next.data.api.support.term.literal.AbstractStringLiteral;
 import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
-import fr.inria.corese.core.next.data.impl.common.literal.RDF;
-import fr.inria.corese.core.next.data.impl.exception.IncorrectOperationException;
-import fr.inria.corese.core.next.data.impl.adapter.CoreseIRI;
+import fr.inria.corese.core.next.data.api.literal.RDFDatatype;
+import fr.inria.corese.core.next.data.api.exception.IncorrectOperationException;
+import fr.inria.corese.core.next.data.impl.adapter.node.CoreseIRI;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
 /**
@@ -101,7 +101,7 @@ public class CoreseLanguageTaggedStringLiteral extends AbstractStringLiteral imp
 
     @Override
     public CoreDatatype getCoreDatatype() {
-        return RDF.LANGSTRING;
+        return RDFDatatype.LANGSTRING;
     }
 
     @Override
@@ -121,6 +121,6 @@ public class CoreseLanguageTaggedStringLiteral extends AbstractStringLiteral imp
      * @return The datatype IRI for language-tagged string literals.
      */
     public IRI getDatatype() {
-        return RDF.LANGSTRING.getIRI();
+        return RDFDatatype.LANGSTRING.getIRI();
     }
 }

@@ -5,7 +5,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.ExistsAst;
-import fr.inria.corese.core.next.query.kgram.api.core.ExprType;
+import fr.inria.corese.core.next.query.impl.kgram.api.core.ExprType;
 import fr.inria.corese.core.sparql.triple.parser.Constant;
 import fr.inria.corese.core.sparql.triple.parser.Expression;
 import fr.inria.corese.core.sparql.triple.parser.Variable;
@@ -19,7 +19,7 @@ class SparqlAstToExpressionTest {
 
     @Test
     void iriAstToExpression() {
-        IriAst iri = new IriAst("<http://ns.inria.fr/test/iri");
+        IriAst iri = new IriAst("<http://ns.inria.fr/test/iri>");
         Expression iriNode = SparqlAstToExpression.convert(iri);
         assertNotNull(iriNode);
         assertInstanceOf(Constant.class, iriNode);

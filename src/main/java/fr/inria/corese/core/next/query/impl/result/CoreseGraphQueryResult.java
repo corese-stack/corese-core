@@ -1,19 +1,20 @@
 package fr.inria.corese.core.next.query.impl.result;
 
-import fr.inria.corese.core.next.data.api.Statement;
+import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.query.api.result.GraphQueryResult;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 /**
  * Basic implementation backed by a pre-built list of statements.
  */
-public class CoreseGraphQueryResult implements GraphQueryResult {
+public final class CoreseGraphQueryResult implements GraphQueryResult {
 
     private final Iterator<Statement> iterator;
 
     public CoreseGraphQueryResult(Iterator<Statement> iterator) {
-        this.iterator = iterator;
+        this.iterator = Objects.requireNonNull(iterator, "iterator");
     }
 
     @Override

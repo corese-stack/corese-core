@@ -1,12 +1,12 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
-import fr.inria.corese.core.next.data.api.BNode;
-import fr.inria.corese.core.next.data.api.IRI;
-import fr.inria.corese.core.next.data.api.Literal;
-import fr.inria.corese.core.next.data.api.Value;
+import fr.inria.corese.core.next.data.api.term.BNode;
+import fr.inria.corese.core.next.data.api.term.IRI;
+import fr.inria.corese.core.next.data.api.term.Literal;
+import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
-import fr.inria.corese.core.next.query.kgram.api.core.Node;
-import fr.inria.corese.core.next.query.kgram.tool.NodeImpl;
+import fr.inria.corese.core.next.query.impl.kgram.api.core.Node;
+import fr.inria.corese.core.next.query.impl.kgram.tool.NodeImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

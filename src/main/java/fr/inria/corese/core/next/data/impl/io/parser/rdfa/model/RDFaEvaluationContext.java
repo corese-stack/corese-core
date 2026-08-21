@@ -1,8 +1,8 @@
 package fr.inria.corese.core.next.data.impl.io.parser.rdfa.model;
 
-import fr.inria.corese.core.next.data.api.IRI;
-import fr.inria.corese.core.next.data.api.Resource;
-import fr.inria.corese.core.next.data.api.Value;
+import fr.inria.corese.core.next.data.api.term.IRI;
+import fr.inria.corese.core.next.data.api.term.Resource;
+import fr.inria.corese.core.next.data.api.term.Value;
 
 import java.util.*;
 
@@ -10,7 +10,7 @@ import java.util.*;
  * This class is to be used during the evaluation of an HTML file to generate triples during the DOM traversal.
  * @see <a href="https://www.w3.org/TR/rdfa-core/#evaluation-context">RDFa recommandation<a/>
  */
-public class RDFaEvaluationContext  {
+public class RDFaEvaluationContext {
     /**
      * The base. This will usually be the IRI of the document being processed, but it could be some other IRI, set by some other mechanism, such as the (X)HTML base element. The important thing is that it establishes an IRI against which relative paths can be resolved.
      */

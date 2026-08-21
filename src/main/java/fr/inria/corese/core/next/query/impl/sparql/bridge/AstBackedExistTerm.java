@@ -1,8 +1,8 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
 import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
-import fr.inria.corese.core.next.query.kgram.api.core.ExprType;
-import fr.inria.corese.core.next.query.kgram.core.Exp;
+import fr.inria.corese.core.next.query.impl.kgram.api.core.ExprType;
+import fr.inria.corese.core.next.query.impl.kgram.core.Exp;
 import fr.inria.corese.core.sparql.triple.parser.ASTBuffer;
 import fr.inria.corese.core.sparql.triple.parser.Term;
 

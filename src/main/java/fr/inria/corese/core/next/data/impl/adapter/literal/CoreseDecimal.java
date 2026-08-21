@@ -1,11 +1,11 @@
 package fr.inria.corese.core.next.data.impl.adapter.literal;
 
-import fr.inria.corese.core.next.data.api.IRI;
-import fr.inria.corese.core.next.data.api.base.model.literal.AbstractLiteral;
-import fr.inria.corese.core.next.data.api.base.model.literal.AbstractNumber;
-import fr.inria.corese.core.next.data.impl.common.literal.XSD;
+import fr.inria.corese.core.next.data.api.term.IRI;
+import fr.inria.corese.core.next.data.api.support.term.literal.AbstractLiteral;
+import fr.inria.corese.core.next.data.api.support.term.literal.AbstractNumber;
+import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
-import fr.inria.corese.core.next.data.impl.exception.IncorrectDatatypeException;
+import fr.inria.corese.core.next.data.api.exception.InvalidDatatypeException;
 import fr.inria.corese.core.sparql.datatype.CoreseDouble;
 
 import java.math.BigDecimal;
@@ -17,13 +17,18 @@ import java.math.BigInteger;
  */
 public class CoreseDecimal extends AbstractCoreseNumber {
 
+    @Override
+    protected CoreseDouble createCoreseObject(String value) {
+        return new fr.inria.corese.core.sparql.datatype.CoreseDecimal(new BigDecimal(value));
+    }
+
     /**
      * Constructor for CoreseDecimal.
      *
      * @param value  the value of the decimal literal
      */
     public CoreseDecimal(double value) {
-        super(new CoreseDouble(value), XSD.DECIMAL.getIRI());
+        super(new fr.inria.corese.core.sparql.datatype.CoreseDecimal(value), XSDDatatype.DECIMAL.getIRI());
     }
 
     /**
@@ -31,7 +36,7 @@ public class CoreseDecimal extends AbstractCoreseNumber {
      * @param coreseObject the CoreseDouble object
      */
     public CoreseDecimal(CoreseDouble coreseObject) {
-        super(coreseObject, XSD.DECIMAL.getIRI());
+        super(coreseObject, XSDDatatype.DECIMAL.getIRI());
     }
 
     /**
@@ -48,7 +53,7 @@ public class CoreseDecimal extends AbstractCoreseNumber {
      * @param value the value of the decimal literal
      */
     public CoreseDecimal(String value) {
-        this(new CoreseDouble(value));
+        this(new fr.inria.corese.core.sparql.datatype.CoreseDecimal(new BigDecimal(value)));
     }
 
     /**
@@ -57,7 +62,7 @@ public class CoreseDecimal extends AbstractCoreseNumber {
      * @param datatype the datatype of the literal
      */
     public CoreseDecimal(String value, IRI datatype) {
-        this(new CoreseDouble(value), datatype);
+        this(new fr.inria.corese.core.sparql.datatype.CoreseDecimal(new BigDecimal(value)), datatype);
     }
 
     /**
@@ -69,26 +74,25 @@ public class CoreseDecimal extends AbstractCoreseNumber {
     public CoreseDecimal(String value, IRI datatype, CoreDatatype coreDatatype) {
         this(value, datatype);
         if(! AbstractLiteral.isDecimalCoreDatatype(coreDatatype)) {
-            throw new IncorrectDatatypeException("Cannot create CoreseDecimal with a non-integer CoreDatatype.");
+            throw new InvalidDatatypeException("Cannot create CoreseDecimal with a non-integer CoreDatatype.");
         }
     }
 
     /**
      * Constructor for CoreseDecimal.
-     * @param bigDecimal the BigInteger value of the decimal literal
-     * @ImplNote The Corese object that this object adapts do not allows for the storing of large floting point numbers, so the value is stored as a double. This may lead to loss of precision.
+     * @param bigDecimal the exact decimal value of the literal
      */
     public CoreseDecimal(BigDecimal bigDecimal) {
-        super(new CoreseDouble(bigDecimal.doubleValue()), XSD.DECIMAL.getIRI());
+        super(new fr.inria.corese.core.sparql.datatype.CoreseDecimal(bigDecimal), XSDDatatype.DECIMAL.getIRI());
     }
 
     /**
      *
-     * @return XSD.DECIMAL
+     * @return XSDDatatype.DECIMAL
      */
     @Override
     public CoreDatatype getCoreDatatype() {
-        return XSD.DECIMAL;
+        return XSDDatatype.DECIMAL;
     }
 
     /**
@@ -98,7 +102,7 @@ public class CoreseDecimal extends AbstractCoreseNumber {
     @Override
     protected void setCoreDatatype(CoreDatatype coreDatatype) {
         if(! AbstractLiteral.isDecimalCoreDatatype(coreDatatype)) {
-            throw new IncorrectDatatypeException("Cannot set a non-decimal CoreDatatype for a CoreseDecimal.");
+            throw new InvalidDatatypeException("Cannot set a non-decimal CoreDatatype for a CoreseDecimal.");
         }
     }
 
@@ -139,7 +143,7 @@ public class CoreseDecimal extends AbstractCoreseNumber {
      */
     @Override
     public double doubleValue() {
-        return this.coreseObject.doubleValue();
+        return coreseObject().doubleValue();
     }
 
     /**
@@ -155,7 +159,7 @@ public class CoreseDecimal extends AbstractCoreseNumber {
      */
     @Override
     public BigDecimal decimalValue() {
-        return BigDecimal.valueOf(this.doubleValue());
+        return coreseObject().decimalValue();
     }
 
     @Override

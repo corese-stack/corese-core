@@ -1,15 +1,15 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
-import fr.inria.corese.core.next.data.api.Value;
+import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
-import fr.inria.corese.core.next.query.kgram.api.core.Node;
+import fr.inria.corese.core.next.query.impl.kgram.api.core.Node;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
 /**
  * Converts KGRAM {@link Node} constants to API {@link Value} instances.
  *
  * <p>This is the single point in the bridge layer that is allowed to inspect
- * {@link IDatatype} on behalf of callers outside {@code next.query.kgram}.</p>
+ * {@link IDatatype} on behalf of callers outside {@code next.query.impl.kgram}.</p>
  */
 public final class KgramNodeConverter {
 

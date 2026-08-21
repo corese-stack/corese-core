@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast.constraint;
 
-import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
+import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.AstVisitor;
 
 /**
  * Function {@code STRUUID()} in SPARQL 1.1

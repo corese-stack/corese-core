@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.query.impl.repository;
 
-import fr.inria.corese.core.next.data.api.ValueFactory;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.query.api.BooleanQuery;
 import fr.inria.corese.core.next.query.api.GraphQuery;
 import fr.inria.corese.core.next.query.api.QueryLanguage;
@@ -11,7 +11,7 @@ import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.api.exception.RepositoryException;
 import fr.inria.corese.core.next.query.api.repository.Repository;
 import fr.inria.corese.core.next.query.api.repository.RepositoryConnection;
-import fr.inria.corese.core.next.query.impl.parser.SparqlParser;
+import fr.inria.corese.core.next.query.impl.sparql.parser.SparqlParser;
 import fr.inria.corese.core.next.query.impl.query.CoreseBooleanQuery;
 import fr.inria.corese.core.next.query.impl.query.CoreseGraphQuery;
 import fr.inria.corese.core.next.query.impl.query.CoreseTupleQuery;
@@ -23,7 +23,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.UpdateRequestAst;
 import fr.inria.corese.core.next.query.impl.sparql.execution.NextSparqlPipelineExecutor;
-import fr.inria.corese.core.next.storagemanager.api.StorageManager;
+import fr.inria.corese.core.next.storage.api.StorageManager;
 
 /**
  * Connection to a Corese repository.
@@ -73,6 +73,7 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
     public TupleQuery prepareTupleQuery(QueryLanguage queryLanguage, String queryString)
             throws QuerySyntaxException, RepositoryException {
         checkOpen();
+        checkLanguage(queryLanguage);
         QueryAst ast = parse(queryString);
         if (!(ast instanceof SelectQueryAst)) {
             throw new QuerySyntaxException(
@@ -87,6 +88,7 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
     public GraphQuery prepareGraphQuery(QueryLanguage queryLanguage, String queryString)
             throws QuerySyntaxException, RepositoryException {
         checkOpen();
+        checkLanguage(queryLanguage);
         QueryAst ast = parse(queryString);
         if (!(ast instanceof ConstructQueryAst) && !(ast instanceof DescribeQueryAst)) {
             throw new QuerySyntaxException(
@@ -101,6 +103,7 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
     public BooleanQuery prepareBooleanQuery(QueryLanguage queryLanguage, String queryString)
             throws QuerySyntaxException, RepositoryException {
         checkOpen();
+        checkLanguage(queryLanguage);
         QueryAst ast = parse(queryString);
         if (!(ast instanceof AskQueryAst)) {
             throw new QuerySyntaxException(
@@ -115,6 +118,7 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
     public Update prepareUpdate(QueryLanguage queryLanguage, String updateString)
             throws QuerySyntaxException, RepositoryException {
         checkOpen();
+        checkLanguage(queryLanguage);
         QueryAst ast = parse(updateString);
         if (!(ast instanceof UpdateRequestAst)) {
             throw new QuerySyntaxException(
@@ -156,6 +160,12 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
     private void checkOpen() {
         if (!open) {
             throw new RepositoryException("This connection is closed.");
+        }
+    }
+
+    private void checkLanguage(QueryLanguage queryLanguage) {
+        if (queryLanguage != QueryLanguage.SPARQL) {
+            throw new RepositoryException("Only SPARQL is supported by the next query pipeline.");
         }
     }
 

@@ -1,14 +1,14 @@
 package fr.inria.corese.core.next.query.impl.sparql.io.serializer.xml;
 
-import fr.inria.corese.core.next.data.api.BNode;
-import fr.inria.corese.core.next.data.api.IRI;
-import fr.inria.corese.core.next.data.api.Literal;
-import fr.inria.corese.core.next.data.api.Value;
-import fr.inria.corese.core.next.data.api.base.io.FileFormat;
-import fr.inria.corese.core.next.data.api.io.IOOptions;
-import fr.inria.corese.core.next.data.impl.common.literal.RDF;
-import fr.inria.corese.core.next.data.impl.common.literal.XSD;
-import fr.inria.corese.core.next.data.impl.exception.SerializationException;
+import fr.inria.corese.core.next.data.api.term.BNode;
+import fr.inria.corese.core.next.data.api.term.IRI;
+import fr.inria.corese.core.next.data.api.term.Literal;
+import fr.inria.corese.core.next.data.api.term.Value;
+import fr.inria.corese.core.next.data.api.io.format.FileFormat;
+import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.api.literal.RDFDatatype;
+import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
+import fr.inria.corese.core.next.data.api.exception.SerializationException;
 import fr.inria.corese.core.next.query.api.io.ResultFormat;
 import fr.inria.corese.core.next.query.api.io.serializer.LinksOptions;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
@@ -134,8 +134,8 @@ public class XmlTupleResultSerializer implements ResultSerializer {
                 valueElement = document.createElement(XmlResultConstants.LITERAL_QNAME);
                 if (literalValue.getLanguage().isEmpty()
                         && literalValue.getDatatype() != null
-                        && literalValue.getDatatype() != XSD.STRING.getIRI()
-                        && literalValue.getDatatype() != RDF.LANGSTRING.getIRI()) {
+                        && literalValue.getDatatype() != XSDDatatype.STRING.getIRI()
+                        && literalValue.getDatatype() != RDFDatatype.LANGSTRING.getIRI()) {
                     valueElement.setAttribute(XmlResultConstants.DATATYPE_ATTR, literalValue.getDatatype().stringValue());
                 }
                 if (literalValue.getLanguage().isPresent()) {

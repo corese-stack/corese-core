@@ -1,10 +1,10 @@
 package fr.inria.corese.core.next.query.impl.sparql.io.serializer.xml;
 
-import fr.inria.corese.core.next.data.api.io.IOOptions;
+import fr.inria.corese.core.next.data.api.io.option.IOOptions;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
-import fr.inria.corese.core.next.query.impl.sparql.io.serializer.common.AbstractResultSerializerTest;
-import fr.inria.corese.core.next.query.impl.sparql.io.serializer.common.LinksSerializerTest;
+import fr.inria.corese.core.next.query.impl.sparql.io.serializer.support.AbstractResultSerializerTest;
+import fr.inria.corese.core.next.query.impl.sparql.io.serializer.support.LinksSerializerTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

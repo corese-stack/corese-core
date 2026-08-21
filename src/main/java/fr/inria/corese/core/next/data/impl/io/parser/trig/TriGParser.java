@@ -1,12 +1,12 @@
 package fr.inria.corese.core.next.data.impl.io.parser.trig;
 
-import fr.inria.corese.core.next.data.api.Model;
-import fr.inria.corese.core.next.data.api.ValueFactory;
-import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.data.api.base.io.parser.AbstractRDFParser;
-import fr.inria.corese.core.next.data.api.io.IOOptions;
-import fr.inria.corese.core.next.data.impl.exception.ParsingErrorException;
-import fr.inria.corese.core.next.impl.parser.antlr.TriGLexer;
+import fr.inria.corese.core.next.data.api.model.Model;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
+import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
+import fr.inria.corese.core.next.data.api.support.io.parser.AbstractRDFParser;
+import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.api.exception.ParsingException;
+import fr.inria.corese.core.next.generated.antlr.TriGLexer;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
@@ -54,7 +54,7 @@ public class TriGParser extends AbstractRDFParser {
     }
 
     @Override
-    public void parse(InputStream in, String baseURI) throws ParsingErrorException {
+    public void parse(InputStream in, String baseURI) throws ParsingException {
         parse(new InputStreamReader(in, StandardCharsets.UTF_8), baseURI);
     }
 
@@ -63,10 +63,10 @@ public class TriGParser extends AbstractRDFParser {
      *
      * @param reader  The {@link Reader} to read the RDF data.
      * @param baseURI The base URI.
-     * @throws ParsingErrorException if a parsing or I/O error occurs.
+     * @throws ParsingException if a parsing or I/O error occurs.
      */
     @Override
-    public void parse(Reader reader, String baseURI) throws ParsingErrorException {
+    public void parse(Reader reader, String baseURI) throws ParsingException {
         try {
             CharStream charStream = CharStreams.fromReader(reader);
             TriGLexer triGLexer = new TriGLexer(charStream);
@@ -76,7 +76,7 @@ public class TriGParser extends AbstractRDFParser {
             triGLexer.addErrorListener(trigErrorListener);
 
             CommonTokenStream tokens = new CommonTokenStream(triGLexer);
-            fr.inria.corese.core.next.impl.parser.antlr.TriGParser triGParser = new fr.inria.corese.core.next.impl.parser.antlr.TriGParser(tokens);
+            fr.inria.corese.core.next.generated.antlr.TriGParser triGParser = new fr.inria.corese.core.next.generated.antlr.TriGParser(tokens);
 
 
             triGParser.removeErrorListeners();
@@ -86,20 +86,20 @@ public class TriGParser extends AbstractRDFParser {
             ParseTree tree = triGParser.trigDoc();
 
             if (trigErrorListener.hasErrors()) {
-                throw new ParsingErrorException("Syntax error in TriG document: " + trigErrorListener.getErrorMessage());
+                throw new ParsingException("Syntax error in TriG document: " + trigErrorListener.getErrorMessage());
             }
             IOOptions optionsWithBaseURI = new TriGParserOptions.Builder()
                     .baseIRI(baseURI)
                     .build();
-            TriGListerner listener = new TriGListerner(getModel(), getValueFactory(), optionsWithBaseURI);
+            TriGListener listener = new TriGListener(getModel(), getValueFactory(), optionsWithBaseURI);
             walker.walk((ParseTreeListener) listener, tree);
 
-        } catch (ParsingErrorException e) {
+        } catch (ParsingException e) {
             throw e;
         } catch (IOException e) {
-            throw new ParsingErrorException("Failed to parse TriG RDF: " + e.getMessage(), e);
+            throw new ParsingException("Failed to parse TriG RDF: " + e.getMessage(), e);
         } catch (Exception e) {
-            throw new ParsingErrorException("Unexpected error during TriG parsing: " + e.getMessage(), e);
+            throw new ParsingException("Unexpected error during TriG parsing: " + e.getMessage(), e);
         }
     }
 

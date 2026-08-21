@@ -1,14 +1,16 @@
 package fr.inria.corese.core.next.data.impl.io.parser.turtle;
 
-import fr.inria.corese.core.next.data.api.*;
-import fr.inria.corese.core.next.data.api.io.IOOptions;
-import fr.inria.corese.core.next.data.api.io.common.BaseIRIOptions;
-import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
-import fr.inria.corese.core.next.data.impl.exception.ParsingErrorException;
-import fr.inria.corese.core.next.data.impl.io.parser.common.AbstractTurtleTriGListener;
-import fr.inria.corese.core.next.data.impl.io.parser.util.ParserConstants;
-import fr.inria.corese.core.next.impl.parser.antlr.TurtleBaseListener;
-import fr.inria.corese.core.next.impl.parser.antlr.TurtleParser;
+import fr.inria.corese.core.next.data.api.term.*;
+import fr.inria.corese.core.next.data.api.model.*;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
+import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.api.io.option.BaseIRIOptions;
+import fr.inria.corese.core.next.data.api.vocabulary.RDF;
+import fr.inria.corese.core.next.data.api.exception.ParsingException;
+import fr.inria.corese.core.next.data.impl.io.parser.support.AbstractTurtleTriGListener;
+import fr.inria.corese.core.next.data.impl.io.parser.support.ParserConstants;
+import fr.inria.corese.core.next.generated.antlr.TurtleBaseListener;
+import fr.inria.corese.core.next.generated.antlr.TurtleParser;
 
 import java.util.List;
 
@@ -97,7 +99,7 @@ public class TurtleListener extends TurtleBaseListener {
      * Processes the subject and its associated predicate-object list.
      *
      * @param ctx triples context
-     * @throws ParsingErrorException if the subject is missing or processing fails
+     * @throws ParsingException if the subject is missing or processing fails
      */
     @Override
     public void enterTriples(TurtleParser.TriplesContext ctx) {
@@ -113,12 +115,12 @@ public class TurtleListener extends TurtleBaseListener {
                     processPredicateObjectList(ctx.predicateObjectList());
                 }
             } else {
-                throw new ParsingErrorException("Missing subject in triple.");
+                throw new ParsingException("Missing subject in triple.");
             }
-        } catch (ParsingErrorException e) {
+        } catch (ParsingException e) {
             throw e;
         } catch (Exception e) {
-            throw new ParsingErrorException("Error processing triples: " + e.getMessage(), e);
+            throw new ParsingException("Error processing triples: " + e.getMessage(), e);
         }
     }
 
@@ -148,13 +150,13 @@ public class TurtleListener extends TurtleBaseListener {
      *
      * @param ctx object context
      * @return extracted RDF value (IRI, blank node, or literal)
-     * @throws ParsingErrorException if the object type is unsupported or IRI cannot be resolved
+     * @throws ParsingException if the object type is unsupported or IRI cannot be resolved
      */
     private Value extractObject(TurtleParser.Object_Context ctx) {
         if (ctx.iri() != null) {
             String resolvedIRI = delegate.resolveIRI(ctx.iri().getText());
             if (resolvedIRI.isEmpty()) {
-                throw new ParsingErrorException("Cannot resolve object IRI: " + ctx.iri().getText());
+                throw new ParsingException("Cannot resolve object IRI: " + ctx.iri().getText());
             }
             return delegate.factory.createIRI(resolvedIRI);
         }
@@ -166,7 +168,7 @@ public class TurtleListener extends TurtleBaseListener {
             } else if (blankNodeText.equals(ParserConstants.EMPTY_SQUARE_BRACKET)) {
                 return delegate.factory.createBNode();
             } else {
-                throw new ParsingErrorException("Unsupported blank node format: " + blankNodeText);
+                throw new ParsingException("Unsupported blank node format: " + blankNodeText);
             }
         }
 
@@ -182,7 +184,7 @@ public class TurtleListener extends TurtleBaseListener {
             return processCollection(ctx.collection());
         }
 
-        throw new ParsingErrorException("Unsupported object type: " + (ctx.getText() != null ? ctx.getText() : "null"));
+        throw new ParsingException("Unsupported object type: " + (ctx.getText() != null ? ctx.getText() : "null"));
     }
 
     /**
@@ -190,7 +192,7 @@ public class TurtleListener extends TurtleBaseListener {
      *
      * @param ctx subject context
      * @return subject resource (IRI, blank node, or collection head)
-     * @throws ParsingErrorException if the subject type is unsupported
+     * @throws ParsingException if the subject type is unsupported
      */
     private Resource extractSubject(TurtleParser.SubjectContext ctx) {
         if (ctx.iri() != null) {
@@ -203,13 +205,13 @@ public class TurtleListener extends TurtleBaseListener {
             } else if (blankNodeText.equals(ParserConstants.EMPTY_SQUARE_BRACKET)) {
                 return delegate.factory.createBNode();
             } else {
-                throw new ParsingErrorException("Unsupported blank node format: " + blankNodeText);
+                throw new ParsingException("Unsupported blank node format: " + blankNodeText);
             }
         }
         if (ctx.collection() != null) {
             return processCollection(ctx.collection());
         }
-        throw new ParsingErrorException("Unsupported subject type: " + ctx.getText());
+        throw new ParsingException("Unsupported subject type: " + ctx.getText());
     }
 
     /**
@@ -280,7 +282,7 @@ public class TurtleListener extends TurtleBaseListener {
      *
      * @param ctx literal context
      * @return RDF literal value
-     * @throws ParsingErrorException if the literal type is unsupported
+     * @throws ParsingException if the literal type is unsupported
      */
     private Literal extractLiteral(TurtleParser.LiteralContext ctx) {
         if (ctx.rdfLiteral() != null) {
@@ -313,7 +315,7 @@ public class TurtleListener extends TurtleBaseListener {
             return delegate.createNumericLiteral(numericText, type);
         }
 
-        throw new ParsingErrorException("Unsupported literal: " + ctx.getText());
+        throw new ParsingException("Unsupported literal: " + ctx.getText());
     }
 
     /**
@@ -322,13 +324,13 @@ public class TurtleListener extends TurtleBaseListener {
      *
      * @param ctx verb context
      * @return predicate IRI
-     * @throws ParsingErrorException if the IRI cannot be resolved
+     * @throws ParsingException if the IRI cannot be resolved
      */
     private IRI extractVerb(TurtleParser.VerbContext ctx) {
         String verbText = ctx.getText();
         String resolvedIRI = delegate.resolveIRI(verbText);
         if (resolvedIRI.isEmpty()) {
-            throw new ParsingErrorException("Cannot resolve verb to a valid IRI: " + verbText);
+            throw new ParsingException("Cannot resolve verb to a valid IRI: " + verbText);
         }
         return delegate.factory.createIRI(resolvedIRI);
     }

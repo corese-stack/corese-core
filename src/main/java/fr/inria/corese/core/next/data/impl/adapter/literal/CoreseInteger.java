@@ -1,12 +1,12 @@
 package fr.inria.corese.core.next.data.impl.adapter.literal;
 
-import fr.inria.corese.core.next.data.api.IRI;
-import fr.inria.corese.core.next.data.api.base.model.literal.AbstractLiteral;
-import fr.inria.corese.core.next.data.api.base.model.literal.AbstractNumber;
-import fr.inria.corese.core.next.data.impl.common.literal.XSD;
+import fr.inria.corese.core.next.data.api.term.IRI;
+import fr.inria.corese.core.next.data.api.support.term.literal.AbstractLiteral;
+import fr.inria.corese.core.next.data.api.support.term.literal.AbstractNumber;
+import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
-import fr.inria.corese.core.next.data.impl.exception.IncorrectDatatypeException;
-import fr.inria.corese.core.next.data.impl.exception.IncorrectOperationException;
+import fr.inria.corese.core.next.data.api.exception.InvalidDatatypeException;
+import fr.inria.corese.core.next.data.api.exception.IncorrectOperationException;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -16,13 +16,18 @@ import java.math.BigInteger;
  */
 public class CoreseInteger extends AbstractCoreseNumber {
 
+    @Override
+    protected fr.inria.corese.core.sparql.datatype.CoreseInteger createCoreseObject(String value) {
+        return new fr.inria.corese.core.sparql.datatype.CoreseInteger(value);
+    }
+
     /**
      * Constructor for CoreseInteger.
      *
      * @param value  the value of the integer literal
      */
     public CoreseInteger(long value) {
-        super(new fr.inria.corese.core.sparql.datatype.CoreseInteger(value), XSD.INTEGER.getIRI());
+        super(new fr.inria.corese.core.sparql.datatype.CoreseInteger(value), XSDDatatype.INTEGER.getIRI());
     }
 
     /**
@@ -30,7 +35,7 @@ public class CoreseInteger extends AbstractCoreseNumber {
      * @param coreseObject the CoreseInteger object
      */
     public CoreseInteger(fr.inria.corese.core.sparql.datatype.CoreseInteger coreseObject) {
-        super(coreseObject, XSD.INTEGER.getIRI());
+        super(coreseObject, XSDDatatype.INTEGER.getIRI());
     }
 
     /**
@@ -68,7 +73,7 @@ public class CoreseInteger extends AbstractCoreseNumber {
     public CoreseInteger(String value, IRI datatype, CoreDatatype coreDatatype) {
         this(value, datatype);
         if(! AbstractLiteral.isIntegerCoreDatatype(coreDatatype)) {
-            throw new IncorrectDatatypeException("Cannot create CoreseInteger with a non-integer CoreDatatype.");
+            throw new InvalidDatatypeException("Cannot create CoreseInteger with a non-integer CoreDatatype.");
         }
     }
 
@@ -77,16 +82,16 @@ public class CoreseInteger extends AbstractCoreseNumber {
      * @param bigInteger the BigInteger value of the integer literal
      */
     public CoreseInteger(BigInteger bigInteger) {
-        super(new fr.inria.corese.core.sparql.datatype.CoreseInteger(bigInteger.longValue()), XSD.INTEGER.getIRI());
+        super(new fr.inria.corese.core.sparql.datatype.CoreseInteger(bigInteger.longValue()), XSDDatatype.INTEGER.getIRI());
     }
 
     /**
      *
-     * @return XSD.INTEGER
+     * @return XSDDatatype.INTEGER
      */
     @Override
     public CoreDatatype getCoreDatatype() {
-        return XSD.INTEGER;
+        return XSDDatatype.INTEGER;
     }
 
     /**
@@ -105,7 +110,7 @@ public class CoreseInteger extends AbstractCoreseNumber {
      */
     @Override
     public byte byteValue() {
-        return (byte) this.coreseObject.longValue();
+        return (byte) coreseObject().longValue();
     }
 
     /**
@@ -113,7 +118,7 @@ public class CoreseInteger extends AbstractCoreseNumber {
      */
     @Override
     public int intValue() {
-        return (int) this.coreseObject.longValue();
+        return (int) coreseObject().longValue();
     }
 
     /**
@@ -121,7 +126,7 @@ public class CoreseInteger extends AbstractCoreseNumber {
      */
     @Override
     public long longValue() {
-        return this.coreseObject.longValue();
+        return coreseObject().longValue();
     }
 
     /**
@@ -129,7 +134,7 @@ public class CoreseInteger extends AbstractCoreseNumber {
      */
     @Override
     public short shortValue() {
-        return (short) this.coreseObject.longValue();
+        return (short) coreseObject().longValue();
     }
 
     /**
@@ -137,7 +142,7 @@ public class CoreseInteger extends AbstractCoreseNumber {
      */
     @Override
     public double doubleValue() {
-        return this.coreseObject.longValue();
+        return coreseObject().longValue();
     }
 
     /**
@@ -145,7 +150,7 @@ public class CoreseInteger extends AbstractCoreseNumber {
      */
     @Override
     public BigInteger integerValue() {
-        return BigInteger.valueOf(this.coreseObject.longValue());
+        return BigInteger.valueOf(coreseObject().longValue());
     }
 
     /**
@@ -153,7 +158,7 @@ public class CoreseInteger extends AbstractCoreseNumber {
      */
     @Override
     public BigDecimal decimalValue() {
-        return BigDecimal.valueOf(this.coreseObject.longValue());
+        return BigDecimal.valueOf(coreseObject().longValue());
     }
 
     @Override

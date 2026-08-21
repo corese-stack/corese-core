@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
-import fr.inria.corese.core.next.query.impl.parser.AbstractSparqlParserFeatureTest;
+import fr.inria.corese.core.next.query.impl.sparql.parser.AbstractSparqlParserFeatureTest;
 import fr.inria.corese.core.next.query.impl.sparql.ast.BgpAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.DatasetClauseAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
@@ -17,11 +17,11 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ASTConstants;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.ExistsAst;
-import fr.inria.corese.core.next.query.kgram.api.core.Expr;
-import fr.inria.corese.core.next.query.kgram.api.core.ExprType;
-import fr.inria.corese.core.next.query.kgram.api.core.Node;
-import fr.inria.corese.core.next.query.kgram.core.Exp;
-import fr.inria.corese.core.next.query.kgram.core.Query;
+import fr.inria.corese.core.next.query.impl.kgram.api.core.Expr;
+import fr.inria.corese.core.next.query.impl.kgram.api.core.ExprType;
+import fr.inria.corese.core.next.query.impl.kgram.api.core.Node;
+import fr.inria.corese.core.next.query.impl.kgram.core.Exp;
+import fr.inria.corese.core.next.query.impl.kgram.core.Query;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

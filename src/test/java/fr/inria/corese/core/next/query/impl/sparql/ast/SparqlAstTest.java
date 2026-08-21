@@ -14,7 +14,7 @@ import static fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAstTe
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for SPARQL AST types in {@code fr.inria.corese.core.next.query.sparql.ast}:
+ * Unit tests for SPARQL AST types in {@code fr.inria.corese.core.next.query.impl.sparql.ast}:
  * term types (VarAst, IriAst, LiteralAst), TriplePatternAst, BgpAst, GroupGraphPatternAst, QueryAst.
  *
  */
@@ -447,6 +447,49 @@ class SparqlAstTest {
         @DisplayName("SelectQueryAst implements QueryAst")
         void implementsQueryAst() {
             assertTrue(new SelectQueryAst(new GroupGraphPatternAst(List.of())) instanceof QueryAst);
+        }
+    }
+
+    // ---------- QueryAst / AskQueryAst ----------
+
+    @Nested
+    @DisplayName("QueryAst / AskQueryAst")
+    class QueryAskAstTest {
+
+        @Test
+        @DisplayName("AskQueryAst stores and returns whereClause via whereClause()")
+        void whereClauseAccessor() {
+            GroupGraphPatternAst where = new GroupGraphPatternAst(List.of(
+                    new BgpAst(List.of(TriplePatternAst.of(
+                            new VarAst("s"), new VarAst("p"), new VarAst("o"))))));
+            SparqlQueryAst query = new AskQueryAst(DatasetClauseAst.none(), where);
+            assertSame(where, query.whereClause());
+        }
+
+        @Test
+        @DisplayName("AskQueryAst record equality when same whereClause")
+        void askQueryAstEquality() {
+            GroupGraphPatternAst where = new GroupGraphPatternAst(List.of());
+            AskQueryAst first = new AskQueryAst(DatasetClauseAst.none(), where);
+            AskQueryAst second = new AskQueryAst(DatasetClauseAst.none(), where);
+            assertEquals(first, second);
+            assertEquals(first.hashCode(), second.hashCode());
+        }
+
+        @Test
+        @DisplayName("AskQueryAst with null whereClause uses empty group")
+        void nullWhereClauseDefaultsToEmpty() {
+            AskQueryAst query = new AskQueryAst(DatasetClauseAst.none(), null);
+            assertNotNull(query.whereClause());
+            assertTrue(query.whereClause().patterns().isEmpty());
+        }
+
+        @Test
+        @DisplayName("AskQueryAst implements QueryAst")
+        void implementsQueryAst() {
+            assertInstanceOf(
+                    QueryAst.class,
+                    new AskQueryAst(DatasetClauseAst.none(), new GroupGraphPatternAst(List.of())));
         }
     }
 

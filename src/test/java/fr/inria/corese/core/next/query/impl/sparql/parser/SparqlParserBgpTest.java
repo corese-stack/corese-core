@@ -1,0 +1,241 @@
+package fr.inria.corese.core.next.query.impl.sparql.parser;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import fr.inria.corese.core.next.query.impl.sparql.ast.*;
+import org.junit.jupiter.api.Test;
+
+import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
+
+/**
+ * Test if we parse the Basic Graph Pattern (BGP)
+ */
+class SparqlParserBgpTest extends AbstractSparqlParserFeatureTest {
+
+    @Test
+    void shouldParseSingleTriplePatternInBgp() {
+        SparqlParser parser = newParserDefault();
+
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
+                SELECT * WHERE {
+                  ?s ?p ?o .
+                }
+                """);
+
+        assertNotNull(ast);
+        assertNotNull(ast.whereClause());
+
+        GroupGraphPatternAst where = ast.whereClause();
+        assertEquals(1, where.patterns().size(), "WHERE should contain 1 pattern (BGP)");
+
+        PatternAst p0 = where.patterns().getFirst();
+        assertInstanceOf(BgpAst.class, p0, "First pattern should be a BGP");
+
+        BgpAst bgp = (BgpAst) p0;
+        assertEquals(1, bgp.triples().size(), "BGP should contain 1 triple");
+
+        TriplePatternAst t = bgp.triples().getFirst();
+
+        assertInstanceOf(VarAst.class, t.subject());
+        assertInstanceOf(VarAst.class, simplePredicateTerm(t));
+        assertInstanceOf(VarAst.class, t.object());
+
+        assertEquals("s", ((VarAst) t.subject()).name());
+        assertEquals("p", ((VarAst) simplePredicateTerm(t)).name());
+        assertEquals("o", ((VarAst) t.object()).name());
+    }
+
+    @Test
+    void shouldParsePropertyListSemicolonAndCommaIntoMultipleTriples() {
+        SparqlParser parser = newParserDefault();
+
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
+                PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+                SELECT * WHERE {
+                  ?s a foaf:Person ;
+                     foaf:name ?n , ?n2 .
+                }
+                """);
+
+        GroupGraphPatternAst where = ast.whereClause();
+        assertEquals(1, where.patterns().size());
+
+        BgpAst bgp = (BgpAst) where.patterns().getFirst();
+
+        // Expected triples:
+        // (?s, a, foaf:Person)
+        // (?s, foaf:name, ?n)
+        // (?s, foaf:name, ?n2)
+        assertEquals(3, bgp.triples().size());
+
+        TriplePatternAst t0 = bgp.triples().getFirst();
+        assertEquals("s", ((VarAst) t0.subject()).name());
+        assertInstanceOf(IriAst.class, simplePredicateTerm(t0));
+        assertEquals(expectedRdfTypeIriAst().raw(), ((IriAst) simplePredicateTerm(t0)).raw());
+
+        TriplePatternAst t1 = bgp.triples().get(1);
+        assertEquals("s", ((VarAst) t1.subject()).name());
+        assertInstanceOf(IriAst.class, simplePredicateTerm(t1));
+        assertEquals("foaf:name", ((IriAst) simplePredicateTerm(t1)).raw());
+        assertEquals("n", ((VarAst) t1.object()).name());
+
+        TriplePatternAst t2 = bgp.triples().get(2);
+        assertEquals("s", ((VarAst) t2.subject()).name());
+        assertEquals("foaf:name", ((IriAst) simplePredicateTerm(t2)).raw());
+        assertEquals("n2", ((VarAst) t2.object()).name());
+    }
+
+    @Test
+    void shouldParseRdfLiteralWithLanguageTag() {
+        SparqlParser parser = newParserDefault();
+
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
+                SELECT * WHERE {
+                  ?s <http://example/p> "salut"@fr .
+                }
+                """);
+
+        BgpAst bgp = (BgpAst) ast.whereClause().patterns().get(0);
+        assertEquals(1, bgp.triples().size());
+
+        TriplePatternAst t = bgp.triples().getFirst();
+        assertInstanceOf(LiteralAst.class, t.object());
+
+        LiteralAst lit = (LiteralAst) t.object();
+        assertEquals("\"salut\"", lit.lexical()); // tu conserves les guillemets (string_().getText())
+        assertEquals("fr", lit.lang());
+        assertNull(lit.datatype());
+    }
+
+    @Test
+    void shouldParseRdfLiteralWithDatatype() {
+        SparqlParser parser = newParserDefault();
+
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
+                PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+                SELECT * WHERE {
+                  ?s <http://example/p> "12"^^xsd:integer .
+                }
+                """);
+
+        BgpAst bgp = (BgpAst) ast.whereClause().patterns().getFirst();
+        TriplePatternAst t = bgp.triples().getFirst();
+
+        assertInstanceOf(LiteralAst.class, t.object());
+        LiteralAst lit = (LiteralAst) t.object();
+
+        assertEquals("\"12\"", lit.lexical());
+        assertNull(lit.lang());
+        assertEquals("xsd:integer", lit.datatype());
+    }
+
+    @Test
+    void shouldParsePrefixedNameWithDigitOnlyLocalPart() {
+        SparqlParser parser = newParserDefault();
+
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
+                PREFIX ex: <http://example.org/>
+                SELECT * WHERE {
+                  ?s ex:1 ?o .
+                }
+                """);
+
+        BgpAst bgp = (BgpAst) ast.whereClause().patterns().getFirst();
+        TriplePatternAst triple = bgp.triples().getFirst();
+
+        assertInstanceOf(IriAst.class, simplePredicateTerm(triple));
+        assertEquals("ex:1", ((IriAst) simplePredicateTerm(triple)).raw());
+    }
+
+    @Test
+    void shouldParsePrefixedNameWithHyphenInLocalPart() {
+        SparqlParser parser = newParserDefault();
+
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
+                PREFIX ex: <http://example.org/>
+                SELECT * WHERE {
+                  ?s ex:abc-def ?o .
+                }
+                """);
+
+        BgpAst bgp = (BgpAst) ast.whereClause().patterns().getFirst();
+        TriplePatternAst triple = bgp.triples().getFirst();
+
+        assertInstanceOf(IriAst.class, simplePredicateTerm(triple));
+        assertEquals("ex:abc-def", ((IriAst) simplePredicateTerm(triple)).raw());
+    }
+
+    @Test
+    void shouldParsePrefixedNameWithEscapedReservedCharacterInLocalPart() {
+        SparqlParser parser = newParserDefault();
+
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
+                PREFIX ns: <http://example.org/ns#>
+                SELECT * WHERE {
+                  ?s ns:id\\=123 ?o .
+                }
+                """);
+
+        BgpAst bgp = (BgpAst) ast.whereClause().patterns().getFirst();
+        TriplePatternAst triple = bgp.triples().getFirst();
+
+        assertInstanceOf(IriAst.class, simplePredicateTerm(triple));
+        assertEquals("ns:id\\=123", ((IriAst) simplePredicateTerm(triple)).raw());
+    }
+
+    @Test
+    void shouldParsePrefixedNameWithDefaultPrefix() {
+        SparqlParser parser = newParserDefault();
+
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
+                PREFIX : <http://example.org/default#>
+                SELECT * WHERE {
+                  ?s :foo ?o .
+                }
+                """);
+
+        BgpAst bgp = (BgpAst) ast.whereClause().patterns().getFirst();
+        TriplePatternAst triple = bgp.triples().getFirst();
+
+        assertInstanceOf(IriAst.class, simplePredicateTerm(triple));
+        assertEquals(":foo", ((IriAst) simplePredicateTerm(triple)).raw());
+    }
+
+    @Test
+    void failFastTrueShouldThrowQuerySyntaxExceptionOnInvalidQuery() {
+        SparqlParser parser = newParser(true, true);
+
+        // Syntax error: missing object after predicate
+        assertThrows(QuerySyntaxException.class, () ->
+                parser.parse("SELECT * WHERE { ?s ?p . }")
+        );
+    }
+
+    @Test
+    void failFastFalseCollectErrorsTrueShouldThrowQuerySyntaxExceptionWithCollectedErrors() {
+        SparqlParser parser = newParser(false, true);
+
+        QuerySyntaxException ex = assertThrows(QuerySyntaxException.class, () ->
+                parser.parse("SELECT * WHERE { ?s ?p . }")
+        );
+
+        assertTrue(ex.getMessage().contains("Syntax error"), "Should contain syntax error message");
+
+    }
+
+    @Test
+    void shouldParseEmptyWhereGroup() {
+        SparqlParser parser = newParserDefault();
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("SELECT * WHERE { }");
+
+        assertNotNull(ast.whereClause());
+        // selon ton builder: TriplesBlock absent => pas de BgpAst, donc patterns vide
+        assertEquals(0, ast.whereClause().patterns().size());
+    }
+
+}

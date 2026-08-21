@@ -3,18 +3,18 @@ package fr.inria.corese.core.next.data.impl.adapter.literal;
 import java.util.Objects;
 
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.next.data.api.IRI;
-import fr.inria.corese.core.next.data.api.base.model.literal.AbstractStringLiteral;
+import fr.inria.corese.core.next.data.api.term.IRI;
+import fr.inria.corese.core.next.data.api.support.term.literal.AbstractStringLiteral;
 import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
-import fr.inria.corese.core.next.data.impl.common.literal.XSD;
-import fr.inria.corese.core.next.data.impl.common.util.literal.CoreDatatypeHelper;
-import fr.inria.corese.core.next.data.impl.exception.IncorrectOperationException;
-import fr.inria.corese.core.next.data.impl.adapter.CoreseIRI;
+import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
+import fr.inria.corese.core.next.data.api.literal.CoreDatatypes;
+import fr.inria.corese.core.next.data.api.exception.IncorrectOperationException;
+import fr.inria.corese.core.next.data.impl.adapter.node.CoreseIRI;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.CoreseGeneric;
 import fr.inria.corese.core.sparql.datatype.CoreseString;
 
-import static fr.inria.corese.core.next.data.impl.common.vocabulary.XSD.xsdString;
+import static fr.inria.corese.core.next.data.api.vocabulary.XSD.xsdString;
 
 /**
  * An implementation of the {@code xsd:string} datatype used by Corese.
@@ -59,20 +59,20 @@ public class CoreseTyped extends AbstractStringLiteral implements CoreseDatatype
 
     /**
      * Constructs a {@link CoreseTyped} instance from a string value.
-     * The datatype is set to XSD.STRING.
+     * The datatype is set to XSDDatatype.STRING.
      *
      * @param value The string value for the literal.
      */
     public CoreseTyped(String value) {
         this(new CoreseString(value));
-        this.coreDatatype = XSD.STRING;
-        this.datatype = XSD.STRING.getIRI();
+        this.coreDatatype = XSDDatatype.STRING;
+        this.datatype = XSDDatatype.STRING.getIRI();
     }
 
     /**
      * Constructs a {@link CoreseTyped} instance from a string value and a specified
      * datatype IRI.
-     * If the datatype is {@code null}, the datatype is set to XSD.STRING.
+     * If the datatype is {@code null}, the datatype is set to XSDDatatype.STRING.
      * If the datatype is non-null, the {@link CoreDatatype} is determined from the
      * datatype IRI.
      *
@@ -82,11 +82,11 @@ public class CoreseTyped extends AbstractStringLiteral implements CoreseDatatype
     public CoreseTyped(String value, IRI datatype) {
         this(new CoreseGeneric(value, datatype == null ? xsdString.getIRI().stringValue() : datatype.stringValue()));
         if (datatype == null) {
-            this.datatype = XSD.STRING.getIRI();
-            this.coreDatatype = XSD.STRING;
+            this.datatype = XSDDatatype.STRING.getIRI();
+            this.coreDatatype = XSDDatatype.STRING;
         } else {
             this.datatype = datatype;
-            this.coreDatatype = CoreDatatypeHelper.from(datatype);
+            this.coreDatatype = CoreDatatypes.from(datatype);
         }
     }
 

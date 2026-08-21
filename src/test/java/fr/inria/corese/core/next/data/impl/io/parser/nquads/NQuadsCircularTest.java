@@ -1,13 +1,15 @@
 package fr.inria.corese.core.next.data.impl.io.parser.nquads;
 
-import fr.inria.corese.core.next.data.api.*;
-import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
+import fr.inria.corese.core.next.data.api.term.*;
+import fr.inria.corese.core.next.data.api.model.*;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
+import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
-import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
-import fr.inria.corese.core.next.data.impl.io.serialization.DataSerializerFactory;
-import fr.inria.corese.core.next.data.impl.io.serialization.nquads.NQuadsSerializerOptions;
-import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
+import fr.inria.corese.core.next.data.impl.io.parser.DefaultRDFParserFactory;
+import fr.inria.corese.core.next.data.impl.io.serializer.DefaultRDFSerializerFactory;
+import fr.inria.corese.core.next.data.impl.io.serializer.nquads.NQuadsSerializerOptions;
+import fr.inria.corese.core.next.data.impl.io.parser.support.ParserTestBase;
 import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,8 +34,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class NQuadsCircularTest extends ParserTestBase {
 
     private ValueFactory valueFactory;
-    private fr.inria.corese.core.next.data.api.io.serializer.SerializerFactory serializerFactory;
-    private ParserFactory parserFactory;
+    private fr.inria.corese.core.next.data.api.io.serializer.RDFSerializerFactory serializerFactory;
+    private DefaultRDFParserFactory parserFactory;
     private NQuadsSerializerOptions defaultConfig;
 
     // Test data constants
@@ -56,8 +58,8 @@ class NQuadsCircularTest extends ParserTestBase {
     @BeforeEach
     void setUp() {
         valueFactory = new CoreseValueFactory();
-        serializerFactory = new DataSerializerFactory();
-        parserFactory = new ParserFactory();
+        serializerFactory = new DefaultRDFSerializerFactory();
+        parserFactory = new DefaultRDFParserFactory();
         defaultConfig = NQuadsSerializerOptions.defaultConfig();
     }
 

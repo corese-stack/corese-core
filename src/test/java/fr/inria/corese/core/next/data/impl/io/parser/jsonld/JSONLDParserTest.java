@@ -1,11 +1,13 @@
 package fr.inria.corese.core.next.data.impl.io.parser.jsonld;
 
-import fr.inria.corese.core.next.data.api.*;
-import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
+import fr.inria.corese.core.next.data.api.term.*;
+import fr.inria.corese.core.next.data.api.model.*;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
+import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
-import fr.inria.corese.core.next.data.impl.io.common.JSONLDOptions;
-import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
-import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
+import fr.inria.corese.core.next.data.impl.io.jsonld.JSONLDOptions;
+import fr.inria.corese.core.next.data.impl.io.parser.DefaultRDFParserFactory;
+import fr.inria.corese.core.next.data.impl.io.parser.support.ParserTestBase;
 import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class JSONLDParserTest extends ParserTestBase {
 
-    private final ParserFactory factory = new ParserFactory();
+    private final DefaultRDFParserFactory factory = new DefaultRDFParserFactory();
     private final ValueFactory valueFactory = new CoreseValueFactory();
 
 
@@ -214,21 +216,21 @@ public class JSONLDParserTest extends ParserTestBase {
                     "@context": {
                       "foaf": "http://xmlns.com/foaf/0.1/"
                     },
-            
+
                     "@graph":
                     [
                       {
                         "@id": "_:b0",
                         "foaf:knows": {"@id": "_:b1"}
                       },
-            
+
                       {
                         "@id": "_:b1",
                         "foaf:knows": {"@id": "_:b0"}
                       }
                     ]
                     }
-            
+
             """;
         Model model = createTestModel();
         RDFParser parser = factory.createRDFParser(RDFFormat.JSONLD, model, valueFactory);

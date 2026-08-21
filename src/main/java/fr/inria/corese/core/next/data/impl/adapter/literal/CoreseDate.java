@@ -10,13 +10,13 @@ import java.util.Optional;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.next.data.api.IRI;
-import fr.inria.corese.core.next.data.api.base.model.literal.AbstractTemporalPointLiteral;
+import fr.inria.corese.core.next.data.api.term.IRI;
+import fr.inria.corese.core.next.data.api.support.term.literal.AbstractTemporalPointLiteral;
 import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
-import fr.inria.corese.core.next.data.impl.common.literal.XSD;
-import fr.inria.corese.core.next.data.impl.exception.IncorrectDatatypeException;
-import fr.inria.corese.core.next.data.impl.exception.IncorrectOperationException;
-import fr.inria.corese.core.next.data.impl.adapter.CoreseIRI;
+import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
+import fr.inria.corese.core.next.data.api.exception.InvalidDatatypeException;
+import fr.inria.corese.core.next.data.api.exception.IncorrectOperationException;
+import fr.inria.corese.core.next.data.impl.adapter.node.CoreseIRI;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
 public class CoreseDate extends AbstractTemporalPointLiteral implements CoreseDatatypeAdapter {
@@ -71,12 +71,12 @@ public class CoreseDate extends AbstractTemporalPointLiteral implements CoreseDa
      *
      * @param value        the string representation of the date
      * @param datatype     the datatype of the literal
-     * @param coreDatatype the CoreDatatype of the literal. Must be XSD.DATE.
+     * @param coreDatatype the CoreDatatype of the literal. Must be XSDDatatype.DATE.
      */
     public CoreseDate(String value, IRI datatype, CoreDatatype coreDatatype) {
         this(value, datatype);
-        if (coreDatatype != null && coreDatatype != XSD.DATE) {
-            throw new IncorrectDatatypeException("Cannot create CoreseDate with a non-date CoreDatatype.");
+        if (coreDatatype != null && coreDatatype != XSDDatatype.DATE) {
+            throw new InvalidDatatypeException("Cannot create CoreseDate with a non-date CoreDatatype.");
         }
     }
 
@@ -105,75 +105,75 @@ public class CoreseDate extends AbstractTemporalPointLiteral implements CoreseDa
     }
 
     /**
-     * @throws IncorrectDatatypeException as date cannot be converted to boolean
+     * @throws InvalidDatatypeException as date cannot be converted to boolean
      */
     @Override
     public boolean booleanValue() {
-        throw new IncorrectDatatypeException("Cannot convert date to boolean value.");
+        throw new InvalidDatatypeException("Cannot convert date to boolean value.");
     }
 
     /**
-     * @throws IncorrectDatatypeException as date cannot be converted to byte
+     * @throws InvalidDatatypeException as date cannot be converted to byte
      */
     @Override
     public byte byteValue() {
-        throw new IncorrectDatatypeException("Cannot convert date to byte value.");
+        throw new InvalidDatatypeException("Cannot convert date to byte value.");
     }
 
     /**
-     * @throws IncorrectDatatypeException as date cannot be converted to float
+     * @throws InvalidDatatypeException as date cannot be converted to float
      */
     @Override
     public short shortValue() {
-        throw new IncorrectDatatypeException("Cannot convert date to short value.");
+        throw new InvalidDatatypeException("Cannot convert date to short value.");
     }
 
     /**
-     * @throws IncorrectDatatypeException as date cannot be converted to int
+     * @throws InvalidDatatypeException as date cannot be converted to int
      */
     @Override
     public int intValue() {
-        throw new IncorrectDatatypeException("Cannot convert date to int value.");
+        throw new InvalidDatatypeException("Cannot convert date to int value.");
     }
 
     /**
-     * @throws IncorrectDatatypeException as date cannot be converted to long
+     * @throws InvalidDatatypeException as date cannot be converted to long
      */
     @Override
     public long longValue() {
-        throw new IncorrectDatatypeException("Cannot convert date to long value.");
+        throw new InvalidDatatypeException("Cannot convert date to long value.");
     }
 
     /**
-     * @throws IncorrectDatatypeException as date cannot be converted to BigInteger
+     * @throws InvalidDatatypeException as date cannot be converted to BigInteger
      */
     @Override
     public BigInteger integerValue() {
-        throw new IncorrectDatatypeException("Cannot convert date to integer value.");
+        throw new InvalidDatatypeException("Cannot convert date to integer value.");
     }
 
     /**
-     * @throws IncorrectDatatypeException as date cannot be converted to BigDecimal
+     * @throws InvalidDatatypeException as date cannot be converted to BigDecimal
      */
     @Override
     public BigDecimal decimalValue() {
-        throw new IncorrectDatatypeException("Cannot convert date to decimal value.");
+        throw new InvalidDatatypeException("Cannot convert date to decimal value.");
     }
 
     /**
-     * @throws IncorrectDatatypeException as date cannot be converted to float
+     * @throws InvalidDatatypeException as date cannot be converted to float
      */
     @Override
     public float floatValue() {
-        throw new IncorrectDatatypeException("Cannot convert date to float value.");
+        throw new InvalidDatatypeException("Cannot convert date to float value.");
     }
 
     /**
-     * @throws IncorrectDatatypeException as date cannot be converted to double
+     * @throws InvalidDatatypeException as date cannot be converted to double
      */
     @Override
     public double doubleValue() {
-        throw new IncorrectDatatypeException("Cannot convert date to double value.");
+        throw new InvalidDatatypeException("Cannot convert date to double value.");
     }
 
     @Override
@@ -188,15 +188,15 @@ public class CoreseDate extends AbstractTemporalPointLiteral implements CoreseDa
 
     /**
      *
-     * @return XSD.DATE as the core datatype for this date object.
+     * @return XSDDatatype.DATE as the core datatype for this date object.
      */
     @Override
     public CoreDatatype getCoreDatatype() {
-        return XSD.DATE;
+        return XSDDatatype.DATE;
     }
 
     /**
-     * @throws IncorrectOperationException if the CoreDatatype is not XSD.DATE
+     * @throws IncorrectOperationException if the CoreDatatype is not XSDDatatype.DATE
      */
     @Override
     public void setCoreDatatype(CoreDatatype coreDatatype) {

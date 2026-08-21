@@ -5,13 +5,13 @@ import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 
-import fr.inria.corese.core.next.data.api.IRI;
-import fr.inria.corese.core.next.data.api.Model;
-import fr.inria.corese.core.next.data.api.Namespace;
-import fr.inria.corese.core.next.data.api.Resource;
-import fr.inria.corese.core.next.data.api.Statement;
-import fr.inria.corese.core.next.data.api.Value;
-import fr.inria.corese.core.next.data.api.base.model.AbstractModel;
+import fr.inria.corese.core.next.data.api.term.IRI;
+import fr.inria.corese.core.next.data.api.model.Model;
+import fr.inria.corese.core.next.data.api.namespace.Namespace;
+import fr.inria.corese.core.next.data.api.term.Resource;
+import fr.inria.corese.core.next.data.api.model.Statement;
+import fr.inria.corese.core.next.data.api.term.Value;
+import fr.inria.corese.core.next.data.api.support.model.AbstractModel;
 
 /**
  * A model wrapper that blocks access to all statements, allowing only namespace

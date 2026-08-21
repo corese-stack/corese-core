@@ -1,11 +1,10 @@
 package fr.inria.corese.core.next.data.impl.adapter.literal;
 
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.next.data.api.base.model.literal.AbstractLiteral;
+import fr.inria.corese.core.next.data.api.support.term.literal.AbstractLiteral;
 import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
-import fr.inria.corese.core.next.data.impl.common.literal.XSD;
-import fr.inria.corese.core.next.data.impl.exception.IncorrectOperationException;
-import fr.inria.corese.core.next.data.impl.adapter.CoreseIRI;
+import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
+import fr.inria.corese.core.next.data.api.exception.IncorrectOperationException;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
 /**
@@ -22,17 +21,12 @@ public class CoreseBoolean extends AbstractLiteral implements CoreseDatatypeAdap
     /**
      * The Corese object representing the boolean literal in the old API.
      */
-    private final fr.inria.corese.core.sparql.datatype.CoreseBoolean coreseObject;
-
-    /**
-     * The core datatype of this literal, which is XSD.BOOLEAN.
-     */
-    private CoreDatatype coreDatatype;
+    private transient volatile fr.inria.corese.core.sparql.datatype.CoreseBoolean coreseObject;
 
     /**
      * The value of the boolean literal.
      */
-    private Boolean value;
+    private final boolean value;
 
     /**
      * A constant representing the boolean value {@code true}.
@@ -57,14 +51,12 @@ public class CoreseBoolean extends AbstractLiteral implements CoreseDatatypeAdap
      *                                     {@link fr.inria.corese.core.sparql.datatype.CoreseBoolean}.
      */
     public CoreseBoolean(IDatatype coreseObject) {
-        super(new CoreseIRI(coreseObject.getDatatypeURI()));
-        if (coreseObject instanceof fr.inria.corese.core.sparql.datatype.CoreseBoolean) {
-            this.coreseObject = (fr.inria.corese.core.sparql.datatype.CoreseBoolean) coreseObject;
+        super(XSDDatatype.BOOLEAN.getIRI());
+        if (coreseObject instanceof fr.inria.corese.core.sparql.datatype.CoreseBoolean booleanValue) {
+            this.coreseObject = booleanValue;
             this.value = this.coreseObject.booleanValue();
-            this.coreDatatype = XSD.BOOLEAN;
-            this.datatype = XSD.BOOLEAN.getIRI();
         } else {
-            throw new IncorrectOperationException("Cannot create CoreseDate from a non-date Corese object.");
+            throw new IncorrectOperationException("Cannot create CoreseBoolean from a non-boolean Corese object.");
         }
     }
 
@@ -75,9 +67,6 @@ public class CoreseBoolean extends AbstractLiteral implements CoreseDatatypeAdap
      */
     public CoreseBoolean(boolean value) {
         this(new fr.inria.corese.core.sparql.datatype.CoreseBoolean(value));
-        this.value = value;
-        this.coreDatatype = XSD.BOOLEAN;
-        this.datatype = XSD.BOOLEAN.getIRI();
     }
 
     /**
@@ -93,21 +82,24 @@ public class CoreseBoolean extends AbstractLiteral implements CoreseDatatypeAdap
 
     @Override
     public CoreDatatype getCoreDatatype() {
-        return this.coreDatatype;
+        return XSDDatatype.BOOLEAN;
     }
 
     @Override
-    public void setCoreDatatype(CoreDatatype coreDatatype) {
-        this.coreDatatype = coreDatatype;
+    protected void setCoreDatatype(CoreDatatype coreDatatype) {
+        if (coreDatatype != XSDDatatype.BOOLEAN) {
+            throw new IncorrectOperationException("CoreseBoolean only supports xsd:boolean.");
+        }
     }
 
+    @Override
     public boolean booleanValue() {
-        return this.value;
+        return value;
     }
 
     @Override
     public String stringValue() {
-        return this.value.toString();
+        return Boolean.toString(value);
     }
 
     /**
@@ -125,11 +117,30 @@ public class CoreseBoolean extends AbstractLiteral implements CoreseDatatypeAdap
 
     @Override
     public Node getCoreseNode() {
-        return this.coreseObject;
+        return coreseObject();
     }
 
     @Override
     public IDatatype getIDatatype() {
-        return this.coreseObject;
+        return coreseObject();
+    }
+
+    private fr.inria.corese.core.sparql.datatype.CoreseBoolean coreseObject() {
+        var result = coreseObject;
+        if (result == null) {
+            result = new fr.inria.corese.core.sparql.datatype.CoreseBoolean(value);
+            coreseObject = result;
+        }
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return this == other || super.equals(other);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

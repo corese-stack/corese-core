@@ -7,16 +7,21 @@ import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.processor.ToRdfProcessor;
 import com.apicatalog.rdf.api.RdfConsumerException;
 import com.apicatalog.rdf.api.RdfQuadConsumer;
-import fr.inria.corese.core.next.data.api.*;
-import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.data.api.base.io.parser.AbstractRDFParser;
-import fr.inria.corese.core.next.data.api.io.IOOptions;
-import fr.inria.corese.core.next.data.impl.common.literal.XSD;
-import fr.inria.corese.core.next.data.impl.common.prefix.PrefixHandler;
-import fr.inria.corese.core.next.data.impl.common.util.IRIUtils;
-import fr.inria.corese.core.next.data.impl.exception.ParsingErrorException;
-import fr.inria.corese.core.next.data.impl.io.common.JSONLDOptions;
-import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
+import fr.inria.corese.core.next.data.api.term.IRI;
+import fr.inria.corese.core.next.data.api.term.Resource;
+import fr.inria.corese.core.next.data.api.term.Value;
+import fr.inria.corese.core.next.data.api.model.Model;
+import fr.inria.corese.core.next.data.api.model.Statement;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
+import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
+import fr.inria.corese.core.next.data.api.support.io.parser.AbstractRDFParser;
+import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
+import fr.inria.corese.core.next.data.impl.namespace.PrefixHandler;
+import fr.inria.corese.core.next.data.api.support.term.IRIUtils;
+import fr.inria.corese.core.next.data.api.exception.ParsingException;
+import fr.inria.corese.core.next.data.impl.io.jsonld.JSONLDOptions;
+import fr.inria.corese.core.next.data.impl.io.parser.DefaultRDFParserFactory;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -25,7 +30,7 @@ import java.net.URI;
 /**
  * Parser for JSON-LD RDF files. This parser is based on the Titanium JSON-LD library.
  *
- * @see ParserFactory
+ * @see DefaultRDFParserFactory
  * @see <a href="https://github.com/filip26/titanium-json-ld">Titanium JSON-LD</a>
  */
 public class JSONLDParser extends AbstractRDFParser {
@@ -78,14 +83,14 @@ public class JSONLDParser extends AbstractRDFParser {
      * If baseURI is null, the base URI defined in the option for this parser will be used.
      * @param in      The InputStream to read RDF data from.
      * @param baseURI The base URI for resolving relative URIs in the RDF data.
-     * @throws ParsingErrorException
+     * @throws ParsingException
      */
     @Override
     public void parse(InputStream in, String baseURI) {
             try {
                 parseJSONLDDocument(JsonDocument.of(in), baseURI);
             } catch (JsonLdError e) {
-                throw new ParsingErrorException(e);
+                throw new ParsingException(e);
             }
     }
 
@@ -100,16 +105,15 @@ public class JSONLDParser extends AbstractRDFParser {
         try {
             parseJSONLDDocument(JsonDocument.of(reader), baseURI);
         } catch (JsonLdError e) {
-            throw new ParsingErrorException(e);
+            throw new ParsingException(e);
         }
     }
 
     private void parseJSONLDDocument(Document document, String baseURI) {
         try {
-            JsonLdOptions options = new JsonLdOptions();
-            if(this.getConfig() instanceof JSONLDOptions) {
-                options = ((JSONLDOptions) this.getConfig()).getJsonLdOptions();
-            }
+            JsonLdOptions options = getConfig() instanceof JSONLDOptions jsonldOptions
+                    ? jsonldOptions.getJsonLdOptions()
+                    : new JsonLdOptions();
             if(baseURI != null && !baseURI.isEmpty()) {
                 options.setBase(URI.create(baseURI));
             }
@@ -117,7 +121,7 @@ public class JSONLDParser extends AbstractRDFParser {
 
             ToRdfProcessor.toRdf(consumer, document, options);
         } catch (JsonLdError e) {
-            throw new ParsingErrorException(e);
+            throw new ParsingException(e);
         }
     }
 
@@ -131,59 +135,59 @@ public class JSONLDParser extends AbstractRDFParser {
         return new RdfQuadConsumer() {
             @Override
             public RdfQuadConsumer quad(String subject, String predicate, String object, String datatype, String language, String direction, String graph) throws RdfConsumerException {
-                // Subject
-                Resource subjResource = null;
-                if (RdfQuadConsumer.isBlank(subject)) {
-                    subjResource = getValueFactory().createBNode(subject);
-                } else {
-                    subjResource = getValueFactory().createIRI(subject);
-                }
-
+                Resource subjResource = createSubject(subject);
                 IRI predicateIRI = getValueFactory().createIRI(predicate);
-
-                // Object
-                Value objValue = null;
-                // Object is a BN
-                if (RdfQuadConsumer.isBlank(object)) {
-                    objValue = getValueFactory().createBNode(object);
-                    // Object is a Literal
-                } else if (RdfQuadConsumer.isLiteral(datatype, language, direction)) {
-                    if (RdfQuadConsumer.isLangString(datatype, language, direction)) {
-                        objValue = getValueFactory().createLiteral(object, language);
-                    } else if( ! datatype.equals(XSD.STRING.toString()) ){
-                        objValue = getValueFactory().createLiteral(object, getValueFactory().createIRI(datatype));
-                    } else {
-                        objValue = getValueFactory().createLiteral(object);
-                    }
-                    // Object is a IRI
-                } else if(IRIUtils.isStandardIRI(object)) {
-                    objValue = getValueFactory().createIRI(object);
-                } else {
-                    throw new ParsingErrorException("Invalid object: " + object);
-                }
-
-                // Graph
-                Resource graphResource = null;
-                if(graph != null) {
-                    if (RdfQuadConsumer.isBlank(graph)) {
-                        graphResource = getValueFactory().createBNode(graph);
-                    } else if (!graph.equals(JSONLD_JAVA_DEFAULT_GRAPH) && IRIUtils.isStandardIRI(graph)) {
-                        graphResource = getValueFactory().createIRI(graph);
-                    } else {
-                        throw new ParsingErrorException("Invalid graph: " + graph);
-                    }
-                }
-
-                Statement statement = null;
-                if(graphResource == null) {
-                    statement = getValueFactory().createStatement(subjResource, predicateIRI, objValue);
-                } else {
-                    statement = getValueFactory().createStatement(subjResource, predicateIRI, objValue, graphResource);
-                }
+                Value objValue = createObject(object, datatype, language, direction);
+                Resource graphResource = createGraph(graph);
+                Statement statement = graphResource == null
+                        ? getValueFactory().createStatement(subjResource, predicateIRI, objValue)
+                        : getValueFactory().createStatement(subjResource, predicateIRI, objValue, graphResource);
                 getModel().add(statement);
 
                 return this;
             }
         };
+    }
+
+    private Resource createSubject(String subject) {
+        return RdfQuadConsumer.isBlank(subject)
+                ? getValueFactory().createBNode(subject)
+                : getValueFactory().createIRI(subject);
+    }
+
+    private Value createObject(String object, String datatype, String language, String direction) {
+        if (RdfQuadConsumer.isBlank(object)) {
+            return getValueFactory().createBNode(object);
+        }
+        if (RdfQuadConsumer.isLiteral(datatype, language, direction)) {
+            return createLiteral(object, datatype, language, direction);
+        }
+        if (IRIUtils.isStandardIRI(object)) {
+            return getValueFactory().createIRI(object);
+        }
+        throw new ParsingException("Invalid object: " + object);
+    }
+
+    private Value createLiteral(String value, String datatype, String language, String direction) {
+        if (RdfQuadConsumer.isLangString(datatype, language, direction)) {
+            return getValueFactory().createLiteral(value, language);
+        }
+        if (!XSDDatatype.STRING.toString().equals(datatype)) {
+            return getValueFactory().createLiteral(value, getValueFactory().createIRI(datatype));
+        }
+        return getValueFactory().createLiteral(value);
+    }
+
+    private Resource createGraph(String graph) {
+        if (graph == null) {
+            return null;
+        }
+        if (RdfQuadConsumer.isBlank(graph)) {
+            return getValueFactory().createBNode(graph);
+        }
+        if (!JSONLD_JAVA_DEFAULT_GRAPH.equals(graph) && IRIUtils.isStandardIRI(graph)) {
+            return getValueFactory().createIRI(graph);
+        }
+        throw new ParsingException("Invalid graph: " + graph);
     }
 }

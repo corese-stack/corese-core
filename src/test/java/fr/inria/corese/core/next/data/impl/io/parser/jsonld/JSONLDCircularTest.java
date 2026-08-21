@@ -1,17 +1,19 @@
 package fr.inria.corese.core.next.data.impl.io.parser.jsonld;
 
-import fr.inria.corese.core.next.data.api.*;
-import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
+import fr.inria.corese.core.next.data.api.term.*;
+import fr.inria.corese.core.next.data.api.model.*;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
+import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
-import fr.inria.corese.core.next.data.impl.StorageModel;
-import fr.inria.corese.core.next.data.impl.io.common.JSONLDOptions;
-import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
-import fr.inria.corese.core.next.data.impl.io.serialization.DataSerializerFactory;
-import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
+import fr.inria.corese.core.next.storage.impl.model.StorageModel;
+import fr.inria.corese.core.next.data.impl.io.jsonld.JSONLDOptions;
+import fr.inria.corese.core.next.data.impl.io.parser.DefaultRDFParserFactory;
+import fr.inria.corese.core.next.data.impl.io.serializer.DefaultRDFSerializerFactory;
+import fr.inria.corese.core.next.data.impl.io.parser.support.ParserTestBase;
 import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
-import fr.inria.corese.core.next.storagemanager.api.plugin.StoragePluginManager;
-import fr.inria.corese.core.next.storagemanager.api.support.config.StorageConfig;
+import fr.inria.corese.core.next.storage.api.plugin.StoragePluginManager;
+import fr.inria.corese.core.next.storage.api.config.StorageConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,8 +37,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class JSONLDCircularTest extends ParserTestBase {
 
     private ValueFactory valueFactory;
-    private fr.inria.corese.core.next.data.api.io.serializer.SerializerFactory serializerFactory;
-    private ParserFactory parserFactory;
+    private fr.inria.corese.core.next.data.api.io.serializer.RDFSerializerFactory serializerFactory;
+    private DefaultRDFParserFactory parserFactory;
     private JSONLDOptions defaultConfig;
 
     // Test data constants
@@ -59,8 +61,8 @@ class JSONLDCircularTest extends ParserTestBase {
     @BeforeEach
     void setUp() {
         valueFactory = new CoreseValueFactory();
-        serializerFactory = new DataSerializerFactory();
-        parserFactory = new ParserFactory();
+        serializerFactory = new DefaultRDFSerializerFactory();
+        parserFactory = new DefaultRDFParserFactory();
         defaultConfig = new JSONLDOptions.Builder()
                 .build();
     }

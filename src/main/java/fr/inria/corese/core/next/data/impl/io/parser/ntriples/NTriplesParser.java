@@ -1,12 +1,12 @@
 package fr.inria.corese.core.next.data.impl.io.parser.ntriples;
 
-import fr.inria.corese.core.next.data.api.Model;
-import fr.inria.corese.core.next.data.api.ValueFactory;
-import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.data.api.base.io.parser.AbstractRDFParser;
-import fr.inria.corese.core.next.data.api.io.IOOptions;
-import fr.inria.corese.core.next.data.impl.exception.ParsingErrorException;
-import fr.inria.corese.core.next.impl.parser.antlr.NTriplesLexer;
+import fr.inria.corese.core.next.data.api.model.Model;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
+import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
+import fr.inria.corese.core.next.data.api.support.io.parser.AbstractRDFParser;
+import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.api.exception.ParsingException;
+import fr.inria.corese.core.next.generated.antlr.NTriplesLexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -59,7 +59,7 @@ public class NTriplesParser extends AbstractRDFParser {
     }
 
     @Override
-    public void parse(InputStream in, String baseURI) throws ParsingErrorException {
+    public void parse(InputStream in, String baseURI) throws ParsingException {
         parse(new InputStreamReader(in, StandardCharsets.UTF_8), baseURI);
     }
 
@@ -68,18 +68,18 @@ public class NTriplesParser extends AbstractRDFParser {
      *
      * @param reader  The Reader to read RDF data from.
      * @param baseURI The base URI (ignored for N-Triples as all URIs are absolute).
-     * @throws ParsingErrorException if a parsing or I/O error occurs.
+     * @throws ParsingException if a parsing or I/O error occurs.
      */
     @Override
-    public void parse(Reader reader, String baseURI) throws ParsingErrorException {
+    public void parse(Reader reader, String baseURI) throws ParsingException {
         try {
             CharStream charStream = CharStreams.fromReader(reader);
             String input = charStream.toString();
             if (input.contains("@prefix")) {
-                throw new ParsingErrorException("@prefix directives are not allowed in N-Triples");
+                throw new ParsingException("@prefix directives are not allowed in N-Triples");
             }
             if (input.contains("@base")) {
-                throw new ParsingErrorException("@base directives are not allowed in N-Triples");
+                throw new ParsingException("@base directives are not allowed in N-Triples");
             }
             charStream = CharStreams.fromString(input);
             NTriplesLexer lexer = new NTriplesLexer(charStream);
@@ -89,7 +89,7 @@ public class NTriplesParser extends AbstractRDFParser {
 
             CommonTokenStream tokens = new CommonTokenStream(lexer);
 
-            fr.inria.corese.core.next.impl.parser.antlr.NTriplesParser antlrParser = new fr.inria.corese.core.next.impl.parser.antlr.NTriplesParser(tokens);
+            fr.inria.corese.core.next.generated.antlr.NTriplesParser antlrParser = new fr.inria.corese.core.next.generated.antlr.NTriplesParser(tokens);
 
             antlrParser.removeErrorListener(ConsoleErrorListener.INSTANCE);
             antlrParser.setErrorHandler(new BailErrorStrategy());
@@ -103,22 +103,22 @@ public class NTriplesParser extends AbstractRDFParser {
             walker.walk(listener, tree);
 
         } catch (ParseCancellationException pce) {
-            if (pce.getCause() instanceof ParsingErrorException cause) {
+            if (pce.getCause() instanceof ParsingException cause) {
                 throw cause;
             }
-            throw new ParsingErrorException("Parsing cancelled due to a syntax error: " + pce.getMessage(), pce);
+            throw new ParsingException("Parsing cancelled due to a syntax error: " + pce.getMessage(), pce);
         } catch (IOException e) {
-            throw new ParsingErrorException("Failed to read N-Triples input: " + e.getMessage(), e);
+            throw new ParsingException("Failed to read N-Triples input: " + e.getMessage(), e);
         } catch (IllegalArgumentException e) {
-            throw new ParsingErrorException("Invalid RDF data: " + e.getMessage(), e);
+            throw new ParsingException("Invalid RDF data: " + e.getMessage(), e);
         } catch (Exception e) {
-            throw new ParsingErrorException("Unexpected error during N-Triples parsing: " + e.getMessage(), e);
+            throw new ParsingException("Unexpected error during N-Triples parsing: " + e.getMessage(), e);
         }
     }
 
     /**
      * Static inner class for a custom ANTLR error listener.
-     * This class throws a ParsingErrorException whenever a syntax error
+     * This class throws a ParsingException whenever a syntax error
      * or lexical error is encountered.
      * This ensures that parsing failures are consistently reported
      * via the application's custom exception.
@@ -134,7 +134,7 @@ public class NTriplesParser extends AbstractRDFParser {
                                 RecognitionException e) {
             String errorMessage = String.format("Syntax error at line %d:%d - %s",
                     line, charPositionInLine, msg);
-            throw new ParseCancellationException(new ParsingErrorException(errorMessage, e));
+            throw new ParseCancellationException(new ParsingException(errorMessage, e));
         }
     }
 }

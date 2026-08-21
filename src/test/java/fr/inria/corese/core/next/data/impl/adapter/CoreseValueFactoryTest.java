@@ -2,19 +2,17 @@ package fr.inria.corese.core.next.data.impl.adapter;
 
 import java.time.Duration;
 
-import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
-import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
-import fr.inria.corese.core.next.data.impl.adapter.CoreseIRI;
-import fr.inria.corese.core.next.data.impl.adapter.CoreseNodeAdapter;
-import fr.inria.corese.core.next.data.impl.adapter.CoreseStatement;
+import fr.inria.corese.core.next.data.api.vocabulary.XSD;
+import fr.inria.corese.core.next.data.impl.adapter.node.CoreseIRI;
+import fr.inria.corese.core.next.data.impl.adapter.node.CoreseNodeAdapter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import fr.inria.corese.core.next.data.api.IRI;
-import fr.inria.corese.core.next.data.api.Literal;
-import fr.inria.corese.core.next.data.api.Resource;
-import fr.inria.corese.core.next.data.api.model.ValueFactoryTest;
-import fr.inria.corese.core.next.data.impl.common.literal.RDF;
+import fr.inria.corese.core.next.data.api.term.IRI;
+import fr.inria.corese.core.next.data.api.term.Literal;
+import fr.inria.corese.core.next.data.api.term.Resource;
+import fr.inria.corese.core.next.data.api.factory.ValueFactoryTest;
+import fr.inria.corese.core.next.data.api.literal.RDFDatatype;
 import fr.inria.corese.core.next.data.impl.adapter.literal.CoreseLanguageTaggedStringLiteral;
 import fr.inria.corese.core.next.data.impl.adapter.literal.CoreseTyped;
 
@@ -34,7 +32,7 @@ public class CoreseValueFactoryTest extends ValueFactoryTest {
     public void setUp() {
         this.valueFactory = new CoreseValueFactory();
         stringTestValue = "String value";
-        xsdStringIRI = fr.inria.corese.core.next.data.impl.common.literal.XSD.STRING.getIRI();
+        xsdStringIRI = fr.inria.corese.core.next.data.api.literal.XSDDatatype.STRING.getIRI();
         subject = new CoreseIRI("http://corese.com/subject");
         predicate = new CoreseIRI("http://corese.com/predicate");
     }
@@ -56,7 +54,7 @@ public class CoreseValueFactoryTest extends ValueFactoryTest {
         assertNotNull(literal);
         assertTrue(literal instanceof CoreseTyped);
         assertEquals(stringTestValue, literal.getLabel());
-        assertEquals(fr.inria.corese.core.next.data.impl.common.literal.XSD.STRING, literal.getCoreDatatype());
+        assertEquals(fr.inria.corese.core.next.data.api.literal.XSDDatatype.STRING, literal.getCoreDatatype());
     }
 
     @Test
@@ -70,7 +68,7 @@ public class CoreseValueFactoryTest extends ValueFactoryTest {
         assertTrue(literal instanceof CoreseLanguageTaggedStringLiteral);
         assertEquals(stringTestValue, literal.getLabel());
         assertEquals(testLanguage, literal.getLanguage().orElse(null));
-        assertEquals(RDF.LANGSTRING, literal.getCoreDatatype());
+        assertEquals(RDFDatatype.LANGSTRING, literal.getCoreDatatype());
     }
 
     @Test
@@ -81,34 +79,34 @@ public class CoreseValueFactoryTest extends ValueFactoryTest {
         assertNotNull(literal);
         assertTrue(literal instanceof CoreseTyped);
         assertEquals(stringTestValue, literal.getLabel());
-        assertEquals(fr.inria.corese.core.next.data.impl.common.literal.XSD.STRING, literal.getCoreDatatype());
+        assertEquals(fr.inria.corese.core.next.data.api.literal.XSDDatatype.STRING, literal.getCoreDatatype());
     }
 
     @Test
     public void testCreateLiteralWithCoreDatatype() {
         // Test createLiteral with CoreDatatype (XSD.STRING)
-        Literal literal = valueFactory.createLiteral(stringTestValue, fr.inria.corese.core.next.data.impl.common.literal.XSD.STRING);
+        Literal literal = valueFactory.createLiteral(stringTestValue, fr.inria.corese.core.next.data.api.literal.XSDDatatype.STRING);
 
         assertNotNull(literal);
         assertTrue(literal instanceof CoreseTyped);
         assertEquals(stringTestValue, literal.getLabel());
-        assertEquals(fr.inria.corese.core.next.data.impl.common.literal.XSD.STRING, literal.getCoreDatatype());
+        assertEquals(fr.inria.corese.core.next.data.api.literal.XSDDatatype.STRING, literal.getCoreDatatype());
     }
 
     @Test
     public void testCreateLiteralWithDatatypeIRIAndCoreDatatype() {
         // Test createLiteral with IRI datatype and CoreDatatype (XSD.STRING)
-        Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI, fr.inria.corese.core.next.data.impl.common.literal.XSD.STRING);
+        Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI, fr.inria.corese.core.next.data.api.literal.XSDDatatype.STRING);
 
         assertNotNull(literal);
         assertTrue(literal instanceof CoreseTyped);
         assertEquals(stringTestValue, literal.getLabel());
-        assertEquals(fr.inria.corese.core.next.data.impl.common.literal.XSD.STRING, literal.getCoreDatatype());
+        assertEquals(fr.inria.corese.core.next.data.api.literal.XSDDatatype.STRING, literal.getCoreDatatype());
     }
 
     @Test
     public void testCreateStatementWithoutContext() {
-        Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI, fr.inria.corese.core.next.data.impl.common.literal.XSD.STRING);
+        Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI, fr.inria.corese.core.next.data.api.literal.XSDDatatype.STRING);
         CoreseStatement statement = (CoreseStatement) valueFactory.createStatement(subject, predicate, literal);
         assertNotNull(statement);
         assertEquals(subject, statement.getSubject());
@@ -119,7 +117,7 @@ public class CoreseValueFactoryTest extends ValueFactoryTest {
 
     @Test
     public void testCreateStatementWithContext() {
-        Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI, fr.inria.corese.core.next.data.impl.common.literal.XSD.STRING);
+        Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI, fr.inria.corese.core.next.data.api.literal.XSDDatatype.STRING);
 
         CoreseStatement statement = (CoreseStatement) valueFactory.createStatement(subject, predicate, literal, context);
 

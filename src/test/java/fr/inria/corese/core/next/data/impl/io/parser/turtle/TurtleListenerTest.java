@@ -1,9 +1,9 @@
 package fr.inria.corese.core.next.data.impl.io.parser.turtle;
 
-import fr.inria.corese.core.next.data.api.Model;
-import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
-import fr.inria.corese.core.next.impl.parser.antlr.TurtleLexer;
-import fr.inria.corese.core.next.impl.parser.antlr.TurtleParser;
+import fr.inria.corese.core.next.data.api.model.Model;
+import fr.inria.corese.core.next.data.impl.io.parser.support.ParserTestBase;
+import fr.inria.corese.core.next.generated.antlr.TurtleLexer;
+import fr.inria.corese.core.next.generated.antlr.TurtleParser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -102,7 +102,7 @@ class TurtleListenerTest extends ParserTestBase {
             @base <http://example.org/base/> .
             @prefix : <http://example.org/prefix/> .
             @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-            
+
             <http://example.org/prefix/Name> rdf:type rdf:Property .
             :phone rdf:type rdf:Property .
             """;

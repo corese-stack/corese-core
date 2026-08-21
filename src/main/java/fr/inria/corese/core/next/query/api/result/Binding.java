@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.query.api.result;
 
-import fr.inria.corese.core.next.data.api.Value;
+import fr.inria.corese.core.next.data.api.term.Value;
 
 /**
  * Represents a single variable-to-value association in a SPARQL solution.
@@ -13,7 +13,7 @@ import fr.inria.corese.core.next.data.api.Value;
  *
  *
  * @see BindingSet
- * @see fr.inria.corese.core.next.data.api.Value
+ * @see fr.inria.corese.core.next.data.api.term.Value
  */
 public interface Binding {
 

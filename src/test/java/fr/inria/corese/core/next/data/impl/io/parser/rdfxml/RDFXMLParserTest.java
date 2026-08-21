@@ -1,9 +1,9 @@
 package fr.inria.corese.core.next.data.impl.io.parser.rdfxml;
 
-import fr.inria.corese.core.next.data.api.Literal;
-import fr.inria.corese.core.next.data.api.Model;
-import fr.inria.corese.core.next.data.api.Value;
-import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
+import fr.inria.corese.core.next.data.api.term.Literal;
+import fr.inria.corese.core.next.data.api.model.Model;
+import fr.inria.corese.core.next.data.api.term.Value;
+import fr.inria.corese.core.next.data.impl.io.parser.support.ParserTestBase;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -293,19 +293,19 @@ public class RDFXMLParserTest extends ParserTestBase {
                 <?xml version="1.0" encoding="utf-8"?>
                           <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                                    xmlns:dc="http://purl.org/dc/elements/1.1/">
-                
+
                             <rdf:Description rdf:about="http://www.w3.org/TR/rdf-syntax-grammar">
                               <dc:title>RDF 1.2 XML Syntax</dc:title>
                               <dc:title xml:lang="en">RDF 1.2 XML Syntax</dc:title>
                               <dc:title xml:lang="en-US">RDF 1.2 XML Syntax</dc:title>
                             </rdf:Description>
-                
+
                             <rdf:Description rdf:about="http://example.org/buecher/baum" xml:lang="de">
                               <dc:title>Der Baum</dc:title>
                               <dc:description>Das Buch ist außergewöhnlich</dc:description>
                               <dc:title xml:lang="en">The Tree</dc:title>
                             </rdf:Description>
-                
+
                           </rdf:RDF>
                 """.trim();
 
@@ -325,11 +325,11 @@ public class RDFXMLParserTest extends ParserTestBase {
                 <?xml version="1.0"?>
                                     <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                                                 xmlns:ex="http://example.org/stuff/1.0/">
-                
+
                                       <rdf:Description rdf:about="http://example.org/item01">
                                         <ex:size rdf:datatype="http://www.w3.org/2001/XMLSchema#int">123</ex:size>
                                       </rdf:Description>
-                
+
                                     </rdf:RDF>
                 """.trim();
         Model model = parseRdfXml(rdfXml);

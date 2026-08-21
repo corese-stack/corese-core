@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.data.impl.adapter.literal;
 
-import fr.inria.corese.core.next.data.impl.common.literal.XSD;
+import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 import fr.inria.corese.core.sparql.datatype.CoreseNumber;
 import org.junit.jupiter.api.Test;
 
@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CoreseDecimalTest  extends AbstractCoreseNumberTest {
+public class CoreseDecimalTest extends AbstractCoreseNumberTest {
     @Override
     protected AbstractCoreseNumber createNumber(String stringValue) {
         return new CoreseDecimal(stringValue);
@@ -25,7 +25,7 @@ public class CoreseDecimalTest  extends AbstractCoreseNumberTest {
     @Test
     public void getCoreDatatype() {
         AbstractCoreseNumber coreseNumber = createNumber("13.46");
-        assertEquals(XSD.DECIMAL, coreseNumber.getCoreDatatype());
+        assertEquals(XSDDatatype.DECIMAL, coreseNumber.getCoreDatatype());
     }
 
     @Override

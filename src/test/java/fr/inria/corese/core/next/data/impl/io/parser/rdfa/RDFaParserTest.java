@@ -1,14 +1,16 @@
 package fr.inria.corese.core.next.data.impl.io.parser.rdfa;
 
-import fr.inria.corese.core.next.data.api.*;
-import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
+import fr.inria.corese.core.next.data.api.term.*;
+import fr.inria.corese.core.next.data.api.model.*;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
+import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
-import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
-import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
-import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
-import fr.inria.corese.core.next.data.impl.io.serialization.DataSerializerFactory;
-import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
+import fr.inria.corese.core.next.data.api.vocabulary.RDF;
+import fr.inria.corese.core.next.data.api.vocabulary.XSD;
+import fr.inria.corese.core.next.data.impl.io.parser.DefaultRDFParserFactory;
+import fr.inria.corese.core.next.data.impl.io.serializer.DefaultRDFSerializerFactory;
+import fr.inria.corese.core.next.data.impl.io.parser.support.ParserTestBase;
 import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,7 +28,7 @@ class RDFaParserTest extends ParserTestBase {
 
     private static final Logger logger = LoggerFactory.getLogger(RDFaParserTest.class);
 
-    private ParserFactory parserFactory = new ParserFactory();
+    private DefaultRDFParserFactory parserFactory = new DefaultRDFParserFactory();
     private ValueFactory valueFactory = new CoreseValueFactory();
     private final String defaultTurtlePrefixes = """
             @prefix bibo: 	<http://purl.org/ontology/bibo/> .
@@ -165,7 +167,7 @@ class RDFaParserTest extends ParserTestBase {
 
         referenceModel.add(subject, predicate, object);
 
-        RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFA, testModel, valueFactory);
+        RDFParser parser = new DefaultRDFParserFactory().createRDFParser(RDFFormat.RDFA, testModel, valueFactory);
 
         parser.parse(new ByteArrayInputStream(testDataString.getBytes()), "http://www.w3.org/2006/07/SWD/RDFa/testsuite/xhtml1-testcases/");
 
@@ -201,7 +203,7 @@ class RDFaParserTest extends ParserTestBase {
 
         Model testModel = createTestModel();
 
-        RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFA, testModel, valueFactory);
+        RDFParser parser = new DefaultRDFParserFactory().createRDFParser(RDFFormat.RDFA, testModel, valueFactory);
 
         parser.parse(new ByteArrayInputStream(testDataString.getBytes()), "http://not.the.right.base.uri");
 
@@ -233,7 +235,7 @@ class RDFaParserTest extends ParserTestBase {
         Model testModel = createTestModel();
         Model referenceModel = createTestModel();
 
-        RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFA, testModel, valueFactory);
+        RDFParser parser = new DefaultRDFParserFactory().createRDFParser(RDFFormat.RDFA, testModel, valueFactory);
 
         parser.parse(new ByteArrayInputStream(testDataString.getBytes()), "http://not.the.right.base.uri");
 
@@ -271,7 +273,7 @@ class RDFaParserTest extends ParserTestBase {
         Model testModel = createTestModel();
         Model referenceModel = createTestModel();
 
-        RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFA, testModel, valueFactory);
+        RDFParser parser = new DefaultRDFParserFactory().createRDFParser(RDFFormat.RDFA, testModel, valueFactory);
 
         parser.parse(new ByteArrayInputStream(testDataString.getBytes()), "http://not.the.right.base.uri");
 
@@ -307,7 +309,7 @@ class RDFaParserTest extends ParserTestBase {
         Model testModel = createTestModel();
         Model referenceModel = createTestModel();
 
-        RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFA, testModel, valueFactory);
+        RDFParser parser = new DefaultRDFParserFactory().createRDFParser(RDFFormat.RDFA, testModel, valueFactory);
 
         parser.parse(new ByteArrayInputStream(testDataString.getBytes()), "http://not.the.right.base.uri");
 
@@ -358,7 +360,7 @@ class RDFaParserTest extends ParserTestBase {
         Model testModel = createTestModel();
         Model referenceModel = createTestModel();
 
-        RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFA, testModel, valueFactory);
+        RDFParser parser = new DefaultRDFParserFactory().createRDFParser(RDFFormat.RDFA, testModel, valueFactory);
 
         parser.parse(new ByteArrayInputStream(testDataString.getBytes()), "http://not.the.right.base.uri");
 
@@ -401,7 +403,7 @@ class RDFaParserTest extends ParserTestBase {
         Model testModel = createTestModel();
         Model referenceModel = createTestModel();
 
-        RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFA, testModel, valueFactory);
+        RDFParser parser = new DefaultRDFParserFactory().createRDFParser(RDFFormat.RDFA, testModel, valueFactory);
 
         parser.parse(new ByteArrayInputStream(testDataString.getBytes()), "http://inria.fr/");
 
@@ -453,7 +455,7 @@ class RDFaParserTest extends ParserTestBase {
         Model testModel = createTestModel();
         Model referenceModel = createTestModel();
 
-        RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFA, testModel, valueFactory);
+        RDFParser parser = new DefaultRDFParserFactory().createRDFParser(RDFFormat.RDFA, testModel, valueFactory);
 
         parser.parse(new ByteArrayInputStream(testDataString.getBytes()), "http://inria.fr/");
 
@@ -496,7 +498,7 @@ class RDFaParserTest extends ParserTestBase {
 
         RDFaParserOptions.Builder builder = new RDFaParserOptions.Builder();
         RDFaParserOptions options = builder.build();
-        RDFaParser parser = (RDFaParser) new ParserFactory().createRDFParser(RDFFormat.RDFA, testModel, valueFactory, options);
+        RDFaParser parser = (RDFaParser) new DefaultRDFParserFactory().createRDFParser(RDFFormat.RDFA, testModel, valueFactory, options);
 
         parser.parse(new ByteArrayInputStream(testDataString.getBytes()), "http://not.the.right.base.uri");
 
@@ -511,7 +513,7 @@ class RDFaParserTest extends ParserTestBase {
 
     private static void logModelContent(Model model) {
         StringWriter outWriter = new StringWriter();
-        RDFSerializer serializer = (new DataSerializerFactory()).createSerializer(RDFFormat.TURTLE, model);
+        RDFSerializer serializer = (new DefaultRDFSerializerFactory()).createSerializer(RDFFormat.TURTLE, model);
         serializer.write(outWriter);
         logger.info("{}", outWriter.toString());
     }

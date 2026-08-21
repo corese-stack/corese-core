@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
-import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
+import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.AstVisitor;
 
 /**
  * IRI or QName in a triple pattern (e.g. &lt;http://...&gt;, foaf:Person, a).

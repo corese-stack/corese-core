@@ -1,12 +1,12 @@
 package fr.inria.corese.core.next.query.impl.sparql.io.serializer;
 
-import fr.inria.corese.core.next.data.api.io.IOOptions;
+import fr.inria.corese.core.next.data.api.io.option.IOOptions;
 import fr.inria.corese.core.next.query.api.io.ResultFormat;
 import fr.inria.corese.core.next.query.api.io.serializer.BooleanResultSerializer;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializerFactory;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
-import fr.inria.corese.core.next.query.impl.sparql.io.serializer.common.BooleanStringSerializer;
+import fr.inria.corese.core.next.query.impl.sparql.io.serializer.support.BooleanStringSerializer;
 import fr.inria.corese.core.next.query.impl.sparql.io.serializer.csv.CsvTupleResultSerializer;
 import fr.inria.corese.core.next.query.impl.sparql.io.serializer.json.JsonBooleanResultSerializer;
 import fr.inria.corese.core.next.query.impl.sparql.io.serializer.json.JsonTupleResultSerializer;

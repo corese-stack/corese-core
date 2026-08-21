@@ -1,14 +1,14 @@
 package fr.inria.corese.core.next.query.impl.repository;
 
-import fr.inria.corese.core.next.data.api.ValueFactory;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
 import fr.inria.corese.core.next.query.api.exception.RepositoryException;
 import fr.inria.corese.core.next.query.api.repository.Repository;
 import fr.inria.corese.core.next.query.api.repository.RepositoryConnection;
-import fr.inria.corese.core.next.storagemanager.api.StorageManager;
-import fr.inria.corese.core.next.storagemanager.api.lifecycle.LifecycleState;
-import fr.inria.corese.core.next.storagemanager.api.support.config.StorageConfig;
-import fr.inria.corese.core.next.storagemanager.api.support.exception.StorageException;
+import fr.inria.corese.core.next.storage.api.StorageManager;
+import fr.inria.corese.core.next.storage.api.lifecycle.LifecycleState;
+import fr.inria.corese.core.next.storage.api.config.StorageConfig;
+import fr.inria.corese.core.next.storage.api.exception.StorageException;
 
 import java.io.File;
 

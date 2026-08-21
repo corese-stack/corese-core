@@ -1,8 +1,8 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
-import fr.inria.corese.core.next.query.kgram.api.core.Expr;
-import fr.inria.corese.core.next.query.kgram.api.core.Filter;
+import fr.inria.corese.core.next.query.impl.kgram.api.core.Expr;
+import fr.inria.corese.core.next.query.impl.kgram.api.core.Filter;
 import fr.inria.corese.core.sparql.triple.parser.Expression;
 
 import java.util.List;

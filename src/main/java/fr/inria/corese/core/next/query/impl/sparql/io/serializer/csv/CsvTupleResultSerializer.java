@@ -1,14 +1,13 @@
 package fr.inria.corese.core.next.query.impl.sparql.io.serializer.csv;
 
-import fr.inria.corese.core.next.data.api.BNode;
-import fr.inria.corese.core.next.data.api.Value;
-import fr.inria.corese.core.next.data.api.base.io.FileFormat;
-import fr.inria.corese.core.next.data.api.io.IOOptions;
-import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
-import fr.inria.corese.core.next.data.impl.io.serialization.util.SerializationConstants;
+import fr.inria.corese.core.next.data.api.term.BNode;
+import fr.inria.corese.core.next.data.api.term.Value;
+import fr.inria.corese.core.next.data.api.io.format.FileFormat;
+import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.api.support.io.IOConstants;
 import fr.inria.corese.core.next.query.api.io.ResultFormat;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
-import fr.inria.corese.core.next.query.impl.sparql.io.serializer.common.CharacterSeparatedValuesSerializer;
+import fr.inria.corese.core.next.query.impl.sparql.io.serializer.support.CharacterSeparatedValuesSerializer;
 
 /**
  * CSV serializer for the CSV format of SPARQL results.
@@ -17,7 +16,7 @@ import fr.inria.corese.core.next.query.impl.sparql.io.serializer.common.Characte
 public class CsvTupleResultSerializer extends CharacterSeparatedValuesSerializer {
 
     public CsvTupleResultSerializer(TupleQueryResult results, IOOptions options) {
-        super(SerializationConstants.COMMA, results, options);
+        super(IOConstants.COMMA, results, options);
     }
 
     public CsvTupleResultSerializer(TupleQueryResult results) {
@@ -35,7 +34,7 @@ public class CsvTupleResultSerializer extends CharacterSeparatedValuesSerializer
     @Override
     protected String valuetoString(Value value) {
         if(value instanceof BNode bnodeValue) {
-            return SerializationConstants.BLANK_NODE_PREFIX + bnodeValue.getID();
+            return IOConstants.BLANK_NODE_PREFIX + bnodeValue.getID();
         }
         if(value.stringValue().contains(IOConstants.QUOTE)
             || value.stringValue().contains(IOConstants.COMMA)

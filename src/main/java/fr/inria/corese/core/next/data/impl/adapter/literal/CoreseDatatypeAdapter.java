@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.data.impl.adapter.literal;
 
-import fr.inria.corese.core.next.data.impl.adapter.CoreseNodeAdapter;
+import fr.inria.corese.core.next.data.impl.adapter.node.CoreseNodeAdapter;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
 /**

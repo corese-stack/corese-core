@@ -3,10 +3,10 @@ package fr.inria.corese.core.next.data.impl.adapter;
 import fr.inria.corese.core.edge.EdgeImpl;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.next.data.api.IRI;
-import fr.inria.corese.core.next.data.api.Resource;
-import fr.inria.corese.core.next.data.api.Value;
-import fr.inria.corese.core.next.data.api.base.model.AbstractStatement;
+import fr.inria.corese.core.next.data.api.term.IRI;
+import fr.inria.corese.core.next.data.api.term.Resource;
+import fr.inria.corese.core.next.data.api.term.Value;
+import fr.inria.corese.core.next.data.api.support.model.AbstractStatement;
 
 /**
  * Represents a statement in Corese. A Corese statement consists of a subject,
@@ -67,15 +67,15 @@ public class CoreseStatement extends AbstractStatement implements CoreseEdgeAdap
             throw new IllegalArgumentException("Edge cannot be null");
         }
 
-        Resource subject_corese = (Resource) converter.toRdf4jValue(edge.getSubjectValue());
-        IRI predicate_corese = (IRI) converter.toRdf4jValue(edge.getPredicateValue());
-        Value object_corese = converter.toRdf4jValue(edge.getObjectValue());
-        Resource context_corese = (Resource) converter.toRdf4jValueContext(edge.getGraph());
+        Resource subjectValue = (Resource) converter.fromCoreseNode(edge.getSubjectValue());
+        IRI predicateValue = (IRI) converter.fromCoreseNode(edge.getPredicateValue());
+        Value objectValue = converter.fromCoreseNode(edge.getObjectValue());
+        Resource contextValue = converter.fromCoreseContext(edge.getGraph());
 
-        this.subject = subject_corese;
-        this.predicate = predicate_corese;
-        this.object = object_corese;
-        this.context = context_corese;
+        this.subject = subjectValue;
+        this.predicate = predicateValue;
+        this.object = objectValue;
+        this.context = contextValue;
         this.edge = edge;
     }
 

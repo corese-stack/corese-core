@@ -1,9 +1,9 @@
 package fr.inria.corese.core.next.data.api.io.parser;
 
-import fr.inria.corese.core.next.data.api.Model;
-import fr.inria.corese.core.next.data.api.ValueFactory;
-import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.data.api.io.IOOptions;
+import fr.inria.corese.core.next.data.api.model.Model;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
+import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
+import fr.inria.corese.core.next.data.api.io.option.IOOptions;
 
 /**
  * A factory for creating RDF parsers.
@@ -21,7 +21,7 @@ public interface RDFParserFactory {
 
     /**
      * Creates a new RDF parser for the specified format and model.
-     * 
+     *
      * @param format  The RDF format to use for parsing.
      * @param model   The model to which the parsed data will be added.
      * @param factory The value factory to use for creating RDF values.

@@ -2,7 +2,7 @@
  * Concrete implementations of the public repository API.
  *
  * <p>Entry point for users: create a {@link fr.inria.corese.core.next.query.impl.repository.CoreseRepository}
- * backed by any {@link fr.inria.corese.core.next.storagemanager.api.StorageManager},
+ * backed by any {@link fr.inria.corese.core.next.storage.api.StorageManager},
  * call {@code init()}, then open a
  * {@link fr.inria.corese.core.next.query.api.repository.RepositoryConnection} via
  * {@code getConnection()}.</p>

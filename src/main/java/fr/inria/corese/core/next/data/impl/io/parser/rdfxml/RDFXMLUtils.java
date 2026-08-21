@@ -1,13 +1,13 @@
 package fr.inria.corese.core.next.data.impl.io.parser.rdfxml;
 
-import fr.inria.corese.core.next.data.api.Model;
-import fr.inria.corese.core.next.data.api.Resource;
-import fr.inria.corese.core.next.data.api.ValueFactory;
-import fr.inria.corese.core.next.data.impl.common.literal.XSD;
-import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
-import fr.inria.corese.core.next.data.impl.exception.IncorrectFormatException;
-import fr.inria.corese.core.next.data.impl.exception.ParsingErrorException;
-import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
+import fr.inria.corese.core.next.data.api.model.Model;
+import fr.inria.corese.core.next.data.api.term.Resource;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
+import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
+import fr.inria.corese.core.next.data.api.vocabulary.RDF;
+import fr.inria.corese.core.next.data.api.exception.IncorrectFormatException;
+import fr.inria.corese.core.next.data.api.exception.ParsingException;
+import fr.inria.corese.core.next.data.api.support.io.IOConstants;
 import org.xml.sax.Attributes;
 
 import java.util.List;
@@ -46,8 +46,8 @@ public class RDFXMLUtils {
      * @param datatypeUri the datatype URI
      * @return an Optional containing the matching XSD type if found
      */
-    public static Optional<XSD> resolveDatatype(String datatypeUri) {
-        for (XSD xsd : XSD.values()) {
+    public static Optional<XSDDatatype> resolveDatatype(String datatypeUri) {
+        for (XSDDatatype xsd : XSDDatatype.values()) {
             if (xsd.getIRI().stringValue().equals(datatypeUri)) return Optional.of(xsd);
         }
         return Optional.empty();
@@ -109,7 +109,7 @@ public class RDFXMLUtils {
      * @param baseURI  the base URI for resolving relative IRIs
      * @param usedIDs  set to track used rdf:ID values (can be null if not tracking)
      * @return a Resource representing the subject
-     * @throws ParsingErrorException if rdf:ID, rdf:nodeID, or rdf:bagID value is not a valid XML Name,
+     * @throws ParsingException if rdf:ID, rdf:nodeID, or rdf:bagID value is not a valid XML Name,
      *                               if conflicting attributes are present, or if obsolete attributes are used
      */
     public static Resource extractSubject(Attributes attrs, ValueFactory factory, String baseURI, Set<String> usedIDs) {
@@ -118,11 +118,11 @@ public class RDFXMLUtils {
         String aboutEachPrefix = attrs.getValue(RDF.type.getNamespace(), "aboutEachPrefix");
 
         if (aboutEach != null) {
-            throw new ParsingErrorException("rdf:aboutEach is not supported. " +
+            throw new ParsingException("rdf:aboutEach is not supported. " +
                     "This attribute was removed from RDF specifications.");
         }
         if (aboutEachPrefix != null) {
-            throw new ParsingErrorException("rdf:aboutEachPrefix is not supported. " +
+            throw new ParsingException("rdf:aboutEachPrefix is not supported. " +
                     "This attribute was removed from RDF specifications.");
         }
 
@@ -134,7 +134,7 @@ public class RDFXMLUtils {
         // Check for conflicting attributes
         int count = (about != null ? 1 : 0) + (nodeID != null ? 1 : 0) + (id != null ? 1 : 0) + (bagID != null ? 1 : 0);
         if (count > 1) {
-            throw new ParsingErrorException("Cannot have multiple subject-identifying attributes. " +
+            throw new ParsingException("Cannot have multiple subject-identifying attributes. " +
                     "Only one of rdf:about, rdf:nodeID, rdf:ID, or rdf:bagID is allowed per element.");
         }
 
@@ -144,7 +144,7 @@ public class RDFXMLUtils {
 
         if (nodeID != null) {
             if (isInvalidXMLName(nodeID, false)) {
-                throw new ParsingErrorException("rdf:nodeID value '" + nodeID + "' is not a valid NCName. " +
+                throw new ParsingException("rdf:nodeID value '" + nodeID + "' is not a valid NCName. " +
                         "NCNames cannot contain colons and must start with a letter or underscore.");
             }
             return factory.createBNode(IOConstants.BLANK_NODE_PREFIX + nodeID);
@@ -152,13 +152,13 @@ public class RDFXMLUtils {
 
         if (id != null) {
             if (isInvalidXMLName(id, true)) {
-                throw new ParsingErrorException("rdf:ID value '" + id + "' is not a valid NCName. " +
+                throw new ParsingException("rdf:ID value '" + id + "' is not a valid NCName. " +
                         "NCNames cannot contain colons and must start with a letter or underscore. " +
                         "Additionally, rdf:ID cannot start with '_:'.");
             }
             String fullId = resolveAgainstBase("#" + id, baseURI);
             if (usedIDs != null && !usedIDs.add(fullId)) {
-                throw new ParsingErrorException("rdf:ID value '" + id + "' has already been used in this document. " +
+                throw new ParsingException("rdf:ID value '" + id + "' has already been used in this document. " +
                         "Each rdf:ID must be unique within a document.");
             }
             return factory.createIRI(fullId);
@@ -166,7 +166,7 @@ public class RDFXMLUtils {
 
         if (bagID != null) {
             if (isInvalidXMLName(bagID, true)) {
-                throw new ParsingErrorException("rdf:bagID value '" + bagID + "' is not a valid NCName. " +
+                throw new ParsingException("rdf:bagID value '" + bagID + "' is not a valid NCName. " +
                         "NCNames cannot contain colons and must start with a letter or underscore. " +
                         "Additionally, rdf:bagID cannot start with '_:'.");
             }
@@ -194,7 +194,7 @@ public class RDFXMLUtils {
         try {
             return new java.net.URI(baseURI).resolve(iri).toString();
         } catch (Exception e) {
-            throw new ParsingErrorException("Failed to resolve IRI: " + iri + " against base: " + baseURI, e);
+            throw new ParsingException("Failed to resolve IRI: " + iri + " against base: " + baseURI, e);
         }
     }
 
@@ -259,7 +259,7 @@ public class RDFXMLUtils {
      *
      * @param uri       the namespace URI
      * @param localName the local name of the element
-     * @throws ParsingErrorException if the element name is a forbidden RDF name
+     * @throws ParsingException if the element name is a forbidden RDF name
      */
     public static void validateNodeElementName(String uri, String localName) {
         if (!RDF.type.getNamespace().equals(uri)) {
@@ -270,7 +270,7 @@ public class RDFXMLUtils {
 
             case "RDF","ID", "about", "bagID", "parseType", "resource", "nodeID", "datatype",
                  "aboutEach", "aboutEachPrefix","li":
-                throw new ParsingErrorException("'" + localName + "' is not allowed as a node element name from the RDF namespace. " +
+                throw new ParsingException("'" + localName + "' is not allowed as a node element name from the RDF namespace. " +
                         "RDF namespace names like rdf:ID, rdf:about, rdf:bagID, etc. cannot be used as typed node elements.");
 
             default:
@@ -284,7 +284,7 @@ public class RDFXMLUtils {
      *
      * @param uri       the namespace URI
      * @param localName the local name of the element
-     * @throws ParsingErrorException if the property name is a forbidden RDF name
+     * @throws ParsingException if the property name is a forbidden RDF name
      */
     public static void validatePropertyElementName(String uri, String localName) {
         if (!RDF.type.getNamespace().equals(uri)) {
@@ -294,7 +294,7 @@ public class RDFXMLUtils {
         switch (localName) {
             case "RDF", "ID", "about", "bagID", "parseType", "resource", "nodeID",
                  "datatype", "Description", "aboutEach", "aboutEachPrefix":
-                throw new ParsingErrorException("'" + localName + "' is not allowed as a property element name from the RDF namespace. " +
+                throw new ParsingException("'" + localName + "' is not allowed as a property element name from the RDF namespace. " +
                         "Only rdf:type, rdf:_n (container membership), and rdf:li are valid RDF property names.");
 
             default:
@@ -350,7 +350,7 @@ public class RDFXMLUtils {
      * Only "Resource", "Literal", and "Collection" are valid values.
      *
      * @param parseType the parseType value to validate
-     * @throws ParsingErrorException if the parseType value is invalid
+     * @throws ParsingException if the parseType value is invalid
      */
     public static void validateParseType(String parseType) {
         if (parseType == null) {
@@ -361,7 +361,7 @@ public class RDFXMLUtils {
             case "Resource", "Literal", "Collection":
                 return; // Valid
             default:
-                throw new ParsingErrorException(
+                throw new ParsingException(
                         "Invalid rdf:parseType value: '" + parseType + "'. " +
                                 "Only 'Resource', 'Literal', and 'Collection' are allowed.");
         }

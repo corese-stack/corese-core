@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.query.api.result;
 
-import fr.inria.corese.core.next.data.api.Value;
+import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.query.api.TupleQuery;
 
 import java.util.Set;

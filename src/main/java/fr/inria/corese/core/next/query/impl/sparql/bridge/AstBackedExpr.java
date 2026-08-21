@@ -2,15 +2,15 @@ package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
-import fr.inria.corese.core.next.query.kgram.api.core.BindingContext;
-import fr.inria.corese.core.next.query.kgram.api.core.DatatypeValue;
-import fr.inria.corese.core.next.query.kgram.api.core.Expr;
-import fr.inria.corese.core.next.query.kgram.api.core.Filter;
-import fr.inria.corese.core.next.query.kgram.adapter.BindingAdapter;
-import fr.inria.corese.core.next.query.kgram.adapter.TripleParserEvalSupport;
-import fr.inria.corese.core.next.query.kgram.api.query.Environment;
-import fr.inria.corese.core.next.query.kgram.api.query.Evaluator;
-import fr.inria.corese.core.next.query.kgram.api.query.Producer;
+import fr.inria.corese.core.next.query.impl.kgram.api.core.BindingContext;
+import fr.inria.corese.core.next.query.impl.kgram.api.core.DatatypeValue;
+import fr.inria.corese.core.next.query.impl.kgram.api.core.Expr;
+import fr.inria.corese.core.next.query.impl.kgram.api.core.Filter;
+import fr.inria.corese.core.next.query.impl.kgram.adapter.BindingAdapter;
+import fr.inria.corese.core.next.query.impl.kgram.adapter.TripleParserEvalSupport;
+import fr.inria.corese.core.next.query.impl.kgram.api.query.Environment;
+import fr.inria.corese.core.next.query.impl.kgram.api.query.Evaluator;
+import fr.inria.corese.core.next.query.impl.kgram.api.query.Producer;
 import fr.inria.corese.core.sparql.api.Computer;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
@@ -23,7 +23,7 @@ import java.util.Optional;
 
 /**
  * Wraps a {@link fr.inria.corese.core.sparql.triple.parser.Expression} (SPARQL interpreter tree) as a
- * {@link fr.inria.corese.core.next.query.kgram.api.core.Expr}.
+ * {@link fr.inria.corese.core.next.query.impl.kgram.api.core.Expr}.
  *
  */
 public final class AstBackedExpr implements Expr {

@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.query.api.repository;
 
-import fr.inria.corese.core.next.data.api.ValueFactory;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.query.api.dataset.Dataset;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.api.exception.RepositoryException;

@@ -1,10 +1,10 @@
 package fr.inria.corese.core.next.data.impl.io.parser.trig;
 
-import fr.inria.corese.core.next.data.api.Literal;
-import fr.inria.corese.core.next.data.api.Model;
-import fr.inria.corese.core.next.data.api.Value;
+import fr.inria.corese.core.next.data.api.term.Literal;
+import fr.inria.corese.core.next.data.api.model.Model;
+import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
-import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
+import fr.inria.corese.core.next.data.impl.io.parser.support.ParserTestBase;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,7 +96,7 @@ class TriGParserTest extends ParserTestBase {
                 # This document encodes one graph.
                 @prefix ex: <http://www.example.org/vocabulary#> .
                 @prefix : <http://www.example.org/exampleDocument#> .
-                
+
                 :G1 { :Monica a ex:Person ;
                               ex:name "Monica Murphy" ;
                               ex:homepage <http://www.monicamurphy.org> ;
@@ -120,15 +120,15 @@ class TriGParserTest extends ParserTestBase {
         String trig = """
                 # This document contains a same data as the
                 # previous example.
-                
+
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
                 @prefix dc: <http://purl.org/dc/terms/> .
                 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
-                
+
                 # default graph - no {} used.
                 <http://example.org/bob> dc:publisher "Bob" .
                 <http://example.org/alice> dc:publisher "Alice" .
-                
+
                 # GRAPH keyword to highlight a named graph
                 # Abbreviation of triples using ;
                 GRAPH <http://example.org/bob>
@@ -137,7 +137,7 @@ class TriGParserTest extends ParserTestBase {
                       foaf:mbox <mailto:bob@oldcorp.example.org> ;
                       foaf:knows _:b .
                 }
-                
+
                 GRAPH <http://example.org/alice>
                 {
                     _:b foaf:name "Alice" ;
@@ -159,7 +159,7 @@ class TriGParserTest extends ParserTestBase {
     void testNestedBlankNodesWithSharedIdentifiers()  {
         String trig = """
                 @prefix ex: <http://example.org/> .
-                
+
                 GRAPH ex:graph1 {
                   ex:Alice ex:knows [
                     ex:name "Bob" ;

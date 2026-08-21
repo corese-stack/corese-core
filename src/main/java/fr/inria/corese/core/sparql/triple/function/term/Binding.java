@@ -816,7 +816,7 @@ public class Binding implements Binder {
             dt.set(URI,  g.getDatatypeValue());
         }
     }
-    public void visit(fr.inria.corese.core.next.query.kgram.core.Exp exp, fr.inria.corese.core.next.query.kgram.api.core.Node g, fr.inria.corese.core.next.query.kgram.core.Mappings m1, fr.inria.corese.core.next.query.kgram.core.Mappings m2) {
+    public void visit(fr.inria.corese.core.next.query.impl.kgram.core.Exp exp, fr.inria.corese.core.next.query.impl.kgram.api.core.Node g, fr.inria.corese.core.next.query.impl.kgram.core.Mappings m1, fr.inria.corese.core.next.query.impl.kgram.core.Mappings m2) {
         IDatatype dt = getReport(exp);
         dt.set(NUMBER, exp.getNum());
         dt.set(EXP, exp.toString());
@@ -832,7 +832,7 @@ public class Binding implements Binder {
      * share same report for every call on same named graph pattern or service exp
      * exp report contains list(rep_1  rep_n) one rep_i for each uri
      */
-    IDatatype getReport(fr.inria.corese.core.next.query.kgram.core.Exp exp) {
+    IDatatype getReport(fr.inria.corese.core.next.query.impl.kgram.core.Exp exp) {
         IDatatype dt  = DatatypeMap.newServiceReport();
         
         if (exp.isGraph() || exp.isService()) {

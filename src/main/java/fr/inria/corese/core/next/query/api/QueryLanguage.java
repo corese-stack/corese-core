@@ -19,17 +19,5 @@ public enum QueryLanguage {
     /**
      * The W3C-standard SPARQL 1.1 query and update language.
      */
-    SPARQL("SPARQL"),
-
-    /**
-     * Corese’s extension language allowing procedural and functional constructs.
-     */
-    LDSCRIPT("LDScript");
-
-    private final String name;
-
-    QueryLanguage(String name) { this.name = name; }
-
-    @Override
-    public String toString() { return name; }
+    SPARQL
 }

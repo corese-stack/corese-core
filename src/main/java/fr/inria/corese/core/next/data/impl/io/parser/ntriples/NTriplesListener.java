@@ -1,16 +1,16 @@
 package fr.inria.corese.core.next.data.impl.io.parser.ntriples;
 
-import fr.inria.corese.core.next.data.api.IRI;
-import fr.inria.corese.core.next.data.api.Literal;
-import fr.inria.corese.core.next.data.api.Model;
-import fr.inria.corese.core.next.data.api.Resource;
-import fr.inria.corese.core.next.data.api.Value;
-import fr.inria.corese.core.next.data.api.ValueFactory;
-import fr.inria.corese.core.next.data.api.io.IOOptions;
-import fr.inria.corese.core.next.data.impl.exception.ParsingErrorException;
-import fr.inria.corese.core.next.data.impl.io.parser.common.AbstractNTriplesNQuadsListener;
-import fr.inria.corese.core.next.impl.parser.antlr.NTriplesBaseListener;
-import fr.inria.corese.core.next.impl.parser.antlr.NTriplesParser;
+import fr.inria.corese.core.next.data.api.term.IRI;
+import fr.inria.corese.core.next.data.api.term.Literal;
+import fr.inria.corese.core.next.data.api.model.Model;
+import fr.inria.corese.core.next.data.api.term.Resource;
+import fr.inria.corese.core.next.data.api.term.Value;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
+import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.api.exception.ParsingException;
+import fr.inria.corese.core.next.data.impl.io.parser.support.AbstractNTriplesNQuadsListener;
+import fr.inria.corese.core.next.generated.antlr.NTriplesBaseListener;
+import fr.inria.corese.core.next.generated.antlr.NTriplesParser;
 
 /**
  * Listener for the ANTLR4 generated parser for N-Triples.
@@ -66,7 +66,7 @@ public class NTriplesListener extends NTriplesBaseListener {
             abstractNTriplesQuadsListener.validateBlankNodeLabel(label);
             return factory.createBNode(label);
         }
-        throw new ParsingErrorException("Unsupported N-Triples subject: " + ctx.getText());
+        throw new ParsingException("Unsupported N-Triples subject: " + ctx.getText());
     }
 
     /**
@@ -77,7 +77,7 @@ public class NTriplesListener extends NTriplesBaseListener {
             String iri = abstractNTriplesQuadsListener.unescapeUri(abstractNTriplesQuadsListener.stripAngles(ctx.IRIREF().getText()));
             return factory.createIRI(iri);
         }
-        throw new ParsingErrorException("Unsupported N-Triples predicate: " + ctx.getText());
+        throw new ParsingException("Unsupported N-Triples predicate: " + ctx.getText());
     }
 
     /**
@@ -96,7 +96,7 @@ public class NTriplesListener extends NTriplesBaseListener {
         if (ctx.literal() != null) {
             return extractLiteral(ctx.literal());
         }
-        throw new ParsingErrorException("Unsupported N-Triples object: " + ctx.getText());
+        throw new ParsingException("Unsupported N-Triples object: " + ctx.getText());
     }
 
     /**
@@ -124,11 +124,11 @@ public class NTriplesListener extends NTriplesBaseListener {
      * Blank node labels must not be empty and must not contain a colon.
      *
      * @param label The blank node label (without the "_:" prefix)
-     * @throws ParsingErrorException if the label is invalid
+     * @throws ParsingException if the label is invalid
      * @deprecated Use helper.validateBlankNodeLabel instead
      */
     @Deprecated
-    protected void validateBlankNodeLabel(String label) throws ParsingErrorException {
+    protected void validateBlankNodeLabel(String label) throws ParsingException {
         abstractNTriplesQuadsListener.validateBlankNodeLabel(label);
     }
 

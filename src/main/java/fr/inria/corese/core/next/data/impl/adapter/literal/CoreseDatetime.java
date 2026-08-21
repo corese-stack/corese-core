@@ -8,13 +8,13 @@ import java.util.Optional;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.next.data.api.IRI;
-import fr.inria.corese.core.next.data.api.base.model.literal.AbstractTemporalPointLiteral;
+import fr.inria.corese.core.next.data.api.term.IRI;
+import fr.inria.corese.core.next.data.api.support.term.literal.AbstractTemporalPointLiteral;
 import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
-import fr.inria.corese.core.next.data.impl.common.literal.XSD;
-import fr.inria.corese.core.next.data.impl.exception.IncorrectDatatypeException;
-import fr.inria.corese.core.next.data.impl.exception.IncorrectOperationException;
-import fr.inria.corese.core.next.data.impl.adapter.CoreseIRI;
+import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
+import fr.inria.corese.core.next.data.api.exception.InvalidDatatypeException;
+import fr.inria.corese.core.next.data.api.exception.IncorrectOperationException;
+import fr.inria.corese.core.next.data.impl.adapter.node.CoreseIRI;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
 /**
@@ -79,9 +79,9 @@ public class CoreseDatetime extends AbstractTemporalPointLiteral implements Core
      */
     public CoreseDatetime(String value, IRI datatype, CoreDatatype coreDatatype) {
         this(value, datatype);
-        if (coreDatatype != null && coreDatatype != XSD.DATETIME && coreDatatype != XSD.TIME
-                && coreDatatype != XSD.DATE) {
-            throw new IncorrectDatatypeException(
+        if (coreDatatype != null && coreDatatype != XSDDatatype.DATETIME && coreDatatype != XSDDatatype.TIME
+                && coreDatatype != XSDDatatype.DATE) {
+            throw new InvalidDatatypeException(
                     "Cannot create CoreseDatetime with a core datatype other than xsd:dateTime or xsd:time.");
         }
     }
@@ -194,11 +194,11 @@ public class CoreseDatetime extends AbstractTemporalPointLiteral implements Core
     }
 
     /**
-     * @return XSD.DATETIME as the core datatype
+     * @return XSDDatatype.DATETIME as the core datatype
      */
     @Override
     public CoreDatatype getCoreDatatype() {
-        return XSD.DATETIME;
+        return XSDDatatype.DATETIME;
     }
 
     @Override

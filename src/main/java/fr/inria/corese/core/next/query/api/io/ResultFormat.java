@@ -1,13 +1,13 @@
 package fr.inria.corese.core.next.query.api.io;
 
-import fr.inria.corese.core.next.data.api.base.io.FileFormat;
+import fr.inria.corese.core.next.data.api.io.format.FileFormat;
 
 import java.util.List;
 
 /**
  * Describes the standard SPARQL result serialization formats.
  */
-public class ResultFormat extends FileFormat {
+public final class ResultFormat extends FileFormat {
 
     public static final ResultFormat CSV = new ResultFormat(
             "CSV",

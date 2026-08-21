@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.query.impl.query;
 
-import fr.inria.corese.core.next.data.api.Value;
+import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.query.api.Operation;
 import fr.inria.corese.core.next.query.api.QueryLanguage;
 import fr.inria.corese.core.next.query.api.dataset.Dataset;
@@ -83,7 +83,7 @@ abstract class AbstractCoreseOperation implements Operation {
     }
 
     @Override
-    public boolean getIncludeInferred() {
+    public boolean isIncludeInferred() {
         return includeInferred;
     }
 

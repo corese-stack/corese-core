@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.query.impl.repository;
 
 import fr.inria.corese.core.next.query.api.exception.RepositoryException;
 import fr.inria.corese.core.next.query.api.repository.RepositoryConnection;
-import fr.inria.corese.core.next.storagemanager.impl.memory.MemoryStorageManager;
+import fr.inria.corese.core.next.storage.impl.memory.MemoryStorageManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

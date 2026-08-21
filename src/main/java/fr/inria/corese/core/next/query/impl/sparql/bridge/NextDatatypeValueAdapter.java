@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
-import fr.inria.corese.core.next.query.kgram.api.core.DatatypeValue;
+import fr.inria.corese.core.next.query.impl.kgram.api.core.DatatypeValue;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
 

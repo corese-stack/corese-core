@@ -1,9 +1,11 @@
 package fr.inria.corese.core.next.data.impl.io.parser.nquads;
 
-import fr.inria.corese.core.next.data.api.*;
-import fr.inria.corese.core.next.data.api.io.IOOptions;
-import fr.inria.corese.core.next.data.impl.exception.ParsingErrorException;
-import fr.inria.corese.core.next.impl.parser.antlr.NQuadsParser;
+import fr.inria.corese.core.next.data.api.term.*;
+import fr.inria.corese.core.next.data.api.model.*;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
+import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.api.exception.ParsingException;
+import fr.inria.corese.core.next.generated.antlr.NQuadsParser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.junit.jupiter.api.BeforeEach;
@@ -304,11 +306,12 @@ class NQuadsListenerTest {
 
     @Test
     @DisplayName("unescapeLiteral should throw IllegalArgumentException for invalid \\UXXXXXXXX")
+    @SuppressWarnings("deprecation")
     void testUnescapeLiteralInvalidUx() throws NoSuchMethodException {
         String input = "\"Invalid\\U0000XXX\"";
         java.lang.reflect.Method method = NQuadsListener.class.getDeclaredMethod("unescapeLiteral", String.class);
         method.setAccessible(true);
-        assertThrows(ParsingErrorException.class,
+        assertThrows(ParsingException.class,
                 () -> listener.unescapeLiteral(input),
                 "Should throw for malformed \\UXXXXXXXX escape sequence");
     }
@@ -344,13 +347,14 @@ class NQuadsListenerTest {
 
 
     @Test
-    @DisplayName("unescapeUri should throw ParsingErrorException for invalid \\uXXXX")
+    @DisplayName("unescapeUri should throw ParsingException for invalid \\uXXXX")
+    @SuppressWarnings("deprecation")
     void testUnescapeUriInvalidU() throws NoSuchMethodException {
         String input = "http://example.org/invalid\\uXXX";
         java.lang.reflect.Method method = NQuadsListener.class.getDeclaredMethod("unescapeUri", String.class);
         method.setAccessible(true);
 
-        assertThrows(ParsingErrorException.class,
+        assertThrows(ParsingException.class,
                 () -> listener.unescapeLiteral(input),
                 "Should throw unescapeUri should throw IllegalArgumentException for invalid \\uXXXX");
 

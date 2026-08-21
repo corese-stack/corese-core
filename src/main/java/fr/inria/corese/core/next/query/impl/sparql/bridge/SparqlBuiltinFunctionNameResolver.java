@@ -4,7 +4,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 import fr.inria.corese.core.sparql.triple.parser.Processor;
 
-import static fr.inria.corese.core.next.util.StringUtils.localNameFromIriToken;
+import static fr.inria.corese.core.next.common.text.RdfText.localNameFromIriToken;
 
 /**
  * Maps SPARQL IRI / QName tokens (function position) to the names used in {@link Processor}'s operator table.

@@ -2,23 +2,24 @@ package fr.inria.corese.core.next.query.impl.result;
 
 import fr.inria.corese.core.next.query.api.result.BindingSet;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
-import fr.inria.corese.core.next.query.kgram.api.core.Node;
-import fr.inria.corese.core.next.query.kgram.core.Mapping;
-import fr.inria.corese.core.next.query.kgram.core.Mappings;
+import fr.inria.corese.core.next.query.impl.kgram.api.core.Node;
+import fr.inria.corese.core.next.query.impl.kgram.core.Mapping;
+import fr.inria.corese.core.next.query.impl.kgram.core.Mappings;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Wrapper around Mappings
  */
-public class CoreseTupleQueryResult implements TupleQueryResult {
+public final class CoreseTupleQueryResult implements TupleQueryResult {
 
     private final Mappings mappings;
     private final Iterator<Mapping> iterator;
 
     public CoreseTupleQueryResult(Mappings mappings) {
-        this.mappings = mappings;
+        this.mappings = Objects.requireNonNull(mappings, "mappings");
         this.iterator = this.mappings.iterator();
     }
 

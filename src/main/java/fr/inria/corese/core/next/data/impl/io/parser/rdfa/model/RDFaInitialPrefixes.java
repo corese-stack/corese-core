@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.data.impl.io.parser.rdfa.model;
 
-import fr.inria.corese.core.next.data.api.Namespace;
-import fr.inria.corese.core.next.data.impl.common.vocabulary.*;
+import fr.inria.corese.core.next.data.api.namespace.Namespace;
+import fr.inria.corese.core.next.data.api.vocabulary.*;
 
 /**
  * <a href="https://www.w3.org/2011/rdfa-context/rdfa-1.1">https://www.w3.org/2011/rdfa-context/rdfa-1.1</a> sets a list of predefined prefixes for RDFa contexts.
@@ -29,7 +29,7 @@ public enum RDFaInitialPrefixes implements Namespace {
     //        duv	"https://www.w3.org/ns/duv#"
     DUV("duv", "https://www.w3.org/ns/duv#"),
     //        foaf	"http://xmlns.com/foaf/0.1/"
-    FOAF(fr.inria.corese.core.next.data.impl.common.vocabulary.FOAF.getVocabularyPreferredPrefix(), fr.inria.corese.core.next.data.impl.common.vocabulary.FOAF.getVocabularyNamespace()),
+    FOAF(fr.inria.corese.core.next.data.api.vocabulary.FOAF.getVocabularyPreferredPrefix(), fr.inria.corese.core.next.data.api.vocabulary.FOAF.getVocabularyNamespace()),
     //        gr	"http://purl.org/goodrelations/v1#"
     GR("gr", "http://purl.org/goodrelations/v1#"),
     //        grddl	"http://www.w3.org/2003/g/data-view#"
@@ -51,17 +51,17 @@ public enum RDFaInitialPrefixes implements Namespace {
     //        org	"http://www.w3.org/ns/org#"
     ORG("org", "http://www.w3.org/ns/org#"),
     //        owl	"http://www.w3.org/2002/07/owl#"
-    OWL(fr.inria.corese.core.next.data.impl.common.vocabulary.OWL.getVocabularyPreferredPrefix(), fr.inria.corese.core.next.data.impl.common.vocabulary.OWL.getVocabularyNamespace()),
+    OWL(fr.inria.corese.core.next.data.api.vocabulary.OWL.getVocabularyPreferredPrefix(), fr.inria.corese.core.next.data.api.vocabulary.OWL.getVocabularyNamespace()),
     //        prov	"http://www.w3.org/ns/prov#"
     PROV("prov", "http://www.w3.org/ns/prov#"),
     //        qb	"http://purl.org/linked-data/cube#"
     QB("qb", "http://purl.org/linked-data/cube#"),
     //        rdf	"http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-    RDF(fr.inria.corese.core.next.data.impl.common.vocabulary.RDF.getVocabularyPreferredPrefix(), fr.inria.corese.core.next.data.impl.common.vocabulary.RDF.getVocabularyNamespace()),
+    RDF(fr.inria.corese.core.next.data.api.vocabulary.RDF.getVocabularyPreferredPrefix(), fr.inria.corese.core.next.data.api.vocabulary.RDF.getVocabularyNamespace()),
     //        rdfa	"http://www.w3.org/ns/rdfa#"
     RDFA(RDFa.getVocabularyPreferredPrefix(), RDFa.getVocabularyNamespace()),
     //        rdfs	"http://www.w3.org/2000/01/rdf-schema#"
-    RDFS(fr.inria.corese.core.next.data.impl.common.vocabulary.RDFS.getVocabularyPreferredPrefix(), fr.inria.corese.core.next.data.impl.common.vocabulary.RDFS.getVocabularyNamespace()),
+    RDFS(fr.inria.corese.core.next.data.api.vocabulary.RDFS.getVocabularyPreferredPrefix(), fr.inria.corese.core.next.data.api.vocabulary.RDFS.getVocabularyNamespace()),
     //        rev	"http://purl.org/stuff/rev#"
     REV("rev", "http://purl.org/stuff/rev#"),
     //        rif	"http://www.w3.org/2007/rif#"
@@ -99,7 +99,7 @@ public enum RDFaInitialPrefixes implements Namespace {
     //        xml	"http://www.w3.org/XML/1998/namespace"
     XML("xml", "http://www.w3.org/XML/1998/namespace"),
     //        xsd	"http://www.w3.org/2001/XMLSchema#"
-    XSD(fr.inria.corese.core.next.data.impl.common.vocabulary.XSD.getVocabularyPreferredPrefix(), fr.inria.corese.core.next.data.impl.common.vocabulary.XSD.getVocabularyNamespace()),
+    XSD(fr.inria.corese.core.next.data.api.vocabulary.XSD.getVocabularyPreferredPrefix(), fr.inria.corese.core.next.data.api.vocabulary.XSD.getVocabularyNamespace()),
     ;
 
     private final String prefix;

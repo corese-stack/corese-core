@@ -1,13 +1,15 @@
 package fr.inria.corese.core.next.data.impl.adapter;
 
+import fr.inria.corese.core.next.data.impl.adapter.node.CoreseNodeAdapter;
+
 import fr.inria.corese.core.kgram.api.core.ExpType;
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.next.data.api.BNode;
-import fr.inria.corese.core.next.data.api.IRI;
-import fr.inria.corese.core.next.data.api.Literal;
-import fr.inria.corese.core.next.data.api.Resource;
-import fr.inria.corese.core.next.data.api.Value;
-import fr.inria.corese.core.next.data.api.ValueFactory;
+import fr.inria.corese.core.next.data.api.term.BNode;
+import fr.inria.corese.core.next.data.api.term.IRI;
+import fr.inria.corese.core.next.data.api.term.Literal;
+import fr.inria.corese.core.next.data.api.term.Resource;
+import fr.inria.corese.core.next.data.api.term.Value;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 
@@ -15,7 +17,7 @@ import fr.inria.corese.core.sparql.datatype.DatatypeMap;
  * Utility class for converting between Corese-compatible Node objects
  * and other Value representations.
  */
-public class CoreseValueConverter {
+public final class CoreseValueConverter {
 
     // Factory for creating Corese-compatible Value instances
     private final ValueFactory factory = new CoreseValueFactory();
@@ -23,7 +25,7 @@ public class CoreseValueConverter {
     // Constant representing the default Corese graph context
     private static final Node DEFAULT_CORESE_CONTEXT = DatatypeMap.createResource(ExpType.DEFAULT_GRAPH);
 
-    // --- Rdf4j to Corese conversion methods ---
+    // --- Data API to Corese conversion methods ---
 
     /**
      * Converts a generic Value into a Corese Node.
@@ -66,7 +68,7 @@ public class CoreseValueConverter {
     /**
      * Converts a Resource (used as context) to a Corese Node.
      *
-     * @param context RDF4J Resource context
+     * @param context data API resource context
      * @return Corese Node representing the context
      */
     public Node toCoreseContext(Resource context) {
@@ -74,10 +76,10 @@ public class CoreseValueConverter {
     }
 
     /**
-     * Converts an array of RDF4J Resource contexts into an array of Corese Nodes.
+     * Converts an array of data API resource contexts into Corese nodes.
      *
-     * @param contexts RDF4J contexts array
-     * @return Corese Node array following RDF4J context conventions
+     * @param contexts resource contexts
+     * @return the corresponding Corese context nodes
      */
     public Node[] toCoreseContextArray(Resource[] contexts) {
         if (contexts == null || (contexts.length == 1 && contexts[0] == null)) {
@@ -94,15 +96,15 @@ public class CoreseValueConverter {
         return result;
     }
 
-    // --- Corese to Rdf4j conversion methods ---
+    // --- Corese to data API conversion methods ---
 
     /**
-     * Converts a Corese Node to an RDF4J Value.
+     * Converts a Corese node to a data API value.
      *
      * @param node Corese Node to convert
-     * @return RDF4J Value equivalent
+     * @return equivalent data API value
      */
-    public Value toRdf4jValue(Node node) {
+    public Value fromCoreseNode(Node node) {
         if (node == null) {
             return null;
         }
@@ -129,13 +131,13 @@ public class CoreseValueConverter {
     }
 
     /**
-     * Converts a Corese context node back to an RDF4J Resource.
+     * Converts a Corese context node back to a data API resource.
      *
      * @param node Corese context node
-     * @return RDF4J Resource or null if it's the default context
+     * @return resource, or {@code null} for the default context
      */
-    public Resource toRdf4jValueContext(Node node) {
-        return DEFAULT_CORESE_CONTEXT.equals(node) ? null : (Resource) toRdf4jValue(node);
+    public Resource fromCoreseContext(Node node) {
+        return DEFAULT_CORESE_CONTEXT.equals(node) ? null : (Resource) fromCoreseNode(node);
     }
 
 }

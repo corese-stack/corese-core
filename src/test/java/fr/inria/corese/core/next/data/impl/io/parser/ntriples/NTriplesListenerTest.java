@@ -1,9 +1,11 @@
 package fr.inria.corese.core.next.data.impl.io.parser.ntriples;
 
-import fr.inria.corese.core.next.data.api.*;
-import fr.inria.corese.core.next.data.api.io.IOOptions;
-import fr.inria.corese.core.next.data.impl.exception.ParsingErrorException;
-import fr.inria.corese.core.next.impl.parser.antlr.NTriplesParser;
+import fr.inria.corese.core.next.data.api.term.*;
+import fr.inria.corese.core.next.data.api.model.*;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
+import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.api.exception.ParsingException;
+import fr.inria.corese.core.next.generated.antlr.NTriplesParser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.junit.jupiter.api.BeforeEach;
@@ -222,29 +224,31 @@ class NTriplesListenerTest {
 
 
     @Test
-    @DisplayName("unescapeLiteral should throw ParsingErrorException for invalid \\uXXXX")
+    @DisplayName("unescapeLiteral should throw ParsingException for invalid \\uXXXX")
+    @SuppressWarnings("deprecation")
     void testUnescapeLiteralInvalidUx() throws NoSuchMethodException {
         String input = "\"Invalid\\uXXXX\"";
         java.lang.reflect.Method method = NTriplesListener.class.getDeclaredMethod("unescapeLiteral", String.class);
         method.setAccessible(true);
 
 
-        assertThrows(ParsingErrorException.class,
+        assertThrows(ParsingException.class,
                 () -> listener.unescapeLiteral(input),
-                "Should throw unescapeLiteral should throw ParsingErrorException for invalid \\uXXXX");
+                "Should throw unescapeLiteral should throw ParsingException for invalid \\uXXXX");
     }
 
     @Test
-    @DisplayName("unescapeLiteral should throw ParsingErrorException for invalid \\UXXXXXXXX")
+    @DisplayName("unescapeLiteral should throw ParsingException for invalid \\UXXXXXXXX")
+    @SuppressWarnings("deprecation")
     void testUnescapeLiteralInvalid() throws NoSuchMethodException {
         String input = "\"Invalid\\U0000XXX\"";
         java.lang.reflect.Method method = NTriplesListener.class.getDeclaredMethod("unescapeLiteral", String.class);
         method.setAccessible(true);
 
 
-        assertThrows(ParsingErrorException.class,
+        assertThrows(ParsingException.class,
                 () -> listener.unescapeLiteral(input),
-                "Should throw unescapeLiteral should throw ParsingErrorException for invalid \\UXXXXXXXX");
+                "Should throw unescapeLiteral should throw ParsingException for invalid \\UXXXXXXXX");
     }
 
 

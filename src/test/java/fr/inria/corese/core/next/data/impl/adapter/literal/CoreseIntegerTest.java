@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-import fr.inria.corese.core.next.data.impl.common.literal.XSD;
+import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 import fr.inria.corese.core.sparql.datatype.CoreseNumber;
 
 public class CoreseIntegerTest extends AbstractCoreseNumberTest {
@@ -28,7 +28,7 @@ public class CoreseIntegerTest extends AbstractCoreseNumberTest {
     @Override
     public void getCoreDatatype() {
         AbstractCoreseNumber coreseNumber = createNumber("1346");
-        assertEquals(XSD.INTEGER, coreseNumber.getCoreDatatype());
+        assertEquals(XSDDatatype.INTEGER, coreseNumber.getCoreDatatype());
     }
 
     @Override

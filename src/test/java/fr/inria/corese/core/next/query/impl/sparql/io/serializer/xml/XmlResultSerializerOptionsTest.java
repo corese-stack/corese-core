@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.io.serializer.xml;
 
-import fr.inria.corese.core.next.data.api.io.IOOptions;
+import fr.inria.corese.core.next.data.api.io.option.IOOptions;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,7 +9,7 @@ import javax.xml.transform.OutputKeys;
 import java.io.StringWriter;
 import java.util.List;
 
-import static fr.inria.corese.core.next.query.impl.sparql.io.serializer.common.ResultSerializerTestUtils.MockQueryResults;
+import static fr.inria.corese.core.next.query.impl.sparql.io.serializer.support.ResultSerializerTestUtils.MockQueryResults;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class XmlResultSerializerOptionsTest {

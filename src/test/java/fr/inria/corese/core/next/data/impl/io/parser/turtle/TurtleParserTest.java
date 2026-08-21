@@ -1,15 +1,13 @@
 package fr.inria.corese.core.next.data.impl.io.parser.turtle;
 
-import fr.inria.corese.core.next.data.api.Model;
-import fr.inria.corese.core.next.data.api.Statement;
-import fr.inria.corese.core.next.data.api.ValueFactory;
+import fr.inria.corese.core.next.data.api.model.Model;
+import fr.inria.corese.core.next.data.api.model.Statement;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
-import fr.inria.corese.core.next.data.impl.common.vocabulary.RDFS;
-import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
+import fr.inria.corese.core.next.data.api.vocabulary.RDFS;
+import fr.inria.corese.core.next.data.impl.io.parser.support.ParserTestBase;
 import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.StringReader;
 
@@ -23,8 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * and unescaping of IRIs and literals, and named graphs.
  */
 public class TurtleParserTest extends ParserTestBase {
-
-    private static final Logger logger = LoggerFactory.getLogger(TurtleParserTest.class);
 
     private ValueFactory factory = new CoreseValueFactory();
 
@@ -99,7 +95,7 @@ public class TurtleParserTest extends ParserTestBase {
                 @base <http://rdfa.info/test-suite/test-cases/rdfa1.1/xml/manifest> .
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-                
+
                 <#0006> rdfs:label \"""Test 0006: @rel and @rev\""";
                   rdfs:comment \"""Tests @rev and @rel together, with the object being specified by @href, ignoring content\""";
                   .

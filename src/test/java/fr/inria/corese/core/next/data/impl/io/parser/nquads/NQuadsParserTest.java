@@ -1,9 +1,10 @@
 package fr.inria.corese.core.next.data.impl.io.parser.nquads;
 
-import fr.inria.corese.core.next.data.api.*;
-import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.data.impl.exception.ParsingErrorException;
-import fr.inria.corese.core.next.data.impl.io.parser.nquads.NQuadsParser;
+import fr.inria.corese.core.next.data.api.term.*;
+import fr.inria.corese.core.next.data.api.model.*;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
+import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
+import fr.inria.corese.core.next.data.api.exception.ParsingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -101,7 +102,7 @@ class NQuadsParserTest {
 
     @Test
     @DisplayName("Test parsing a basic quad with IRI graph")
-    void testParseBasicQuadWithIRIGraph() throws ParsingErrorException {
+    void testParseBasicQuadWithIRIGraph() throws ParsingException {
         String nquad = "<http://example.org/subject> <http://example.org/predicate> <http://example.org/object> <http://example.org/graph> .";
         parser.parse(new StringReader(nquad));
 
@@ -111,7 +112,7 @@ class NQuadsParserTest {
 
     @Test
     @DisplayName("Test parsing a basic quad with BNode graph")
-    void testParseBasicQuadWithBNodeGraph() throws ParsingErrorException {
+    void testParseBasicQuadWithBNodeGraph() throws ParsingException {
         String nquad = "<http://example.org/subject> <http://example.org/predicate> <http://example.org/object> _:graph1 .";
         parser.parse(new StringReader(nquad));
 
@@ -121,7 +122,7 @@ class NQuadsParserTest {
 
     @Test
     @DisplayName("Test parsing a quad with a literal object and IRI graph")
-    void testParseQuadWithLiteralObjectAndIRIGraph() throws ParsingErrorException {
+    void testParseQuadWithLiteralObjectAndIRIGraph() throws ParsingException {
         String nquad = "<http://example.org/subject> <http://example.org/predicate> \"simple string\" <http://example.org/graph> .";
         parser.parse(new StringReader(nquad));
 
@@ -131,7 +132,7 @@ class NQuadsParserTest {
 
     @Test
     @DisplayName("Test parsing a triple (no graph) which should go to default graph")
-    void testParseTripleToDefaultGraph() throws ParsingErrorException {
+    void testParseTripleToDefaultGraph() throws ParsingException {
         String nquad = "<http://example.org/subject> <http://example.org/predicate> <http://example.org/object> .";
         parser.parse(new StringReader(nquad));
 
@@ -142,7 +143,7 @@ class NQuadsParserTest {
 
     @Test
     @DisplayName("Test parsing a quad with escaped characters in literal")
-    void testParseEscapedLiteral() throws ParsingErrorException {
+    void testParseEscapedLiteral() throws ParsingException {
         String nquad = "<http://example.org/subject> <http://example.org/predicate> \"literal with \\\"quotes\\\" and \\n newline\" <http://example.org/graph> .";
         parser.parse(new StringReader(nquad));
 
@@ -153,7 +154,7 @@ class NQuadsParserTest {
 
     @Test
     @DisplayName("Test parsing a quad with Unicode escape in literal (\\uXXXX)")
-    void testParseUnicodeEscapeLiteralU() throws ParsingErrorException {
+    void testParseUnicodeEscapeLiteralU() throws ParsingException {
         String nquad = "<http://example.org/subject> <http://example.org/predicate> \"Hello\\u0020World\" <http://example.org/graph> .";
         Literal expectedLiteral = mock(Literal.class);
         lenient().when(mockValueFactory.createLiteral(eq("Hello World"))).thenReturn(expectedLiteral);
@@ -164,7 +165,7 @@ class NQuadsParserTest {
 
     @Test
     @DisplayName("Test parsing a quad with Unicode escape in literal (\\UXXXXXXXX)")
-    void testParseUnicodeEscapeLiteralUx() throws ParsingErrorException {
+    void testParseUnicodeEscapeLiteralUx() throws ParsingException {
         String nquad = "<http://example.org/subject> <http://example.org/predicate> \"Euro\" <http://example.org/graph> .";
         Literal expectedLiteral = mock(Literal.class);
         lenient().when(mockValueFactory.createLiteral(eq("Euro"))).thenReturn(expectedLiteral);
@@ -175,7 +176,7 @@ class NQuadsParserTest {
 
     @Test
     @DisplayName("Test parsing a quad with Unicode escape in IRI (\\uXXXX) in graph")
-    void testParseUnicodeEscapeIRIUInGraph() throws ParsingErrorException {
+    void testParseUnicodeEscapeIRIUInGraph() throws ParsingException {
         String nquad = "<http://example.org/subject> <http://example.org/predicate> <http://example.org/object> <http://example.org/grap\\u0068Name> .";
         IRI expectedGraphIRI = mock(IRI.class);
         lenient().when(mockValueFactory.createIRI(eq("http://example.org/graphName"))).thenReturn(expectedGraphIRI);
@@ -186,7 +187,7 @@ class NQuadsParserTest {
 
     @Test
     @DisplayName("Test parsing a quad with Unicode escape in IRI (\\UXXXXXXXX) in graph")
-    void testParseUnicodeEscapeIRIUxInGraph() throws ParsingErrorException {
+    void testParseUnicodeEscapeIRIUxInGraph() throws ParsingException {
         String nquad = "<http://example.org/subject> <http://example.org/predicate> <http://example.org/object> <http://example.org/graph> .";
         IRI expectedGraphIRI = mock(IRI.class);
         lenient().when(mockValueFactory.createIRI(eq("http://example.org/graph"))).thenReturn(expectedGraphIRI);

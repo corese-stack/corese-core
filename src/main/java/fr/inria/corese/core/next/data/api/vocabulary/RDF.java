@@ -1,0 +1,70 @@
+package fr.inria.corese.core.next.data.api.vocabulary;
+
+import fr.inria.corese.core.next.data.api.term.IRI;
+import fr.inria.corese.core.next.data.api.term.SimpleIRI;
+import fr.inria.corese.core.next.data.api.exception.IncorrectFormatException;
+
+/**
+ * Defines the RDF vocabulary.
+ *
+ * Each constant represents one term in the RDF namespace.
+ */
+public enum RDF implements Vocabulary {
+    HTML("HTML"),
+    langString("langString"),
+    PlainLiteral("PlainLiteral"),
+    XMLLiteral("XMLLiteral"),
+    CompoundLiteral("CompoundLiteral"),
+    JSON("JSON"),
+    List("List"),
+    Seq("Seq"),
+    Bag("Bag"),
+    Alt("Alt"),
+    Statement("Statement"),
+    Property("Property"),
+    first("first"),
+    rest("rest"),
+    nil("nil"),
+    subject("subject"),
+    predicate("predicate"),
+    object("object"),
+    type("type"),
+    value("value"),
+    direction("direction"),
+    language("language");
+
+
+    private final IRI iri;
+
+    /**
+     * Constructor for the RDF vocabulary enum.
+     *
+     * @param localName the local name of the IRI
+     * @throws IncorrectFormatException if the namespace and the local name do not form a correct IRI
+     */
+    RDF(String localName) {
+        this.iri = new SimpleIRI(getNamespace(), localName);
+    }
+    @Override
+    public IRI getIRI() {
+        return this.iri;
+    }
+
+    @Override
+    public String getNamespace() {
+        return getVocabularyNamespace();
+    }
+
+    @Override
+    public String getPreferredPrefix() {
+        return getVocabularyPreferredPrefix();
+    }
+
+    public static String getVocabularyNamespace() {
+        return "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+    }
+
+    public static String getVocabularyPreferredPrefix() {
+        return "rdf";
+    }
+}

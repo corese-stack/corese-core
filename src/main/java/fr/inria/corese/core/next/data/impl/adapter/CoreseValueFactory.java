@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.data.impl.adapter;
 
+import fr.inria.corese.core.next.data.impl.adapter.node.CoreseIRI;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -7,23 +9,23 @@ import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalAmount;
 import java.util.Date;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import fr.inria.corese.core.next.data.api.BNode;
-import fr.inria.corese.core.next.data.api.IRI;
-import fr.inria.corese.core.next.data.api.Literal;
-import fr.inria.corese.core.next.data.api.Resource;
-import fr.inria.corese.core.next.data.api.Statement;
-import fr.inria.corese.core.next.data.api.Triple;
-import fr.inria.corese.core.next.data.api.Value;
-import fr.inria.corese.core.next.data.api.ValueFactory;
-import fr.inria.corese.core.next.data.api.base.model.literal.AbstractLiteral;
+import fr.inria.corese.core.next.data.api.term.BNode;
+import fr.inria.corese.core.next.data.api.term.IRI;
+import fr.inria.corese.core.next.data.api.term.Literal;
+import fr.inria.corese.core.next.data.api.term.Resource;
+import fr.inria.corese.core.next.data.api.model.Statement;
+import fr.inria.corese.core.next.data.api.term.Triple;
+import fr.inria.corese.core.next.data.api.term.Value;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
+import fr.inria.corese.core.next.data.api.support.term.literal.AbstractLiteral;
 import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
-import fr.inria.corese.core.next.data.impl.common.literal.XSD;
-import fr.inria.corese.core.next.data.impl.exception.InternalException;
-import fr.inria.corese.core.next.data.impl.adapter.literal.CoreseBNode;
+import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
+import fr.inria.corese.core.next.data.impl.adapter.node.CoreseBNode;
 import fr.inria.corese.core.next.data.impl.adapter.literal.CoreseBoolean;
 import fr.inria.corese.core.next.data.impl.adapter.literal.CoreseDate;
 import fr.inria.corese.core.next.data.impl.adapter.literal.CoreseDatetime;
@@ -110,13 +112,13 @@ public class CoreseValueFactory implements ValueFactory {
     @Override
     public Literal createLiteral(String label, IRI datatype) {
         // Temporal types
-        if (XSD.DATE.getIRI().equals(datatype)) {
+        if (XSDDatatype.DATE.getIRI().equals(datatype)) {
             return new CoreseDate(label);
-        } else if (XSD.DATETIME.getIRI().equals(datatype)) {
+        } else if (XSDDatatype.DATETIME.getIRI().equals(datatype)) {
             return new CoreseDatetime(label);
-        } else if (XSD.TIME.getIRI().equals(datatype)) {
+        } else if (XSDDatatype.TIME.getIRI().equals(datatype)) {
             return new CoreseTime(label);
-        } else if (XSD.DURATION.getIRI().equals(datatype)) {
+        } else if (XSDDatatype.DURATION.getIRI().equals(datatype)) {
             return new CoreseDuration(label);
         }
 
@@ -128,12 +130,12 @@ public class CoreseValueFactory implements ValueFactory {
         }
 
         // Boolean types
-        else if (XSD.BOOLEAN.getIRI().equals(datatype)) {
+        else if (XSDDatatype.BOOLEAN.getIRI().equals(datatype)) {
             return new CoreseBoolean(Boolean.parseBoolean(label));
         }
 
         // String literals
-        else if (XSD.STRING.getIRI().equals(datatype)) {
+        else if (XSDDatatype.STRING.getIRI().equals(datatype)) {
             return new CoreseTyped(label);
         }
 
@@ -150,13 +152,13 @@ public class CoreseValueFactory implements ValueFactory {
     @Override
     public Literal createLiteral(String label, CoreDatatype coreDatatype) {
         // Temporal types
-        if (XSD.DATE.equals(coreDatatype)) {
+        if (XSDDatatype.DATE.equals(coreDatatype)) {
             return new CoreseDate(label);
-        } else if (XSD.DATETIME.equals(coreDatatype)) {
+        } else if (XSDDatatype.DATETIME.equals(coreDatatype)) {
             return new CoreseDatetime(label);
-        } else if (XSD.TIME.equals(coreDatatype)) {
+        } else if (XSDDatatype.TIME.equals(coreDatatype)) {
             return new CoreseTime(label);
-        } else if (XSD.DURATION.equals(coreDatatype)) {
+        } else if (XSDDatatype.DURATION.equals(coreDatatype)) {
             return new CoreseDuration(label);
         }
 
@@ -168,12 +170,12 @@ public class CoreseValueFactory implements ValueFactory {
         }
 
         // Boolean types
-        else if (XSD.BOOLEAN.equals(coreDatatype)) {
+        else if (XSDDatatype.BOOLEAN.equals(coreDatatype)) {
             return new CoreseBoolean(Boolean.parseBoolean(label));
         }
 
         // String literals
-        else if (XSD.STRING.equals(coreDatatype)) {
+        else if (XSDDatatype.STRING.equals(coreDatatype)) {
             return new CoreseTyped(label);
         }
         return new CoreseTyped(label, coreDatatype.getIRI(), coreDatatype);
@@ -189,13 +191,13 @@ public class CoreseValueFactory implements ValueFactory {
     @Override
     public Literal createLiteral(String label, IRI datatype, CoreDatatype coreDatatype) {
         // Temporal types
-        if (XSD.DATE.equals(coreDatatype)) {
+        if (XSDDatatype.DATE.equals(coreDatatype)) {
             return new CoreseDate(label, datatype, coreDatatype);
-        } else if (XSD.DATETIME.equals(coreDatatype)) {
+        } else if (XSDDatatype.DATETIME.equals(coreDatatype)) {
             return new CoreseDatetime(label, datatype, coreDatatype);
-        } else if (XSD.TIME.equals(coreDatatype)) {
+        } else if (XSDDatatype.TIME.equals(coreDatatype)) {
             return new CoreseTime(label, datatype, coreDatatype);
-        } else if (XSD.DURATION.equals(coreDatatype)) {
+        } else if (XSDDatatype.DURATION.equals(coreDatatype)) {
             return new CoreseDuration(label, datatype, coreDatatype);
         }
 
@@ -207,7 +209,7 @@ public class CoreseValueFactory implements ValueFactory {
         }
 
         // String literals
-        else if (XSD.STRING.equals(coreDatatype)) {
+        else if (XSDDatatype.STRING.equals(coreDatatype)) {
             return new CoreseTyped(label, datatype, coreDatatype);
         }
         return new CoreseTyped(label, datatype, coreDatatype);
@@ -360,20 +362,14 @@ public class CoreseValueFactory implements ValueFactory {
      * @param predicate the predicate of the statement (cannot be null)
      * @param object the object of the statement (cannot be null)
      * @return a new {@link CoreseStatement} with the given subject, predicate, and object, and no context
-     * @throws InternalException if any of the parameters are {@code null}
+     * @throws NullPointerException if any required parameter is {@code null}
      */
     @Override
     public Statement createStatement(Resource subject, IRI predicate, Value object) {
 
-        if (subject == null) {
-            throw new InternalException("Subject cannot be null");
-        }
-        if (predicate == null) {
-            throw new InternalException("Predicate cannot be null");
-        }
-        if (object == null) {
-            throw new InternalException("Object cannot be null");
-        }
+        Objects.requireNonNull(subject, "Subject cannot be null");
+        Objects.requireNonNull(predicate, "Predicate cannot be null");
+        Objects.requireNonNull(object, "Object cannot be null");
         return new CoreseStatement(subject, predicate, object, null);
     }
 
@@ -385,19 +381,13 @@ public class CoreseValueFactory implements ValueFactory {
      * @param object the object of the statement (cannot be null)
      * @param context the context (graph) of the statement (can be null)
      * @return a new {@link CoreseStatement} with the given subject, predicate, object, and context
-     * @throws InternalException if any of the parameters are {@code null}
+     * @throws NullPointerException if any required parameter is {@code null}
      */
     @Override
     public Statement createStatement(Resource subject, IRI predicate, Value object, Resource context) {
-        if (subject == null) {
-            throw new InternalException("Subject cannot be null");
-        }
-        if (predicate == null) {
-            throw new InternalException("Predicate cannot be null");
-        }
-        if (object == null) {
-            throw new InternalException("Object cannot be null");
-        }
+        Objects.requireNonNull(subject, "Subject cannot be null");
+        Objects.requireNonNull(predicate, "Predicate cannot be null");
+        Objects.requireNonNull(object, "Object cannot be null");
         return new CoreseStatement(subject, predicate, object, context);
     }
 

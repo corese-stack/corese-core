@@ -1,15 +1,17 @@
 package fr.inria.corese.core.next.data.impl.io.parser.rdfa;
 
-import fr.inria.corese.core.next.data.api.*;
-import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.data.api.base.io.parser.AbstractRDFParser;
-import fr.inria.corese.core.next.data.api.io.IOOptions;
-import fr.inria.corese.core.next.data.api.io.common.BaseIRIOptions;
-import fr.inria.corese.core.next.data.impl.common.util.IRIUtils;
-import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
-import fr.inria.corese.core.next.data.impl.exception.ParsingErrorException;
+import fr.inria.corese.core.next.data.api.term.*;
+import fr.inria.corese.core.next.data.api.model.*;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
+import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
+import fr.inria.corese.core.next.data.api.support.io.parser.AbstractRDFParser;
+import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.api.io.option.BaseIRIOptions;
+import fr.inria.corese.core.next.data.api.support.term.IRIUtils;
+import fr.inria.corese.core.next.data.api.vocabulary.RDF;
+import fr.inria.corese.core.next.data.api.exception.ParsingException;
 import fr.inria.corese.core.next.data.impl.io.parser.rdfa.model.*;
-import fr.inria.corese.core.next.data.impl.io.serialization.util.SerializationConstants;
+import fr.inria.corese.core.next.data.api.support.io.IOConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.*;
@@ -42,7 +44,7 @@ public class RDFaParser extends AbstractRDFParser {
     private static final String BASE_TAG = "base";
     private static final String XMLNS_PREFIX = "xmlns";
 
-    private String baseIri = SerializationConstants.getDefaultBaseURI();
+    private String baseIri = IOConstants.getDefaultBaseURI();
 
     private SAXParser saxParser;
     private SAXParserFactory saxParserFactory;
@@ -72,7 +74,7 @@ public class RDFaParser extends AbstractRDFParser {
         try {
             this.saxParser = this.saxParserFactory.newSAXParser();
         } catch (SAXException | ParserConfigurationException e) {
-            throw new ParsingErrorException("Unexpected error during XML+RDFa parser creation: " + e.getMessage(), e);
+            throw new ParsingException("Unexpected error during XML+RDFa parser creation: " + e.getMessage(), e);
         }
         this.setConfig(config);
     }
@@ -89,14 +91,14 @@ public class RDFaParser extends AbstractRDFParser {
                 try {
                     this.saxParserFactory.setFeature(featureUri, value);
                 } catch (ParserConfigurationException | SAXNotRecognizedException | SAXNotSupportedException e) {
-                    throw new ParsingErrorException("Failed setting the SAX feature " + featureUri + " from the parser's options", e);
+                    throw new ParsingException("Failed setting the SAX feature " + featureUri + " from the parser's options", e);
                 }
             });
             rdfaOptions.getSAXProperties().forEach((propertyUri, value) -> {
                 try {
                     this.saxParser.setProperty(propertyUri, value);
                 } catch (SAXNotRecognizedException | SAXNotSupportedException e) {
-                    throw new ParsingErrorException("Failed setting the SAX property " + propertyUri + " from the parser's options", e);
+                    throw new ParsingException("Failed setting the SAX property " + propertyUri + " from the parser's options", e);
                 }
             });
             this.saxParserFactory.setSchema(rdfaOptions.getSchema());
@@ -132,9 +134,9 @@ public class RDFaParser extends AbstractRDFParser {
             InputSource inputSource = new InputSource(reader);
             saxParser.parse(inputSource, new XMLSaxHandler());
         } catch (IOException e) {
-            throw new ParsingErrorException("Failed to parse XML+RDFa input stream: " + e.getMessage(), e);
+            throw new ParsingException("Failed to parse XML+RDFa input stream: " + e.getMessage(), e);
         } catch (Exception e) {
-            throw new ParsingErrorException("Unexpected error during XML+RDFa parsing: " + e.getMessage(), e);
+            throw new ParsingException("Unexpected error during XML+RDFa parsing: " + e.getMessage(), e);
         }
     }
 
@@ -217,7 +219,7 @@ public class RDFaParser extends AbstractRDFParser {
         processingContext.setElementAttributes(attrs);
         this.processingContexts.addFirst(processingContext);
         if(! this.currentProcessingContext().getElementName().equals(qName)) {
-            throw new ParsingErrorException("Start process element "+ qName +" is not paired with the right context" + this.currentProcessingContext());
+            throw new ParsingException("Start process element "+ qName +" is not paired with the right context" + this.currentProcessingContext());
         }
 
         // HTML-specific base element
@@ -241,7 +243,7 @@ public class RDFaParser extends AbstractRDFParser {
                 String prefixName = attribute.replace(XMLNS_PREFIX + ":", "");
 
                 if (prefixName.contains("_")) {
-                    throw new ParsingErrorException("Prefix '" + prefixName + "' contains underscore character which is not allowed in xmlns declaration");
+                    throw new ParsingException("Prefix '" + prefixName + "' contains underscore character which is not allowed in xmlns declaration");
                 }
 
                 IRI prefixNamespace = getValueFactory().createIRI(attributeValue, "");
@@ -298,7 +300,7 @@ public class RDFaParser extends AbstractRDFParser {
                         if (emptyAboutResource.isPresent()) {
                             this.currentProcessingContext().setTypedResource(emptyAboutResource.get());
                         } else {
-                            throw new ParsingErrorException("Expected to be able to generate typedResource from empty CURIE");
+                            throw new ParsingException("Expected to be able to generate typedResource from empty CURIE");
                         }
                         // otherwise,
                     } else {
@@ -347,7 +349,7 @@ public class RDFaParser extends AbstractRDFParser {
                         if (emptyAboutResource.isPresent()) {
                             this.currentProcessingContext().setNewSubject(emptyAboutResource.get());
                         } else {
-                            throw new ParsingErrorException("Expected to be able to generate newSubject from empty CURIE");
+                            throw new ParsingException("Expected to be able to generate newSubject from empty CURIE");
                         }
                         // otherwise, if @typeof is present, then new subject is set to be a newly created bnode;
                     } else if (isAttributePresent(RDFaAttributes.TYPEOF)) {
@@ -382,7 +384,7 @@ public class RDFaParser extends AbstractRDFParser {
                     if (emptyAboutResource.isPresent()) {
                         this.currentProcessingContext().setTypedResource(emptyAboutResource.get());
                     } else {
-                        throw new ParsingErrorException("Expected to be able to generate typedResource from empty CURIE");
+                        throw new ParsingException("Expected to be able to generate typedResource from empty CURIE");
                     }
                 } else if (currentProcessingContext().getEvaluationContext().getParentObjectResource() != null) {
                     this.currentProcessingContext().setNewSubject(currentProcessingContext().getEvaluationContext().getParentObjectResource());
@@ -436,7 +438,7 @@ public class RDFaParser extends AbstractRDFParser {
                         if (relResource.isIRI()) {
                             this.getModel().add(this.currentProcessingContext().getNewSubject(), (IRI) relResource, this.currentProcessingContext().getCurrentObjectResource());
                         } else {
-                            throw new ParsingErrorException("Value of attribute @rel expected to be an IRI but was " + this.currentProcessingContext().getElementAttributes().get(RDFaAttributes.REL.getName()));
+                            throw new ParsingException("Value of attribute @rel expected to be an IRI but was " + this.currentProcessingContext().getElementAttributes().get(RDFaAttributes.REL.getName()));
                         }
                     }
                 }
@@ -444,10 +446,10 @@ public class RDFaParser extends AbstractRDFParser {
                     List<Resource> revResourceList = getAttributeValueResourceList(RDFaAttributes.REV);
                     for(Resource revResource: revResourceList) {
                         if (!revResource.isIRI()) {
-                            throw new ParsingErrorException("Value of attribute @rev expected to be an IRI but was " + getAttributeStringValue(RDFaAttributes.REV));
+                            throw new ParsingException("Value of attribute @rev expected to be an IRI but was " + getAttributeStringValue(RDFaAttributes.REV));
                         }
                         if (!this.currentProcessingContext().getCurrentObjectResource().isResource()) {
-                            throw new ParsingErrorException("object resource expected to be a resource but was " + this.currentProcessingContext().getCurrentObjectResource());
+                            throw new ParsingException("object resource expected to be a resource but was " + this.currentProcessingContext().getCurrentObjectResource());
                         }
                         this.getModel().add(this.currentProcessingContext().getCurrentObjectResource(), (IRI) revResource, this.currentProcessingContext().getNewSubject());
                     }
@@ -477,7 +479,7 @@ public class RDFaParser extends AbstractRDFParser {
                 }
             } else if (isAttributePresent(RDFaAttributes.REV)) {
                 if (!getAttributeValueResource(RDFaAttributes.REV).isIRI()) {
-                    throw new ParsingErrorException("Value of attribute @rev expected to be an IRI but was " + this.currentProcessingContext().getElementAttributes().get(RDFaAttributes.REV.getName()));
+                    throw new ParsingException("Value of attribute @rev expected to be an IRI but was " + this.currentProcessingContext().getElementAttributes().get(RDFaAttributes.REV.getName()));
                 }
                 List<Resource> revList = getAttributeValueResourceList(RDFaAttributes.REV);
                 for (Resource revRes : revList) {
@@ -542,14 +544,14 @@ public class RDFaParser extends AbstractRDFParser {
      */
     private void endProcessElement(String uri, String localName, String qName) {
         if(! this.currentProcessingContext().getElementName().equals(qName)) {
-            throw new ParsingErrorException("End process element "+ qName +" is not paired with the right context" + this.currentProcessingContext());
+            throw new ParsingException("End process element "+ qName +" is not paired with the right context" + this.currentProcessingContext());
         }
 
         // 11. The next step of the iteration is to establish any current property value;
         if (isAttributePresent(RDFaAttributes.PROPERTY) ) {
             String propertyValue = getAttributeStringValue(RDFaAttributes.PROPERTY);
             if (propertyValue == null || propertyValue.trim().isEmpty()) {
-                throw new ParsingErrorException("@property attribute cannot be empty");
+                throw new ParsingException("@property attribute cannot be empty");
             }
             List<Resource> propertyIRIList = getAttributeValueResourceList(RDFaAttributes.PROPERTY);
             // as a typed literal if @datatype is present, does not have an empty value according to the section on CURIE and IRI Processing, and is not set to XMLLiteral in the vocabulary http://www.w3.org/1999/02/22-rdf-syntax-ns#.
@@ -631,7 +633,7 @@ public class RDFaParser extends AbstractRDFParser {
             // If the element also includes the @inlist attribute, the current property value is added to the local list mapping as follows:
             for(Resource propertyIRIResource: propertyIRIList) {
                 if (!propertyIRIResource.isIRI()) {
-                    throw new ParsingErrorException("Property must be an IRI, got: " + propertyIRIResource + ". Blank nodes are not allowed as predicates.");
+                    throw new ParsingException("Property must be an IRI, got: " + propertyIRIResource + ". Blank nodes are not allowed as predicates.");
                 }
                 IRI propertyIRI = (IRI) propertyIRIResource;
                 if(this.currentProcessingContext().getCurrentPropertyValue() != null) {
@@ -683,12 +685,12 @@ public class RDFaParser extends AbstractRDFParser {
 
         @Override
         public void error(SAXParseException e) {
-            throw new ParsingErrorException("Failed to parse XML+RDFa: " + e.getMessage(), e);
+            throw new ParsingException("Failed to parse XML+RDFa: " + e.getMessage(), e);
         }
 
         @Override
         public void fatalError(SAXParseException e) {
-            throw new ParsingErrorException("Failed to parse XML+RDFa: " + e.getMessage(), e);
+            throw new ParsingException("Failed to parse XML+RDFa: " + e.getMessage(), e);
         }
 
         @Override
@@ -702,7 +704,7 @@ public class RDFaParser extends AbstractRDFParser {
         HashMap<String, IRI> result = new HashMap<>();
 
         if (prefixArray.length % 2 != 0) {
-            throw new ParsingErrorException("Error during prefix extraction of " + declaration);
+            throw new ParsingException("Error during prefix extraction of " + declaration);
         }
 
         int numberOfPairs = prefixArray.length / 2;
@@ -711,17 +713,17 @@ public class RDFaParser extends AbstractRDFParser {
             String namespaceString = prefixArray[pairNumber * 2 + 1];
 
             if(!prefix.endsWith(":")) {
-                throw new ParsingErrorException("Expecting namespace prefix declaration to end with \":\", got " + prefix + " in declaration " + declaration);
+                throw new ParsingException("Expecting namespace prefix declaration to end with \":\", got " + prefix + " in declaration " + declaration);
             }
 
             prefix = prefix.replaceAll(":$", "");
 
             if (prefix.contains("_") && !prefix.equals("_")) {
-                throw new ParsingErrorException("Prefix '" + prefix + "' contains underscore character which is not allowed in declaration: " + declaration);
+                throw new ParsingException("Prefix '" + prefix + "' contains underscore character which is not allowed in declaration: " + declaration);
             }
 
             if (namespaceString == null || namespaceString.trim().isEmpty()) {
-                throw new ParsingErrorException("Namespace for prefix '" + prefix + "' cannot be empty in declaration: " + declaration);
+                throw new ParsingException("Namespace for prefix '" + prefix + "' cannot be empty in declaration: " + declaration);
             }
 
             // AJOUT: Résoudre les IRIs relatives
@@ -763,7 +765,7 @@ public class RDFaParser extends AbstractRDFParser {
         if (resourceResolution.isPresent()) {
             return resourceResolution.get();
         } else {
-            throw new ParsingErrorException("Could not parse @" + attribute.getName() + " value: " + attributeValue);
+            throw new ParsingException("Could not parse @" + attribute.getName() + " value: " + attributeValue);
         }
     }
 
@@ -818,7 +820,7 @@ public class RDFaParser extends AbstractRDFParser {
             } else if (prefixString.isEmpty()) { // CURIE is relative to the base URI
                 return Optional.of(this.getValueFactory().createIRI(currentProcessingContext().getEvaluationContext().getBaseIri().stringValue(), localNameString));
             } else {
-                throw new ParsingErrorException("CURIE " + stringResource + " uses unknown prefix among " + this.getIriMappings().keySet() + " and " + this.getIriMappings().keySet());
+                throw new ParsingException("CURIE " + stringResource + " uses unknown prefix among " + this.getIriMappings().keySet() + " and " + this.getIriMappings().keySet());
             }
         } else if (IRIUtils.isStandardIRI(resultString)) {  // Full IRI
             return Optional.of(this.getValueFactory().createIRI(resultString));

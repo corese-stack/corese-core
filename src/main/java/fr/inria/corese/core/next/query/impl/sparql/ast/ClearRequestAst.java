@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
-import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
+import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.AstVisitor;
 
 /**
  * Represents the CLEAR operation as defined in the <a href="https://www.w3.org/TR/2013/REC-sparql11-update-20130321/#clear">SPARQL 1.1 recommendation<a/>.

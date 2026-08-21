@@ -11,12 +11,12 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.PatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ServiceAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.UnionAst;
-import fr.inria.corese.core.next.query.kgram.api.core.Edge;
-import fr.inria.corese.core.next.query.kgram.api.core.ExpType.Type;
-import fr.inria.corese.core.next.query.kgram.api.core.Filter;
-import fr.inria.corese.core.next.query.kgram.api.core.Node;
-import fr.inria.corese.core.next.query.kgram.core.Exp;
-import fr.inria.corese.core.next.query.kgram.core.Query;
+import fr.inria.corese.core.next.query.impl.kgram.api.core.Edge;
+import fr.inria.corese.core.next.query.impl.kgram.api.core.ExpType.Type;
+import fr.inria.corese.core.next.query.impl.kgram.api.core.Filter;
+import fr.inria.corese.core.next.query.impl.kgram.api.core.Node;
+import fr.inria.corese.core.next.query.impl.kgram.core.Exp;
+import fr.inria.corese.core.next.query.impl.kgram.core.Query;
 
 import java.util.Objects;
 

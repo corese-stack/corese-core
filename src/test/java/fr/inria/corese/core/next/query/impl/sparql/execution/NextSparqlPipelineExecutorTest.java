@@ -1,10 +1,10 @@
 package fr.inria.corese.core.next.query.impl.sparql.execution;
 
-import fr.inria.corese.core.next.data.api.IRI;
-import fr.inria.corese.core.next.data.api.Resource;
-import fr.inria.corese.core.next.data.api.Statement;
-import fr.inria.corese.core.next.data.api.Value;
-import fr.inria.corese.core.next.data.api.ValueFactory;
+import fr.inria.corese.core.next.data.api.term.IRI;
+import fr.inria.corese.core.next.data.api.term.Resource;
+import fr.inria.corese.core.next.data.api.model.Statement;
+import fr.inria.corese.core.next.data.api.term.Value;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
 import fr.inria.corese.core.next.query.api.dataset.Dataset;
 import fr.inria.corese.core.next.query.api.exception.QueryTimeoutException;
@@ -13,7 +13,7 @@ import fr.inria.corese.core.next.query.api.result.BindingSet;
 import fr.inria.corese.core.next.query.api.result.GraphQueryResult;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 import fr.inria.corese.core.next.query.impl.dataset.CoreseDataset;
-import fr.inria.corese.core.next.storagemanager.impl.memory.MemoryStorageManager;
+import fr.inria.corese.core.next.storage.impl.memory.MemoryStorageManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

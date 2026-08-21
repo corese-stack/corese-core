@@ -37,7 +37,7 @@ sonar {
 // === Generated sources directories ===
 val javaccGeneratedDir = layout.buildDirectory.dir("generated-src/javacc").get().asFile
 val antlrGeneratedDir = layout.buildDirectory.dir("generated-src/antlr").get().asFile
-val antlrPackageDir = layout.buildDirectory.dir("generated-src/antlr/fr/inria/corese/core/next/impl/parser/antlr").get().asFile
+val antlrPackageDir = layout.buildDirectory.dir("generated-src/antlr/fr/inria/corese/core/next/generated/antlr").get().asFile
 
 // JavaCC configuration
 javacc {
@@ -293,7 +293,7 @@ tasks.withType<PublishToMavenRepository>().configureEach {
 
 // Configure the Antlr task to generate parser code with specific arguments
 tasks.named<AntlrTask>("generateGrammarSource") {
-    arguments.addAll(listOf("-visitor", "-long-messages", "-package", "fr.inria.corese.core.next.impl.parser.antlr"))
+    arguments.addAll(listOf("-visitor", "-long-messages", "-package", "fr.inria.corese.core.next.generated.antlr"))
     outputDirectory = antlrPackageDir
     setSource(fileTree("src/main/antlr") {
         include("**/*.g4")

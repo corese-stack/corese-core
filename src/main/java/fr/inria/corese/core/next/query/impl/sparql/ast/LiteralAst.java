@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
-import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
+import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.AstVisitor;
 
 /**
  * RDF literal in a triple pattern (lexical form, optional language tag or datatype).

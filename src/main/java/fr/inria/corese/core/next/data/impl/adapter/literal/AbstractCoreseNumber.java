@@ -1,8 +1,8 @@
 package fr.inria.corese.core.next.data.impl.adapter.literal;
 
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.next.data.api.IRI;
-import fr.inria.corese.core.next.data.api.base.model.literal.AbstractNumber;
+import fr.inria.corese.core.next.data.api.term.IRI;
+import fr.inria.corese.core.next.data.api.support.term.literal.AbstractNumber;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.CoreseNumber;
 
@@ -14,7 +14,8 @@ import java.math.BigInteger;
  */
 public abstract class AbstractCoreseNumber extends AbstractNumber implements CoreseDatatypeAdapter {
 
-    protected final CoreseNumber coreseObject;
+    private final String lexicalValue;
+    private transient volatile CoreseNumber coreseObject;
 
     /**
      * Constructor for AbstractCoreseNumber.
@@ -25,22 +26,34 @@ public abstract class AbstractCoreseNumber extends AbstractNumber implements Cor
     protected AbstractCoreseNumber(CoreseNumber coreseObject, IRI datatype) {
         super(datatype);
         this.coreseObject = coreseObject;
+        this.lexicalValue = coreseObject.getLabel();
     }
 
+    /** Recreates the legacy value after Java deserialization. */
+    protected abstract CoreseNumber createCoreseObject(String value);
+
+    protected final CoreseNumber coreseObject() {
+        CoreseNumber value = coreseObject;
+        if (value == null) {
+            value = createCoreseObject(lexicalValue);
+            coreseObject = value;
+        }
+        return value;
+    }
 
     @Override
     public Node getCoreseNode() {
-        return coreseObject;
+        return coreseObject();
     }
 
     @Override
     public IDatatype getIDatatype() {
-        return coreseObject;
+        return coreseObject();
     }
 
     @Override
     public String getLabel() {
-        return this.coreseObject.getLabel();
+        return lexicalValue;
     }
 
     @Override
@@ -57,7 +70,7 @@ public abstract class AbstractCoreseNumber extends AbstractNumber implements Cor
 
     @Override
     public float floatValue() {
-        return this.coreseObject.floatValue();
+        return coreseObject().floatValue();
     }
 
     @Override
@@ -71,7 +84,7 @@ public abstract class AbstractCoreseNumber extends AbstractNumber implements Cor
 
     @Override
     public String stringValue() {
-        return this.coreseObject.getLabel();
+        return lexicalValue;
     }
 
     @Override
@@ -79,12 +92,12 @@ public abstract class AbstractCoreseNumber extends AbstractNumber implements Cor
         if (this == o) return true;
         if (!(o instanceof AbstractNumber)) return false;
         if (!(o instanceof AbstractCoreseNumber that)) return super.equals(o);
-        return this.coreseObject.equals(that.coreseObject);
+        return this.coreseObject().equals(that.coreseObject());
     }
 
     @Override
     public int hashCode() {
-        return this.coreseObject.hashCode();
+        return this.coreseObject().hashCode();
     }
 
 }

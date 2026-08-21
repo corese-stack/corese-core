@@ -1,25 +1,15 @@
 package fr.inria.corese.core.next.query.impl.result;
 
-import fr.inria.corese.core.next.data.api.Value;
+import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.query.api.result.Binding;
 
-public class CoreseBinding implements Binding {
-    private final String varName;
-    private final Value bindingValue;
+import java.util.Objects;
 
-    public CoreseBinding(String variable, Value value) {
-        this.varName = variable;
-        this.bindingValue = value;
+/** Immutable variable-to-value binding. */
+public record CoreseBinding(String name, Value value) implements Binding {
+
+    public CoreseBinding {
+        Objects.requireNonNull(name, "name");
+        Objects.requireNonNull(value, "value");
     }
-
-    @Override
-    public String name() {
-        return this.varName;
-    }
-
-    @Override
-    public Value value() {
-        return this.bindingValue;
-    }
-
 }

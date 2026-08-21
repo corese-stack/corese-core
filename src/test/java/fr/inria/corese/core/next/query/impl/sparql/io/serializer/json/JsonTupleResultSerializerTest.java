@@ -1,12 +1,12 @@
 package fr.inria.corese.core.next.query.impl.sparql.io.serializer.json;
 
-import fr.inria.corese.core.next.data.api.Value;
-import fr.inria.corese.core.next.data.api.io.IOOptions;
-import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
+import fr.inria.corese.core.next.data.api.term.Value;
+import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.api.vocabulary.RDF;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
-import fr.inria.corese.core.next.query.impl.sparql.io.serializer.common.AbstractResultSerializerTest;
-import fr.inria.corese.core.next.query.impl.sparql.io.serializer.common.LinksSerializerTest;
+import fr.inria.corese.core.next.query.impl.sparql.io.serializer.support.AbstractResultSerializerTest;
+import fr.inria.corese.core.next.query.impl.sparql.io.serializer.support.LinksSerializerTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static fr.inria.corese.core.next.query.impl.sparql.io.serializer.common.ResultSerializerTestUtils.MockQueryResults;
+import static fr.inria.corese.core.next.query.impl.sparql.io.serializer.support.ResultSerializerTestUtils.MockQueryResults;
 
 public class JsonTupleResultSerializerTest extends AbstractResultSerializerTest implements LinksSerializerTest {
     @Override
@@ -278,7 +278,7 @@ public class JsonTupleResultSerializerTest extends AbstractResultSerializerTest 
         serializer.write(writer);
         assertEquals(getJSONStandardResultsString(), writer.toString());
     }
-    
+
     private String getLinksTestResultsString() {
         return "{" +
             "\"head\":{" +

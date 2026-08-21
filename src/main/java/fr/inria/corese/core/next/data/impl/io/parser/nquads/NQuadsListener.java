@@ -1,11 +1,13 @@
 package fr.inria.corese.core.next.data.impl.io.parser.nquads;
 
-import fr.inria.corese.core.next.data.api.*;
-import fr.inria.corese.core.next.data.api.io.IOOptions;
-import fr.inria.corese.core.next.data.impl.exception.ParsingErrorException;
-import fr.inria.corese.core.next.data.impl.io.parser.common.AbstractNTriplesNQuadsListener;
-import fr.inria.corese.core.next.impl.parser.antlr.NQuadsBaseListener;
-import fr.inria.corese.core.next.impl.parser.antlr.NQuadsParser;
+import fr.inria.corese.core.next.data.api.term.*;
+import fr.inria.corese.core.next.data.api.model.*;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
+import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.api.exception.ParsingException;
+import fr.inria.corese.core.next.data.impl.io.parser.support.AbstractNTriplesNQuadsListener;
+import fr.inria.corese.core.next.generated.antlr.NQuadsBaseListener;
+import fr.inria.corese.core.next.generated.antlr.NQuadsParser;
 
 /**
  * Listener for the ANTLR4 generated parser for N-Quads.
@@ -54,7 +56,7 @@ public class NQuadsListener extends NQuadsBaseListener {
     private void checkForInvalidDirectives(NQuadsParser.StatementContext ctx) {
         String text = ctx.getText();
         if (text != null && (text.contains("@base") || text.contains("@prefix"))) {
-            throw new ParsingErrorException(
+            throw new ParsingException(
                     "Directives (@base, @prefix) are not allowed in N-Quads format");
         }
     }
@@ -86,7 +88,7 @@ public class NQuadsListener extends NQuadsBaseListener {
             validateBlankNodeLabel(label);
             return factory.createBNode(label);
         }
-        throw new ParsingErrorException("Unsupported N-Quads subject: " + ctx.getText());
+        throw new ParsingException("Unsupported N-Quads subject: " + ctx.getText());
     }
 
     /**
@@ -97,7 +99,7 @@ public class NQuadsListener extends NQuadsBaseListener {
             String iri = abstractNTriplesQuadsListener.unescapeUri(stripAngles(ctx.IRIREF().getText()));
             return factory.createIRI(iri);
         }
-        throw new ParsingErrorException("Unsupported N-Quads predicate: " + ctx.getText());
+        throw new ParsingException("Unsupported N-Quads predicate: " + ctx.getText());
     }
 
     /**
@@ -116,7 +118,7 @@ public class NQuadsListener extends NQuadsBaseListener {
         if (ctx.literal() != null) {
             return extractLiteral(ctx.literal());
         }
-        throw new ParsingErrorException("Unsupported N-Quads object: " + ctx.getText());
+        throw new ParsingException("Unsupported N-Quads object: " + ctx.getText());
     }
 
     /**
@@ -132,7 +134,7 @@ public class NQuadsListener extends NQuadsBaseListener {
             validateBlankNodeLabel(label);
             return factory.createBNode(label);
         }
-        throw new ParsingErrorException("Unsupported N-Quads graph: " + ctx.getText());
+        throw new ParsingException("Unsupported N-Quads graph: " + ctx.getText());
     }
 
     /**
@@ -144,7 +146,7 @@ public class NQuadsListener extends NQuadsBaseListener {
                 : null;
 
         if (rawText == null) {
-            throw new ParsingErrorException("Missing literal token: " + ctx.getText());
+            throw new ParsingException("Missing literal token: " + ctx.getText());
         }
 
         String label = abstractNTriplesQuadsListener.unescapeLiteral(rawText);
@@ -174,13 +176,13 @@ public class NQuadsListener extends NQuadsBaseListener {
      * Blank node labels must match PN_LOCAL rules, which means they cannot be empty,
      * and cannot contain colons. They *can* start with a digit.
      * @param label The blank node label string (without the "_:" prefix).
-     * @throws ParsingErrorException if the blank node label is invalid.
+     * @throws ParsingException if the blank node label is invalid.
      */
     protected void validateBlankNodeLabel(String label) {
         abstractNTriplesQuadsListener.validateBlankNodeLabel(label);
 
         if (!label.matches("^[A-Za-z_0-9][A-Za-z0-9_\\-\\.]*$")) {
-            throw new ParsingErrorException("Invalid blank node label syntax: " + label);
+            throw new ParsingException("Invalid blank node label syntax: " + label);
         }
     }
 

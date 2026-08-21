@@ -1,9 +1,10 @@
 package fr.inria.corese.core.next.data.impl.io.parser.ntriples;
 
-import fr.inria.corese.core.next.data.api.*;
-import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.data.impl.exception.ParsingErrorException;
-import fr.inria.corese.core.next.data.impl.io.parser.ntriples.NTriplesParser;
+import fr.inria.corese.core.next.data.api.term.*;
+import fr.inria.corese.core.next.data.api.model.*;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
+import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
+import fr.inria.corese.core.next.data.api.exception.ParsingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -94,7 +95,7 @@ class NTriplesParserTest {
 
     @Test
     @DisplayName("Test parsing a basic triple with IRIs")
-    void testParseBasicTriple() throws ParsingErrorException {
+    void testParseBasicTriple() throws ParsingException {
         String ntriple = "<http://example.org/subject> <http://example.org/predicate> <http://example.org/object> .";
         parser.parse(new StringReader(ntriple));
 
@@ -104,7 +105,7 @@ class NTriplesParserTest {
 
     @Test
     @DisplayName("Test parsing a triple with a blank node subject")
-    void testParseBlankNodeSubject() throws ParsingErrorException {
+    void testParseBlankNodeSubject() throws ParsingException {
         String ntriple = "_:sub1 <http://example.org/predicate> <http://example.org/object> .";
         parser.parse(new StringReader(ntriple));
 
@@ -114,7 +115,7 @@ class NTriplesParserTest {
 
     @Test
     @DisplayName("Test parsing a triple with a blank node object")
-    void testParseBlankNodeObject() throws ParsingErrorException {
+    void testParseBlankNodeObject() throws ParsingException {
         String ntriple = "<http://example.org/subject> <http://example.org/predicate> _:obj1 .";
         parser.parse(new StringReader(ntriple));
 
@@ -124,7 +125,7 @@ class NTriplesParserTest {
 
     @Test
     @DisplayName("Test parsing a triple with a simple literal object")
-    void testParseSimpleLiteralObject() throws ParsingErrorException {
+    void testParseSimpleLiteralObject() throws ParsingException {
         String ntriple = "<http://example.org/subject> <http://example.org/predicate> \"simple string\" .";
         parser.parse(new StringReader(ntriple));
 
@@ -134,7 +135,7 @@ class NTriplesParserTest {
 
     @Test
     @DisplayName("Test parsing a triple with a language-tagged literal object")
-    void testParseLangLiteralObject() throws ParsingErrorException {
+    void testParseLangLiteralObject() throws ParsingException {
         String ntriple = "<http://example.org/subject> <http://example.org/predicate> \"hello\"@en .";
         parser.parse(new StringReader(ntriple));
 
@@ -144,7 +145,7 @@ class NTriplesParserTest {
 
     @Test
     @DisplayName("Test parsing a triple with a typed literal object")
-    void testParseTypedLiteralObject() throws ParsingErrorException {
+    void testParseTypedLiteralObject() throws ParsingException {
         String ntriple = "<http://example.org/subject> <http://example.org/predicate> \"123\"^^<http://www.w3.org/2001/XMLSchema#integer> .";
         parser.parse(new StringReader(ntriple));
 
@@ -155,7 +156,7 @@ class NTriplesParserTest {
 
     @Test
     @DisplayName("Test parsing a triple with escaped characters in literal")
-    void testParseEscapedLiteral() throws ParsingErrorException {
+    void testParseEscapedLiteral() throws ParsingException {
         String ntriple = "<http://example.org/subject> <http://example.org/predicate> \"literal with \\\"quotes\\\" and \\n newline\" .";
         parser.parse(new StringReader(ntriple));
 
@@ -166,7 +167,7 @@ class NTriplesParserTest {
 
     @Test
     @DisplayName("Test parsing a triple with Unicode escape in literal (\\uXXXX)")
-    void testParseUnicodeEscapeLiteralUxxxx() throws ParsingErrorException {
+    void testParseUnicodeEscapeLiteralUxxxx() throws ParsingException {
         String ntriple = "<http://example.org/subject> <http://example.org/predicate> \"Hello\\u0020World\" .";
 
         Literal expectedLiteral = mock(Literal.class);
@@ -178,7 +179,7 @@ class NTriplesParserTest {
 
     @Test
     @DisplayName("Test parsing a triple with Unicode escape in literal (\\UXXXXXXXX)")
-    void testParseUnicodeEscapeLiteral() throws ParsingErrorException {
+    void testParseUnicodeEscapeLiteral() throws ParsingException {
         String ntriple = "<http://example.org/subject> <http://example.org/predicate> \"Euro\\U000020AC\" .";
 
         Literal expectedLiteral = mock(Literal.class);
@@ -190,7 +191,7 @@ class NTriplesParserTest {
 
     @Test
     @DisplayName("Test parsing a triple with Unicode escape in IRI (\\uXXXX)")
-    void testParseUnicodeEscapeIRIUxxxx() throws ParsingErrorException {
+    void testParseUnicodeEscapeIRIUxxxx() throws ParsingException {
         String ntriple = "<http://example.org/s\\u0020ubject> <http://example.org/predicate> <http://example.org/object> .";
         IRI expectedSubjectIRI = mock(IRI.class);
         lenient().when(mockValueFactory.createIRI(eq("http://example.org/s ubject"))).thenReturn(expectedSubjectIRI);
@@ -201,7 +202,7 @@ class NTriplesParserTest {
 
     @Test
     @DisplayName("Test parsing a triple with Unicode escape in IRI (\\UXXXXXXXX)")
-    void testParseUnicodeEscapeIRIU() throws ParsingErrorException {
+    void testParseUnicodeEscapeIRIU() throws ParsingException {
         String ntriple = "<http://example.org/path/\\U000020AC> <http://example.org/predicate> <http://example.org/object> .";
         IRI expectedSubjectIRI = mock(IRI.class);
         lenient().when(mockValueFactory.createIRI(eq("http://example.org/path/€"))).thenReturn(expectedSubjectIRI);

@@ -1,13 +1,15 @@
 package fr.inria.corese.core.next.data.impl.io.parser.trig;
 
-import fr.inria.corese.core.next.data.api.*;
-import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
+import fr.inria.corese.core.next.data.api.term.*;
+import fr.inria.corese.core.next.data.api.model.*;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
+import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
-import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
-import fr.inria.corese.core.next.data.impl.io.serialization.DataSerializerFactory;
-import fr.inria.corese.core.next.data.impl.io.serialization.trig.TriGSerializerOptions;
-import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
+import fr.inria.corese.core.next.data.impl.io.parser.DefaultRDFParserFactory;
+import fr.inria.corese.core.next.data.impl.io.serializer.DefaultRDFSerializerFactory;
+import fr.inria.corese.core.next.data.impl.io.serializer.trig.TriGSerializerOptions;
+import fr.inria.corese.core.next.data.impl.io.parser.support.ParserTestBase;
 import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,8 +34,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class TriGCircularTest extends ParserTestBase {
 
     private ValueFactory valueFactory;
-    private fr.inria.corese.core.next.data.api.io.serializer.SerializerFactory serializerFactory;
-    private ParserFactory parserFactory;
+    private fr.inria.corese.core.next.data.api.io.serializer.RDFSerializerFactory serializerFactory;
+    private DefaultRDFParserFactory parserFactory;
     private TriGSerializerOptions defaultConfig;
 
     // Test data constants
@@ -56,8 +58,8 @@ class TriGCircularTest extends ParserTestBase {
     @BeforeEach
     void setUp() {
         valueFactory = new CoreseValueFactory();
-        serializerFactory = new DataSerializerFactory();
-        parserFactory = new ParserFactory();
+        serializerFactory = new DefaultRDFSerializerFactory();
+        parserFactory = new DefaultRDFParserFactory();
         defaultConfig = TriGSerializerOptions.defaultConfig();
     }
 
@@ -65,7 +67,7 @@ class TriGCircularTest extends ParserTestBase {
     /**
      * Creates a simple model with basic triples containing IRIs and string
      * literals.
-     * 
+     *
      * @return A model with two simple triples
      */
     private Model createSimpleTestModel() {
@@ -86,7 +88,7 @@ class TriGCircularTest extends ParserTestBase {
 
     /**
      * Creates a model with named graphs for testing TriG specific functionality.
-     * 
+     *
      * @return A model with triples in different named graphs
      */
     private Model createNamedGraphsTestModel() {
@@ -113,7 +115,7 @@ class TriGCircularTest extends ParserTestBase {
     /**
      * Creates a complex model with various RDF value types including
      * typed literals, language-tagged literals, and blank nodes.
-     * 
+     *
      * @return A model with diverse triple patterns
      */
     private Model createComplexTestModel() {
@@ -156,7 +158,7 @@ class TriGCircularTest extends ParserTestBase {
 
     /**
      * Creates a model with typed literals for testing.
-     * 
+     *
      * @return A model with integer and string typed literals
      */
     private Model createTypedLiteralsTestModel() {
@@ -181,7 +183,7 @@ class TriGCircularTest extends ParserTestBase {
 
     /**
      * Creates a model with language-tagged literals for testing.
-     * 
+     *
      * @return A model with English and French language-tagged literals
      */
     private Model createLanguageTaggedLiteralsTestModel() {
@@ -203,7 +205,7 @@ class TriGCircularTest extends ParserTestBase {
 
     /**
      * Creates a model with blank nodes for testing.
-     * 
+     *
      * @return A model with blank nodes as subject and object
      */
     private Model createBlankNodesTestModel() {
@@ -220,7 +222,7 @@ class TriGCircularTest extends ParserTestBase {
 
     /**
      * Creates a model with special characters and escape sequences for testing.
-     * 
+     *
      * @return A model with literals containing newlines, quotes, and Unicode
      */
     private Model createSpecialCharactersTestModel() {
@@ -243,7 +245,7 @@ class TriGCircularTest extends ParserTestBase {
 
     /**
      * Performs a round-trip serialization and parsing cycle.
-     * 
+     *
      * @param originalModel The model to serialize and parse back
      * @return The model resulting from parsing the serialized data
      */

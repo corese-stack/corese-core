@@ -1,8 +1,8 @@
 package fr.inria.corese.core.next.data.impl.adapter.literal;
 
-import fr.inria.corese.core.next.data.api.IRI;
+import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
-import fr.inria.corese.core.next.data.impl.common.literal.XSD;
+import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 
 /**
  * There are no dedicated implementation to represent xsd:time in Corese.
@@ -42,9 +42,9 @@ public class CoreseTime extends CoreseDatetime {
 
     /**
      *
-     * @return XSD.TIME
+     * @return XSDDatatype.TIME
      */
     public CoreDatatype getCoreDatatype() {
-        return XSD.TIME;
+        return XSDDatatype.TIME;
     }
 }

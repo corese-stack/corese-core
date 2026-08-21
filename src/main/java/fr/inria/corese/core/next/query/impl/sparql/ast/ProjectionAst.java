@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
-import fr.inria.corese.core.next.query.impl.parser.semantic.support.VisitableAst;
+import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.AstVisitor;
+import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.VisitableAst;
 
 /**
  * SPARQL SELECT projection: either {@code SELECT *} (all variables from the
