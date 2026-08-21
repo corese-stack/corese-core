@@ -14,7 +14,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalAmount;
-import java.util.Date;
 
 public interface ValueFactory {
 
@@ -170,13 +169,6 @@ public interface ValueFactory {
 	 * @return Literal that has a XMLGregorianCalendar value.
 	 */
 	Literal createLiteral(XMLGregorianCalendar calendar);
-
-	/**
-	 * Create a literal typed by xsd:date.
-	 * @param date Value
-	 * @return Literal that has a Date value.
-	 */
-	Literal createLiteral(Date date);
 
 	/**
 	 * Create a statement with the given subject, predicate and object.

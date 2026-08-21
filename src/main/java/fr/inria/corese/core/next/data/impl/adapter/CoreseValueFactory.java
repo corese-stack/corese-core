@@ -8,7 +8,6 @@ import java.security.SecureRandom;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalAmount;
-import java.util.Date;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -343,16 +342,6 @@ public class CoreseValueFactory implements ValueFactory {
     @Override
     public Literal createLiteral(XMLGregorianCalendar calendar) {
         return new CoreseDatetime(calendar);
-    }
-
-    /**
-     * Creates a literal with the given Date value.
-     * @param date Date value
-     * @return a new CoreseDate object with the given Date value
-     */
-    @Override
-    public Literal createLiteral(Date date) {
-        return new CoreseDate(date);
     }
 
     /**

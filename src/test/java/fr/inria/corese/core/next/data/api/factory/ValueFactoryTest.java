@@ -465,13 +465,12 @@ public abstract class ValueFactoryTest {
     }
 
     @Test
-    public void testCreateLiteralDate() throws ParseException {
-        String dateString = "2021-01-01";
-        Date date = (new SimpleDateFormat("yyyy-MM-dd" )).parse(dateString);
+    public void testCreateLiteralDate() {
+        java.time.LocalDate date = java.time.LocalDate.parse("2021-01-01");
         Literal literal = this.valueFactory.createLiteral(date);
 
         assertNotNull(literal);
-        assertEquals((new SimpleDateFormat("yyyy-MM-dd" )).format(date), literal.stringValue());
+        assertEquals("2021-01-01", literal.stringValue());
     }
 
     @Test
