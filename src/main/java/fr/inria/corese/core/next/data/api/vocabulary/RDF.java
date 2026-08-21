@@ -2,13 +2,13 @@ package fr.inria.corese.core.next.data.api.vocabulary;
 
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.SimpleIRI;
-import fr.inria.corese.core.next.data.api.exception.IncorrectFormatException;
 
 /**
  * Defines the RDF vocabulary.
  *
  * Each constant represents one term in the RDF namespace.
  */
+@SuppressWarnings("java:S115")
 public enum RDF implements Vocabulary {
     HTML("HTML"),
     langString("langString"),
@@ -33,6 +33,8 @@ public enum RDF implements Vocabulary {
     direction("direction"),
     language("language");
 
+    public static final String NAMESPACE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+    public static final String PREFERRED_PREFIX = "rdf";
 
     private final IRI iri;
 
@@ -61,10 +63,10 @@ public enum RDF implements Vocabulary {
     }
 
     public static String getVocabularyNamespace() {
-        return "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+        return NAMESPACE;
     }
 
     public static String getVocabularyPreferredPrefix() {
-        return "rdf";
+        return PREFERRED_PREFIX;
     }
 }

@@ -8,6 +8,7 @@ import fr.inria.corese.core.next.data.api.term.SimpleIRI;
  *
  * Because a lot of the datatype names are also Java keywords, the names are exceptions to the naming convention.
  */
+@SuppressWarnings("java:S115")
 public enum XSD implements Vocabulary {
 
     /**
@@ -195,6 +196,9 @@ public enum XSD implements Vocabulary {
      */
     xsdNCName("NCName");
 
+    public static final String NAMESPACE = "http://www.w3.org/2001/XMLSchema#";
+    public static final String PREFERRED_PREFIX = "xsd";
+
     private IRI iri;
 
     XSD(String localName) {
@@ -217,11 +221,11 @@ public enum XSD implements Vocabulary {
     }
 
     public static String getVocabularyNamespace() {
-        return "http://www.w3.org/2001/XMLSchema#";
+        return NAMESPACE;
     }
 
     public static String getVocabularyPreferredPrefix() {
-        return "xsd";
+        return PREFERRED_PREFIX;
     }
 
 }

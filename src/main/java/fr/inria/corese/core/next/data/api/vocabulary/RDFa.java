@@ -2,8 +2,11 @@ package fr.inria.corese.core.next.data.api.vocabulary;
 
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.SimpleIRI;
-import fr.inria.corese.core.next.data.api.exception.IncorrectFormatException;
 
+/**
+ * Defines the RDFa (Resource Description Framework in Attributes) vocabulary.
+ */
+@SuppressWarnings("java:S115")
 public enum RDFa implements Vocabulary {
 
     PGClass("PGClass"),
@@ -26,6 +29,9 @@ public enum RDFa implements Vocabulary {
     PrefixMapping("PrefixMapping"),
     TermMapping("TermMapping"),
     Warning("Warning");
+
+    public static final String NAMESPACE = "http://www.w3.org/ns/rdfa#";
+    public static final String PREFERRED_PREFIX = "rdfa";
 
     private final IRI iri;
 
@@ -54,10 +60,10 @@ public enum RDFa implements Vocabulary {
     }
 
     public static String getVocabularyNamespace() {
-        return "http://www.w3.org/ns/rdfa#";
+        return NAMESPACE;
     }
 
     public static String getVocabularyPreferredPrefix() {
-        return "rdfa";
+        return PREFERRED_PREFIX;
     }
 }

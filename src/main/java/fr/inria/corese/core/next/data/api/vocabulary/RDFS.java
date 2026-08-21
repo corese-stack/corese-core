@@ -2,11 +2,11 @@ package fr.inria.corese.core.next.data.api.vocabulary;
 
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.SimpleIRI;
-import fr.inria.corese.core.next.data.api.exception.IncorrectFormatException;
 
 /**
  * Vocabulary for RDF Schema (RDFS).
  */
+@SuppressWarnings("java:S115")
 public enum RDFS implements Vocabulary {
     /**
      * @see <a href="http://www.w3.org/2000/01/rdf-schema#Resource">RDFS Resource</a>
@@ -74,6 +74,9 @@ public enum RDFS implements Vocabulary {
     isDefinedBy("isDefinedBy")
     ;
 
+    public static final String NAMESPACE = "http://www.w3.org/2000/01/rdf-schema#";
+    public static final String PREFERRED_PREFIX = "rdfs";
+
     private final IRI iri;
     /**
      * Constructor for the RDFS vocabulary enum.
@@ -101,10 +104,10 @@ public enum RDFS implements Vocabulary {
     }
 
     public static String getVocabularyNamespace() {
-        return "http://www.w3.org/2000/01/rdf-schema#";
+        return NAMESPACE;
     }
 
     public static String getVocabularyPreferredPrefix() {
-        return "rdfs";
+        return PREFERRED_PREFIX;
     }
 }

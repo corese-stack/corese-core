@@ -6,6 +6,7 @@ import fr.inria.corese.core.next.data.api.term.SimpleIRI;
 /**
  * Defines the OWL (Web Ontology Language) vocabulary.
  */
+@SuppressWarnings("java:S115")
 public enum OWL implements Vocabulary {
     /**
      * @see <a href="http://www.w3.org/2002/07/owl#Class">OWL Class</a>
@@ -49,6 +50,9 @@ public enum OWL implements Vocabulary {
     differentFrom("differentFrom")
     ;
 
+    public static final String NAMESPACE = "http://www.w3.org/2002/07/owl#";
+    public static final String PREFERRED_PREFIX = "owl";
+
     private final IRI iri;
 
     OWL(String localName) {
@@ -71,10 +75,10 @@ public enum OWL implements Vocabulary {
     }
 
     public static String getVocabularyNamespace() {
-        return "http://www.w3.org/2002/07/owl#";
+        return NAMESPACE;
     }
 
     public static String getVocabularyPreferredPrefix() {
-        return "owl";
+        return PREFERRED_PREFIX;
     }
 }

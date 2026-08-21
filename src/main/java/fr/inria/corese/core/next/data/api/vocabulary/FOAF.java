@@ -3,8 +3,22 @@ package fr.inria.corese.core.next.data.api.vocabulary;
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.SimpleIRI;
 
+/**
+ * Defines the FOAF (Friend of a Friend) vocabulary.
+ */
+@SuppressWarnings("java:S115")
 public enum FOAF implements Vocabulary {
-    ;
+    Person("Person"),
+    Agent("Agent"),
+    Group("Group"),
+    Organization("Organization"),
+    name("name"),
+    knows("knows"),
+    mbox("mbox"),
+    homepage("homepage");
+
+    public static final String NAMESPACE = "http://xmlns.com/foaf/0.1/";
+    public static final String PREFERRED_PREFIX = "foaf";
 
     private final IRI iri;
 
@@ -19,7 +33,7 @@ public enum FOAF implements Vocabulary {
 
     @Override
     public String getNamespace() {
-        return getVocabularyNamespace(); // Referencing the directly defined static NS
+        return getVocabularyNamespace();
     }
 
     @Override
@@ -28,10 +42,10 @@ public enum FOAF implements Vocabulary {
     }
 
     public static String getVocabularyNamespace() {
-        return "http://xmlns.com/foaf/0.1/";
+        return NAMESPACE;
     }
 
     public static String getVocabularyPreferredPrefix() {
-        return "foaf";
+        return PREFERRED_PREFIX;
     }
 }
