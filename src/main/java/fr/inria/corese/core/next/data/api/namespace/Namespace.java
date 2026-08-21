@@ -21,7 +21,7 @@ public interface Namespace extends Serializable {
     String getNamespace();
 
     /**
-     * @param o
+     * @param o the object to compare for equality
      * @return true if o is a Namespace and has the same prefix and name as this Namespace.
      */
     @Override

@@ -12,7 +12,7 @@ public interface PrefixMapping {
     /**
      * Gets the namespace IRI for a given prefix.
      *
-     * @param prefix the prefix to look
+     * @param prefix the prefix to look up
      * @return the namespace IRI
      * or null if the prefix is not registered
      * @throws IllegalArgumentException if prefix is null
@@ -24,7 +24,7 @@ public interface PrefixMapping {
      * If multiple prefixes are mapped to the same namespace,
      * the result is implementation-dependent.
      *
-     * @param namespace the namespace IRI to look
+     * @param namespace the namespace IRI to look up
      * @return the prefix (e.g., "ex"), or null if the namespace is not registered
      * @throws IllegalArgumentException if namespace is null
      */
@@ -192,5 +192,6 @@ public interface PrefixMapping {
      *
      * @return a new PrefixMapping instance with same mappings
      */
+    @SuppressWarnings("java:S2975")
     PrefixMapping clone();
 }

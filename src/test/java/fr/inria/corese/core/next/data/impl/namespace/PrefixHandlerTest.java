@@ -253,6 +253,7 @@ class PrefixHandlerTest {
         assertNotNull(handlerWithStd.getNamespace("rdfs"), "RDFS should be included.");
         assertNotNull(handlerWithStd.getNamespace("xsd"), "XSD should be included.");
         assertNotNull(handlerWithStd.getNamespace("owl"), "OWL should be included.");
+        assertNotNull(handlerWithStd.getNamespace("foaf"), "FOAF should be included.");
     }
 
     /**

@@ -8,6 +8,7 @@ import fr.inria.corese.core.next.data.api.support.namespace.AbstractNamespace;
 /**
  * Immutable default implementation of a {@link Namespace} binding.
  */
+@SuppressWarnings("java:S2160")
 public final class SimpleNamespace extends AbstractNamespace {
 
     @Serial
