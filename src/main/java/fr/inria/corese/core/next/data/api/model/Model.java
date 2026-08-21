@@ -11,16 +11,13 @@ import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.data.api.exception.IncorrectOperationException;
 
 /**
- * This class represents an RDF model, a set of statements.
- * This is the central class to handle RDF data.
- * Statements can have zero or several resources as contexts to represent the
- * different graphs in the model.
+ * Represents an RDF model, a set of statements.
+ * This is the central interface for handling RDF data.
+ * Statements can have zero or several resources as contexts to represent
+ * named graphs within the model.
  * A model also handles a set of namespaces. There can be different prefixes for
- * the same namespace, although it is ill-advised, how it affects serialization
- * is implementation-dependant. There cannot be two namespaces with the same
- * prefix.
- * Statements can have zero or several resources as contexts, representing
- * different named graphs within the modela
+ * the same namespace, although it is ill-advised, and how it affects serialization
+ * is implementation-dependent. There cannot be two namespaces with the same prefix.
  */
 public interface Model extends Set<Statement>, Serializable {
 
@@ -33,8 +30,11 @@ public interface Model extends Set<Statement>, Serializable {
      * Returns the namespace registered for {@code prefix}, if any.
      */
     default Optional<Namespace> getNamespace(String prefix) {
+        if (prefix == null) {
+            return Optional.empty();
+        }
         return getNamespaces().stream()
-                .filter(namespace -> namespace.getPrefix().equals(prefix))
+                .filter(namespace -> prefix.equals(namespace.getPrefix()))
                 .findFirst();
     }
 
@@ -134,7 +134,7 @@ public interface Model extends Set<Statement>, Serializable {
      *
      * @param subj     a Resource, subject of the statement. Can be {@code null} to
      *                 match any subject.
-     * @param pred     a an IRI, predicate of the statement. Can be {@code null} to
+     * @param pred     an IRI, predicate of the statement. Can be {@code null} to
      *                 match any predicate.
      * @param obj      a Value, object of the statement. Can be {@code null} to
      *                 match any object.

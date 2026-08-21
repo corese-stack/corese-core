@@ -7,7 +7,7 @@ import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.term.Value;
 
 /**
- * Represents a value in RDF. Roughly equivalent to a quad with subject, predicate, object, and context.
+ * Represents an RDF statement or quad, composed of a subject, predicate, object, and optional context.
  */
 public interface Statement extends Serializable {
 
