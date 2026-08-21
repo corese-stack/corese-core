@@ -1,9 +1,11 @@
 package fr.inria.corese.core.next.data.impl.model;
 
+import fr.inria.corese.core.next.common.exception.CoreseException;
+
 /**
  * Exception thrown when a Model operation fails.
  */
-public class ModelException extends RuntimeException {
+public class ModelException extends CoreseException {
 
     /**
      * The operation that failed.

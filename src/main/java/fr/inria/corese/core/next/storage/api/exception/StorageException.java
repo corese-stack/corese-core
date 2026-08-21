@@ -1,9 +1,11 @@
 package fr.inria.corese.core.next.storage.api.exception;
 
+import fr.inria.corese.core.next.common.exception.CoreseException;
+
 /**
  * Specific exception for StorageManager operations.
  */
-public class StorageException extends RuntimeException {
+public class StorageException extends CoreseException {
 
     private final ErrorCode code;
 
