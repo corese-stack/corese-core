@@ -5,6 +5,7 @@ import com.typesafe.config.ConfigException;
 import com.typesafe.config.ConfigFactory;
 import fr.inria.corese.core.next.common.exception.ConfigurationException;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /** Loads and exposes the shared Corese configuration. */
@@ -27,6 +28,7 @@ public final class ConfigurationProperties {
     }
 
     public Optional<String> getValue(ConfigurationProperty property) {
+        Objects.requireNonNull(property, "Property must not be null");
         if (contains(property)) {
             return Optional.of(this.config.getString(property.getName()));
         }
@@ -37,6 +39,7 @@ public final class ConfigurationProperties {
     }
 
     public boolean contains(ConfigurationProperty property) {
+        Objects.requireNonNull(property, "Property must not be null");
         return this.config.hasPath(property.getName());
     }
 
