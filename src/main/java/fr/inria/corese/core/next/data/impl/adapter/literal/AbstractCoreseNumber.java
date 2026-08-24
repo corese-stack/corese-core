@@ -4,7 +4,6 @@ import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.support.term.literal.AbstractNumber;
 import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.datatype.CoreseNumber;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -16,7 +15,7 @@ import java.math.BigInteger;
 public abstract class AbstractCoreseNumber extends AbstractNumber implements CoreseDatatypeAdapter {
 
     private final String lexicalValue;
-    private transient volatile CoreseNumber coreseObject;
+    private transient volatile IDatatype coreseObject;
 
     /**
      * Constructor for AbstractCoreseNumber.
@@ -24,17 +23,24 @@ public abstract class AbstractCoreseNumber extends AbstractNumber implements Cor
      * @param coreseObject the CoreseNumber object
      * @param datatype     the datatype of the literal
      */
-    protected AbstractCoreseNumber(CoreseNumber coreseObject, IRI datatype) {
+    protected AbstractCoreseNumber(IDatatype coreseObject, IRI datatype) {
+        this(coreseObject.getLabel(), coreseObject, datatype);
+    }
+
+    /**
+     * Constructor preserving the RDF lexical form supplied by the caller.
+     */
+    protected AbstractCoreseNumber(String lexicalValue, IDatatype coreseObject, IRI datatype) {
         super(datatype);
         this.coreseObject = coreseObject;
-        this.lexicalValue = coreseObject.getLabel();
+        this.lexicalValue = lexicalValue;
     }
 
     /** Recreates the legacy value after Java deserialization. */
-    protected abstract CoreseNumber createCoreseObject(String value);
+    protected abstract IDatatype createCoreseObject(String value);
 
-    protected final CoreseNumber coreseObject() {
-        CoreseNumber value = coreseObject;
+    protected final IDatatype coreseObject() {
+        IDatatype value = coreseObject;
         if (value == null) {
             value = createCoreseObject(lexicalValue);
             coreseObject = value;
@@ -86,19 +92,6 @@ public abstract class AbstractCoreseNumber extends AbstractNumber implements Cor
     @Override
     public String stringValue() {
         return lexicalValue;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof AbstractNumber)) return false;
-        if (!(o instanceof AbstractCoreseNumber that)) return super.equals(o);
-        return this.coreseObject().equals(that.coreseObject());
-    }
-
-    @Override
-    public int hashCode() {
-        return this.coreseObject().hashCode();
     }
 
 }

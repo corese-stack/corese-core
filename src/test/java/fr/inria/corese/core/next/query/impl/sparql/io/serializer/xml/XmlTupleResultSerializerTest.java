@@ -135,26 +135,27 @@ class XmlTupleResultSerializerTest extends AbstractResultSerializerTest implemen
 
     @Override
     protected String getResultsWithMultiLinesLiteralString() {
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +
-                "<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">" +
-                    "<head>" +
-                        "<variable name=\"mail\"/>" +
-                        "<variable name=\"depiction\"/>" +
-                    "</head>" +
-                    "<results>" +
-                        "<result>" +
-                            "<binding name=\"mail\">" +
-                                "<uri>mailto:carol@example.org</uri>" +
-                            "</binding>" +
-                            "<binding name=\"depiction\">" +
-                                "<literal>All this work and no play makes Carols a dull girl,\n" +
-                "All this work and no play makes Carols a dull girl,\n" +
-                "All this work and no play makes Carols a dull girl,\n" +
-                "All this work and no play makes Carols a dull girl.</literal>" +
-                            "</binding>" +
-                        "</result>" +
-                    "</results>" +
-                "</sparql>";
+        return """
+                <?xml version="1.0" encoding="UTF-8" standalone="yes"?>\
+                <sparql xmlns="http://www.w3.org/2005/sparql-results#">\
+                <head>\
+                <variable name="mail"/>\
+                <variable name="depiction"/>\
+                </head>\
+                <results>\
+                <result>\
+                <binding name="mail">\
+                <uri>mailto:carol@example.org</uri>\
+                </binding>\
+                <binding name="depiction">\
+                <literal>All this work and no play makes Carols a dull girl,
+                All this work and no play makes Carols a dull girl,
+                All this work and no play makes Carols a dull girl,
+                All this work and no play makes Carols a dull girl.</literal>\
+                </binding>\
+                </result>\
+                </results>\
+                </sparql>""";
     }
 
     @Override
@@ -251,7 +252,7 @@ class XmlTupleResultSerializerTest extends AbstractResultSerializerTest implemen
                                 "<bnode>blank1</bnode>" +
                             "</binding>" +
                             "<binding name=\"literal\">" +
-                                "<literal datatype=\"http://www.w3.org/2001/XMLSchema#integer\">123</literal>" +
+                                "<literal datatype=\"http://www.w3.org/2001/XMLSchema#int\">123</literal>" +
                             "</binding>" +
                         "</result>" +
                     "</results>" +

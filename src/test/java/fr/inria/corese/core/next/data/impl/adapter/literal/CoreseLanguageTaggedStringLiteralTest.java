@@ -76,4 +76,16 @@ class CoreseLanguageTaggedStringLiteralTest {
         // Test that the datatype IRI is correctly returned
         assertEquals(RDFDatatype.LANGSTRING.getIRI(), coreseLanguageTaggedString.getDatatype());
     }
+
+    @Test
+    void equalityIncludesLanguageTagAndIgnoresItsCase() {
+        var english = new CoreseLanguageTaggedStringLiteral("Hello", "en");
+        var uppercaseEnglish = new CoreseLanguageTaggedStringLiteral("Hello", "EN");
+        var french = new CoreseLanguageTaggedStringLiteral("Hello", "fr");
+
+        assertEquals(english, uppercaseEnglish);
+        assertEquals(english.hashCode(), uppercaseEnglish.hashCode());
+        assertEquals("en", uppercaseEnglish.getLanguage().orElseThrow());
+        assertNotEquals(english, french);
+    }
 }

@@ -108,7 +108,7 @@ public interface ValueFactory {
 	Literal createLiteral(short value);
 
 	/**
-	 * Create a literal typed by xsd:integer.
+	 * Create a literal typed by xsd:int.
 	 * @param value Value
 	 * @return Literal that has an int value.
 	 */

@@ -5,6 +5,7 @@ import fr.inria.corese.core.next.data.api.support.term.literal.AbstractLiteral;
 import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
 import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 import fr.inria.corese.core.next.data.api.exception.IncorrectOperationException;
+import fr.inria.corese.core.next.data.api.exception.InvalidDatatypeException;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
 /**
@@ -28,6 +29,9 @@ public class CoreseBoolean extends AbstractLiteral implements CoreseDatatypeAdap
      * The value of the boolean literal.
      */
     private final boolean value;
+
+    /** The RDF lexical form, including the valid numeric forms {@code 0} and {@code 1}. */
+    private final String lexicalValue;
 
     /**
      * A constant representing the boolean value {@code true}.
@@ -56,6 +60,7 @@ public class CoreseBoolean extends AbstractLiteral implements CoreseDatatypeAdap
         if (coreseObject instanceof fr.inria.corese.core.sparql.datatype.CoreseBoolean booleanValue) {
             this.coreseObject = booleanValue;
             this.value = this.coreseObject.booleanValue();
+            this.lexicalValue = this.coreseObject.getLabel();
         } else {
             throw new IncorrectOperationException("Cannot create CoreseBoolean from a non-boolean Corese object.");
         }
@@ -71,6 +76,19 @@ public class CoreseBoolean extends AbstractLiteral implements CoreseDatatypeAdap
     }
 
     /**
+     * Constructs a boolean literal from an XML Schema lexical form.
+     *
+     * @param lexicalValue one of {@code true}, {@code false}, {@code 1}, or {@code 0}
+     * @throws InvalidDatatypeException if the lexical form is invalid
+     */
+    public CoreseBoolean(String lexicalValue) {
+        super(XSDDatatype.BOOLEAN.getIRI());
+        this.value = parseLexicalValue(lexicalValue);
+        this.lexicalValue = lexicalValue;
+        this.coreseObject = new fr.inria.corese.core.sparql.datatype.CoreseBoolean(value);
+    }
+
+    /**
      * Returns the label of this boolean literal, which is either {@code "true"} or
      * {@code "false"}.
      *
@@ -78,7 +96,7 @@ public class CoreseBoolean extends AbstractLiteral implements CoreseDatatypeAdap
      */
     @Override
     public String getLabel() {
-        return value ? "true" : "false";
+        return lexicalValue;
     }
 
     @Override
@@ -100,7 +118,7 @@ public class CoreseBoolean extends AbstractLiteral implements CoreseDatatypeAdap
 
     @Override
     public String stringValue() {
-        return Boolean.toString(value);
+        return lexicalValue;
     }
 
     /**
@@ -133,6 +151,15 @@ public class CoreseBoolean extends AbstractLiteral implements CoreseDatatypeAdap
             coreseObject = result;
         }
         return result;
+    }
+
+    private static boolean parseLexicalValue(String lexicalValue) {
+        return switch (lexicalValue) {
+            case "true", "1" -> true;
+            case "false", "0" -> false;
+            case null, default -> throw new InvalidDatatypeException(
+                    "Invalid xsd:boolean lexical value: " + lexicalValue);
+        };
     }
 
     @Override

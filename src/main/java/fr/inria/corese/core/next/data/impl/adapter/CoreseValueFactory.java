@@ -19,11 +19,13 @@ import fr.inria.corese.core.next.data.api.term.Literal;
 import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.data.api.term.Triple;
+import fr.inria.corese.core.next.data.api.term.SimpleTriple;
 import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.support.term.literal.AbstractLiteral;
 import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
 import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
+import fr.inria.corese.core.next.data.api.literal.CoreDatatypes;
 import fr.inria.corese.core.next.data.impl.adapter.node.CoreseBNode;
 import fr.inria.corese.core.next.data.impl.adapter.literal.CoreseBoolean;
 import fr.inria.corese.core.next.data.impl.adapter.literal.CoreseDate;
@@ -31,6 +33,7 @@ import fr.inria.corese.core.next.data.impl.adapter.literal.CoreseDatetime;
 import fr.inria.corese.core.next.data.impl.adapter.literal.CoreseDecimal;
 import fr.inria.corese.core.next.data.impl.adapter.literal.CoreseDuration;
 import fr.inria.corese.core.next.data.impl.adapter.literal.CoreseInteger;
+import fr.inria.corese.core.next.data.impl.adapter.literal.CoreseIllTypedLiteral;
 import fr.inria.corese.core.next.data.impl.adapter.literal.CoreseLanguageTaggedStringLiteral;
 import fr.inria.corese.core.next.data.impl.adapter.literal.CoreseTime;
 import fr.inria.corese.core.next.data.impl.adapter.literal.CoreseTyped;
@@ -40,6 +43,7 @@ import fr.inria.corese.core.next.data.impl.adapter.literal.CoreseTyped;
  */
 public class CoreseValueFactory implements ValueFactory {
 
+    private static final String LABEL_PARAMETER = "label";
     private static final SecureRandom secureRandom = new SecureRandom();
 
     private final AtomicLong nodeID = new AtomicLong(secureRandom.nextLong());
@@ -111,31 +115,38 @@ public class CoreseValueFactory implements ValueFactory {
      */
     @Override
     public Literal createLiteral(String label, IRI datatype) {
-        // Temporal types
-        if (XSDDatatype.DATE.getIRI().equals(datatype)) {
-            return new CoreseDate(label);
-        } else if (XSDDatatype.DATETIME.getIRI().equals(datatype)) {
-            return new CoreseDatetime(label);
-        } else if (XSDDatatype.TIME.getIRI().equals(datatype)) {
-            return new CoreseTime(label);
-        } else if (XSDDatatype.DURATION.getIRI().equals(datatype)) {
-            return new CoreseDuration(label);
-        }
+        Objects.requireNonNull(label, LABEL_PARAMETER);
+        Objects.requireNonNull(datatype, "datatype");
 
-        // Numeric types
-        else if (AbstractLiteral.isIriOfIntegerCoreDatatype(datatype)) {
-            return new CoreseInteger(new BigInteger(label));
-        } else if (AbstractLiteral.isIriOfDecimalCoreDatatype(datatype)) {
-            return new CoreseDecimal(new BigDecimal(label));
-        }
+        try {
+            // Temporal types
+            if (XSDDatatype.DATE.getIRI().equals(datatype)) {
+                return new CoreseDate(label);
+            } else if (XSDDatatype.DATETIME.getIRI().equals(datatype)) {
+                return new CoreseDatetime(label);
+            } else if (XSDDatatype.TIME.getIRI().equals(datatype)) {
+                return new CoreseTime(label);
+            } else if (XSDDatatype.DURATION.getIRI().equals(datatype)) {
+                return new CoreseDuration(label);
+            }
 
-        // Boolean types
-        else if (XSDDatatype.BOOLEAN.getIRI().equals(datatype)) {
-            return new CoreseBoolean(Boolean.parseBoolean(label));
+            // Numeric types
+            else if (AbstractLiteral.isIriOfIntegerCoreDatatype(datatype)) {
+                return new CoreseInteger(label, datatype);
+            } else if (AbstractLiteral.isIriOfDecimalCoreDatatype(datatype)) {
+                return new CoreseDecimal(label, datatype);
+            }
+
+            // Boolean types
+            else if (XSDDatatype.BOOLEAN.getIRI().equals(datatype)) {
+                return new CoreseBoolean(label);
+            }
+        } catch (RuntimeException invalidLexicalForm) {
+            return new CoreseIllTypedLiteral(label, datatype, CoreDatatypes.from(datatype));
         }
 
         // String literals
-        else if (XSDDatatype.STRING.getIRI().equals(datatype)) {
+        if (XSDDatatype.STRING.getIRI().equals(datatype)) {
             return new CoreseTyped(label);
         }
 
@@ -151,33 +162,14 @@ public class CoreseValueFactory implements ValueFactory {
      */
     @Override
     public Literal createLiteral(String label, CoreDatatype coreDatatype) {
+        Objects.requireNonNull(label, LABEL_PARAMETER);
+        Objects.requireNonNull(coreDatatype, "coreDatatype");
+
+        if (coreDatatype.getIRI() != null) {
+            return createLiteral(label, coreDatatype.getIRI());
+        }
+
         // Temporal types
-        if (XSDDatatype.DATE.equals(coreDatatype)) {
-            return new CoreseDate(label);
-        } else if (XSDDatatype.DATETIME.equals(coreDatatype)) {
-            return new CoreseDatetime(label);
-        } else if (XSDDatatype.TIME.equals(coreDatatype)) {
-            return new CoreseTime(label);
-        } else if (XSDDatatype.DURATION.equals(coreDatatype)) {
-            return new CoreseDuration(label);
-        }
-
-        // Numeric types
-        else if (AbstractLiteral.isIntegerCoreDatatype(coreDatatype)) {
-            return new CoreseInteger(label, coreDatatype.getIRI(), coreDatatype);
-        } else if (AbstractLiteral.isDecimalCoreDatatype(coreDatatype)) {
-            return new CoreseDecimal(label, coreDatatype.getIRI(), coreDatatype);
-        }
-
-        // Boolean types
-        else if (XSDDatatype.BOOLEAN.equals(coreDatatype)) {
-            return new CoreseBoolean(Boolean.parseBoolean(label));
-        }
-
-        // String literals
-        else if (XSDDatatype.STRING.equals(coreDatatype)) {
-            return new CoreseTyped(label);
-        }
         return new CoreseTyped(label, coreDatatype.getIRI(), coreDatatype);
     }
 
@@ -190,26 +182,42 @@ public class CoreseValueFactory implements ValueFactory {
      */
     @Override
     public Literal createLiteral(String label, IRI datatype, CoreDatatype coreDatatype) {
-        // Temporal types
-        if (XSDDatatype.DATE.equals(coreDatatype)) {
-            return new CoreseDate(label, datatype, coreDatatype);
-        } else if (XSDDatatype.DATETIME.equals(coreDatatype)) {
-            return new CoreseDatetime(label, datatype, coreDatatype);
-        } else if (XSDDatatype.TIME.equals(coreDatatype)) {
-            return new CoreseTime(label, datatype, coreDatatype);
-        } else if (XSDDatatype.DURATION.equals(coreDatatype)) {
-            return new CoreseDuration(label, datatype, coreDatatype);
-        }
+        Objects.requireNonNull(label, LABEL_PARAMETER);
+        Objects.requireNonNull(datatype, "datatype");
+        Objects.requireNonNull(coreDatatype, "coreDatatype");
 
-        // Numeric types
-        else if (AbstractLiteral.isIntegerCoreDatatype(coreDatatype)) {
-            return new CoreseInteger(label, datatype, coreDatatype);
-        } else if (AbstractLiteral.isDecimalCoreDatatype(coreDatatype)) {
-            return new CoreseDecimal(label, datatype, coreDatatype);
+        try {
+            // Temporal types
+            if (XSDDatatype.DATE.equals(coreDatatype)) {
+                return new CoreseDate(label, datatype, coreDatatype);
+            } else if (XSDDatatype.DATETIME.equals(coreDatatype)) {
+                return new CoreseDatetime(label, datatype, coreDatatype);
+            } else if (XSDDatatype.TIME.equals(coreDatatype)) {
+                return new CoreseTime(label, datatype, coreDatatype);
+            } else if (XSDDatatype.DURATION.equals(coreDatatype)) {
+                return new CoreseDuration(label, datatype, coreDatatype);
+            }
+
+            // Numeric types
+            else if (AbstractLiteral.isIntegerCoreDatatype(coreDatatype)) {
+                return new CoreseInteger(label, datatype, coreDatatype);
+            } else if (AbstractLiteral.isDecimalCoreDatatype(coreDatatype)) {
+                return new CoreseDecimal(label, datatype, coreDatatype);
+            }
+
+            // Boolean types
+            else if (XSDDatatype.BOOLEAN.equals(coreDatatype)) {
+                if (!XSDDatatype.BOOLEAN.getIRI().equals(datatype)) {
+                    return new CoreseTyped(label, datatype, coreDatatype);
+                }
+                return new CoreseBoolean(label);
+            }
+        } catch (RuntimeException invalidLexicalForm) {
+            return new CoreseIllTypedLiteral(label, datatype, coreDatatype);
         }
 
         // String literals
-        else if (XSDDatatype.STRING.equals(coreDatatype)) {
+        if (XSDDatatype.STRING.equals(coreDatatype)) {
             return new CoreseTyped(label, datatype, coreDatatype);
         }
         return new CoreseTyped(label, datatype, coreDatatype);
@@ -232,7 +240,7 @@ public class CoreseValueFactory implements ValueFactory {
      */
     @Override
     public Literal createLiteral(byte value) {
-        return new CoreseInteger(value);
+        return new CoreseInteger(Byte.toString(value), XSDDatatype.BYTE.getIRI(), XSDDatatype.BYTE);
     }
 
     /**
@@ -242,7 +250,7 @@ public class CoreseValueFactory implements ValueFactory {
      */
     @Override
     public Literal createLiteral(short value) {
-        return new CoreseInteger(value);
+        return new CoreseInteger(Short.toString(value), XSDDatatype.SHORT.getIRI(), XSDDatatype.SHORT);
     }
 
     /**
@@ -252,7 +260,7 @@ public class CoreseValueFactory implements ValueFactory {
      */
     @Override
     public Literal createLiteral(int value) {
-        return new CoreseInteger(value);
+        return new CoreseInteger(Integer.toString(value), XSDDatatype.INT.getIRI(), XSDDatatype.INT);
     }
 
     /**
@@ -262,7 +270,7 @@ public class CoreseValueFactory implements ValueFactory {
      */
     @Override
     public Literal createLiteral(long value) {
-        return new CoreseInteger(value);
+        return new CoreseInteger(Long.toString(value), XSDDatatype.LONG.getIRI(), XSDDatatype.LONG);
     }
 
     /**
@@ -272,7 +280,7 @@ public class CoreseValueFactory implements ValueFactory {
      */
     @Override
     public Literal createLiteral(float value) {
-        return new CoreseDecimal(value);
+        return new CoreseDecimal(Float.toString(value), XSDDatatype.FLOAT.getIRI(), XSDDatatype.FLOAT);
     }
 
     /**
@@ -282,7 +290,7 @@ public class CoreseValueFactory implements ValueFactory {
      */
     @Override
     public Literal createLiteral(double value) {
-        return new CoreseDecimal(value);
+        return new CoreseDecimal(Double.toString(value), XSDDatatype.DOUBLE.getIRI(), XSDDatatype.DOUBLE);
     }
 
     /**
@@ -383,6 +391,6 @@ public class CoreseValueFactory implements ValueFactory {
 
     @Override
     public Triple createTriple(Resource subject, IRI predicate, Value object) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new SimpleTriple(subject, predicate, object);
     }
 }

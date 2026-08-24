@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.data.impl.adapter.literal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.math.BigInteger;
@@ -33,6 +34,17 @@ public abstract class AbstractCoreseNumberTest {
     public void stringValue() {
         AbstractCoreseNumber coreseNumber = createNumber("14");
         assertEquals("14", coreseNumber.stringValue());
+    }
+
+    @Test
+    public void equalityUsesRdfTermIdentityRatherThanNumericValue() {
+        AbstractCoreseNumber canonical = createNumber("1");
+        AbstractCoreseNumber sameTerm = createNumber("1");
+        AbstractCoreseNumber differentLexicalForm = createNumber("01");
+
+        assertEquals(canonical, sameTerm);
+        assertEquals(canonical.hashCode(), sameTerm.hashCode());
+        assertNotEquals(canonical, differentLexicalForm);
     }
 
     @Test

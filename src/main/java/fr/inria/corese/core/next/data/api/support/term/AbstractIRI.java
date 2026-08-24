@@ -77,9 +77,12 @@ public abstract class AbstractIRI implements IRI, Comparable<IRI> {
 
     @Override
     public int hashCode() {
+        String value = stringValue();
+        String canonicalNamespace = IRIUtils.guessNamespace(value);
+        String canonicalLocalName = IRIUtils.guessLocalName(value);
         int hash = 7;
-        hash = 31 * hash + (this.namespace == null ? 0 : this.namespace.hashCode());
-        hash = 31 * hash + (this.localName == null ? 0 : this.localName.hashCode());
+        hash = 31 * hash + canonicalNamespace.hashCode();
+        hash = 31 * hash + canonicalLocalName.hashCode();
         return hash;
     }
 

@@ -1,6 +1,8 @@
 package fr.inria.corese.core.next.data.impl.adapter;
 
 import java.time.Duration;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import fr.inria.corese.core.next.data.api.vocabulary.XSD;
 import fr.inria.corese.core.next.data.impl.adapter.node.CoreseIRI;
@@ -13,8 +15,11 @@ import fr.inria.corese.core.next.data.api.term.Literal;
 import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.factory.ValueFactoryTest;
 import fr.inria.corese.core.next.data.api.literal.RDFDatatype;
+import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
+import fr.inria.corese.core.next.data.api.exception.IncorrectOperationException;
 import fr.inria.corese.core.next.data.impl.adapter.literal.CoreseLanguageTaggedStringLiteral;
 import fr.inria.corese.core.next.data.impl.adapter.literal.CoreseTyped;
+import fr.inria.corese.core.sparql.datatype.CoreseDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,7 +37,7 @@ class CoreseValueFactoryTest extends ValueFactoryTest {
     public void setUp() {
         this.valueFactory = new CoreseValueFactory();
         stringTestValue = "String value";
-        xsdStringIRI = fr.inria.corese.core.next.data.api.literal.XSDDatatype.STRING.getIRI();
+        xsdStringIRI = XSDDatatype.STRING.getIRI();
         subject = new CoreseIRI("http://corese.com/subject");
         predicate = new CoreseIRI("http://corese.com/predicate");
     }
@@ -52,7 +57,7 @@ class CoreseValueFactoryTest extends ValueFactoryTest {
         assertNotNull(literal);
         assertTrue(literal instanceof CoreseTyped);
         assertEquals(stringTestValue, literal.getLabel());
-        assertEquals(fr.inria.corese.core.next.data.api.literal.XSDDatatype.STRING, literal.getCoreDatatype());
+        assertEquals(XSDDatatype.STRING, literal.getCoreDatatype());
     }
 
     @Test
@@ -77,34 +82,34 @@ class CoreseValueFactoryTest extends ValueFactoryTest {
         assertNotNull(literal);
         assertTrue(literal instanceof CoreseTyped);
         assertEquals(stringTestValue, literal.getLabel());
-        assertEquals(fr.inria.corese.core.next.data.api.literal.XSDDatatype.STRING, literal.getCoreDatatype());
+        assertEquals(XSDDatatype.STRING, literal.getCoreDatatype());
     }
 
     @Test
     void testCreateLiteralWithCoreDatatype() {
         // Test createLiteral with CoreDatatype (XSD.STRING)
-        Literal literal = valueFactory.createLiteral(stringTestValue, fr.inria.corese.core.next.data.api.literal.XSDDatatype.STRING);
+        Literal literal = valueFactory.createLiteral(stringTestValue, XSDDatatype.STRING);
 
         assertNotNull(literal);
         assertTrue(literal instanceof CoreseTyped);
         assertEquals(stringTestValue, literal.getLabel());
-        assertEquals(fr.inria.corese.core.next.data.api.literal.XSDDatatype.STRING, literal.getCoreDatatype());
+        assertEquals(XSDDatatype.STRING, literal.getCoreDatatype());
     }
 
     @Test
     void testCreateLiteralWithDatatypeIRIAndCoreDatatype() {
         // Test createLiteral with IRI datatype and CoreDatatype (XSD.STRING)
-        Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI, fr.inria.corese.core.next.data.api.literal.XSDDatatype.STRING);
+        Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI, XSDDatatype.STRING);
 
         assertNotNull(literal);
         assertTrue(literal instanceof CoreseTyped);
         assertEquals(stringTestValue, literal.getLabel());
-        assertEquals(fr.inria.corese.core.next.data.api.literal.XSDDatatype.STRING, literal.getCoreDatatype());
+        assertEquals(XSDDatatype.STRING, literal.getCoreDatatype());
     }
 
     @Test
     void testCreateStatementWithoutContext() {
-        Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI, fr.inria.corese.core.next.data.api.literal.XSDDatatype.STRING);
+        Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI, XSDDatatype.STRING);
         CoreseStatement statement = (CoreseStatement) valueFactory.createStatement(subject, predicate, literal);
         assertNotNull(statement);
         assertEquals(subject, statement.getSubject());
@@ -115,7 +120,7 @@ class CoreseValueFactoryTest extends ValueFactoryTest {
 
     @Test
     void testCreateStatementWithContext() {
-        Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI, fr.inria.corese.core.next.data.api.literal.XSDDatatype.STRING);
+        Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI, XSDDatatype.STRING);
 
         CoreseStatement statement = (CoreseStatement) valueFactory.createStatement(subject, predicate, literal, context);
 
@@ -142,6 +147,69 @@ class CoreseValueFactoryTest extends ValueFactoryTest {
         assertNotNull(date);
         assertEquals(XSD.xsdDate.getIRI().stringValue(), date.getDatatype().stringValue());
         assertEquals(literalStringValue, date.getLabel());
-        assertInstanceOf(fr.inria.corese.core.sparql.datatype.CoreseDate.class, ((CoreseNodeAdapter) date).getCoreseNode());
+        assertInstanceOf(CoreseDate.class, ((CoreseNodeAdapter) date).getCoreseNode());
+    }
+
+    @Test
+    void typedNumericLiteralPreservesLexicalFormAndDatatype() {
+        Literal literal = valueFactory.createLiteral("01", XSDDatatype.INT.getIRI());
+
+        assertEquals("01", literal.getLabel());
+        assertEquals(XSDDatatype.INT.getIRI(), literal.getDatatype());
+        assertEquals(XSDDatatype.INT, literal.getCoreDatatype());
+        assertEquals(1, literal.intValue());
+    }
+
+    @Test
+    void booleanLiteralPreservesValidAndIllTypedLexicalForms() {
+        Literal numericTrue = valueFactory.createLiteral("1", XSDDatatype.BOOLEAN.getIRI());
+        Literal numericFalse = valueFactory.createLiteral("0", XSDDatatype.BOOLEAN.getIRI());
+
+        assertTrue(numericTrue.booleanValue());
+        assertFalse(numericFalse.booleanValue());
+        assertEquals("1", numericTrue.getLabel());
+        assertEquals("0", numericFalse.getLabel());
+        assertNotEquals(numericTrue, valueFactory.createLiteral("true", XSDDatatype.BOOLEAN.getIRI()));
+        Literal illTyped = valueFactory.createLiteral("TRUE", XSDDatatype.BOOLEAN.getIRI());
+
+        assertEquals("TRUE", illTyped.getLabel());
+        assertEquals(XSDDatatype.BOOLEAN.getIRI(), illTyped.getDatatype());
+        assertEquals(XSDDatatype.BOOLEAN, illTyped.getCoreDatatype());
+        assertThrows(IncorrectOperationException.class, illTyped::booleanValue);
+    }
+
+    @Test
+    void illTypedNumericLiteralRemainsAnRdfTermWithoutANumericValue() {
+        Literal illTyped = valueFactory.createLiteral("not-an-integer", XSDDatatype.INTEGER.getIRI());
+
+        assertEquals("not-an-integer", illTyped.getLabel());
+        assertEquals(XSDDatatype.INTEGER.getIRI(), illTyped.getDatatype());
+        assertEquals(XSDDatatype.INTEGER, illTyped.getCoreDatatype());
+        assertThrows(IncorrectOperationException.class, illTyped::integerValue);
+    }
+
+    @Test
+    void arbitrarySizeIntegerIsNotTruncated() {
+        BigInteger value = new BigInteger("1234567890123456789012345678901234567890");
+
+        Literal literal = valueFactory.createLiteral(value);
+
+        assertEquals(value.toString(), literal.getLabel());
+        assertEquals(value, literal.integerValue());
+        assertEquals(new BigDecimal(value), literal.decimalValue());
+    }
+
+    @Test
+    void primitiveOverloadsUseTheirDocumentedXsdDatatypes() {
+        assertEquals(XSDDatatype.BYTE, valueFactory.createLiteral((byte) 1).getCoreDatatype());
+        assertEquals(XSDDatatype.SHORT, valueFactory.createLiteral((short) 1).getCoreDatatype());
+        assertEquals(XSDDatatype.INT, valueFactory.createLiteral(1).getCoreDatatype());
+        assertEquals(XSDDatatype.LONG, valueFactory.createLiteral(1L).getCoreDatatype());
+        assertEquals(XSDDatatype.FLOAT, valueFactory.createLiteral(1.0f).getCoreDatatype());
+        assertEquals(XSDDatatype.DOUBLE, valueFactory.createLiteral(1.0d).getCoreDatatype());
+        assertEquals(XSDDatatype.DECIMAL,
+                valueFactory.createLiteral(BigDecimal.ONE).getCoreDatatype());
+        assertEquals(XSDDatatype.INTEGER,
+                valueFactory.createLiteral(BigInteger.ONE).getCoreDatatype());
     }
 }

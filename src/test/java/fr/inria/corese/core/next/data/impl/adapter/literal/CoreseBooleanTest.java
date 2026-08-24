@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.data.impl.adapter.literal;
 
 import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
+import fr.inria.corese.core.next.data.api.exception.InvalidDatatypeException;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import org.junit.jupiter.api.Test;
 
@@ -51,6 +52,18 @@ class CoreseBooleanTest {
 
         assertTrue(trueBoolean.booleanValue());
         assertFalse(falseBoolean.booleanValue());
+    }
+
+    @Test
+    void testConstructorPreservesValidLexicalForm() {
+        CoreseBoolean one = new CoreseBoolean("1");
+        CoreseBoolean zero = new CoreseBoolean("0");
+
+        assertTrue(one.booleanValue());
+        assertFalse(zero.booleanValue());
+        assertEquals("1", one.getLabel());
+        assertEquals("0", zero.getLabel());
+        assertThrows(InvalidDatatypeException.class, () -> new CoreseBoolean("yes"));
     }
 
 }

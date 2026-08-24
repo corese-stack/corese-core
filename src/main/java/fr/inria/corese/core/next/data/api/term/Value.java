@@ -43,7 +43,11 @@ public interface Value extends Serializable {
     }
 
 	/**
-	 * @return the string representation of this value (expected to be the same as the NTriples representation)
+	 * Returns the value's lexical string. This is not a serialized N-Triples representation:
+	 * IRIs are returned without angle brackets, blank nodes without the {@code _:} prefix,
+	 * and literals without quotes or datatype suffixes.
+	 *
+	 * @return the lexical string of this value
 	 */
 	String stringValue();
 

@@ -34,6 +34,15 @@ public abstract class IRITest {
     }
 
     @Test
+    public void equalIrisMustHaveEqualHashCodesRegardlessOfNamespaceSplit() {
+        IRI first = createIRI("http://example.org/ns", "term");
+        IRI second = createIRI("http://example.org/n", "sterm");
+
+        assertEquals(first, second);
+        assertEquals(first.hashCode(), second.hashCode());
+    }
+
+    @Test
     public void equalsTest() {
         IRI basicIRI = createIRI("http://example.org/test");
         IRI basicIRI2 = createIRI("http://example.org/test");

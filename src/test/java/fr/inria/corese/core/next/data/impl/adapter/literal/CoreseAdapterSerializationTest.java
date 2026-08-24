@@ -11,8 +11,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import org.junit.jupiter.api.Test;
+
+import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 
 class CoreseAdapterSerializationTest {
 
@@ -27,6 +30,15 @@ class CoreseAdapterSerializationTest {
     }
 
     @Test
+    void booleanRetainsItsNumericLexicalForm() throws IOException, ClassNotFoundException {
+        CoreseBoolean value = roundTrip(new CoreseBoolean("1"), CoreseBoolean.class);
+
+        assertTrue(value.booleanValue());
+        assertEquals("1", value.getLabel());
+        assertNotNull(value.getIDatatype());
+    }
+
+    @Test
     void numbersRetainTheirLexicalValueAndLegacyAdapter() throws IOException, ClassNotFoundException {
         CoreseInteger integer = roundTrip(new CoreseInteger("42"), CoreseInteger.class);
         CoreseDecimal decimal = roundTrip(new CoreseDecimal("12.50"), CoreseDecimal.class);
@@ -36,6 +48,42 @@ class CoreseAdapterSerializationTest {
         assertEquals(new BigDecimal("12.50"), decimal.decimalValue());
         assertNotNull(integer.getIDatatype());
         assertNotNull(decimal.getIDatatype());
+    }
+
+    @Test
+    void arbitrarySizeIntegerRetainsItsExactValue() throws IOException, ClassNotFoundException {
+        BigInteger value = new BigInteger("1234567890123456789012345678901234567890");
+
+        CoreseInteger integer = roundTrip(new CoreseInteger(value), CoreseInteger.class);
+
+        assertEquals(value.toString(), integer.getLabel());
+        assertEquals(value, integer.integerValue());
+        assertEquals(value.toString(), integer.getIDatatype().getLabel());
+    }
+
+    @Test
+    void numericSubtypeRetainsItsCoreDatatype() throws IOException, ClassNotFoundException {
+        CoreseInteger integer = roundTrip(
+                new CoreseInteger("42", XSDDatatype.INT.getIRI(), XSDDatatype.INT),
+                CoreseInteger.class);
+        CoreseDecimal decimal = roundTrip(
+                new CoreseDecimal("12.5", XSDDatatype.DOUBLE.getIRI(), XSDDatatype.DOUBLE),
+                CoreseDecimal.class);
+
+        assertEquals(XSDDatatype.INT, integer.getCoreDatatype());
+        assertEquals(XSDDatatype.DOUBLE, decimal.getCoreDatatype());
+    }
+
+    @Test
+    void illTypedLiteralRetainsItsTermAndCoreDatatype() throws IOException, ClassNotFoundException {
+        CoreseIllTypedLiteral literal = roundTrip(
+                new CoreseIllTypedLiteral("truth", XSDDatatype.BOOLEAN.getIRI(), XSDDatatype.BOOLEAN),
+                CoreseIllTypedLiteral.class);
+
+        assertEquals("truth", literal.getLabel());
+        assertEquals(XSDDatatype.BOOLEAN.getIRI(), literal.getDatatype());
+        assertEquals(XSDDatatype.BOOLEAN, literal.getCoreDatatype());
+        assertEquals("truth", literal.getIDatatype().getLabel());
     }
 
     @Test

@@ -206,7 +206,7 @@ class JsonTupleResultSerializerTest extends AbstractResultSerializerTest impleme
                     "}," +
                     "{" +
                         "\"x\":{\"type\":\"bnode\",\"value\":\"blank1\"}," +
-                        "\"literal\":{\"datatype\":\"http://www.w3.org/2001/XMLSchema#integer\",\"type\":\"literal\",\"value\":\"123\"}" +
+                        "\"literal\":{\"datatype\":\"http://www.w3.org/2001/XMLSchema#int\",\"type\":\"literal\",\"value\":\"123\"}" +
                     "}" +
                 "]" +
             "}" +

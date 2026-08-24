@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalAmount;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -58,7 +59,9 @@ public abstract class AbstractLiteral implements Literal {
      * @return true if the given core datatype is an integer core datatype, e.g xsd;integer, xsd:int, xsd:byte, etc, false otherwise
      */
     public static boolean isIntegerCoreDatatype(CoreDatatype coreDatatype) {
-        return integerXSDCoreDatatypeIRIs.contains(coreDatatype.getIRI());
+        return coreDatatype != null
+                && coreDatatype.getIRI() != null
+                && integerXSDCoreDatatypeIRIs.contains(coreDatatype.getIRI());
     }
 
     /**
@@ -66,7 +69,7 @@ public abstract class AbstractLiteral implements Literal {
      * @return true if the given IRI is an integer core datatype, e.g xsd;integer, xsd:int, xsd:byte, etc, false otherwise
      */
     public static boolean isIriOfIntegerCoreDatatype(IRI iri) {
-        return integerXSDCoreDatatypeIRIs.contains(iri);
+        return iri != null && integerXSDCoreDatatypeIRIs.contains(iri);
     }
 
     /**
@@ -74,7 +77,9 @@ public abstract class AbstractLiteral implements Literal {
      * @return true if the given core datatype is a decimal core datatype, e.g xsd;decimal, xsd:float, xsd:double, etc, false otherwise
      */
     public static boolean isDecimalCoreDatatype(CoreDatatype coreDatatype) {
-        return decimalXSDCoreDatatypeIRIs.contains(coreDatatype.getIRI());
+        return coreDatatype != null
+                && coreDatatype.getIRI() != null
+                && decimalXSDCoreDatatypeIRIs.contains(coreDatatype.getIRI());
     }
 
     /**
@@ -82,7 +87,7 @@ public abstract class AbstractLiteral implements Literal {
      * @return true if the given IRI is a decimal core datatype, e.g xsd;decimal, xsd:float, xsd:double, etc, false otherwise
      */
     public static boolean isIriOfDecimalCoreDatatype(IRI iri) {
-        return decimalXSDCoreDatatypeIRIs.contains(iri);
+        return iri != null && decimalXSDCoreDatatypeIRIs.contains(iri);
     }
     /**
      * Sets the core datatype of the literal.
@@ -167,29 +172,29 @@ public abstract class AbstractLiteral implements Literal {
     }
 
     /**
-     * Check if two temporal literals are equal.
+     * Compares RDF literal terms by lexical form, datatype, and language tag.
+     * Value-space comparisons belong to the SPARQL evaluation layer and must not
+     * be implemented through {@link Object#equals(Object)}.
+     *
      * @param obj the object to compare with
-     * @return true if compareTo returns 0, false otherwise
+     * @return {@code true} when both objects denote the same RDF literal term
      */
     @Override
     public boolean equals(Object obj) {
-        if(obj == this) {
+        if (obj == this) {
             return true;
         }
-        if(!(obj instanceof Literal)) {
+        if (!(obj instanceof Literal other)) {
             return false;
         }
-
-        return ((Literal) obj).getLabel().equals(this.getLabel()) && ((Literal) obj).getDatatype().equals(this.datatype);
+        return Objects.equals(getLabel(), other.getLabel())
+                && Objects.equals(getDatatype(), other.getDatatype())
+                && Objects.equals(getLanguage(), other.getLanguage());
     }
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 31 * hash + (this.getLabel() == null ? 0 : this.getLabel().hashCode());
-        hash = 31 * hash + (this.getDatatype() == null ? 0 : this.getDatatype().hashCode());
-        hash = 31 * hash + this.getLanguage().map(String::hashCode).orElse(0);
-        return hash;
+        return Objects.hash(getLabel(), getDatatype(), getLanguage());
     }
 
     @Override

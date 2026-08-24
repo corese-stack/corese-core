@@ -108,21 +108,6 @@ public class CoreseDuration extends AbstractDuration implements CoreseDatatypeAd
         return XSDDatatype.DURATION;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof CoreseDuration coreseDuration) {
-            return this.coreseObject().equals(coreseDuration.coreseObject());
-        } else if (obj instanceof AbstractDuration) {
-            return super.equals(obj);
-        }
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return this.coreseObject().hashCode();
-    }
-
     private CoreseUndefLiteral coreseObject() {
         CoreseUndefLiteral result = coreseObject;
         if (result == null) {

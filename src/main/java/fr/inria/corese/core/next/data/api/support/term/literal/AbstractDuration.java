@@ -82,29 +82,18 @@ public abstract class AbstractDuration extends AbstractLiteral implements Compar
     }
 
     /**
-     * Check if two temporal literals are equal.
-     * @param obj the object to compare with
-     * @return true if compareTo returns 0, false otherwise
+     * Duration ordering compares values, while RDF equality compares terms. Two
+     * different lexical forms can therefore compare as equal without being the
+     * same RDF literal.
      */
     @Override
-    public boolean equals(Object obj) {
-        if(obj == this) {
-            return true;
-        }
-        if(obj == null || obj.getClass() != this.getClass()) {
-            return false;
-        }
-        AbstractDuration other = (AbstractDuration) obj;
-        return this.compareTo(other) == 0;
+    public boolean equals(Object other) {
+        return this == other || super.equals(other);
     }
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 31 * hash + (this.datatype == null ? 0 : this.datatype.hashCode());
-        hash = 31 * hash + (this.getCoreDatatype() == null ? 0 : this.getCoreDatatype().hashCode());
-        hash = 31 * hash + (this.temporalAmountValue() == null ? 0 : this.temporalAmountValue().hashCode());
-        return hash;
+        return super.hashCode();
     }
 
 }

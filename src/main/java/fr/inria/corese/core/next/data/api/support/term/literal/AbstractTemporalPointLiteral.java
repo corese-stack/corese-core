@@ -21,25 +21,19 @@ public abstract class AbstractTemporalPointLiteral extends AbstractLiteral imple
         return this.calendarValue().compare(literal.calendarValue());
     }
 
+    /**
+     * Temporal ordering compares values, while RDF equality compares terms. Two
+     * different lexical forms can therefore compare as equal without being the
+     * same RDF literal.
+     */
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-        AbstractTemporalPointLiteral other = (AbstractTemporalPointLiteral) obj;
-        return this.datatype.equals(other.datatype) && this.calendarValue().equals(other.calendarValue());
+    public boolean equals(Object other) {
+        return this == other || super.equals(other);
     }
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 31 * hash + (this.datatype == null ? 0 : this.datatype.hashCode());
-        hash = 31 * hash + (this.getCoreDatatype() == null ? 0 : this.getCoreDatatype().hashCode());
-        hash = 31 * hash + (this.temporalAccessorValue() == null ? 0 : this.temporalAccessorValue().hashCode());
-        return hash;
+        return super.hashCode();
     }
 
 }
