@@ -8,6 +8,10 @@ import fr.inria.corese.core.next.data.api.vocabulary.RDFS;
 import fr.inria.corese.core.next.data.impl.io.parser.support.ParserTestBase;
 import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import java.util.stream.Stream;
 
 import java.io.StringReader;
 
@@ -20,12 +24,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * and interact with the Model and ValueFactory, including error handling
  * and unescaping of IRIs and literals, and named graphs.
  */
-public class TurtleParserTest extends ParserTestBase {
+class TurtleParserTest extends ParserTestBase {
 
     private final ValueFactory factory = new CoreseValueFactory();
 
     @Test
-    public void testParseWithPrefixAndTriple() {
+    void testParseWithPrefixAndTriple() {
         String turtle = """
                 @prefix ex: <http://example.org/> .
                 ex:Alice ex:knows ex:Bob .""";
@@ -37,64 +41,51 @@ public class TurtleParserTest extends ParserTestBase {
         assertEquals(1, model.getNamespaces().size()); // Should contains ex: and the relative base uri :
     }
 
-    @Test
-    public void testTripleQuoteLiteralWithDoubleQuoteIncludedTextBefore() {
-        String turtle = """
-                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-                <#0214>\s
-                    rdfs:comment \"""blabla"abc""\"" .""";
-
+    @ParameterizedTest
+    @MethodSource("provideTripleQuoteTestCases")
+    void testTripleQuoteLiteralWithDoubleQuotes(String turtleInput, String expectedLiteralValue) {
         Model model = createTestModel();
         RDFParser parser = new TurtleParser(model, factory, new TurtleParserOptions.Builder().baseIRI("http://inria.fr/").build());
-        parser.parse(new StringReader(turtle));
+        parser.parse(new StringReader(turtleInput));
         assertEquals(1, model.size());
-        model.contains(factory.createIRI("http://inria.fr/#0214"), RDFS.comment.getIRI(), factory.createLiteral("blabla\"abc\""));
+        assertTrue(model.contains(factory.createIRI("http://inria.fr/#0214"), RDFS.comment.getIRI(), factory.createLiteral(expectedLiteralValue)));
+    }
+
+    private static Stream<Arguments> provideTripleQuoteTestCases() {
+        return Stream.of(
+            Arguments.of(
+                """
+                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+                <#0214>\s
+                    rdfs:comment \"""blabla"abc""\"" .""",
+                "blabla\"abc\""
+            ),
+            Arguments.of(
+                """
+                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+                <#0214>\s
+                    rdfs:comment ""\""abc"blabla\""" .""",
+                "\"abc\"blabla"
+            ),
+            Arguments.of(
+                """
+                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+                <#0214>\s
+                    rdfs:comment \"""blabla"abc"blabla\""" .""",
+                "blabla\"abc\"blabla"
+            ),
+            Arguments.of(
+                """
+                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+                <#0214>\s
+                    rdfs:comment ""\""abc""\"" .""",
+                "\"abc\""
+            )
+        );
     }
 
     @Test
-    public void testTripleQuoteLiteralWithDoubleQuoteIncludedTextAfter() {
-        String turtle = """
-                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-                <#0214>\s
-                    rdfs:comment ""\""abc"blabla\""" .""";
-
-        Model model = createTestModel();
-        RDFParser parser = new TurtleParser(model, factory, new TurtleParserOptions.Builder().baseIRI("http://inria.fr/").build());
-        parser.parse(new StringReader(turtle));
-        assertEquals(1, model.size());
-        model.contains(factory.createIRI("http://inria.fr/#0214"), RDFS.comment.getIRI(), factory.createLiteral("\"abc\"blabla"));
-    }
-
-    @Test
-    public void testTripleQuoteLiteralWithDoubleQuoteIncludedTextBeforeAndAfter() {
-        String turtle = """
-                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-                <#0214>\s
-                    rdfs:comment \"""blabla"abc"blabla\""" .""";
-
-        Model model = createTestModel();
-        RDFParser parser = new TurtleParser(model, factory, new TurtleParserOptions.Builder().baseIRI("http://inria.fr/").build());
-        parser.parse(new StringReader(turtle));
-        assertEquals(1, model.size());
-        model.contains(factory.createIRI("http://inria.fr/#0214"), RDFS.comment.getIRI(), factory.createLiteral("blabla\"abc\"blabla"));
-    }
-
-    @Test
-    public void testTripleQuoteLiteralWithDoubleQuoteIncludedNoText() {
-        String turtle = """
-                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-                <#0214>\s
-                    rdfs:comment ""\""abc""\"" .""";
-
-        Model model = createTestModel();
-        RDFParser parser = new TurtleParser(model, factory, new TurtleParserOptions.Builder().baseIRI("http://inria.fr/").build());
-        parser.parse(new StringReader(turtle));
-        assertEquals(1, model.size());
-        model.contains(factory.createIRI("http://inria.fr/#0214"), RDFS.comment.getIRI(), factory.createLiteral("\"abc\""));
-    }
-
-    @Test
-    public void testRdfaManifest() {
+    void testRdfaManifest() {
         String turtle = """
                 @base <http://rdfa.info/test-suite/test-cases/rdfa1.1/xml/manifest> .
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .

@@ -36,7 +36,7 @@ class JSONLDSerializerTest {
     private final IRI graph2 = factory.createIRI("http://example.org/graph2");
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         StorageConfig config = StorageConfig.builder()
                 .property("type", "memory")
                 .build();
@@ -51,7 +51,7 @@ class JSONLDSerializerTest {
      * Check that the serializer can handle a small model with all types of literals
      */
     @Test
-    public void smallModelTest() {
+    void smallModelTest() {
         // IRI IRI IRI
         this.model.add(iriNode, iriPred, iriNode);
         // IRI IRI Literal
@@ -95,9 +95,9 @@ class JSONLDSerializerTest {
         Reader resultReader = new StringReader(result);
         Reader expectedResultReader = new StringReader(expectedResult);
 
-        JsonReaderFactory factory = Json.createReaderFactory(null);
-        JsonReader resultJsonReader = factory.createReader(resultReader);
-        JsonReader expectedResultJsonReader = factory.createReader(expectedResultReader);
+        JsonReaderFactory jsonReaderFactory = Json.createReaderFactory(null);
+        JsonReader resultJsonReader = jsonReaderFactory.createReader(resultReader);
+        JsonReader expectedResultJsonReader = jsonReaderFactory.createReader(expectedResultReader);
         assertTrue(JsonLdComparison.equals(resultJsonReader.readValue(), expectedResultJsonReader.readValue()), "The result should be the expected JSON object");
     }
 
@@ -105,7 +105,7 @@ class JSONLDSerializerTest {
      * Test the serialization of a model with blank nodes.
      */
     @Test
-    public void modelWithBlankNodesTest() {
+    void modelWithBlankNodesTest() {
         // IRI IRI BlankNode
         this.model.add(iriNode, iriPred, blankNode);
         // BlankNode IRI IRI
@@ -149,9 +149,9 @@ class JSONLDSerializerTest {
         Reader resultReader = new StringReader(result);
         Reader expectedResultReader = new StringReader(expectedResult);
 
-        JsonReaderFactory factory = Json.createReaderFactory(null);
-        JsonReader resultJsonReader = factory.createReader(resultReader);
-        JsonReader expectedResultJsonReader = factory.createReader(expectedResultReader);
+        JsonReaderFactory jsonReaderFactory = Json.createReaderFactory(null);
+        JsonReader resultJsonReader = jsonReaderFactory.createReader(resultReader);
+        JsonReader expectedResultJsonReader = jsonReaderFactory.createReader(expectedResultReader);
         assertTrue(JsonLdComparison.equals(resultJsonReader.readValue(), expectedResultJsonReader.readValue()), "The result should be " + expectedResult);
     }
 
@@ -159,7 +159,7 @@ class JSONLDSerializerTest {
      * Test the serialization of a model with named graphs.
      */
     @Test
-    public void modelWithNamedGraphsTest() {
+    void modelWithNamedGraphsTest() {
         // IRI IRI IRI
         this.model.add(iriNode, iriPred, iriNode);
         // IRI IRI Literal

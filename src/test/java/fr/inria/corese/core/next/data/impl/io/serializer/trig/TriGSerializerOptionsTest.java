@@ -23,6 +23,7 @@ class TriGSerializerOptionsTest {
 
     @Test
     @DisplayName("defaultConfig() should return a config with expected TriG defaults")
+    @SuppressWarnings("java:S5961")
     void defaultConfig_shouldReturnExpectedDefaults() {
         TriGSerializerOptions config = TriGSerializerOptions.defaultConfig();
 

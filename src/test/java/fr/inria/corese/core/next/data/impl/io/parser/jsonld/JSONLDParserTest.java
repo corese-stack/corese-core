@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class JSONLDParserTest extends ParserTestBase {
+class JSONLDParserTest extends ParserTestBase {
 
     private final DefaultRDFParserFactory factory = new DefaultRDFParserFactory();
     private final ValueFactory valueFactory = new CoreseValueFactory();
@@ -35,7 +35,8 @@ public class JSONLDParserTest extends ParserTestBase {
 
     @Test
     void constructorNullValueFactoryThrowsTest() {
-        assertThrows(NullPointerException.class, () -> new JSONLDParser(createTestModel(), null));
+        Model testModel = createTestModel();
+        assertThrows(NullPointerException.class, () -> new JSONLDParser(testModel, null));
     }
 
     @Test
@@ -58,7 +59,7 @@ public class JSONLDParserTest extends ParserTestBase {
      * Test method for {@link JSONLDParser#parse(java.io.InputStream)}. No relative IRIs in this test.
      */
     @Test
-    public void testParseInputStream() {
+    void testParseInputStream() {
         // taken from https://www.w3.org/TR/json-ld-api/#object-to-rdf-conversion
         String sampleJsonLD = """
                 {
@@ -96,7 +97,7 @@ public class JSONLDParserTest extends ParserTestBase {
      * Test method for {@link JSONLDParser#parse(java.io.InputStream, java.lang.String)}. A relative IRI is used in this test.
      */
     @Test
-    public void testParseInputStreamString() {
+    void testParseInputStreamString() {
         // taken from https://www.w3.org/TR/json-ld-api/#object-to-rdf-conversion
         String sampleJsonLD = """
                 {
@@ -134,7 +135,7 @@ public class JSONLDParserTest extends ParserTestBase {
      * Test of {@link JSONLDParser#parse(java.io.Reader, java.lang.String)}, of class JSONLDParser. No relative IRIs are used in this test.
      */
     @Test
-    public void testParseReader() {
+    void testParseReader() {
         // taken from https://www.w3.org/TR/json-ld-api/#object-to-rdf-conversion
         String sampleJsonLD = """
                 {
@@ -172,7 +173,7 @@ public class JSONLDParserTest extends ParserTestBase {
      * Test of {@link JSONLDParser#parse(java.io.Reader, java.lang.String)}, of class JSONLDParser. A relative IRI is used in this test.
      */
     @Test
-    public void testParseReaderString() {
+    void testParseReaderString() {
         // taken from https://www.w3.org/TR/json-ld-api/#object-to-rdf-conversion
         String sampleJsonLD = """
                 {
@@ -210,7 +211,7 @@ public class JSONLDParserTest extends ParserTestBase {
      * Test parsing JSON-LD with blank nodes.
      */
     @Test
-    public void testParseJsonLDWithBlankNodes() {
+    void testParseJsonLDWithBlankNodes() {
         String sampleJsonLD = """
                     {
                     "@context": {
@@ -272,7 +273,7 @@ public class JSONLDParserTest extends ParserTestBase {
     }
 
     @Test
-    public void testParseJSONLDWithGraphs() {
+    void testParseJSONLDWithGraphs() {
         // Taken from https://www.w3.org/TR/json-ld11/#named-graphs
         String sampleJsonLD = """
                 {

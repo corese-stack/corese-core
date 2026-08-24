@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CoreseStatementTest {
+class CoreseStatementTest {
     private Resource subject;
     private IRI predicate;
     private Value object;
@@ -42,7 +42,7 @@ public class CoreseStatementTest {
     }
 
     @Test
-    public void testCoreseStatementWithContext() {
+    void testCoreseStatementWithContext() {
         CoreseStatement statement = new CoreseStatement(subject, predicate, object, context);
 
         assertEquals(subject, statement.getSubject());
@@ -52,7 +52,7 @@ public class CoreseStatementTest {
     }
 
     @Test
-    public void testCoreseStatementWithoutContext() {
+    void testCoreseStatementWithoutContext() {
         CoreseStatement statement = new CoreseStatement(subject, predicate, object, null);
 
         assertEquals(subject, statement.getSubject());
@@ -62,14 +62,14 @@ public class CoreseStatementTest {
     }
 
     @Test
-    public void testCoreseStatementFromEdgeWithNullEdge() {
+    void testCoreseStatementFromEdgeWithNullEdge() {
         assertThrows(IllegalArgumentException.class, () -> {
             new CoreseStatement(null);
         });
     }
 
     @Test
-    public void testCoreseStatementFromEdge() {
+    void testCoreseStatementFromEdge() {
         CoreseStatement statement = new CoreseStatement(edge);
 
         assertEquals(subject, statement.getSubject());
@@ -79,7 +79,7 @@ public class CoreseStatementTest {
     }
 
     @Test
-    public void testGetCoreseEdge() {
+    void testGetCoreseEdge() {
         CoreseStatement statement = new CoreseStatement(subject, predicate, object, context);
         assertNotNull(statement.getCoreseEdge());
     }

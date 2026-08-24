@@ -18,7 +18,7 @@ import fr.inria.corese.core.next.data.impl.adapter.literal.CoreseTyped;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CoreseValueFactoryTest extends ValueFactoryTest {
+class CoreseValueFactoryTest extends ValueFactoryTest {
 
     private String stringTestValue;
     private IRI xsdStringIRI;
@@ -41,13 +41,11 @@ public class CoreseValueFactoryTest extends ValueFactoryTest {
     @Override
     public void testCreateLiteralTemporalAmount() {
         Duration duration = Duration.ofHours(23);
-        this.valueFactory.createLiteral(duration);
-
         assertNotNull(this.valueFactory.createLiteral(duration));
     }
 
     @Test
-    public void testCreateLiteralWithLabel() {
+    void testCreateLiteralWithLabel() {
         // Test createLiteral with label
         Literal literal = valueFactory.createLiteral(stringTestValue);
 
@@ -58,7 +56,7 @@ public class CoreseValueFactoryTest extends ValueFactoryTest {
     }
 
     @Test
-    public void testCreateLiteralWithLabelAndLanguage() {
+    void testCreateLiteralWithLabelAndLanguage() {
         String testLanguage = "en";
 
         // Test createLiteral with label and language
@@ -72,7 +70,7 @@ public class CoreseValueFactoryTest extends ValueFactoryTest {
     }
 
     @Test
-    public void testCreateLiteralWithDatatypeIRI() {
+    void testCreateLiteralWithDatatypeIRI() {
         // Test createLiteral with IRI datatype (XSD.STRING)
         Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI);
 
@@ -83,7 +81,7 @@ public class CoreseValueFactoryTest extends ValueFactoryTest {
     }
 
     @Test
-    public void testCreateLiteralWithCoreDatatype() {
+    void testCreateLiteralWithCoreDatatype() {
         // Test createLiteral with CoreDatatype (XSD.STRING)
         Literal literal = valueFactory.createLiteral(stringTestValue, fr.inria.corese.core.next.data.api.literal.XSDDatatype.STRING);
 
@@ -94,7 +92,7 @@ public class CoreseValueFactoryTest extends ValueFactoryTest {
     }
 
     @Test
-    public void testCreateLiteralWithDatatypeIRIAndCoreDatatype() {
+    void testCreateLiteralWithDatatypeIRIAndCoreDatatype() {
         // Test createLiteral with IRI datatype and CoreDatatype (XSD.STRING)
         Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI, fr.inria.corese.core.next.data.api.literal.XSDDatatype.STRING);
 
@@ -105,7 +103,7 @@ public class CoreseValueFactoryTest extends ValueFactoryTest {
     }
 
     @Test
-    public void testCreateStatementWithoutContext() {
+    void testCreateStatementWithoutContext() {
         Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI, fr.inria.corese.core.next.data.api.literal.XSDDatatype.STRING);
         CoreseStatement statement = (CoreseStatement) valueFactory.createStatement(subject, predicate, literal);
         assertNotNull(statement);
@@ -116,7 +114,7 @@ public class CoreseValueFactoryTest extends ValueFactoryTest {
     }
 
     @Test
-    public void testCreateStatementWithContext() {
+    void testCreateStatementWithContext() {
         Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI, fr.inria.corese.core.next.data.api.literal.XSDDatatype.STRING);
 
         CoreseStatement statement = (CoreseStatement) valueFactory.createStatement(subject, predicate, literal, context);
@@ -129,14 +127,14 @@ public class CoreseValueFactoryTest extends ValueFactoryTest {
     }
 
     @Test
-    public void testCreateFOAFURI() {
+    void testCreateFOAFURI() {
         IRI foaf = valueFactory.createIRI("http://xmlns.com/foaf/0.1/");
         assertNotNull(foaf);
         assertEquals("http://xmlns.com/foaf/0.1/", foaf.stringValue());
     }
 
     @Test
-    public void testDateCreation() {
+    void testDateCreation() {
         IRI xsdDate = valueFactory.createIRI("http://www.w3.org/2001/XMLSchema#date");
         String literalStringValue = "2025-11-20";
         Literal date = valueFactory.createLiteral(literalStringValue, xsdDate);

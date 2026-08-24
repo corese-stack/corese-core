@@ -74,37 +74,37 @@ class FileFormatTest {
     @Nested
     class Constructor_argument_validation {
 
-        private final List<String> EXT = List.of("ttl");
-        private final List<String> MIME = List.of("text/turtle");
+        private final List<String> ext = List.of("ttl");
+        private final List<String> mime = List.of("text/turtle");
 
         @Test
         void null_name_throws_NPE() {
             assertThrows(NullPointerException.class,
-                    () -> new FileFormat(null, EXT, MIME));
+                    () -> new FileFormat(null, ext, mime));
         }
 
         @Test
         void null_extensions_throws_NPE() {
             assertThrows(NullPointerException.class,
-                    () -> new FileFormat("Turtle", null, MIME));
+                    () -> new FileFormat("Turtle", null, mime));
         }
 
         @Test
         void null_mimeTypes_throws_NPE() {
             assertThrows(NullPointerException.class,
-                    () -> new FileFormat("Turtle", EXT, null));
+                    () -> new FileFormat("Turtle", ext, null));
         }
 
         @Test
         void empty_extensions_throws_IAE() {
             assertThrows(IllegalArgumentException.class,
-                    () -> new FileFormat("Turtle", List.of(), MIME));
+                    () -> new FileFormat("Turtle", List.of(), mime));
         }
 
         @Test
         void empty_mimeTypes_throws_IAE() {
             assertThrows(IllegalArgumentException.class,
-                    () -> new FileFormat("Turtle", EXT, List.of()));
+                    () -> new FileFormat("Turtle", ext, List.of()));
         }
     }
 
@@ -129,11 +129,13 @@ class FileFormatTest {
         assertEquals(List.of("text/turtle"), format.getMimeTypes(), "defensive copy for mimeTypes");
 
         // Returned lists must be unmodifiable
+        List<String> extensions = format.getExtensions();
+        List<String> mimeTypes = format.getMimeTypes();
         assertAll("Returned lists are unmodifiable",
                 () -> assertThrows(UnsupportedOperationException.class,
-                        () -> format.getExtensions().add("new")),
+                        () -> extensions.add("new")),
                 () -> assertThrows(UnsupportedOperationException.class,
-                        () -> format.getMimeTypes().add("new/type")));
+                        () -> mimeTypes.add("new/type")));
     }
 
     /*
@@ -177,8 +179,8 @@ class FileFormatTest {
                     () -> assertNotEquals(base, diffName),
                     () -> assertNotEquals(base, diffExt),
                     () -> assertNotEquals(base, diffMime),
-                    () -> assertNotEquals(base, null),
-                    () -> assertNotEquals(base, "some string"));
+                    () -> assertNotEquals(null, base),
+                    () -> assertNotEquals("some string", base));
         }
     }
 

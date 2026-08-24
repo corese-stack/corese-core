@@ -12,7 +12,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -79,7 +78,7 @@ class NTriplesSerializerTest {
                 mockExName,
                 mockLiteralJohn
         );
-        Mockito.when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
+        when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
         nTriplesSerializer.write(writer);
@@ -102,7 +101,7 @@ class NTriplesSerializerTest {
                 mockLiteralJohn,
                 mockContext
         );
-        Mockito.when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
+        when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
         nTriplesSerializer.write(writer);
@@ -123,7 +122,7 @@ class NTriplesSerializerTest {
                 mockExKnows,
                 mockBNode2
         );
-        Mockito.when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
+        when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
         nTriplesSerializer.write(writer);
@@ -144,9 +143,9 @@ class NTriplesSerializerTest {
                 mockExName,
                 mockLiteralJohn
         );
-        Mockito.when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
+        when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
-        Writer faultyWriter = Mockito.mock(Writer.class);
+        Writer faultyWriter = mock(Writer.class);
 
         doThrow(new IOException("Simulated IO error during write")).when(faultyWriter).write(anyString());
         doThrow(new IOException("Simulated IO error (char array)")).when(faultyWriter).write(any(char[].class), anyInt(), anyInt());
@@ -192,11 +191,11 @@ class NTriplesSerializerTest {
     @Test
     @DisplayName("Write should throw SerializationException for null object value in strict mode")
     void writeShouldThrowOnNullObjectValue() {
-        Statement stmt = Mockito.mock(Statement.class);
-        Mockito.when(stmt.getSubject()).thenReturn(mockExPerson);
-        Mockito.when(stmt.getPredicate()).thenReturn(mockExName);
-        Mockito.when(stmt.getObject()).thenReturn(null);
-        Mockito.when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
+        Statement stmt = mock(Statement.class);
+        when(stmt.getSubject()).thenReturn(mockExPerson);
+        when(stmt.getPredicate()).thenReturn(mockExName);
+        when(stmt.getObject()).thenReturn(null);
+        when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
         SerializationException thrown = assertThrows(SerializationException.class, () -> nTriplesSerializer.write(writer));
@@ -247,7 +246,7 @@ class NTriplesSerializerTest {
                 mockExName,
                 literalMock
         );
-        Mockito.when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
+        when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
         nTriplesSerializer.write(writer);
@@ -267,8 +266,8 @@ class NTriplesSerializerTest {
     void shouldHandleLiteralsWithLanguageTags() throws SerializationException {
         Statement stmt = factory.createStatement(mockExPerson, factory.createIRI("http://example.org/greeting"), mockLiteralHelloEn);
 
-        Model currentTestModel = Mockito.mock(Model.class);
-        Mockito.when(currentTestModel.iterator()).thenReturn(new MockStatementIterator(stmt));
+        Model currentTestModel = mock(Model.class);
+        when(currentTestModel.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         Writer writer = new StringWriter();
 

@@ -10,6 +10,10 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,53 +51,46 @@ class TurtleListenerTest extends ParserTestBase {
         return model;
     }
 
-    @Test
-    void testNamespace() throws Exception {
-        String turtleData = "@prefix ex: <http://example.org/> .\n" +
-                "ex:subject ex:predicate 1 .";
-
+    @ParameterizedTest
+    @MethodSource("provideTurtleTestCases")
+    void testTurtleParsing(String turtleData, int expectedTriples, int expectedNamespaces) throws Exception {
         Model model = parseAndPrintModel(turtleData);
-        assertEquals(1, model.getNamespaces().size(), "Namespace count mismatch");
+        assertEquals(expectedTriples, model.size(), "Triple count mismatch");
+        assertEquals(expectedNamespaces, model.getNamespaces().size(), "Namespace count mismatch");
     }
 
-    @Test
-    void testTypedLiteral() throws Exception {
-        String turtleData = """
-            @prefix ex: <http://example.org/> .
-            @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-            ex:subject ex:age "27"^^xsd:integer .
-            """;
-
-        Model model = parseAndPrintModel(turtleData);
-        assertEquals(1, model.size(), "Triple count mismatch");
-        assertEquals(2, model.getNamespaces().size(), "Namespace count mismatch");
-    }
-
-    @Test
-    void testMultipleObjects() throws Exception {
-        String turtleData = """
-            @prefix ex: <http://example.org/> .
-            ex:subject ex:knows ex:Alice , ex:Bob ;
-                       ex:likes ex:Pizza .
-            """;
-
-        Model model = parseAndPrintModel(turtleData);
-        assertEquals(3, model.size(), "Triple count mismatch");
-        assertEquals(1, model.getNamespaces().size(), "Namespace count mismatch");
-    }
-
-    @Test
-    void testRDFtype() throws Exception {
-        String turtleData = """
-            @prefix ex: <http://example.org/> .
-            ex:Alice a ex:Person .
-            ex:subject ex:knows ex:Alice , ex:Bob ;
-                       ex:likes ex:Pizza .
-            """;
-
-        Model model = parseAndPrintModel(turtleData);
-        assertEquals(4, model.size(), "Triple count mismatch");
-        assertEquals(1, model.getNamespaces().size(), "Namespace count mismatch");
+    private static Stream<Arguments> provideTurtleTestCases() {
+        return Stream.of(
+            Arguments.of(
+                "@prefix ex: <http://example.org/> .\nex:subject ex:predicate 1 .",
+                1, 1
+            ),
+            Arguments.of(
+                """
+                @prefix ex: <http://example.org/> .
+                @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+                ex:subject ex:age "27"^^xsd:integer .
+                """,
+                1, 2
+            ),
+            Arguments.of(
+                """
+                @prefix ex: <http://example.org/> .
+                ex:subject ex:knows ex:Alice , ex:Bob ;
+                           ex:likes ex:Pizza .
+                """,
+                3, 1
+            ),
+            Arguments.of(
+                """
+                @prefix ex: <http://example.org/> .
+                ex:Alice a ex:Person .
+                ex:subject ex:knows ex:Alice , ex:Bob ;
+                           ex:likes ex:Pizza .
+                """,
+                4, 1
+            )
+        );
     }
 
     @Test
@@ -123,12 +120,10 @@ class TurtleListenerTest extends ParserTestBase {
         Model model = parseAndPrintModel(turtleData);
         model.objects().forEach(obj -> {
             assertTrue(obj.isLiteral(), "Expected object to be a literal");
-            try {
+            assertDoesNotThrow(() -> {
                 int value = Integer.parseInt(obj.stringValue());
                 logger.info("Parsed integer: {}", value);
-            } catch (NumberFormatException e) {
-                fail("Literal is not a valid integer: " + obj.stringValue());
-            }
+            }, "Literal should be a valid integer: " + obj.stringValue());
         });
 
         assertEquals(1, model.size(), "Triple count mismatch");

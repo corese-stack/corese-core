@@ -354,14 +354,14 @@ class RDFC10SerializerTest {
         }
 
         DefaultRDFSerializerFactory serializerFactory = new DefaultRDFSerializerFactory();
-        RDFSerializer serializer = serializerFactory.createSerializer(
+        RDFSerializer localSerializer = serializerFactory.createSerializer(
                 RDFFormat.RDFC_1_0,
                 model,
                 RDFC10SerializerOptions.defaultConfig()
         );
 
         StringWriter writer = new StringWriter();
-        serializer.write(writer);
+        localSerializer.write(writer);
         return writer.toString();
     }
 }

@@ -24,13 +24,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * - RDF types
  * - Property attributes
  */
-public class RDFXMLStatementEmitterTest extends ParserTestBase {
+class RDFXMLStatementEmitterTest extends ParserTestBase {
 
     private Model model;
     private RDFXMLStatementEmitter emitter;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         model = createTestModel();
         emitter = new RDFXMLStatementEmitter(model, valueFactory);
     }
@@ -40,7 +40,7 @@ public class RDFXMLStatementEmitterTest extends ParserTestBase {
      * Asserts that the triple is added to the model correctly.
      */
     @Test
-    public void testEmitLiteral_plain() {
+    void testEmitLiteral_plain() {
         Literal literal = valueFactory.createLiteral("hello");
         Resource subject = valueFactory.createBNode();
         IRI predicate = valueFactory.createIRI("http://example.org/predicate");
@@ -65,7 +65,7 @@ public class RDFXMLStatementEmitterTest extends ParserTestBase {
      * Verifies that the correct literal is added to the model.
      */
     @Test
-    public void testEmitLiteral_withLang() {
+    void testEmitLiteral_withLang() {
         Resource subject = valueFactory.createBNode();
         IRI predicate = valueFactory.createIRI("http://example.org/predicate");
         emitter.emitLiteral(subject, predicate, "bonjour", null, "fr");
@@ -80,7 +80,7 @@ public class RDFXMLStatementEmitterTest extends ParserTestBase {
      * Verifies that the correct typed literal is added to the model.
      */
     @Test
-    public void testEmitLiteral_withDatatype() {
+    void testEmitLiteral_withDatatype() {
         Resource subject = valueFactory.createBNode();
         IRI predicate = valueFactory.createIRI("http://example.org/age");
         emitter.emitLiteral(subject, predicate, "42", XSDDatatype.INTEGER.getIRI().stringValue(), null);
@@ -95,7 +95,7 @@ public class RDFXMLStatementEmitterTest extends ParserTestBase {
      * Verifies that the rdf:type triple is correctly created.
      */
     @Test
-    public void testEmitType() {
+    void testEmitType() {
         Resource subject = valueFactory.createIRI("http://example.org/Alice");
         emitter.emitType(subject, "http://example.org/Person");
 
@@ -106,7 +106,7 @@ public class RDFXMLStatementEmitterTest extends ParserTestBase {
      * Test emitting a triple where the object is a resource IRI resolved against a base.
      */
     @Test
-    public void testEmitResourceTriple() {
+    void testEmitResourceTriple() {
         Resource subject = valueFactory.createIRI("http://example.org/Alice");
         IRI predicate = valueFactory.createIRI("http://example.org/knows");
         emitter.emitResourceTriple(subject, predicate, "Bob", "http://example.org/");
@@ -118,7 +118,7 @@ public class RDFXMLStatementEmitterTest extends ParserTestBase {
      * Test emitting a triple where the object is a blank node identified by nodeID.
      */
     @Test
-    public void testEmitBNodeTriple() {
+    void testEmitBNodeTriple() {
         Resource subject = valueFactory.createIRI("http://example.org/Alice");
         IRI predicate = valueFactory.createIRI("http://example.org/knows");
         emitter.emitBNodeTriple(subject, predicate, "b123");
@@ -132,7 +132,7 @@ public class RDFXMLStatementEmitterTest extends ParserTestBase {
      * Test emitting a generic triple with subject, predicate, and object resources.
      */
     @Test
-    public void testEmitTriple() {
+    void testEmitTriple() {
         Resource s = valueFactory.createIRI("http://example.org/s");
         IRI p = valueFactory.createIRI("http://example.org/p");
         Resource o = valueFactory.createIRI("http://example.org/o");
@@ -146,7 +146,7 @@ public class RDFXMLStatementEmitterTest extends ParserTestBase {
      * Test emitting triples from XML attributes.
      */
     @Test
-    public void testEmitPropertyAttributes() {
+    void testEmitPropertyAttributes() {
         Resource s = valueFactory.createIRI("http://example.org/thing");
         AttributesImpl attrs = new AttributesImpl();
         attrs.addAttribute("http://example.org/", "foo", "ex:foo", "CDATA", "val1");

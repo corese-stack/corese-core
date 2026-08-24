@@ -20,13 +20,13 @@ import static org.junit.jupiter.api.Assertions.*;
  * subject extraction, IRI resolution, container detection, syntax attribute recognition,
  * and RDF collection creation.
  */
-public class RDFXMLUtilsTest extends ParserTestBase {
+class RDFXMLUtilsTest extends ParserTestBase {
 
     /**
      * Tests expansion of QNames into full IRIs using provided namespace and local name.
      */
     @Test
-    public void testExpandQName() {
+    void testExpandQName() {
         assertEquals("http://example.org/test", RDFXMLUtils.expandQName("http://example.org/", "test", "ex:test"));
         assertEquals("ex:test", RDFXMLUtils.expandQName(null, null, "ex:test"));
     }
@@ -35,7 +35,7 @@ public class RDFXMLUtilsTest extends ParserTestBase {
      * Tests resolution of known and unknown datatype URIs.
      */
     @Test
-    public void testResolveDatatype() {
+    void testResolveDatatype() {
         assertEquals(Optional.of(XSDDatatype.STRING), RDFXMLUtils.resolveDatatype(XSDDatatype.STRING.getIRI().stringValue()));
         assertTrue(RDFXMLUtils.resolveDatatype("http://nonexistentdatatype").isEmpty());
     }
@@ -44,7 +44,7 @@ public class RDFXMLUtilsTest extends ParserTestBase {
      * Tests subject extraction using the rdf:about attribute.
      */
     @Test
-    public void testExtractSubjectWithAbout() {
+    void testExtractSubjectWithAbout() {
         AttributesImpl attrs = new AttributesImpl();
         attrs.addAttribute(RDF.type.getNamespace(), "about", "", "CDATA", "http://example.org/subject");
         Resource subject = RDFXMLUtils.extractSubject(attrs, valueFactory, null, null);
@@ -56,7 +56,7 @@ public class RDFXMLUtilsTest extends ParserTestBase {
      * Tests subject extraction using the rdf:nodeID attribute.
      */
     @Test
-    public void testExtractSubjectWithNodeID() {
+    void testExtractSubjectWithNodeID() {
         AttributesImpl attrs = new AttributesImpl();
         attrs.addAttribute(RDF.type.getNamespace(), "nodeID", "", "CDATA", "b123");
         Resource subject = RDFXMLUtils.extractSubject(attrs, valueFactory, null, null);
@@ -67,7 +67,7 @@ public class RDFXMLUtilsTest extends ParserTestBase {
      * Tests subject extraction using the rdf:ID attribute with base URI resolution.
      */
     @Test
-    public void testExtractSubjectWithID() {
+    void testExtractSubjectWithID() {
         AttributesImpl attrs = new AttributesImpl();
         attrs.addAttribute(RDF.type.getNamespace(), "ID", "", "CDATA", "id123");
         Resource subject = RDFXMLUtils.extractSubject(attrs, valueFactory, "http://example.org/", null);
@@ -78,7 +78,7 @@ public class RDFXMLUtilsTest extends ParserTestBase {
      * Tests resolving a relative IRI against a base URI.
      */
     @Test
-    public void testResolveAgainstBase() {
+    void testResolveAgainstBase() {
         assertEquals("http://base.org/path", RDFXMLUtils.resolveAgainstBase("path", "http://base.org/"));
     }
 
@@ -86,7 +86,7 @@ public class RDFXMLUtilsTest extends ParserTestBase {
      * Tests recognition of RDF/XML syntax attributes.
      */
     @Test
-    public void testIsSyntaxAttribute() {
+    void testIsSyntaxAttribute() {
         assertTrue(RDFXMLUtils.isSyntaxAttribute(RDF.type.getNamespace(), "about", "rdf:about"));
         assertTrue(RDFXMLUtils.isSyntaxAttribute(null, "lang", "xml:lang"));
         assertFalse(RDFXMLUtils.isSyntaxAttribute("http://example.org/", "type", "ex:type"));
@@ -96,7 +96,7 @@ public class RDFXMLUtilsTest extends ParserTestBase {
      * Tests detection of RDF container types (Bag, Seq, Alt).
      */
     @Test
-    public void testIsContainer() {
+    void testIsContainer() {
         assertTrue(RDFXMLUtils.isContainer("Bag", RDF.type.getNamespace()));
         assertFalse(RDFXMLUtils.isContainer("notAContainer", "http://example.org/"));
     }
@@ -105,7 +105,7 @@ public class RDFXMLUtilsTest extends ParserTestBase {
      * Tests creation of an RDF collection using rdf:first, rdf:rest, and rdf:nil.
      */
     @Test
-    public void testCreateRdfCollection() {
+    void testCreateRdfCollection() {
         Model model = createTestModel();
 
         Resource r1 = valueFactory.createIRI("http://example.org/A");

@@ -144,7 +144,7 @@ class RDFaParserTest extends ParserTestBase {
     }
 
     @Test
-    public void basicBaseTest() {
+    void basicBaseTest() {
         String testDataString = """
 <?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml"
@@ -189,7 +189,7 @@ class RDFaParserTest extends ParserTestBase {
     }
 
     @Test
-    public void aboutTest() {
+    void aboutTest() {
         String testDataString = """
                 <html>
                   <head>
@@ -217,7 +217,7 @@ class RDFaParserTest extends ParserTestBase {
     }
 
     @Test
-    public void basicIRItoIRITest() {
+    void basicIRItoIRITest() {
         String testDataString = """
                 <html>
                   <head>
@@ -256,7 +256,7 @@ class RDFaParserTest extends ParserTestBase {
     }
 
     @Test
-    public void basicIRItoStringTest() {
+    void basicIRItoStringTest() {
         String testDataString = """
                 <html>
                   <head>
@@ -292,7 +292,7 @@ class RDFaParserTest extends ParserTestBase {
     }
 
     @Test
-    public void basicIRItoTypedLiteralTest() {
+    void basicIRItoTypedLiteralTest() {
         String testDataString = """
                 <html>
                   <head>
@@ -341,7 +341,7 @@ class RDFaParserTest extends ParserTestBase {
     }
 
     @Test
-    public void basicChainTest() {
+    void basicChainTest() {
         String testDataString = """
                 <html>
                   <head>
@@ -383,7 +383,7 @@ class RDFaParserTest extends ParserTestBase {
     }
 
     @Test
-    public void inheritSubjectTest() {
+    void inheritSubjectTest() {
         String testDataString = """
                 <!DOCTYPE html>
                 <html prefix="dc: http://purl.org/dc/elements/1.1/">
@@ -434,7 +434,7 @@ class RDFaParserTest extends ParserTestBase {
     }
 
     @Test
-    public void multiplePrefixDeclaration() {
+    void multiplePrefixDeclaration() {
         String testDataString = """
                 <!DOCTYPE html>
                 <html prefix="dc: http://purl.org/dc/elements/1.1/ p2: https://schema.org/">
@@ -481,7 +481,7 @@ class RDFaParserTest extends ParserTestBase {
 
     @Test
     @DisplayName("The XHTML-RDFa DTD has been shown to throw 429 error code if the parser is not configured correctly, as by default.")
-    public void test429ErrorOnDTD() {
+    void test429ErrorOnDTD() {
         String testDataString = """
                 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
                 <html>

@@ -231,7 +231,7 @@ class NTriplesCircularTest extends ParserTestBase {
         // Verify serialization produced content (only check for non-empty models)
         assertNotNull(serializedContent, "Serialized content should not be null");
         if (originalModel.size() > 0) {
-            assertTrue(serializedContent.length() > 0, "Serialized content should not be empty for non-empty models");
+            assertFalse(serializedContent.isEmpty(), "Serialized content should not be empty for non-empty models");
         }
         // Parse back from N-Triples
         Model deserializedModel = createTestModel();

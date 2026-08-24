@@ -7,19 +7,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CoreseLanguageTaggedStringLiteralTest {
+class CoreseLanguageTaggedStringLiteralTest {
 
     private String testValue;
     private String testLanguage;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         testValue = "Hello";
         testLanguage = "en";
     }
 
     @Test
-    public void testConstructorWithIDatatype() {
+    void testConstructorWithIDatatype() {
         // Create a mock CoreseLiteral with value and language
         IDatatype coreseLiteral = new CoreseLiteral(testValue, testLanguage);
         CoreseLanguageTaggedStringLiteral coreseLanguageTaggedString = new CoreseLanguageTaggedStringLiteral(coreseLiteral);
@@ -31,7 +31,7 @@ public class CoreseLanguageTaggedStringLiteralTest {
     }
 
     @Test
-    public void testConstructorWithValueAndLanguage() {
+    void testConstructorWithValueAndLanguage() {
         CoreseLanguageTaggedStringLiteral coreseLanguageTaggedString = new CoreseLanguageTaggedStringLiteral(testValue, testLanguage);
 
         // Test that the value and language are correctly assigned
@@ -42,14 +42,14 @@ public class CoreseLanguageTaggedStringLiteralTest {
     }
 
     @Test
-    public void testGetLabel() {
+    void testGetLabel() {
         CoreseLanguageTaggedStringLiteral coreseLanguageTaggedString = new CoreseLanguageTaggedStringLiteral(testValue, testLanguage);
         // Test that the label (value) is correctly returned
         assertEquals(testValue, coreseLanguageTaggedString.getLabel());
     }
 
     @Test
-    public void testGetLanguage() {
+    void testGetLanguage() {
         CoreseLanguageTaggedStringLiteral coreseLanguageTaggedString = new CoreseLanguageTaggedStringLiteral(testValue, testLanguage);
         // Test that the language is correctly returned as an Optional
         assertTrue(coreseLanguageTaggedString.getLanguage().isPresent());
@@ -57,21 +57,21 @@ public class CoreseLanguageTaggedStringLiteralTest {
     }
 
     @Test
-    public void testGetValue() {
+    void testGetValue() {
         CoreseLanguageTaggedStringLiteral coreseLanguageTaggedString = new CoreseLanguageTaggedStringLiteral(testValue, testLanguage);
         // Test that the value is correctly returned
         assertEquals(testValue, coreseLanguageTaggedString.getValue());
     }
 
     @Test
-    public void testGetCoreDatatype() {
+    void testGetCoreDatatype() {
         CoreseLanguageTaggedStringLiteral coreseLanguageTaggedString = new CoreseLanguageTaggedStringLiteral(testValue, testLanguage);
         // Test that the CoreDatatype is correctly returned (should be RDFDatatype.LANGSTRING)
         assertEquals(RDFDatatype.LANGSTRING, coreseLanguageTaggedString.getCoreDatatype());
     }
 
     @Test
-    public void testGetDatatype() {
+    void testGetDatatype() {
         CoreseLanguageTaggedStringLiteral coreseLanguageTaggedString = new CoreseLanguageTaggedStringLiteral(testValue, testLanguage);
         // Test that the datatype IRI is correctly returned
         assertEquals(RDFDatatype.LANGSTRING.getIRI(), coreseLanguageTaggedString.getDatatype());

@@ -5,6 +5,10 @@ import fr.inria.corese.core.next.data.api.model.Model;
 import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.data.impl.io.parser.support.ParserTestBase;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * and interact with the Model and ValueFactory, including error handling
  * and unescaping of IRIs and literals, and named graphs.
  */
-public class RDFXMLParserTest extends ParserTestBase {
+class RDFXMLParserTest extends ParserTestBase {
     private static final Logger logger = LoggerFactory.getLogger(RDFXMLParserTest.class);
 
     /**
@@ -82,7 +86,7 @@ public class RDFXMLParserTest extends ParserTestBase {
      * @throws Exception If parsing fails.
      */
     @Test
-    public void testNodeElementsWithIRIs() throws Exception {
+    void testNodeElementsWithIRIs() throws Exception {
         String rdfXml = """
                 <?xml version="1.0"?>
                 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -111,7 +115,7 @@ public class RDFXMLParserTest extends ParserTestBase {
      * @throws Exception If parsing fails.
      */
     @Test
-    public void testBasicRdfParsing() throws Exception {
+    void testBasicRdfParsing() throws Exception {
         String rdfXml = """
                 <?xml version="1.0"?>
                 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -132,9 +136,19 @@ public class RDFXMLParserTest extends ParserTestBase {
      *
      * @throws Exception If parsing fails.
      */
-    @Test
-    public void testExample3CompleteDescriptionOfAllGraphPaths() throws Exception {
-        String rdfXml = """
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("provideRdfXmlW3CExamples")
+    void testRdfXmlW3CExamples(String exampleName, String rdfXml, int expectedSize) throws Exception {
+        Model model = parseRdfXml(rdfXml);
+        printModel(model);
+        assertEquals(expectedSize, model.size(), "Statement count mismatch for " + exampleName);
+    }
+
+    private static Stream<Arguments> provideRdfXmlW3CExamples() {
+        return Stream.of(
+            Arguments.of(
+                "Example 3: Complete description of all graph paths",
+                """
                 <?xml version="1.0"?>
                 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                          xmlns:ex="http://example.org/stuff/1.0/"
@@ -160,20 +174,12 @@ public class RDFXMLParserTest extends ParserTestBase {
                       <dc:title>RDF 1.2 XML Syntax</dc:title>
                     </rdf:Description>
                 </rdf:RDF>
-                """.trim();
-        Model model = parseRdfXml(rdfXml);
-        printModel(model);
-        assertEquals(5, model.size(), "Expected five RDF statements");
-    }
-
-    /**
-     * Tests RDF/XML file using multiple property elements on a node element.
-     *
-     * @throws Exception If parsing fails.
-     */
-    @Test
-    public void testExample4UsingMultiplePropertyElements() throws Exception {
-        String rdfXml = """
+                """.trim(),
+                5
+            ),
+            Arguments.of(
+                "Example 4: Using multiple property elements",
+                """
                 <?xml version="1.0"?>
                 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                          xmlns:ex="http://example.org/stuff/1.0/"
@@ -191,105 +197,70 @@ public class RDFXMLParserTest extends ParserTestBase {
                   <dc:title>RDF 1.2 XML Syntax</dc:title>
                 </rdf:Description>
                 </rdf:RDF>
-                """.trim();
-
-        Model model = parseRdfXml(rdfXml);
-        printModel(model);
-        assertEquals(4, model.size(), "Expected four RDF statements");
-    }
-
-    /**
-     * Tests RDF/XML with empty property elements.
-     *
-     * @throws Exception If parsing fails.
-     */
-    @Test
-    public void testExample5EmptyPropertyElements() throws Exception {
-        String rdfXml = """
+                """.trim(),
+                4
+            ),
+            Arguments.of(
+                "Example 5: Empty property elements",
+                """
                 <?xml version="1.0"?>
                 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                          xmlns:ex="http://example.org/stuff/1.0/"
                          xmlns:dc="http://purl.org/dc/terms/">
-<rdf:Description rdf:about="http://www.w3.org/TR/rdf-syntax-grammar">
-  <ex:editor>
-    <rdf:Description>
-      <ex:homePage rdf:resource="http://purl.org/net/dajobe/"/>
-      <ex:fullName>Dave Beckett</ex:fullName>
-    </rdf:Description>
-  </ex:editor>
-  <dc:title>RDF 1.2 XML Syntax</dc:title>
-</rdf:Description>
+                <rdf:Description rdf:about="http://www.w3.org/TR/rdf-syntax-grammar">
+                  <ex:editor>
+                    <rdf:Description>
+                      <ex:homePage rdf:resource="http://purl.org/net/dajobe/"/>
+                      <ex:fullName>Dave Beckett</ex:fullName>
+                    </rdf:Description>
+                  </ex:editor>
+                  <dc:title>RDF 1.2 XML Syntax</dc:title>
+                </rdf:Description>
                 </rdf:RDF>
-                """.trim();
-
-        Model model = parseRdfXml(rdfXml);
-        printModel(model);
-        assertEquals(4, model.size(), "Expected four RDF statements");
-    }
-
-    /**
-     * Tests a RDF/XML file with replacing property elements with string literal content into property attributes.
-     *
-     * @throws Exception If parsing fails.
-     */
-    @Test
-    public void testExample6ReplacingPropertyElementsWithStringLiteral() throws Exception {
-        String rdfXml = """
+                """.trim(),
+                4
+            ),
+            Arguments.of(
+                "Example 6: Replacing property elements with string literal content into property attributes",
+                """
                 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                          xmlns:ex="http://example.org/stuff/1.0/"
                          xmlns:dc="http://purl.org/dc/terms/">
-<rdf:Description rdf:about="http://www.w3.org/TR/rdf-syntax-grammar"
-           dc:title="RDF 1.2 XML Syntax">
-  <ex:editor>
-    <rdf:Description ex:fullName="Dave Beckett">
-      <ex:homePage rdf:resource="http://purl.org/net/dajobe/"/>
-    </rdf:Description>
-  </ex:editor>
-</rdf:Description>
+                <rdf:Description rdf:about="http://www.w3.org/TR/rdf-syntax-grammar"
+                           dc:title="RDF 1.2 XML Syntax">
+                  <ex:editor>
+                    <rdf:Description ex:fullName="Dave Beckett">
+                      <ex:homePage rdf:resource="http://purl.org/net/dajobe/"/>
+                    </rdf:Description>
+                  </ex:editor>
+                </rdf:Description>
                 </rdf:RDF>
-                """.trim();
+                """.trim(),
+                4
+            ),
+            Arguments.of(
+                "Example 7: Complete RDF/XML",
+                """
+                <?xml version="1.0"?>
+                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                            xmlns:dc="http://purl.org/dc/elements/1.1/"
+                            xmlns:ex="http://example.org/stuff/1.0/">
 
-        Model model = parseRdfXml(rdfXml);
-        printModel(model);
-        assertEquals(4, model.size(), "Expected four RDF statements");
-    }
-
-    /**
-     * Tests a complete RDF/XML.
-     *
-     * @throws Exception If parsing fails.
-     */
-    @Test
-    public void testExample7CompleteRDFXML() throws Exception {
-        String rdfXml = """
-<?xml version="1.0"?>
-<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-            xmlns:dc="http://purl.org/dc/elements/1.1/"
-            xmlns:ex="http://example.org/stuff/1.0/">
-
-  <rdf:Description rdf:about="http://www.w3.org/TR/rdf-syntax-grammar"
-             dc:title="RDF 1.2 XML Syntax">
-    <ex:editor>
-      <rdf:Description ex:fullName="Dave Beckett">
-        <ex:homePage rdf:resource="http://purl.org/net/dajobe/" />
-      </rdf:Description>
-    </ex:editor>
-  </rdf:Description>
-</rdf:RDF>
-                """.trim();
-        Model model = parseRdfXml(rdfXml);
-        printModel(model);
-        assertEquals(4, model.size(), "Expected four RDF statements");
-    }
-
-    /**
-     * Tests a complete example of xml:lang.
-     *
-     * @throws Exception If parsing fails.
-     */
-    @Test
-    public void testExample8CompleteExampleXmlLang() throws Exception {
-        String rdfXml = """
+                  <rdf:Description rdf:about="http://www.w3.org/TR/rdf-syntax-grammar"
+                             dc:title="RDF 1.2 XML Syntax">
+                    <ex:editor>
+                      <rdf:Description ex:fullName="Dave Beckett">
+                        <ex:homePage rdf:resource="http://purl.org/net/dajobe/" />
+                      </rdf:Description>
+                    </ex:editor>
+                  </rdf:Description>
+                </rdf:RDF>
+                """.trim(),
+                4
+            ),
+            Arguments.of(
+                "Example 8: Complete example xml:lang",
+                """
                 <?xml version="1.0" encoding="utf-8"?>
                           <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                                    xmlns:dc="http://purl.org/dc/elements/1.1/">
@@ -307,21 +278,12 @@ public class RDFXMLParserTest extends ParserTestBase {
                             </rdf:Description>
 
                           </rdf:RDF>
-                """.trim();
-
-        Model model = parseRdfXml(rdfXml);
-        printModel(model);
-        assertEquals(6, model.size(), "Expected six RDF statements");
-    }
-
-    /**
-     * Tests a complete example of rdf:datatype.
-     *
-     * @throws Exception If parsing fails.
-     */
-    @Test
-    public void testExample11CompleteExamplerdfDatatype() throws Exception {
-        String rdfXml = """
+                """.trim(),
+                6
+            ),
+            Arguments.of(
+                "Example 11: Complete example rdf:datatype",
+                """
                 <?xml version="1.0"?>
                                     <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                                                 xmlns:ex="http://example.org/stuff/1.0/">
@@ -331,269 +293,179 @@ public class RDFXMLParserTest extends ParserTestBase {
                                       </rdf:Description>
 
                                     </rdf:RDF>
-                """.trim();
-        Model model = parseRdfXml(rdfXml);
-        printModel(model);
-        assertEquals(1, model.size(), "Expected one RDF statement");
-    }
+                """.trim(),
+                1
+            ),
+            Arguments.of(
+                "Example 12: Complete RDF/XML using rdf:nodeID",
+                """
+                <?xml version="1.0"?>
+                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                            xmlns:dc="http://purl.org/dc/elements/1.1/"
+                            xmlns:ex="http://example.org/stuff/1.0/">
 
-    /**
-     * Tests a complete RDF/XML file with a description of graph using rdf:nodeID.
-     *
-     * @throws Exception If parsing fails.
-     */
-    @Test
-    public void testExample12CompleteRDFXMLUsingRdfNodeID() throws Exception {
-        String rdfXml = """
-<?xml version="1.0"?>
-<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-            xmlns:dc="http://purl.org/dc/elements/1.1/"
-            xmlns:ex="http://example.org/stuff/1.0/">
+                  <rdf:Description rdf:about="http://www.w3.org/TR/rdf-syntax-grammar"
+                             dc:title="RDF 1.2 XML Syntax">
+                    <ex:editor rdf:nodeID="abc"/>
+                  </rdf:Description>
 
-  <rdf:Description rdf:about="http://www.w3.org/TR/rdf-syntax-grammar"
-             dc:title="RDF 1.2 XML Syntax">
-    <ex:editor rdf:nodeID="abc"/>
-  </rdf:Description>
+                  <rdf:Description rdf:nodeID="abc" ex:fullName="Dave Beckett">
+                    <ex:homePage rdf:resource="http://purl.org/net/dajobe/"/>
+                  </rdf:Description>
 
-  <rdf:Description rdf:nodeID="abc" ex:fullName="Dave Beckett">
-    <ex:homePage rdf:resource="http://purl.org/net/dajobe/"/>
-  </rdf:Description>
+                </rdf:RDF>
+                """.trim(),
+                4
+            ),
+            Arguments.of(
+                "Example 13: Complete example using rdf:parseType=Resource",
+                """
+                <?xml version="1.0"?>
+                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                            xmlns:dc="http://purl.org/dc/elements/1.1/"
+                            xmlns:ex="http://example.org/stuff/1.0/">
+                  <rdf:Description rdf:about="http://www.w3.org/TR/rdf-syntax-grammar"
+                                   dc:title="RDF 1.2 XML Syntax">
+                    <ex:editor rdf:parseType="Resource">
+                      <ex:fullName>Dave Beckett</ex:fullName>
+                      <ex:homePage rdf:resource="http://purl.org/net/dajobe/"/>
+                    </ex:editor>
+                  </rdf:Description>
+                </rdf:RDF>
+                """.trim(),
+                4
+            ),
+            Arguments.of(
+                "Example 14: Complete example of property attributes on an empty property element",
+                """
+                <?xml version="1.0"?>
+                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                            xmlns:dc="http://purl.org/dc/elements/1.1/"
+                            xmlns:ex="http://example.org/stuff/1.0/">
 
-</rdf:RDF>
-                """.trim();
+                  <rdf:Description rdf:about="http://www.w3.org/TR/rdf-syntax-grammar"
+                            dc:title="RDF 1.2 XML Syntax">
+                    <ex:editor ex:fullName="Dave Beckett" />
+                  </rdf:Description>
 
-        Model model = parseRdfXml(rdfXml);
-        printModel(model);
-        assertEquals(4, model.size(), "Expected four RDF statements");
-    }
+                </rdf:RDF>
+                """.trim(),
+                3
+            ),
+            Arguments.of(
+                "Example 15: Complete example with rdf:type",
+                """
+                <?xml version="1.0"?>
+                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                            xmlns:dc="http://purl.org/dc/elements/1.1/"
+                            xmlns:ex="http://example.org/stuff/1.0/">
 
-    /**
-     * Tests a RDF/XML file with a complete example using rdf:parseType=Resource.
-     *
-     * @throws Exception If parsing fails.
-     */
-    @Test
-    public void testExample13CompleteExampleUsingRdfparseTypeResource() throws Exception {
-        String rdfXml = """
-<?xml version="1.0"?>
-<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-            xmlns:dc="http://purl.org/dc/elements/1.1/"
-            xmlns:ex="http://example.org/stuff/1.0/">
-  <rdf:Description rdf:about="http://www.w3.org/TR/rdf-syntax-grammar"
-                   dc:title="RDF 1.2 XML Syntax">
-    <ex:editor rdf:parseType="Resource">
-      <ex:fullName>Dave Beckett</ex:fullName>
-      <ex:homePage rdf:resource="http://purl.org/net/dajobe/"/>
-    </ex:editor>
-  </rdf:Description>
-</rdf:RDF>
-                """.trim();
+                  <rdf:Description rdf:about="http://example.org/thing">
+                    <rdf:type rdf:resource="http://example.org/stuff/1.0/Document"/>
+                    <dc:title>A marvelous thing</dc:title>
+                  </rdf:Description>
+                </rdf:RDF>
+                """.trim(),
+                2
+            ),
+            Arguments.of(
+                "Example 16: Complete example using a typed node element to replace an rdf:type",
+                """
+                <?xml version="1.0"?>
+                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                            xmlns:dc="http://purl.org/dc/elements/1.1/"
+                            xmlns:ex="http://example.org/stuff/1.0/">
 
-        Model model = parseRdfXml(rdfXml);
-        printModel(model);
-        assertEquals(4, model.size(), "Expected four RDF statements");
-    }
+                  <ex:Document rdf:about="http://example.org/thing">
+                    <dc:title>A marvelous thing</dc:title>
+                  </ex:Document>
 
-    /**
-     * Tests a RDF/XML file with a complete example of property attributes on an empty property element.
-     *
-     * @throws Exception If parsing fails.
-     */
-    @Test
-    public void testExample14CompleteExampleOfPropertyAttributesOnAnEmptyPropertyElement() throws Exception {
-        String rdfXml = """
-<?xml version="1.0"?>
-<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-            xmlns:dc="http://purl.org/dc/elements/1.1/"
-            xmlns:ex="http://example.org/stuff/1.0/">
+                </rdf:RDF>
+                """.trim(),
+                2
+            ),
+            Arguments.of(
+                "Example 17: Complete example using rdf:ID and xml:base",
+                """
+                <?xml version="1.0"?>
+                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                            xmlns:ex="http://example.org/stuff/1.0/"
+                            xml:base="http://example.org/here/">
 
-  <rdf:Description rdf:about="http://www.w3.org/TR/rdf-syntax-grammar"
-            dc:title="RDF 1.2 XML Syntax">
-    <ex:editor ex:fullName="Dave Beckett" />
-            <!-- Note the ex:homePage property has been ignored for this example -->
-  </rdf:Description>
+                  <rdf:Description rdf:ID="snack">
+                    <ex:prop rdf:resource="fruit/apple"/>
+                  </rdf:Description>
 
-</rdf:RDF>
-                """.trim();
+                </rdf:RDF>
+                """.trim(),
+                1
+            ),
+            Arguments.of(
+                "Example 18: Complex example using RDF list properties",
+                """
+                <?xml version="1.0"?>
+                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
 
-        Model model = parseRdfXml(rdfXml);
-        printModel(model);
-        assertEquals(3, model.size(), "Expected three RDF statements");
-    }
+                  <rdf:Seq rdf:about="http://example.org/favourite-fruit">
+                    <rdf:_1 rdf:resource="http://example.org/banana"/>
+                    <rdf:_2 rdf:resource="http://example.org/apple"/>
+                    <rdf:_3 rdf:resource="http://example.org/pear"/>
+                  </rdf:Seq>
 
-    /**
-     * Tests a RDF/XML file with a complete example with rdf:type.
-     *
-     * @throws Exception If parsing fails.
-     */
-    @Test
-    public void testExample15CompleteExampleWithRdfType() throws Exception {
-        String rdfXml = """
-<?xml version="1.0"?>
-<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-            xmlns:dc="http://purl.org/dc/elements/1.1/"
-            xmlns:ex="http://example.org/stuff/1.0/">
+                </rdf:RDF>
+                """.trim(),
+                4
+            ),
+            Arguments.of(
+                "Example 19: Complete example using rdf:li properties",
+                """
+                <?xml version="1.0"?>
+                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
 
-  <rdf:Description rdf:about="http://example.org/thing">
-    <rdf:type rdf:resource="http://example.org/stuff/1.0/Document"/>
-    <dc:title>A marvelous thing</dc:title>
-  </rdf:Description>
-</rdf:RDF>
-                """.trim();
+                  <rdf:Seq rdf:about="http://example.org/favourite-fruit">
+                    <rdf:li rdf:resource="http://example.org/banana"/>
+                    <rdf:li rdf:resource="http://example.org/apple"/>
+                    <rdf:li rdf:resource="http://example.org/pear"/>
+                  </rdf:Seq>
 
-        Model model = parseRdfXml(rdfXml);
-        printModel(model);
-        assertEquals(2, model.size(), "Expected two RDF statements");
-    }
+                </rdf:RDF>
+                """.trim(),
+                4
+            ),
+            Arguments.of(
+                "Example 20: Complete example of a RDF collection of nodes",
+                """
+                <?xml version="1.0"?>
+                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                            xmlns:ex="http://example.org/stuff/1.0/">
 
-    /**
-     * Tests a RDF/XML file with a complete example using a typed node element to replace an rdf:type.
-     *
-     * @throws Exception If parsing fails.
-     */
-    @Test
-    public void testExample16CompleteExampleUsingATypedNodeElementToReplaceAnRdfType() throws Exception {
-        String rdfXml = """
-<?xml version="1.0"?>
-<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-            xmlns:dc="http://purl.org/dc/elements/1.1/"
-            xmlns:ex="http://example.org/stuff/1.0/">
+                  <rdf:Description rdf:about="http://example.org/basket">
+                    <ex:hasFruit rdf:parseType="Collection">
+                      <rdf:Description rdf:about="http://example.org/banana"/>
+                      <rdf:Description rdf:about="http://example.org/apple"/>
+                      <rdf:Description rdf:about="http://example.org/pear"/>
+                    </ex:hasFruit>
+                  </rdf:Description>
 
-  <ex:Document rdf:about="http://example.org/thing">
-    <dc:title>A marvelous thing</dc:title>
-  </ex:Document>
+                </rdf:RDF>
+                """.trim(),
+                7
+            ),
+            Arguments.of(
+                "Example 21: Complete example of rdf:ID",
+                """
+                <?xml version="1.0"?>
+                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                            xmlns:ex="http://example.org/stuff/1.0/"
+                            xml:base="http://example.org/triples/">
+                  <rdf:Description rdf:about="http://example.org/">
+                    <ex:prop rdf:ID="triple1">blah</ex:prop>
+                  </rdf:Description>
 
-</rdf:RDF>
-                """.trim();
-
-        Model model = parseRdfXml(rdfXml);
-        printModel(model);
-        assertEquals(2, model.size(), "Expected two RDF statements");
-    }
-
-    /**
-     * Tests an XML/RDF file using rdf:ID and xml:base.
-     *
-     * @throws Exception If parsing fails.
-     */
-    @Test
-    public void testExample17CompleteExampleUsingRdfIDAndXmlbase() throws Exception {
-        String rdfXml = """
-<?xml version="1.0"?>
-<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-            xmlns:ex="http://example.org/stuff/1.0/"
-            xml:base="http://example.org/here/">
-
-  <rdf:Description rdf:ID="snack">
-    <ex:prop rdf:resource="fruit/apple"/>
-  </rdf:Description>
-
-</rdf:RDF>
-                """.trim();
-
-        Model model = parseRdfXml(rdfXml);
-        printModel(model);
-        assertEquals(1, model.size(), "Expected one RDF statement");
-    }
-
-    /**
-     * Tests a complex example using RDF list properties.
-     *
-     * @throws Exception If parsing fails.
-     */
-    @Test
-    public void testExample18ComplexExampleUsingRdfListProperties() throws Exception {
-        String rdfXml = """
-<?xml version="1.0"?>
-<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-
-  <rdf:Seq rdf:about="http://example.org/favourite-fruit">
-    <rdf:_1 rdf:resource="http://example.org/banana"/>
-    <rdf:_2 rdf:resource="http://example.org/apple"/>
-    <rdf:_3 rdf:resource="http://example.org/pear"/>
-  </rdf:Seq>
-
-</rdf:RDF>
-                """.trim();
-
-        Model model = parseRdfXml(rdfXml);
-        printModel(model);
-        assertEquals(4, model.size(), "Expected four RDF statements");
-    }
-
-    /**
-     * Tests a complete example using rdf:li.
-     *
-     * @throws Exception If parsing fails.
-     */
-    @Test
-    public void testExample19CompleteExampleUsingRdfliProperties() throws Exception {
-        String rdfXml = """
-<?xml version="1.0"?>
-<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-
-  <rdf:Seq rdf:about="http://example.org/favourite-fruit">
-    <rdf:li rdf:resource="http://example.org/banana"/>
-    <rdf:li rdf:resource="http://example.org/apple"/>
-    <rdf:li rdf:resource="http://example.org/pear"/>
-  </rdf:Seq>
-
-</rdf:RDF>
-                """.trim();
-
-        Model model = parseRdfXml(rdfXml);
-        printModel(model);
-        assertEquals(4, model.size(), "Expected four RDF statements");
-    }
-
-    /**
-     * Tests a complete example of a RDF collection.
-     *
-     * @throws Exception If parsing fails.
-     */
-    @Test
-    public void testExample20CompleteExampleOfARdfCollectionOfNodes() throws Exception {
-        String rdfXml = """
-<?xml version="1.0"?>
-<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-            xmlns:ex="http://example.org/stuff/1.0/">
-
-  <rdf:Description rdf:about="http://example.org/basket">
-    <ex:hasFruit rdf:parseType="Collection">
-      <rdf:Description rdf:about="http://example.org/banana"/>
-      <rdf:Description rdf:about="http://example.org/apple"/>
-      <rdf:Description rdf:about="http://example.org/pear"/>
-    </ex:hasFruit>
-  </rdf:Description>
-
-</rdf:RDF>
-                """.trim();
-
-        Model model = parseRdfXml(rdfXml);
-        printModel(model);
-        assertEquals(7, model.size(), "Expected seven RDF statements");
-    }
-
-    /**
-     * Tests a complete example of rdf:ID reifying a property element.
-     *
-     * @throws Exception If parsing fails.
-     */
-    @Test
-    public void testExample21CompleteExampleOfRdfID() throws Exception {
-        String rdfXml = """
-<?xml version="1.0"?>
-<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-            xmlns:ex="http://example.org/stuff/1.0/"
-            xml:base="http://example.org/triples/">
-  <rdf:Description rdf:about="http://example.org/">
-    <ex:prop rdf:ID="triple1">blah</ex:prop>
-  </rdf:Description>
-
-</rdf:RDF>
-                """.trim();
-        Model model = parseRdfXml(rdfXml);
-        printModel(model);
-        assertEquals(1, model.size(), "Expected one RDF statement");
+                </rdf:RDF>
+                """.trim(),
+                1
+            )
+        );
     }
 }

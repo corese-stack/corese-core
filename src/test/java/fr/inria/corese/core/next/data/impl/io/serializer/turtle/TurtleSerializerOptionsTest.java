@@ -23,6 +23,7 @@ class TurtleSerializerOptionsTest {
 
     @Test
     @DisplayName("defaultConfig() should return a config with expected Turtle defaults")
+    @SuppressWarnings("java:S5961")
     void defaultConfig_shouldReturnExpectedDefaults() {
         TurtleSerializerOptions config = TurtleSerializerOptions.defaultConfig();
 

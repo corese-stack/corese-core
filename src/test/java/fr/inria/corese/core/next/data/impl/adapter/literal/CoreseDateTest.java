@@ -8,13 +8,13 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CoreseDateTest {
+class CoreseDateTest {
 
     /**
      * test of the constructor using Corese object
      */
     @Test
-    public void constructorCoreseDateTest() {
+    void constructorCoreseDateTest() {
         XMLGregorianCalendar calendar = DatatypeFactory.newDefaultInstance().newXMLGregorianCalendar("2000-01-15T00:00:00");
         fr.inria.corese.core.sparql.datatype.CoreseDate coreseDate = new fr.inria.corese.core.sparql.datatype.CoreseDate(calendar);
         CoreseDate newAPICoreseDate = new CoreseDate(coreseDate);
@@ -28,7 +28,7 @@ public class CoreseDateTest {
      * Test of the constructor using a string
      */
     @Test
-    public void constructorStringTest() {
+    void constructorStringTest() {
         XMLGregorianCalendar calendar = DatatypeFactory.newDefaultInstance().newXMLGregorianCalendar("2000-01-15T00:00:00");
         CoreseDate newAPICoreseDate = new CoreseDate("2000-01-15T00:00:00");
 
@@ -41,7 +41,7 @@ public class CoreseDateTest {
      * Test of the constructor using a XMLGregorianCalendar
      */
     @Test
-    public void constructorXMLGregorianCalendarTest() {
+    void constructorXMLGregorianCalendarTest() {
         XMLGregorianCalendar calendar = DatatypeFactory.newDefaultInstance().newXMLGregorianCalendar("2000-01-15T00:00:00");
         CoreseDate newAPICoreseDate = new CoreseDate(calendar);
 
@@ -54,7 +54,7 @@ public class CoreseDateTest {
      * Test of the comparison between two dates
      */
     @Test
-    public void comparisonTest() {
+    void comparisonTest() {
         CoreseDate date1 = new CoreseDate("2000-01-15T00:00:00");
         CoreseDate date2 = new CoreseDate("2000-01-15T00:00:00");
         CoreseDate date3 = new CoreseDate("2000-01-16T00:00:00");

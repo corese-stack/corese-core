@@ -290,16 +290,16 @@ class TurtleSerializerTest extends ParserTestBase {
     void testBlankNodeSerializarionWithoutId() {
         Logger logger = LoggerFactory.getLogger(TurtleSerializerTest.class);
 
-        String EXAMPLE_NS = "http://example.org/";
-        String PREDICATE_KNOWS = EXAMPLE_NS + "knows";
+        String exampleNs = "http://example.org/";
+        String predicateKnows = exampleNs + "knows";
 
-        TurtleSerializerOptions defaultConfig = TurtleSerializerOptions.defaultConfig();
+        TurtleSerializerOptions options = TurtleSerializerOptions.defaultConfig();
 
         Model model = createTestModel();
 
         BNode blankSubject = valueFactory.createBNode();
         BNode blankObject = valueFactory.createBNode();
-        IRI predicate = valueFactory.createIRI(PREDICATE_KNOWS);
+        IRI predicate = valueFactory.createIRI(predicateKnows);
 
         model.add(blankSubject, predicate, blankObject);
 
@@ -333,11 +333,14 @@ class TurtleSerializerTest extends ParserTestBase {
         }
 
         StringWriter writer = new StringWriter();
-        TurtleSerializer turtleSerializer = new TurtleSerializer(model, defaultConfig);
+        TurtleSerializer turtleSerializer = new TurtleSerializer(model, options);
 
         turtleSerializer.write(writer);
         String actual = writer.toString().replace("\r\n", "\n");
         logger.debug("Serialized Turtle output:\n{}", actual);
+
+        assertNotNull(actual, "Serialized output should not be null");
+        assertFalse(actual.trim().isEmpty(), "Serialized output should not be empty");
     }
 
     /**

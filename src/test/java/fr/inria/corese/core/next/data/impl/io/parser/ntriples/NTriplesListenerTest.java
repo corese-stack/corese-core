@@ -74,8 +74,9 @@ class NTriplesListenerTest {
             if (value.equals("Euro€")) return mock(Literal.class);
             return mock(Literal.class);
         });
-        lenient().when(mockValueFactory.createLiteral(anyString(), any(IRI.class))).thenReturn(mock(Literal.class));
-        lenient().when(mockValueFactory.createLiteral(anyString(), anyString())).thenReturn(mock(Literal.class));
+        Literal defaultMockLiteral = mock(Literal.class);
+        lenient().when(mockValueFactory.createLiteral(anyString(), any(IRI.class))).thenReturn(defaultMockLiteral);
+        lenient().when(mockValueFactory.createLiteral(anyString(), anyString())).thenReturn(defaultMockLiteral);
     }
 
     private TerminalNode mockTerminalNode(String text) {

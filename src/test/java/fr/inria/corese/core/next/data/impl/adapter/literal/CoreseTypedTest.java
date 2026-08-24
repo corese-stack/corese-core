@@ -13,20 +13,20 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CoreseTypedTest {
+class CoreseTypedTest {
     private String testValue;
     private IRI testDatatypeIRI;
     private CoreDatatype testCoreDatatype;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         testValue = "Test String";
         testDatatypeIRI = XSDDatatype.STRING.getIRI();
         testCoreDatatype = XSDDatatype.STRING;
     }
 
     @Test
-    public void testConstructorWithIDatatype() {
+    void testConstructorWithIDatatype() {
         // Create a mock CoreseLiteral with value
         fr.inria.corese.core.sparql.datatype.CoreseString coreseLiteral = new CoreseString(testValue);
 
@@ -36,7 +36,7 @@ public class CoreseTypedTest {
     }
 
     @Test
-    public void testCoreseTypedConstructorWithString() {
+    void testCoreseTypedConstructorWithString() {
         CoreseTyped coreseTyped = new CoreseTyped(testValue);
 
         // Validate the core datatype and value
@@ -45,7 +45,7 @@ public class CoreseTypedTest {
     }
 
     @Test
-    public void testCoreseTypedConstructorWithIRI() {
+    void testCoreseTypedConstructorWithIRI() {
         CoreseTyped coreseTyped = new CoreseTyped(testValue, testDatatypeIRI);
 
         // Validate the core datatype and value
@@ -54,7 +54,7 @@ public class CoreseTypedTest {
     }
 
     @Test
-    public void testCoreseTypedConstructorWithCoreDatatype() {
+    void testCoreseTypedConstructorWithCoreDatatype() {
         CoreseTyped coreseTyped = new CoreseTyped(testValue, testCoreDatatype);
 
         // Validate the core datatype and value
@@ -63,7 +63,7 @@ public class CoreseTypedTest {
     }
 
     @Test
-    public void testCoreseTypedConstructorWithIRIAndCoreDatatype() {
+    void testCoreseTypedConstructorWithIRIAndCoreDatatype() {
         CoreseTyped coreseTyped = new CoreseTyped(testValue, testDatatypeIRI, testCoreDatatype);
 
         // Validate the core datatype and value
@@ -72,7 +72,7 @@ public class CoreseTypedTest {
     }
 
     @Test
-    public void testIncorrectDatatypeInCoreseTypedConstructor() {
+    void testIncorrectDatatypeInCoreseTypedConstructor() {
         // Test for creating CoreseTyped with an invalid datatype (e.g., mismatched CoreDatatype and IRI)
         IRI invalidIRI = new CoreseIRI("http://example.com/invalidDatatype");
 
@@ -82,7 +82,7 @@ public class CoreseTypedTest {
     }
 
     @Test
-    public void testGetLabel() {
+    void testGetLabel() {
         CoreseTyped coreseTyped = new CoreseTyped(testValue);
 
         // Validate that getLabel() returns the correct value
@@ -90,7 +90,7 @@ public class CoreseTypedTest {
     }
 
     @Test
-    public void testGetCoreDatatype() {
+    void testGetCoreDatatype() {
         CoreseTyped coreseTyped = new CoreseTyped(testValue);
 
         // Validate that getCoreDatatype() returns the correct CoreDatatype (XSDDatatype.STRING)
@@ -98,7 +98,7 @@ public class CoreseTypedTest {
     }
 
     @Test
-    public void testGetIDatatype() {
+    void testGetIDatatype() {
         CoreseTyped coreseTyped = new CoreseTyped(testValue);
         IDatatype coreseObject = coreseTyped.getIDatatype();
 
@@ -107,7 +107,7 @@ public class CoreseTypedTest {
     }
 
     @Test
-    public void testGetCoreseNode() {
+    void testGetCoreseNode() {
         CoreseTyped coreseTyped = new CoreseTyped(testValue);
 
         // Validate that getCoreseNode() returns the correct CoreseString node
@@ -115,7 +115,7 @@ public class CoreseTypedTest {
     }
 
     @Test
-    public void testSetCoreDatatype() {
+    void testSetCoreDatatype() {
         CoreseTyped coreseTyped = new CoreseTyped(testValue);
 
         // Test that setCoreDatatype throws IncorrectOperationException, as it's not allowed
@@ -123,7 +123,7 @@ public class CoreseTypedTest {
     }
 
     @Test
-    public void testConstructorWithNullDatatype() {
+    void testConstructorWithNullDatatype() {
         // Expect the default XSDDatatype.STRING
         Literal coreseTyped = new CoreseTyped(testValue, (IRI) null);
         assertEquals(XSDDatatype.STRING.getIRI(), coreseTyped.getDatatype());
@@ -132,7 +132,7 @@ public class CoreseTypedTest {
     }
 
     @Test
-    public void testConstructorWithNonNullDatatypeUnknownCoreDatatype() {
+    void testConstructorWithNonNullDatatypeUnknownCoreDatatype() {
         CoreseIRI unknown = new CoreseIRI("http://example.org");
         // Expect the default XSDDatatype.STRING
         Literal coreseTyped = new CoreseTyped(testValue, unknown);

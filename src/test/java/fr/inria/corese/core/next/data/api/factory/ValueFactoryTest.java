@@ -1,7 +1,9 @@
 package fr.inria.corese.core.next.data.api.factory;
 
+import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Literal;
 import fr.inria.corese.core.next.data.api.term.SimpleIRI;
+import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 import fr.inria.corese.core.next.data.api.exception.IncorrectFormatException;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +30,7 @@ public abstract class ValueFactoryTest {
     public abstract void setUp();
 
     @Test
-    public void testCreateIRI() {
+    void testCreateIRI() {
         String correctIRI = "http://example.org";
         String incorrectIRI = "test";
 
@@ -37,19 +39,29 @@ public abstract class ValueFactoryTest {
     }
 
     @Test
-    public void testCreateBNode() {
+    void testCreateBNode() {
+        assertNotNull(this.valueFactory.createBNode(), "Created BNode should not be null");
     }
 
     @Test
-    public void testCreateLiteralString() {
+    void testCreateLiteralString() {
+        Literal lit = this.valueFactory.createLiteral("test");
+        assertNotNull(lit, "Created literal should not be null");
+        assertEquals("test", lit.getLabel(), "Literal label should match input");
     }
 
     @Test
-    public void testCreateLiteralStringString() {
+    void testCreateLiteralStringString() {
+        Literal lit = this.valueFactory.createLiteral("hello", "en");
+        assertNotNull(lit, "Created literal should not be null");
+        assertEquals("hello", lit.getLabel(), "Literal label should match input");
+        assertTrue(lit.getLanguage().isPresent(), "Language tag should be present");
+        assertEquals("en", lit.getLanguage().get(), "Language tag should match input");
     }
 
     @Test
-    public void testCreateLiteralStringIRI() {
+    @SuppressWarnings("java:S5961")
+    void testCreateLiteralStringIRI() {
 
         // Temporal point
         // // Datetime
@@ -154,7 +166,8 @@ public abstract class ValueFactoryTest {
     }
 
     @Test
-    public void testCreateLiteralStringCoreDatatype() {
+    @SuppressWarnings("java:S5961")
+    void testCreateLiteralStringCoreDatatype() {
         // Temporal point
         // // Datetime
         String fullXSDDateTimeString = "2021-01-01T23:59:59";
@@ -287,7 +300,8 @@ public abstract class ValueFactoryTest {
     }
 
     @Test
-    public void testCreateLiteralStringIRICoreDatatype() {
+    @SuppressWarnings("java:S5961")
+    void testCreateLiteralStringIRICoreDatatype() {
         // Numeric Datatypes
 
         // // Integer
@@ -370,67 +384,83 @@ public abstract class ValueFactoryTest {
     }
 
     @Test
-    public void testCreateLiteralBoolean() {
+    void testCreateLiteralBoolean() {
+        Literal trueLit = this.valueFactory.createLiteral(true);
+        Literal falseLit = this.valueFactory.createLiteral(false);
+        assertTrue(trueLit.booleanValue(), "Literal boolean should be true");
+        assertFalse(falseLit.booleanValue(), "Literal boolean should be false");
     }
 
     @Test
-    public void testCreateLiteralByte() {
+    void testCreateStatement() {
+        IRI subject = this.valueFactory.createIRI("http://example.org/s");
+        IRI predicate = this.valueFactory.createIRI("http://example.org/p");
+        Literal object = this.valueFactory.createLiteral("o");
+        Statement stmt = this.valueFactory.createStatement(subject, predicate, object);
+        assertNotNull(stmt, "Created statement should not be null");
+        assertEquals(subject, stmt.getSubject());
+        assertEquals(predicate, stmt.getPredicate());
+        assertEquals(object, stmt.getObject());
+    }
+
+    @Test
+    void testCreateLiteralByte() {
         byte b = 64;
         Literal literal = this.valueFactory.createLiteral(b);
         assertEquals(b, literal.byteValue());
     }
 
     @Test
-    public void testCreateLiteralShort() {
+    void testCreateLiteralShort() {
         short s = 7851;
         Literal literal = this.valueFactory.createLiteral(s);
         assertEquals(s, literal.shortValue());
     }
 
     @Test
-    public void testCreateLiteralInt() {
+    void testCreateLiteralInt() {
         int i = 1234567890;
         Literal literal = this.valueFactory.createLiteral(i);
         assertEquals(i, literal.intValue());
     }
 
     @Test
-    public void testCreateLiteralLong() {
+    void testCreateLiteralLong() {
         long l = 1234567890123456789L;
         Literal literal = this.valueFactory.createLiteral(l);
         assertEquals(l, literal.longValue());
     }
 
     @Test
-    public void testCreateLiteralFloat() {
+    void testCreateLiteralFloat() {
         float f = 1234567890.1234567890123456789f;
         Literal literal = this.valueFactory.createLiteral(f);
         assertEquals(f, literal.floatValue(), 0);
     }
 
     @Test
-    public void testCreateLiteralDouble() {
+    void testCreateLiteralDouble() {
         double d = 1234567890.1234567890123456789;
         Literal literal = this.valueFactory.createLiteral(d);
         assertEquals(d, literal.doubleValue(), 0);
     }
 
     @Test
-    public void testCreateLiteralBigDecimal() {
+    void testCreateLiteralBigDecimal() {
         BigDecimal bd = new BigDecimal("1234567890.1234567890123456789");
         Literal literal = this.valueFactory.createLiteral(bd);
         assertEquals(bd, literal.decimalValue());
     }
 
     @Test
-    public void testCreateLiteralBigInteger() {
+    void testCreateLiteralBigInteger() {
         BigInteger bi = new BigInteger("1234567890123456789");
         Literal literal = this.valueFactory.createLiteral(bi);
         assertEquals(bi, literal.integerValue());
     }
 
     @Test
-    public void testCreateLiteralTemporalAccessor() {
+    void testCreateLiteralTemporalAccessor() {
         TemporalAccessor datetime = this.valueFactory.createLiteral(LocalTime.parse("01:01:01")).temporalAccessorValue();
         TemporalAccessor date = this.valueFactory.createLiteral(LocalDate.parse("2021-01-01")).temporalAccessorValue();
 
@@ -453,7 +483,7 @@ public abstract class ValueFactoryTest {
     }
 
     @Test
-    public void testCreateLiteralXMLGregorianCalendar() throws DatatypeConfigurationException {
+    void testCreateLiteralXMLGregorianCalendar() throws DatatypeConfigurationException {
         XMLGregorianCalendar calendar = DatatypeFactory.newInstance().newXMLGregorianCalendar("2021-01-01T23:59:59");
         Literal literal = this.valueFactory.createLiteral(calendar);
 
@@ -462,15 +492,11 @@ public abstract class ValueFactoryTest {
     }
 
     @Test
-    public void testCreateLiteralDate() {
+    void testCreateLiteralDate() {
         java.time.LocalDate date = java.time.LocalDate.parse("2021-01-01");
         Literal literal = this.valueFactory.createLiteral(date);
 
         assertNotNull(literal);
         assertEquals("2021-01-01", literal.stringValue());
-    }
-
-    @Test
-    public void testCreateStatement() {
     }
 }

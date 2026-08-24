@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import fr.inria.corese.core.sparql.datatype.CoreseBlankNode;
 
-public class CoreseBNodeTest {
+class CoreseBNodeTest {
 
     private static final String BNODE_ID = "bnodeCorese123";
     private static final CoreseBlankNode coreseBlankNode = new CoreseBlankNode(BNODE_ID);
@@ -17,27 +17,27 @@ public class CoreseBNodeTest {
     private CoreseBNode coreseBNodeFromStringId;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         coreseBNodeFromCoreseObject = new CoreseBNode(coreseBlankNode);
         coreseBNodeFromStringId = new CoreseBNode(BNODE_ID);
     }
 
     @Test
-    public void testConstructorFromString() {
+    void testConstructorFromString() {
         // Test creating CoreseBnode for a string ID
         assertNotNull(coreseBNodeFromStringId);
         assertEquals(BNODE_ID, coreseBNodeFromStringId.getID());
     }
 
     @Test
-    public void testConstructorFromCoreseObject() {
+    void testConstructorFromCoreseObject() {
         // Test creating CoreseBnode for a CoreseBlankNode (old API)
         assertNotNull(coreseBNodeFromCoreseObject);
         assertEquals(BNODE_ID, coreseBNodeFromCoreseObject.getID());
     }
 
     @Test
-    public void testToString() {
+    void testToString() {
         // Test the toString method to ensure it outputs the correct representation
         String expectedString = "_:" + BNODE_ID;
         assertEquals(expectedString, coreseBNodeFromStringId.toString());

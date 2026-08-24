@@ -6,11 +6,11 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CoreseBooleanTest {
+class CoreseBooleanTest {
 
 
     @Test
-    public void testConstructorWithBoolean() {
+    void testConstructorWithBoolean() {
         // Test creating CoreseBoolean with a boolean value
         CoreseBoolean trueBoolean = new CoreseBoolean(true);
         CoreseBoolean falseBoolean = new CoreseBoolean(false);
@@ -33,7 +33,7 @@ public class CoreseBooleanTest {
     }
 
     @Test
-    public void testConstructorWithIDatatype() {
+    void testConstructorWithIDatatype() {
         IDatatype coreseBooleanDatatype = new fr.inria.corese.core.sparql.datatype.CoreseBoolean(true);
 
         CoreseBoolean coreseBoolean = new CoreseBoolean(coreseBooleanDatatype);
@@ -45,7 +45,7 @@ public class CoreseBooleanTest {
     }
 
     @Test
-    public void testValueOf() {
+    void testValueOf() {
         CoreseBoolean trueBoolean = CoreseBoolean.valueOf(true);
         CoreseBoolean falseBoolean = CoreseBoolean.valueOf(false);
 
