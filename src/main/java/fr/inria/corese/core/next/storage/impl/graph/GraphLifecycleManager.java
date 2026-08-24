@@ -8,16 +8,16 @@ import fr.inria.corese.core.next.storage.api.exception.ErrorCode;
 import fr.inria.corese.core.next.storage.api.exception.StorageException;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Lifecycle manager for {@link GraphStorageManager}.
  */
-@SuppressWarnings("java:S3077")
 final class GraphLifecycleManager implements StorageLifecycle {
 
     private final Graph graph;
     private volatile LifecycleState state = LifecycleState.NOT_INITIALIZED;
-    private volatile StorageConfig config;
+    private final AtomicReference<StorageConfig> config = new AtomicReference<>();
 
     /**
      * Constructs a new GraphLifecycleManager.
@@ -48,7 +48,7 @@ final class GraphLifecycleManager implements StorageLifecycle {
         this.state = LifecycleState.INITIALIZING;
         try {
             graph.init();
-            this.config = config;
+            this.config.set(config);
             this.state = LifecycleState.RUNNING;
         } catch (Exception e) {
             this.state = LifecycleState.NOT_INITIALIZED;
@@ -69,7 +69,7 @@ final class GraphLifecycleManager implements StorageLifecycle {
         }
         this.state = LifecycleState.SHUTTING_DOWN;
         this.state = LifecycleState.SHUTDOWN;
-        this.config = null;
+        this.config.set(null);
     }
 
     /**
@@ -89,6 +89,6 @@ final class GraphLifecycleManager implements StorageLifecycle {
      */
     @Override
     public Optional<StorageConfig> getConfig() {
-        return Optional.ofNullable(config);
+        return Optional.ofNullable(config.get());
     }
 }

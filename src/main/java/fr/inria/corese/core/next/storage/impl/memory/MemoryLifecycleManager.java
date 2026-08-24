@@ -7,6 +7,7 @@ import fr.inria.corese.core.next.storage.api.exception.ErrorCode;
 import fr.inria.corese.core.next.storage.api.exception.StorageException;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Lifecycle manager for {@link MemoryStorageManager}.
@@ -14,7 +15,7 @@ import java.util.Optional;
 final class MemoryLifecycleManager implements StorageLifecycle {
 
     private volatile LifecycleState state = LifecycleState.NOT_INITIALIZED;
-    private volatile StorageConfig config;
+    private final AtomicReference<StorageConfig> config = new AtomicReference<>();
 
     /**
      * Constructs a new MemoryLifecycleManager.
@@ -43,7 +44,7 @@ final class MemoryLifecycleManager implements StorageLifecycle {
 
         this.state = LifecycleState.INITIALIZING;
         try {
-            this.config = config;
+            this.config.set(config);
             this.state = LifecycleState.RUNNING;
         } catch (Exception e) {
             this.state = LifecycleState.NOT_INITIALIZED;
@@ -65,7 +66,7 @@ final class MemoryLifecycleManager implements StorageLifecycle {
         // Note: We don't clear data on shutdown - caller must do that explicitly if desired
         this.state = LifecycleState.SHUTTING_DOWN;
         this.state = LifecycleState.SHUTDOWN;
-        this.config = null;
+        this.config.set(null);
     }
 
     /**
@@ -85,6 +86,6 @@ final class MemoryLifecycleManager implements StorageLifecycle {
      */
     @Override
     public Optional<StorageConfig> getConfig() {
-        return Optional.ofNullable(config);
+        return Optional.ofNullable(config.get());
     }
 }
