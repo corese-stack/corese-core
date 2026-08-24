@@ -5,7 +5,7 @@ import fr.inria.corese.core.next.storage.api.transaction.TransactionManager;
 
 /**
  * Main interface for RDF storage management.
- *
+ * Combines read-only queries, update mutations, transaction management, and lifecycle handling.
  */
 public interface StorageManager extends StorageManagerRead, StorageManagerUpdate {
 

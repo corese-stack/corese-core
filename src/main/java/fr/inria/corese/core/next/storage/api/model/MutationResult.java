@@ -27,6 +27,7 @@ public final class MutationResult {
     /**
      * Private constructor - use factory methods or Builder.
      */
+    @SuppressWarnings("java:S107")
     private MutationResult(boolean isBulk, boolean success, List<Statement> affectedStatements,
                            String message, Throwable error,
                            int totalAttempted, int successCount, int failureCount,
