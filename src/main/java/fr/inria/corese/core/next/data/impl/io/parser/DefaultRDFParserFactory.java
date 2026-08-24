@@ -11,6 +11,7 @@ import fr.inria.corese.core.next.data.impl.io.parser.nquads.NQuadsParser;
 import fr.inria.corese.core.next.data.impl.io.parser.ntriples.NTriplesParser;
 import fr.inria.corese.core.next.data.impl.io.parser.rdfa.RDFaParser;
 import fr.inria.corese.core.next.data.impl.io.parser.rdfxml.RDFXMLParser;
+import fr.inria.corese.core.next.data.api.exception.ParsingException;
 import fr.inria.corese.core.next.data.impl.io.parser.turtle.TurtleParser;
 import fr.inria.corese.core.next.data.impl.io.parser.trig.TriGParser;
 
@@ -21,7 +22,6 @@ public class DefaultRDFParserFactory extends AbstractRDFParserFactory {
 
     /**
      * Default constructor for DefaultRDFParserFactory.
-     *
      * The constructor is protected to prevent instantiation from outside the
      * package.
      */
@@ -54,7 +54,7 @@ public class DefaultRDFParserFactory extends AbstractRDFParserFactory {
         } else if (RDFFormat.RDFA.equals(format)) {
             return new RDFaParser(model, factory, config);
         }
-        throw new IllegalArgumentException("Unsupported format: " + format);
+        throw new ParsingException("Unsupported RDF format: " + format.getName());
     }
 
     /**
@@ -81,7 +81,7 @@ public class DefaultRDFParserFactory extends AbstractRDFParserFactory {
         } else if (RDFFormat.RDFA.equals(format)) {
             return new RDFaParser(model, factory);
         }
-        throw new IllegalArgumentException("Unsupported format: " + format);
+        throw new ParsingException("Unsupported RDF format: " + format.getName());
     }
 
 }
