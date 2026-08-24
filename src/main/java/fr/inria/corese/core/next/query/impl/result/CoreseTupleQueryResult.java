@@ -17,6 +17,7 @@ public final class CoreseTupleQueryResult implements TupleQueryResult {
 
     private final Mappings mappings;
     private final Iterator<Mapping> iterator;
+    private boolean closed;
 
     public CoreseTupleQueryResult(Mappings mappings) {
         this.mappings = Objects.requireNonNull(mappings, "mappings");
@@ -30,19 +31,24 @@ public final class CoreseTupleQueryResult implements TupleQueryResult {
 
     @Override
     public boolean hasNext() {
+        checkOpen();
         return this.iterator.hasNext();
     }
 
     @Override
     public BindingSet next() {
+        checkOpen();
         return new CoreseBindingSet(this.iterator.next());
     }
 
-    /**
-     * Does nothing in this implementation
-     */
     @Override
     public void close() {
+        closed = true;
+    }
 
+    private void checkOpen() {
+        if (closed) {
+            throw new IllegalStateException("This tuple query result is closed.");
+        }
     }
 }

@@ -12,6 +12,7 @@ import java.util.Objects;
 public final class CoreseGraphQueryResult implements GraphQueryResult {
 
     private final Iterator<Statement> iterator;
+    private boolean closed;
 
     public CoreseGraphQueryResult(Iterator<Statement> iterator) {
         this.iterator = Objects.requireNonNull(iterator, "iterator");
@@ -19,18 +20,24 @@ public final class CoreseGraphQueryResult implements GraphQueryResult {
 
     @Override
     public boolean hasNext() {
+        checkOpen();
         return this.iterator.hasNext();
     }
 
     @Override
     public Statement next() {
+        checkOpen();
         return this.iterator.next();
     }
 
-    /**
-     * No closing needed in this implementation
-     */
     @Override
     public void close() {
+        closed = true;
+    }
+
+    private void checkOpen() {
+        if (closed) {
+            throw new IllegalStateException("This graph query result is closed.");
+        }
     }
 }

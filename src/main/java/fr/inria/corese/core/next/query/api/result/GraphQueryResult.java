@@ -49,6 +49,9 @@ public interface GraphQueryResult extends Closeable, Iterable<Statement> {
 
             @Override
             public Statement next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
                 return GraphQueryResult.this.next();
             }
         };

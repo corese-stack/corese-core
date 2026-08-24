@@ -66,6 +66,9 @@ public interface TupleQueryResult extends Closeable, Iterable<BindingSet> {
 
             @Override
             public BindingSet next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
                 return TupleQueryResult.this.next();
             }
         };
@@ -84,7 +87,7 @@ public interface TupleQueryResult extends Closeable, Iterable<BindingSet> {
                         Spliterator.ORDERED | Spliterator.NONNULL
                 ),
                 false
-        );
+        ).onClose(this::close);
     }
 
     /**
