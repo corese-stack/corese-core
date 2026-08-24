@@ -79,7 +79,7 @@ public class IRIUtilsTest {
         assertTrue(IRIUtils.isAbsoluteIRI("mailto://user@example.com"));
         assertTrue(IRIUtils.isAbsoluteIRI("mongodb://user:password@127.0.0.1:3307"));
         assertTrue(IRIUtils.isAbsoluteIRI("https://laconsole.dev"));
-        assertTrue(IRIUtils.isAbsoluteIRI("http://127.0.0.1:3000"));;
+        assertTrue(IRIUtils.isAbsoluteIRI("http://127.0.0.1:3000"));
         assertTrue(IRIUtils.isAbsoluteIRI("urn:isbn:978-2-7654-0912-0"));
         assertTrue(IRIUtils.isAbsoluteIRI("urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6"));
         assertTrue(IRIUtils.isAbsoluteIRI("urn:ietf:rfc:2648"));
