@@ -3,9 +3,18 @@ package fr.inria.corese.core.next.data.impl.namespace;
 import fr.inria.corese.core.next.data.api.namespace.PrefixMapping;
 import fr.inria.corese.core.next.data.api.namespace.Namespace;
 import fr.inria.corese.core.next.data.api.namespace.SimpleNamespace;
-import fr.inria.corese.core.next.data.api.vocabulary.*;
+import fr.inria.corese.core.next.data.api.vocabulary.FOAF;
+import fr.inria.corese.core.next.data.api.vocabulary.OWL;
+import fr.inria.corese.core.next.data.api.vocabulary.RDF;
+import fr.inria.corese.core.next.data.api.vocabulary.RDFS;
+import fr.inria.corese.core.next.data.api.vocabulary.XSD;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -420,12 +429,12 @@ public class PrefixHandler implements PrefixMapping, Cloneable {
 
     @Override
     public boolean equals(Object other) {
-        if(! (other instanceof PrefixMapping)) {
+        if (!(other instanceof PrefixMapping mapping)) {
             return false;
         }
-        return Objects.equals(this.getDefaultNamespace(), ((PrefixMapping) other).getDefaultNamespace())
-                && Objects.equals(this.getNamespaceMap(), ((PrefixMapping) other).getNamespaceMap())
-                && Objects.equals(this.getPrefixMap(), ((PrefixMapping) other).getPrefixMap());
+        return Objects.equals(this.getDefaultNamespace(), mapping.getDefaultNamespace())
+                && Objects.equals(this.getNamespaceMap(), mapping.getNamespaceMap())
+                && Objects.equals(this.getPrefixMap(), mapping.getPrefixMap());
     }
 
     @Override

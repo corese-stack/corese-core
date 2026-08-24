@@ -265,10 +265,7 @@ public abstract class FilteredModel extends AbstractModel {
         if (objectFilter != null && !objectFilter.equals(object)) {
             return false;
         }
-        if (!matchContexts(actualContexts, contextFilters)) {
-            return false;
-        }
-        return true;
+        return matchContexts(actualContexts, contextFilters);
     }
 
     /**
