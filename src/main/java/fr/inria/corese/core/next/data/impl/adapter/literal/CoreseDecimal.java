@@ -164,6 +164,6 @@ public class CoreseDecimal extends AbstractCoreseNumber {
 
     @Override
     public int compareTo(AbstractNumber abstractNumber) {
-        return (int) (this.doubleValue() - abstractNumber.doubleValue());
+        return Double.compare(this.doubleValue(), abstractNumber.doubleValue());
     }
 }

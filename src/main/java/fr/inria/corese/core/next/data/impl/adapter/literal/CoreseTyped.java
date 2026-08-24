@@ -24,17 +24,18 @@ import static fr.inria.corese.core.next.data.api.vocabulary.XSD.xsdString;
  * {@link CoreseDatatypeAdapter}.
  */
 
+@SuppressWarnings("java:S2160")
 public class CoreseTyped extends AbstractStringLiteral implements CoreseDatatypeAdapter {
 
     /**
      * The Corese object representing the string literal in the old API.
      */
-    private final CoreseString coreseObject;
+    private final transient CoreseString coreseObject;
 
     /**
      * The core datatype of this literal.
      */
-    private CoreDatatype coreDatatype;
+    private transient CoreDatatype coreDatatype;
 
     /**
      * Constructs a {@link CoreseTyped} instance from an {@link IDatatype} Corese
@@ -50,8 +51,8 @@ public class CoreseTyped extends AbstractStringLiteral implements CoreseDatatype
      */
     public CoreseTyped(IDatatype coreseObject) {
         super(coreseObject.getDatatypeURI() != null && ! coreseObject.getDatatypeURI().isEmpty() ? new CoreseIRI(coreseObject.getDatatypeURI()) : new CoreseIRI(xsdString.getIRI()));
-        if (coreseObject instanceof CoreseString) {
-            this.coreseObject = (CoreseString) coreseObject;
+        if (coreseObject instanceof CoreseString stringObj) {
+            this.coreseObject = stringObj;
         } else {
             throw new IncorrectOperationException("Cannot create CoreseString from a non-string Corese object");
         }

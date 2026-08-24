@@ -2,9 +2,7 @@ package fr.inria.corese.core.next.data.impl.adapter.literal;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.text.SimpleDateFormat;
 import java.time.temporal.TemporalAccessor;
-import java.util.Date;
 import java.util.Optional;
 
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -19,9 +17,10 @@ import fr.inria.corese.core.next.data.api.exception.IncorrectOperationException;
 import fr.inria.corese.core.next.data.impl.adapter.node.CoreseIRI;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
+@SuppressWarnings({"java:S2160", "java:S2143"})
 public class CoreseDate extends AbstractTemporalPointLiteral implements CoreseDatatypeAdapter {
 
-    private final fr.inria.corese.core.sparql.datatype.CoreseDate coreseObject;
+    private final transient fr.inria.corese.core.sparql.datatype.CoreseDate coreseObject;
 
     /**
      * Constructor for CoreseDate.
@@ -30,8 +29,8 @@ public class CoreseDate extends AbstractTemporalPointLiteral implements CoreseDa
      */
     public CoreseDate(IDatatype coreseObject) {
         super(new CoreseIRI(coreseObject.getDatatypeURI()));
-        if (coreseObject instanceof fr.inria.corese.core.sparql.datatype.CoreseDate) {
-            this.coreseObject = (fr.inria.corese.core.sparql.datatype.CoreseDate) coreseObject;
+        if (coreseObject instanceof fr.inria.corese.core.sparql.datatype.CoreseDate dateObj) {
+            this.coreseObject = dateObj;
         } else {
             throw new IncorrectOperationException("Cannot create CoreseDate from a non-date Corese object.");
         }
@@ -51,8 +50,17 @@ public class CoreseDate extends AbstractTemporalPointLiteral implements CoreseDa
      *
      * @param date the Date object.
      */
-    public CoreseDate(Date date) {
-        this((new SimpleDateFormat("yyyy-MM-dd")).format(date));
+    public CoreseDate(java.util.Date date) {
+        this(date.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate().toString());
+    }
+
+    /**
+     * Constructor for CoreseDate.
+     *
+     * @param localDate the LocalDate object.
+     */
+    public CoreseDate(java.time.LocalDate localDate) {
+        this(localDate.toString());
     }
 
     /**

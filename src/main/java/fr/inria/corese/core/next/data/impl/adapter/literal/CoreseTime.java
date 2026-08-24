@@ -8,6 +8,7 @@ import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
  * There are no dedicated implementation to represent xsd:time in Corese.
  * This implementation inherits from CoreseDatetime, which is the super class for all datetime literals.
  */
+@SuppressWarnings("java:S2160")
 public class CoreseTime extends CoreseDatetime {
 
     /**
@@ -35,6 +36,7 @@ public class CoreseTime extends CoreseDatetime {
      *
      * @return XSDDatatype.TIME
      */
+    @Override
     public CoreDatatype getCoreDatatype() {
         return XSDDatatype.TIME;
     }

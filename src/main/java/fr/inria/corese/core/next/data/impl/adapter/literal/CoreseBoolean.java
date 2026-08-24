@@ -16,6 +16,7 @@ import fr.inria.corese.core.sparql.api.IDatatype;
  * valid.
  */
 
+@SuppressWarnings({"java:S2160", "java:S3077"})
 public class CoreseBoolean extends AbstractLiteral implements CoreseDatatypeAdapter {
 
     /**

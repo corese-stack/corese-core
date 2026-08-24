@@ -40,14 +40,16 @@ public final class CoreseValueConverter {
             case CoreseNodeAdapter coreseNodeAdapter -> coreseNodeAdapter.getCoreseNode();
             case IRI iri -> ((CoreseNodeAdapter) factory.createIRI(iri.stringValue())).getCoreseNode();
             case BNode bnode -> ((CoreseNodeAdapter) factory.createBNode(bnode.getID())).getCoreseNode();
-            case Literal literal -> literal.getLanguage()
-                    .map(lang -> ((CoreseNodeAdapter) factory.createLiteral(literal.getLabel(), lang)).getCoreseNode())
-                    .orElseGet(
-                            () -> ((CoreseNodeAdapter) factory.createLiteral(literal.getLabel(), literal.getDatatype()))
-                                    .getCoreseNode());
+            case Literal literal -> createCoreseNodeFromLiteral(literal);
             default -> throw new IllegalArgumentException("Unsupported Value type: " + value.getClass());
         };
+    }
 
+    private Node createCoreseNodeFromLiteral(Literal literal) {
+        Literal newLiteral = literal.getLanguage()
+                .map(lang -> factory.createLiteral(literal.getLabel(), lang))
+                .orElseGet(() -> factory.createLiteral(literal.getLabel(), literal.getDatatype()));
+        return ((CoreseNodeAdapter) newLiteral).getCoreseNode();
     }
 
     /**

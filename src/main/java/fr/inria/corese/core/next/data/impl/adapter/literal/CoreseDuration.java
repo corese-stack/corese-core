@@ -14,6 +14,7 @@ import java.time.temporal.TemporalAmount;
  * CoreseDuration class that represents a duration literal in the Corese framework.
  * @ImplNote Legacy corese do not have a class dedicated to the storage of duration. The object is stored as a string literal.
  */
+@SuppressWarnings({"java:S2160", "java:S3077"})
 public class CoreseDuration extends AbstractDuration implements CoreseDatatypeAdapter {
     private final String lexicalValue;
     private final String legacyDatatypeIri;

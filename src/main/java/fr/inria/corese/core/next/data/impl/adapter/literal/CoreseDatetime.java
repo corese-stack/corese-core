@@ -23,8 +23,9 @@ import fr.inria.corese.core.sparql.api.IDatatype;
  * It extends the AbstractTemporalPointLiteral class and implements the
  * CoreseDatatypeAdapter interface.
  */
+@SuppressWarnings("java:S2160")
 public class CoreseDatetime extends AbstractTemporalPointLiteral implements CoreseDatatypeAdapter {
-    private final fr.inria.corese.core.sparql.datatype.CoreseDateTime coreseObject;
+    private final transient fr.inria.corese.core.sparql.datatype.CoreseDateTime coreseObject;
 
     /**
      * Constructor for CoreseDatetime.
@@ -33,8 +34,8 @@ public class CoreseDatetime extends AbstractTemporalPointLiteral implements Core
      */
     public CoreseDatetime(IDatatype coreseObject) {
         super(new CoreseIRI(coreseObject.getDatatypeURI()));
-        if (coreseObject instanceof fr.inria.corese.core.sparql.datatype.CoreseDateTime) {
-            this.coreseObject = (fr.inria.corese.core.sparql.datatype.CoreseDateTime) coreseObject;
+        if (coreseObject instanceof fr.inria.corese.core.sparql.datatype.CoreseDateTime dateTimeObj) {
+            this.coreseObject = dateTimeObj;
         } else {
             throw new IncorrectOperationException("Cannot create CoreseDatetime from a non-date Corese object.");
         }

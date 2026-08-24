@@ -12,6 +12,7 @@ import java.math.BigInteger;
 /**
  * Super class for all the numeric based literal in the XSD datatype hierarchy.
  */
+@SuppressWarnings({"java:S2160", "java:S3077"})
 public abstract class AbstractCoreseNumber extends AbstractNumber implements CoreseDatatypeAdapter {
 
     private final String lexicalValue;
