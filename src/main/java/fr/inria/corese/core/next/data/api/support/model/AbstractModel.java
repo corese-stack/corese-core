@@ -293,7 +293,7 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
             Iterator<?> iterator = collection.iterator();
             try {
                 while (iterator.hasNext()) {
-                    modified |= remove(iterator.next());
+                    modified |= this.remove(iterator.next());
                 }
                 return modified;
             } finally {
