@@ -39,6 +39,8 @@ import fr.inria.corese.core.next.data.impl.io.serializer.support.SerializationCo
  */
 public class TurtleSerializer extends AbstractGraphSerializer {
 
+    private static final String UNICODE_ESCAPE_FORMAT = "\\u%04X";
+
     private static final Logger logger = LoggerFactory.getLogger(TurtleSerializer.class);
 
     /**
@@ -106,7 +108,7 @@ public class TurtleSerializer extends AbstractGraphSerializer {
         for (int i = 0; i < iri.length(); i++) {
             char c = iri.charAt(i);
             if (c < 0x20 || c == 0x7F || c == SerializationConstants.LT.charAt(0) || c == SerializationConstants.GT.charAt(0) || c == SerializationConstants.QUOTE.charAt(0) || c == '{' || c == '}' || c == '|' || c == '^' || c == '`' || c == SerializationConstants.BACK_SLASH.charAt(0)) {
-                sb.append(String.format("\\u%04X", (int) c));
+                sb.append(String.format(UNICODE_ESCAPE_FORMAT, (int) c));
             } else {
                 sb.append(c);
             }
@@ -122,42 +124,49 @@ public class TurtleSerializer extends AbstractGraphSerializer {
      * @param value The string value of the literal to escape.
      * @return The escaped string suitable for a Turtle literal.
      */
+    @SuppressWarnings("java:S3776")
     @Override
     protected String escapeLiteralString(String value) {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < value.length(); i++) {
+        int i = 0;
+        while (i < value.length()) {
             char c = value.charAt(i);
             switch (c) {
                 case '\n':
                     sb.append(SerializationConstants.BACK_SLASH).append("n");
+                    i++;
                     break;
                 case '\r':
                     sb.append(SerializationConstants.BACK_SLASH).append("r");
+                    i++;
                     break;
                 case '\t':
                     sb.append(SerializationConstants.BACK_SLASH).append("t");
+                    i++;
                     break;
                 case '\b':
                     sb.append(SerializationConstants.BACK_SLASH).append("b");
+                    i++;
                     break;
                 case '\f':
                     sb.append(SerializationConstants.BACK_SLASH).append("f");
+                    i++;
                     break;
                 case '"':
                     sb.append(SerializationConstants.BACK_SLASH).append(SerializationConstants.QUOTE);
+                    i++;
                     break;
                 case '\\':
                     sb.append(SerializationConstants.BACK_SLASH).append(SerializationConstants.BACK_SLASH);
+                    i++;
                     break;
                 default:
-                    if (Character.isISOControl(c) ||c == 0x7F) {
-                        sb.append(String.format("\\u%04X", (int) c));
-                }
-                    else if (this.option instanceof AbstractSerializerOptions abstractSerializerOptions
-                            && abstractSerializerOptions.escapeUnicode()
-                            && c >= 0x80
-                            && c <= 0xFFFF) {
-                        sb.append(String.format("\\u%04X", (int) c));
+                    if (Character.isISOControl(c) || c == 0x7F ||
+                            (this.option instanceof AbstractSerializerOptions abstractSerializerOptions
+                                    && abstractSerializerOptions.escapeUnicode()
+                                    && c >= 0x80)) {
+                        sb.append(String.format(UNICODE_ESCAPE_FORMAT, (int) c));
+                        i++;
                     } else if (Character.isHighSurrogate(c)) {
                         int codePoint = value.codePointAt(i);
                         if (Character.isValidCodePoint(codePoint)) {
@@ -167,13 +176,16 @@ public class TurtleSerializer extends AbstractGraphSerializer {
                             } else {
                                 sb.append(Character.toChars(codePoint));
                             }
-                            i++;
+                            i += Character.charCount(codePoint);
                         } else {
                             sb.append(c);
+                            i++;
                         }
                     } else {
                         sb.append(c);
+                        i++;
                     }
+                    break;
             }
         }
         return sb.toString();

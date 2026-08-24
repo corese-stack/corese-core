@@ -60,22 +60,22 @@ public class DefaultRDFSerializerFactory implements RDFSerializerFactory {
         Map<RDFFormat, BiFunction<Model, IOOptions, RDFSerializer>> tempRegistry = new HashMap<>();
         Map<RDFFormat, Function<Model, RDFSerializer>> tempDefaultRegistry = new HashMap<>();
 
-        tempRegistry.put(RDFFormat.TURTLE, (model, genericConfig) ->  new TurtleSerializer(model, genericConfig));
+        tempRegistry.put(RDFFormat.TURTLE, TurtleSerializer::new);
         tempDefaultRegistry.put(RDFFormat.TURTLE, TurtleSerializer::new);
 
-        tempRegistry.put(RDFFormat.NTRIPLES, (model, genericConfig) ->  new NTriplesSerializer(model, genericConfig));
+        tempRegistry.put(RDFFormat.NTRIPLES, NTriplesSerializer::new);
         tempDefaultRegistry.put(RDFFormat.NTRIPLES, NTriplesSerializer::new);
 
-        tempRegistry.put(RDFFormat.NQUADS, (model, genericConfig) -> new NQuadsSerializer(model, genericConfig));
+        tempRegistry.put(RDFFormat.NQUADS, NQuadsSerializer::new);
         tempDefaultRegistry.put(RDFFormat.NQUADS, NQuadsSerializer::new);
 
-        tempRegistry.put(RDFFormat.TRIG, (model, genericConfig) -> new TriGSerializer(model, genericConfig));
+        tempRegistry.put(RDFFormat.TRIG, TriGSerializer::new);
         tempDefaultRegistry.put(RDFFormat.TRIG, TriGSerializer::new);
 
-        tempRegistry.put(RDFFormat.RDFXML, (model, genericConfig) -> new RDFXMLSerializer(model, genericConfig));
+        tempRegistry.put(RDFFormat.RDFXML, RDFXMLSerializer::new);
         tempDefaultRegistry.put(RDFFormat.RDFXML, RDFXMLSerializer::new);
 
-        tempRegistry.put(RDFFormat.JSONLD, (model, genericConfig) -> new JSONLDSerializer(model, genericConfig));
+        tempRegistry.put(RDFFormat.JSONLD, JSONLDSerializer::new);
         tempDefaultRegistry.put(RDFFormat.JSONLD, JSONLDSerializer::new);
 
         tempRegistry.put(RDFFormat.RDFC_1_0, (model, genericConfig) -> {

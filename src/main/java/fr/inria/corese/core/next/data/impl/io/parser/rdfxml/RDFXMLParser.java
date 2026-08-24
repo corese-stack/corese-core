@@ -39,6 +39,9 @@ import static fr.inria.corese.core.next.data.impl.io.parser.rdfxml.RDFXMLUtils.*
  */
 public class RDFXMLParser extends AbstractRDFParser {
 
+    private static final String DATATYPE_ATTR = "datatype";
+    private static final String RESOURCE_ATTR = "resource";
+
     /** RDF/XML format identifier for this parser. */
     private static final RDFFormat format = RDFFormat.RDFXML;
 
@@ -271,7 +274,7 @@ public class RDFXMLParser extends AbstractRDFParser {
          * @param attrs the XML attributes of the current element
          */
         private void updateDatatype(Attributes attrs) {
-            String datatype = attrs.getValue(RDF.type.getNamespace(), "datatype");
+            String datatype = attrs.getValue(RDF.type.getNamespace(), DATATYPE_ATTR);
             if (datatype != null) ctx.datatypeStack.push(datatype);
         }
 
@@ -306,6 +309,7 @@ public class RDFXMLParser extends AbstractRDFParser {
             return true;
         }
 
+        @SuppressWarnings("java:S3776")
         private boolean processContainerElement(String localName, String uri, String qName, Attributes attrs)
                 throws ParsingException {
 
@@ -331,7 +335,7 @@ public class RDFXMLParser extends AbstractRDFParser {
                     String pred = RDF.type.getNamespace() + "_" + counter;
 
                     IRI predicate = ctx.factory.createIRI(pred);
-                    String resource = attrs.getValue(RDF.type.getNamespace(), "resource");
+                    String resource = attrs.getValue(RDF.type.getNamespace(), RESOURCE_ATTR);
 
 
                     if (resource != null) {
@@ -352,7 +356,7 @@ public class RDFXMLParser extends AbstractRDFParser {
 
                         String pred = RDF.type.getNamespace() + localName;
                         IRI predicate = ctx.factory.createIRI(pred);
-                        String resource = attrs.getValue(RDF.type.getNamespace(), "resource");
+                        String resource = attrs.getValue(RDF.type.getNamespace(), RESOURCE_ATTR);
 
                         // If rdf:resource is present, emit a resource triple directly
                         if (resource != null) {
@@ -374,7 +378,7 @@ public class RDFXMLParser extends AbstractRDFParser {
             boolean hasParentSubject = !ctx.subjectStack.isEmpty();
 
             if (hasParentSubject) {
-                String resource = attrs.getValue(RDF.type.getNamespace(), "resource");
+                String resource = attrs.getValue(RDF.type.getNamespace(), RESOURCE_ATTR);
                 String nodeIDAttr = attrs.getValue(RDF.type.getNamespace(), "nodeID");
 
                 if (resource != null || (nodeIDAttr != null && !isDescription(localName, uri))) {
@@ -414,6 +418,7 @@ public class RDFXMLParser extends AbstractRDFParser {
             return true;
         }
 
+        @SuppressWarnings("java:S3776")
         private void processPropertyElement(String localName, String uri, String qName, Attributes attrs)
                 throws ParsingException {
 
@@ -425,7 +430,7 @@ public class RDFXMLParser extends AbstractRDFParser {
             ctx.predicateStack.push(predicate);
 
             // Extract RDF syntax attributes.
-            String resource = attrs.getValue(RDF.type.getNamespace(), "resource");
+            String resource = attrs.getValue(RDF.type.getNamespace(), RESOURCE_ATTR);
             String nodeID = attrs.getValue(RDF.type.getNamespace(), "nodeID");
             String parseType = attrs.getValue(RDF.type.getNamespace(), "parseType");
             String bagID = attrs.getValue(RDF.type.getNamespace(), "bagID");
@@ -460,7 +465,7 @@ public class RDFXMLParser extends AbstractRDFParser {
                 }
 
                 // CRITICAL FIX: rdf:resource cannot coexist with rdf:datatype on property elements.
-                String datatype = attrs.getValue(RDF.type.getNamespace(), "datatype");
+                String datatype = attrs.getValue(RDF.type.getNamespace(), DATATYPE_ATTR);
                 if (datatype != null) {
                     throw new ParsingException(
                             "rdf:resource and rdf:datatype cannot be used together on the same property element");
@@ -492,7 +497,7 @@ public class RDFXMLParser extends AbstractRDFParser {
                 }
 
                 // rdf:nodeID cannot coexist with rdf:datatype on property elements.
-                String datatype = attrs.getValue(RDF.type.getNamespace(), "datatype");
+                String datatype = attrs.getValue(RDF.type.getNamespace(), DATATYPE_ATTR);
                 if (datatype != null) {
                     throw new ParsingException(
                             "rdf:nodeID and rdf:datatype cannot be used together on the same property element");
@@ -540,15 +545,10 @@ public class RDFXMLParser extends AbstractRDFParser {
                 String attrLocal = attrs.getLocalName(i);
                 String attrQName = attrs.getQName(i);
 
-                // Skip attributes defining RDF/XML syntax (rdf:ID, rdf:about, rdf:resource, etc.)
-                if (isSyntaxAttribute(attrURI, attrLocal, attrQName)) {
-                    continue;
-                }
-
-                // Skip XML-namespace attributes (xml:lang, xml:base, etc.)
-                // Check both URI and QName prefix because SAX parsers may return empty URI
-                if ("http://www.w3.org/XML/1998/namespace".equals(attrURI) ||
-                        (attrQName != null && attrQName.startsWith("xml:"))) {
+                // Skip attributes defining RDF/XML syntax or XML-namespace attributes (xml:lang, xml:base, etc.)
+                if (isSyntaxAttribute(attrURI, attrLocal, attrQName)
+                        || "http://www.w3.org/XML/1998/namespace".equals(attrURI)
+                        || (attrQName != null && attrQName.startsWith("xml:"))) {
                     continue;
                 }
 

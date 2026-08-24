@@ -181,7 +181,7 @@ public class NQuadsListener extends NQuadsBaseListener {
     protected void validateBlankNodeLabel(String label) {
         abstractNTriplesQuadsListener.validateBlankNodeLabel(label);
 
-        if (!label.matches("^[A-Za-z_0-9][A-Za-z0-9_\\-\\.]*$")) {
+        if (!label.matches("^\\w[\\w\\-\\.]*$")) {
             throw new ParsingException("Invalid blank node label syntax: " + label);
         }
     }
@@ -193,7 +193,7 @@ public class NQuadsListener extends NQuadsBaseListener {
      * @return The unescaped literal string without surrounding quotes
      * @deprecated Use helper.unescapeLiteral instead
      */
-    @Deprecated
+    @Deprecated(since = "4.5.0", forRemoval = false)
     protected String unescapeLiteral(String literalText) {
         return abstractNTriplesQuadsListener.unescapeLiteral(literalText);
     }
@@ -205,7 +205,7 @@ public class NQuadsListener extends NQuadsBaseListener {
      * @return The unescaped URI string
      * @deprecated Use helper.unescapeUri instead
      */
-    @Deprecated
+    @Deprecated(since = "4.5.0", forRemoval = false)
     protected String unescapeUri(String uri) {
         return abstractNTriplesQuadsListener.unescapeUri(uri);
     }

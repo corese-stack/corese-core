@@ -9,7 +9,6 @@ import fr.inria.corese.core.next.data.api.io.option.BaseIRIOptions;
 import fr.inria.corese.core.next.data.api.io.serializer.option.BlankNodeIdGenerationOptions;
 import fr.inria.corese.core.next.data.api.io.serializer.option.LineEndingOptions;
 import fr.inria.corese.core.next.data.impl.io.serializer.support.AbstractLineBasedSerializer;
-import fr.inria.corese.core.next.data.impl.io.serializer.ntriples.NTriplesSerializerOptions;
 import fr.inria.corese.core.next.data.impl.io.serializer.option.AbstractNFamilyOptions;
 import fr.inria.corese.core.next.data.impl.io.serializer.support.SerializationConstants;
 import org.slf4j.Logger;

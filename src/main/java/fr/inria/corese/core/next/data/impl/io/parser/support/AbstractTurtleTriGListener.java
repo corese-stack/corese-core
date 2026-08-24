@@ -37,7 +37,7 @@ public abstract class AbstractTurtleTriGListener {
      * @param factory factory for creating RDF terms (IRIs, blank nodes, literals)
      * @param baseURI base URI for resolving relative IRI references
      */
-    public AbstractTurtleTriGListener(Model model, ValueFactory factory, String baseURI) {
+    protected AbstractTurtleTriGListener(Model model, ValueFactory factory, String baseURI) {
         this.model = model;
         this.factory = factory;
         this.baseURI = baseURI;
@@ -95,6 +95,7 @@ public abstract class AbstractTurtleTriGListener {
      * @return resolved absolute IRI
      * @throws ParsingException if the IRI cannot be resolved
      */
+    @SuppressWarnings("java:S3776")
     public String resolveIRI(String raw) {
         try {
 
@@ -180,6 +181,7 @@ public abstract class AbstractTurtleTriGListener {
      * @return unescaped IRI string
      * @throws IllegalArgumentException if escape sequences are malformed or contain surrogates
      */
+    @SuppressWarnings({"java:S3776", "java:S127"})
     public String unescapeIRI(String rawIri) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < rawIri.length(); i++) {
@@ -218,6 +220,7 @@ public abstract class AbstractTurtleTriGListener {
      * @return unescaped string content
      * @throws IllegalArgumentException if escape sequences are malformed
      */
+    @SuppressWarnings({"java:S3776", "java:S127"})
     public String unescapeString(String text) {
         if (text == null || text.length() < 2) {
             return text;
@@ -264,8 +267,7 @@ public abstract class AbstractTurtleTriGListener {
                         sb.append('\\');
                         i++;
                         break;
-                    case 'u':
-                    case 'U':
+                    case 'u', 'U':
                         int len = (next == 'u') ? 4 : 8;
                         if (i + len + 1 <= content.length()) {
                             String hex = content.substring(i + 2, i + 2 + len);

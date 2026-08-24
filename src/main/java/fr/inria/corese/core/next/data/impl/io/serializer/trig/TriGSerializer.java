@@ -97,6 +97,7 @@ public class TriGSerializer extends AbstractGraphSerializer {
      * @param writer the {@link Writer} to which the statements will be written.
      * @throws IOException if an I/O error occurs.
      */
+    @SuppressWarnings("java:S3776")
     private void writeStatementsWithContext(Writer writer) throws IOException {
         Map<Resource, List<Statement>> byContext = new HashMap<>();
         model.stream()
@@ -223,48 +224,60 @@ public class TriGSerializer extends AbstractGraphSerializer {
     @Override
     protected String escapeLiteralString(String value) {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < value.length(); i++) {
+        int i = 0;
+        while (i < value.length()) {
             char c = value.charAt(i);
             switch (c) {
                 case '\n':
                     sb.append(SerializationConstants.BACK_SLASH).append("n");
+                    i++;
                     break;
                 case '\r':
                     sb.append(SerializationConstants.BACK_SLASH).append("r");
+                    i++;
                     break;
                 case '\t':
                     sb.append(SerializationConstants.BACK_SLASH).append("t");
+                    i++;
                     break;
                 case '\b':
                     sb.append(SerializationConstants.BACK_SLASH).append("b");
+                    i++;
                     break;
                 case '\f':
                     sb.append(SerializationConstants.BACK_SLASH).append("f");
+                    i++;
                     break;
                 case '"':
                     sb.append(SerializationConstants.BACK_SLASH).append(SerializationConstants.QUOTE);
+                    i++;
                     break;
                 case '\\':
                     sb.append(SerializationConstants.BACK_SLASH).append(SerializationConstants.BACK_SLASH);
+                    i++;
                     break;
                 default:
                     if (this.option instanceof AbstractSerializerOptions abstractSerializerOptions
                             && abstractSerializerOptions.escapeUnicode()
                             && (c <= 0x1F
                                 || c == 0x7F
-                                || (c >= 0x80 && c <= 0xFFFF))) {
+                                || c >= 0x80)) {
                         sb.append(String.format("\\u%04X", (int) c));
+                        i++;
                     } else if (Character.isHighSurrogate(c)) {
                         int codePoint = value.codePointAt(i);
                         if (Character.isValidCodePoint(codePoint)) {
                             sb.append(String.format("\\U%08X", codePoint));
-                            i++;
+                            i += Character.charCount(codePoint);
                         } else {
                             sb.append(c);
+                            i++;
                         }
                     } else {
                         sb.append(c);
+                        i++;
                     }
+                    break;
             }
         }
         return sb.toString();

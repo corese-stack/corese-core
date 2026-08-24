@@ -130,9 +130,9 @@ public class RDFaParser extends AbstractRDFParser {
             factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
             factory.setValidating(false);
 
-            SAXParser saxParser = factory.newSAXParser();
+            SAXParser parser = factory.newSAXParser();
             InputSource inputSource = new InputSource(reader);
-            saxParser.parse(inputSource, new XMLSaxHandler());
+            parser.parse(inputSource, new XMLSaxHandler());
         } catch (IOException e) {
             throw new ParsingException("Failed to parse XML+RDFa input stream: " + e.getMessage(), e);
         } catch (Exception e) {
@@ -141,6 +141,7 @@ public class RDFaParser extends AbstractRDFParser {
     }
 
 
+    @SuppressWarnings("java:S3398")
     private void addPrefix(String prefix, String uri) {
         IRI prefixIRI = getValueFactory().createIRI(uri);
         this.addIriMapping(prefix, prefixIRI);
@@ -150,6 +151,7 @@ public class RDFaParser extends AbstractRDFParser {
      * Handles character data between XML elements
      * Accumulate the characters in all local values in the pile
      */
+    @SuppressWarnings("java:S3398")
     private void handleCharacters(char[] ch, int start, int length) {
         for (RDFaProcessingContext value : this.processingContexts) {
             value.addCharacters(ch, start, length);
@@ -167,7 +169,8 @@ public class RDFaParser extends AbstractRDFParser {
      * To reconcile both approaches, the "local values" are stored in a pile of ProcessingContext. The IRI mapping are shared independently.
      * All operations except the ones that create literals are done ine this function.
      */
-    private void startProcessElement(String uri, String localName, String qName, Attributes attrs) {
+    @SuppressWarnings({"java:S3776", "java:S3398", "java:S125"})
+    private void startProcessElement(String qName, Attributes attrs) {
 
         // 1 First, the local values are initialized
         RDFaProcessingContext processingContext;
@@ -413,7 +416,7 @@ public class RDFaParser extends AbstractRDFParser {
                 && isAttributePresent(RDFaAttributes.TYPEOF)) {
             List<Resource> typeList = getAttributeValueResourceList(RDFaAttributes.TYPEOF);
             for(Resource typeRes : typeList) {
-                this.getModel().add(this.currentProcessingContext().getTypedResource(), RDF.type.getIRI(), (IRI) typeRes);
+                this.getModel().add(this.currentProcessingContext().getTypedResource(), RDF.type.getIRI(), typeRes);
             }
         }
 
@@ -469,7 +472,7 @@ public class RDFaParser extends AbstractRDFParser {
                 List<Resource> relList = getAttributeValueResourceList(RDFaAttributes.REL);
                 for(Resource relResource : relList) {
                     if (isAttributePresent(RDFaAttributes.INLIST)) {
-                        if (!this.currentProcessingContext().getListMappings().containsKey((IRI) relResource)) {
+                        if (!this.currentProcessingContext().getListMappings().containsKey(relResource)) {
                             this.currentProcessingContext().addListMappings((IRI) relResource, new HashSet<>());
                         }
                         this.currentProcessingContext().addIncompleteStatement(new RDFaIncompleteStatement((IRI) relResource, RDFaIncompleteStatement.Direction.NONE));
@@ -542,7 +545,8 @@ public class RDFaParser extends AbstractRDFParser {
     /*
      * Ths function will apply the operations for the creation of literals using the character buffer and remove the current top processing context from the pile.
      */
-    private void endProcessElement(String uri, String localName, String qName) {
+    @SuppressWarnings({"java:S3776", "java:S3398"})
+    private void endProcessElement(String qName) {
         if(! this.currentProcessingContext().getElementName().equals(qName)) {
             throw new ParsingException("End process element "+ qName +" is not paired with the right context" + this.currentProcessingContext());
         }
@@ -675,12 +679,12 @@ public class RDFaParser extends AbstractRDFParser {
 
         @Override
         public void startElement(String uri, String localName, String qName, Attributes attrs) {
-            startProcessElement(uri, localName, qName, attrs);
+            startProcessElement(qName, attrs);
         }
 
         @Override
         public void endElement(String uri, String localName, String qName) {
-            endProcessElement(uri, localName, qName);
+            endProcessElement(qName);
         }
 
         @Override

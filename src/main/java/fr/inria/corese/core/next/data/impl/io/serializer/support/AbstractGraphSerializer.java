@@ -285,6 +285,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @throws IOException              if an I/O error occurs.
      * @throws IllegalArgumentException if the provided value is null or of an unsupported type.
      */
+    @SuppressWarnings("java:S3776")
     protected void writeValue(Writer writer, Value value) throws IOException {
         validateValue(value);
 
@@ -439,6 +440,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @param properties the list of statements where the blank node is the subject.
      * @throws IOException if an I/O error occurs.
      */
+    @SuppressWarnings("java:S3776")
     protected void writeInlineBlankNode(Writer writer, List<Statement> properties) throws IOException {
         String currentIndent = this.option instanceof PrettyPrintOptions prettyPrintOptions && prettyPrintOptions.prettyPrint() ? prettyPrintOptions.getIndent() : SerializationConstants.EMPTY_STRING;
         String propIndent = this.option instanceof PrettyPrintOptions prettyPrintOptions && prettyPrintOptions.prettyPrint() ? currentIndent + prettyPrintOptions.getIndent() : "";
@@ -488,6 +490,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @param writer the {@link Writer} to which the optimized statements will be written.
      * @throws IOException if an I/O error occurs.
      */
+    @SuppressWarnings("java:S3776")
     protected void writeOptimizedStatements(Writer writer) throws IOException {
         Map<Resource, List<Statement>> bySubject = this.option instanceof PrettyPrintOptions prettyPrintOptions && prettyPrintOptions.sortSubjects() ?
                 new TreeMap<>(Comparator.comparing(Resource::stringValue)) :
@@ -560,6 +563,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @return {@code true} if an RDF list was serialized, {@code false} otherwise.
      * @throws IOException if an I/O error occurs.
      */
+    @SuppressWarnings("java:S3776")
     protected boolean writeRDFList(Writer writer, Resource listHead) throws IOException {
 
         List<Value> items = new ArrayList<>();
@@ -582,33 +586,30 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
 
             if (statements.size() != 2) {
                 current = null;
-                break;
-            }
-
-            Optional<Value> first = statements.stream()
-                    .filter(stmt -> stmt.getPredicate().equals(RDF.first.getIRI()))
-                    .map(Statement::getObject)
-                    .findFirst();
-
-            Optional<Value> rest = statements.stream()
-                    .filter(stmt -> stmt.getPredicate().equals(RDF.rest.getIRI()))
-                    .map(Statement::getObject)
-                    .findFirst();
-
-            if (!first.isPresent() || !rest.isPresent()) {
-                current = null;
-                break;
-            }
-
-            items.add(first.get());
-
-            if (rest.get().equals(RDF.nil.getIRI())) {
-                current = null;
-            } else if (rest.get().isBNode()) {
-                current = (Resource) rest.get();
             } else {
-                current = null;
-                break;
+                Optional<Value> first = statements.stream()
+                        .filter(stmt -> stmt.getPredicate().equals(RDF.first.getIRI()))
+                        .map(Statement::getObject)
+                        .findFirst();
+
+                Optional<Value> rest = statements.stream()
+                        .filter(stmt -> stmt.getPredicate().equals(RDF.rest.getIRI()))
+                        .map(Statement::getObject)
+                        .findFirst();
+
+                if (first.isEmpty() || rest.isEmpty()) {
+                    current = null;
+                } else {
+                    items.add(first.get());
+
+                    if (rest.get().equals(RDF.nil.getIRI())) {
+                        current = null;
+                    } else if (rest.get().isBNode()) {
+                        current = (Resource) rest.get();
+                    } else {
+                        current = null;
+                    }
+                }
             }
         }
         currentlyWritingBlankNodes.remove(listHead);
@@ -648,6 +649,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      *
      * @return A {@link Set} of {@link Resource} representing the blank nodes that will be serialized inline.
      */
+    @SuppressWarnings("java:S3776")
     protected Set<Resource> precomputeInlineBlankNodesAndLists() {
         Set<Resource> precomputed = new HashSet<>();
         for (Statement stmt : model) {

@@ -210,7 +210,7 @@ public class RDFXMLSerializer implements RDFSerializer {
      */
     private Set<String> collectUsedNamespaces() {
         // Collecting namespaces of all IRIs in the data
-        Set<String> potentialNamespaces = this.cachedStatements.stream()
+        return this.cachedStatements.stream()
                 .flatMap(stmt -> {
                     List<Value> values = new ArrayList<>(Arrays.asList(
                             stmt.getSubject(),
@@ -220,7 +220,7 @@ public class RDFXMLSerializer implements RDFSerializer {
                     if (stmt.getContext() != null) {
                         values.add(stmt.getContext());
                     }
-                    if(stmt.getObject().isLiteral()
+                    if (stmt.getObject().isLiteral()
                             && ((Literal) stmt.getObject()).getDatatype() != null) {
                         values.add(((Literal) stmt.getObject()).getDatatype());
                     }
@@ -230,8 +230,6 @@ public class RDFXMLSerializer implements RDFSerializer {
                 .filter(Value::isIRI)
                 .map(v -> IRIUtils.guessNamespace(v.stringValue()))
                 .collect(Collectors.toSet());
-
-        return potentialNamespaces;
     }
 
 
@@ -324,6 +322,7 @@ public class RDFXMLSerializer implements RDFSerializer {
      * @param currentIndent the current indentation string.
      * @throws IOException if an I/O error occurs.
      */
+    @SuppressWarnings("java:S3776")
     private void writePropertyElement(Writer writer, IRI predicate, Value object, String currentIndent) throws IOException {
         String predicateString = predicate.stringValue();
         String prefixedPredicateName = getPrefixedNameInternal(predicateString);

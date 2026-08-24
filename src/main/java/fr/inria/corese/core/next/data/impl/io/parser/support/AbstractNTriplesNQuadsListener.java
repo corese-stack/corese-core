@@ -24,7 +24,7 @@ public abstract class AbstractNTriplesNQuadsListener {
      * @param factory ValueFactory for creating RDF terms
      * @param options IO configuration options
      */
-    public AbstractNTriplesNQuadsListener(Model model, ValueFactory factory, IOOptions options) {
+    protected AbstractNTriplesNQuadsListener(Model model, ValueFactory factory, IOOptions options) {
         this.model = model;
         this.factory = factory;
         this.options = options;
@@ -127,6 +127,7 @@ public abstract class AbstractNTriplesNQuadsListener {
      * @param context Context for error messages ("literal" or "URI")
      * @return Unescaped string
      */
+    @SuppressWarnings("java:S127")
     public String processEscapeSequences(String input, String context) {
         StringBuilder result = new StringBuilder(input.length());
 

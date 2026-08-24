@@ -110,14 +110,13 @@ public class NQuadsParser extends AbstractRDFParser {
     private ParsingException unwrapException(Exception exception) {
         Throwable current = exception;
         while (current != null) {
-            if (current instanceof ParsingException) {
-                return (ParsingException) current;
+            if (current instanceof ParsingException pe) {
+                return pe;
             }
             current = current.getCause();
         }
-        return new ParsingException(
-                "Unexpected error during N-Quads parsing: " + exception.getMessage(),
-                exception);
+        String msg = (exception != null && exception.getMessage() != null) ? exception.getMessage() : "Unknown error";
+        return new ParsingException("Unexpected error during N-Quads parsing: " + msg, exception);
     }
 
     /**

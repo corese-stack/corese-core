@@ -127,7 +127,7 @@ public class NTriplesListener extends NTriplesBaseListener {
      * @throws ParsingException if the label is invalid
      * @deprecated Use helper.validateBlankNodeLabel instead
      */
-    @Deprecated
+    @Deprecated(since = "4.5.0", forRemoval = false)
     protected void validateBlankNodeLabel(String label) throws ParsingException {
         abstractNTriplesQuadsListener.validateBlankNodeLabel(label);
     }
@@ -139,7 +139,7 @@ public class NTriplesListener extends NTriplesBaseListener {
      * @return The unescaped literal string without surrounding quotes
      * @deprecated Use helper.unescapeLiteral instead
      */
-    @Deprecated
+    @Deprecated(since = "4.5.0", forRemoval = false)
     public String unescapeLiteral(String literalText) {
         return abstractNTriplesQuadsListener.unescapeLiteral(literalText);
     }
@@ -151,7 +151,7 @@ public class NTriplesListener extends NTriplesBaseListener {
      * @return The unescaped URI string
      * @deprecated Use helper.unescapeUri instead
      */
-    @Deprecated
+    @Deprecated(since = "4.5.0", forRemoval = false)
     protected String unescapeUri(String uri) {
         return abstractNTriplesQuadsListener.unescapeUri(uri);
     }

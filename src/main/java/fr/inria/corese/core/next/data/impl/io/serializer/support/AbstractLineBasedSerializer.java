@@ -288,21 +288,25 @@ public abstract class AbstractLineBasedSerializer implements RDFSerializer {
      */
     protected String escapeUnicodeString(String value) {
         StringBuilder sb = new StringBuilder();
-        int len = value.length(); // Cache length for invariant stop condition
-        for (int i = 0; i < len; i++) {
+        int len = value.length();
+        int i = 0;
+        while (i < len) {
             char c = value.charAt(i);
-            if (c <= 0x1F || c == 0x7F || (c >= 0x80 && c <= 0xFFFF)) { // Basic Multilingual Plane characters and control characters
+            if (c <= 0x1F || c == 0x7F || c >= 0x80) { // Basic Multilingual Plane characters and control characters
                 sb.append(String.format("\\u%04X", (int) c));
+                i++;
             } else if (Character.isHighSurrogate(c)) { // Supplementary characters
                 int codePoint = value.codePointAt(i);
                 if (Character.isValidCodePoint(codePoint)) {
                     sb.append(String.format("\\U%08X", codePoint));
-                    i++; // Skip the low surrogate char
+                    i += Character.charCount(codePoint);
                 } else {
-                    sb.append(c); // Append invalid surrogate char directly
+                    sb.append(c);
+                    i++;
                 }
             } else {
                 sb.append(c);
+                i++;
             }
         }
         return sb.toString();
@@ -317,7 +321,7 @@ public abstract class AbstractLineBasedSerializer implements RDFSerializer {
      */
     protected void validateValue(Value value) {
         if (value == null) {
-            logger.warn("Encountered a null value where a non-null value was expected for " + getFormatName() + " serialization. This will result in an IllegalArgumentException if strict mode is enabled.");
+            logger.warn("Encountered a null value where a non-null value was expected for {} serialization. This will result in an IllegalArgumentException if strict mode is enabled.", getFormatName());
             throw new SerializationException("Value cannot be null in " + getFormatName() + " format when strictMode is enabled.", this.getFormatName());
         }
 

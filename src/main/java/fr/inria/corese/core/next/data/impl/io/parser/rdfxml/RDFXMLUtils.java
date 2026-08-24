@@ -22,6 +22,17 @@ import java.util.Set;
  * </p>
  */
 public class RDFXMLUtils {
+
+    private static final String ATTR_ABOUT_EACH = "aboutEach";
+    private static final String ATTR_ABOUT_EACH_PREFIX = "aboutEachPrefix";
+    private static final String ATTR_ABOUT = "about";
+    private static final String ATTR_NODE_ID = "nodeID";
+    private static final String ATTR_BAG_ID = "bagID";
+    private static final String ATTR_RESOURCE = "resource";
+    private static final String ATTR_DATATYPE = "datatype";
+    private static final String ATTR_PARSE_TYPE = "parseType";
+    private static final String ELEMENT_DESCRIPTION = "Description";
+
     private RDFXMLUtils() {
         // Utility class; no instantiation.
     }
@@ -112,10 +123,11 @@ public class RDFXMLUtils {
      * @throws ParsingException if rdf:ID, rdf:nodeID, or rdf:bagID value is not a valid XML Name,
      *                               if conflicting attributes are present, or if obsolete attributes are used
      */
+    @SuppressWarnings("java:S3776")
     public static Resource extractSubject(Attributes attrs, ValueFactory factory, String baseURI, Set<String> usedIDs) {
         // Check for obsolete attributes (removed in RDF 1.1)
-        String aboutEach = attrs.getValue(RDF.type.getNamespace(), "aboutEach");
-        String aboutEachPrefix = attrs.getValue(RDF.type.getNamespace(), "aboutEachPrefix");
+        String aboutEach = attrs.getValue(RDF.type.getNamespace(), ATTR_ABOUT_EACH);
+        String aboutEachPrefix = attrs.getValue(RDF.type.getNamespace(), ATTR_ABOUT_EACH_PREFIX);
 
         if (aboutEach != null) {
             throw new ParsingException("rdf:aboutEach is not supported. " +
@@ -126,10 +138,10 @@ public class RDFXMLUtils {
                     "This attribute was removed from RDF specifications.");
         }
 
-        String about = attrs.getValue(RDF.type.getNamespace(), "about");
-        String nodeID = attrs.getValue(RDF.type.getNamespace(), "nodeID");
+        String about = attrs.getValue(RDF.type.getNamespace(), ATTR_ABOUT);
+        String nodeID = attrs.getValue(RDF.type.getNamespace(), ATTR_NODE_ID);
         String id = attrs.getValue(RDF.type.getNamespace(), "ID");
-        String bagID = attrs.getValue(RDF.type.getNamespace(), "bagID");
+        String bagID = attrs.getValue(RDF.type.getNamespace(), ATTR_BAG_ID);
 
         // Check for conflicting attributes
         int count = (about != null ? 1 : 0) + (nodeID != null ? 1 : 0) + (id != null ? 1 : 0) + (bagID != null ? 1 : 0);
@@ -206,7 +218,7 @@ public class RDFXMLUtils {
      * @return {@code true} if it's an RDF description element
      */
     public static boolean isDescription(String localName, String uri) {
-        return RDF.type.getNamespace().equals(uri) && "Description".equals(localName);
+        return RDF.type.getNamespace().equals(uri) && ELEMENT_DESCRIPTION.equals(localName);
     }
 
 
@@ -218,7 +230,7 @@ public class RDFXMLUtils {
      * @return the parseType value, or null if not present
      */
     public static String getParseType(Attributes attrs) {
-        return attrs.getValue(RDF.type.getNamespace(), "parseType");
+        return attrs.getValue(RDF.type.getNamespace(), ATTR_PARSE_TYPE);
     }
 
 
@@ -233,7 +245,7 @@ public class RDFXMLUtils {
     public static boolean isSyntaxAttribute(String uri, String localName, String qName) {
         if (RDF.type.getNamespace().equals(uri)) {
             return switch (localName) {
-                case "about", "ID", "nodeID", "resource", "parseType", "datatype" -> true;
+                case ATTR_ABOUT, "ID", ATTR_NODE_ID, ATTR_RESOURCE, ATTR_PARSE_TYPE, ATTR_DATATYPE -> true;
                 default -> false;
             };
         }
@@ -268,8 +280,8 @@ public class RDFXMLUtils {
 
         switch (localName) {
 
-            case "RDF","ID", "about", "bagID", "parseType", "resource", "nodeID", "datatype",
-                 "aboutEach", "aboutEachPrefix","li":
+            case "RDF","ID", ATTR_ABOUT, ATTR_BAG_ID, ATTR_PARSE_TYPE, ATTR_RESOURCE, ATTR_NODE_ID, ATTR_DATATYPE,
+                 ATTR_ABOUT_EACH, ATTR_ABOUT_EACH_PREFIX,"li":
                 throw new ParsingException("'" + localName + "' is not allowed as a node element name from the RDF namespace. " +
                         "RDF namespace names like rdf:ID, rdf:about, rdf:bagID, etc. cannot be used as typed node elements.");
 
@@ -292,8 +304,8 @@ public class RDFXMLUtils {
         }
 
         switch (localName) {
-            case "RDF", "ID", "about", "bagID", "parseType", "resource", "nodeID",
-                 "datatype", "Description", "aboutEach", "aboutEachPrefix":
+            case "RDF", "ID", ATTR_ABOUT, ATTR_BAG_ID, ATTR_PARSE_TYPE, ATTR_RESOURCE, ATTR_NODE_ID,
+                 ATTR_DATATYPE, ELEMENT_DESCRIPTION, ATTR_ABOUT_EACH, ATTR_ABOUT_EACH_PREFIX:
                 throw new ParsingException("'" + localName + "' is not allowed as a property element name from the RDF namespace. " +
                         "Only rdf:type, rdf:_n (container membership), and rdf:li are valid RDF property names.");
 
@@ -380,7 +392,7 @@ public class RDFXMLUtils {
             return false;
         }
 
-        return "Description".equals(localName) ||
+        return ELEMENT_DESCRIPTION.equals(localName) ||
                 "Bag".equals(localName) ||
                 "Seq".equals(localName) ||
                 "Alt".equals(localName);

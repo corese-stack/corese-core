@@ -58,7 +58,7 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
 
     @Override
     public RdfGraph getDefaultGraph() {
-        RdfGraph resultGraph = new RdfGraph() {
+        return new RdfGraph() {
             @Override
             public boolean contains(RdfTriple triple) {
                 return model.contains(toResource(triple.getSubject()), toIRI(triple.getPredicate()), toValue(triple.getObject()), (Resource) null);
@@ -69,7 +69,6 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
                 return model.filter(null, null, null, (Resource) null).stream().map(TitaniumRDFDatasetSerializationAdapter.this::toRdfTriple).toList();
             }
         };
-        return resultGraph;
     }
 
     @Override
@@ -356,8 +355,8 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
 
                 @Override
                 public boolean equals(Object o) {
-                    return this == o || o instanceof BNode
-                            && getID().equals(((BNode) o).getID());
+                    return this == o || (o instanceof BNode bnode
+                            && getID().equals(bnode.getID()));
                 }
 
                 @Override
@@ -495,8 +494,8 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
 
             @Override
             public boolean equals(Object o) {
-                return this == o || o instanceof IRI
-                        && stringValue().equals(((IRI) o).stringValue());
+                return this == o || (o instanceof IRI otherIri
+                        && stringValue().equals(otherIri.stringValue()));
             }
 
             @Override

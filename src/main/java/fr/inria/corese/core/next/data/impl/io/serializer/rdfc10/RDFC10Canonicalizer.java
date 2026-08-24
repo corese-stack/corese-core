@@ -128,6 +128,7 @@ public class RDFC10Canonicalizer {
      *
      * @return A deterministic mapping from original blank node identifiers to canonical ones.
      */
+    @SuppressWarnings("java:S3776")
     private Map<String, String> createCanonicalMap(Map<String, Set<Statement>> bnodeToQuads) {
         Map<String, String> canonicalIssuer = new HashMap<>();
         int counter = 0;

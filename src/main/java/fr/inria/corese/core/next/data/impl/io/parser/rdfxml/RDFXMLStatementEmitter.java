@@ -127,9 +127,7 @@ public class RDFXMLStatementEmitter {
             String attrQName = attrs.getQName(i);
             String value = attrs.getValue(i);
 
-            if (isSyntaxAttribute(attrURI, attrLocal, attrQName)) continue;
-
-            if (attrURI == null || attrURI.isEmpty()) {
+            if (isSyntaxAttribute(attrURI, attrLocal, attrQName) || attrURI == null || attrURI.isEmpty()) {
                 continue;
             }
 

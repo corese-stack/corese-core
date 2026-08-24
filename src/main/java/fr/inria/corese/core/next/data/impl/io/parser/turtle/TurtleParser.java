@@ -7,7 +7,13 @@ import fr.inria.corese.core.next.data.api.support.io.parser.AbstractRDFParser;
 import fr.inria.corese.core.next.data.api.io.option.IOOptions;
 import fr.inria.corese.core.next.data.api.exception.ParsingException;
 import fr.inria.corese.core.next.generated.antlr.TurtleLexer;
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.BaseErrorListener;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
@@ -82,21 +88,8 @@ public class TurtleParser extends AbstractRDFParser {
             turtleParser.addErrorListener(turtleErrorListener);
 
             ParseTreeWalker walker = new ParseTreeWalker();
-            ParseTree tree;
+            ParseTree tree = parseTree(turtleParser, turtleErrorListener);
 
-            try {
-                tree = turtleParser.turtleDoc();
-
-                if (turtleErrorListener.hasErrors()) {
-                    String errorMsg = turtleErrorListener.getErrorMessage();
-                    if (errorMsg == null || errorMsg.trim().isEmpty()) {
-                        errorMsg = "Unknown syntax error detected";
-                    }
-                    throw new ParsingException("Syntax error in Turtle document: " + errorMsg);
-                }
-            } catch (RecognitionException e) {
-                throw new ParsingException("Recognition error in Turtle document: " + e.getMessage());
-            }
             IOOptions optionsWithBaseURI = new TurtleParserOptions.Builder()
                     .baseIRI(baseURI)
                     .build();
@@ -109,6 +102,23 @@ public class TurtleParser extends AbstractRDFParser {
             throw new ParsingException("Failed to parse Turtle RDF: " + e.getMessage(), e);
         } catch (Exception e) {
             throw new ParsingException("Unexpected error during Turtle parsing: " + e.getMessage(), e);
+        }
+    }
+
+    private ParseTree parseTree(fr.inria.corese.core.next.generated.antlr.TurtleParser turtleParser, TurtleErrorListener turtleErrorListener) {
+        try {
+            ParseTree tree = turtleParser.turtleDoc();
+
+            if (turtleErrorListener.hasErrors()) {
+                String errorMsg = turtleErrorListener.getErrorMessage();
+                if (errorMsg == null || errorMsg.trim().isEmpty()) {
+                    errorMsg = "Unknown syntax error detected";
+                }
+                throw new ParsingException("Syntax error in Turtle document: " + errorMsg);
+            }
+            return tree;
+        } catch (RecognitionException e) {
+            throw new ParsingException("Recognition error in Turtle document: " + e.getMessage());
         }
     }
 
@@ -135,13 +145,11 @@ public class TurtleParser extends AbstractRDFParser {
                 msg = "Unknown syntax error";
             }
 
-            if (msg.contains("token recognition error") || msg.contains("mismatched input")) {
-                if (offendingSymbol instanceof Token) {
-                    Token token = (Token) offendingSymbol;
-                    String tokenText = token.getText();
-                    if (msg.contains("token recognition error") && tokenText != null && tokenText.contains("\"")) {
-                        msg = "Invalid string literal - possibly unterminated or contains invalid escape sequence: " + msg;
-                    }
+            if ((msg.contains("token recognition error") || msg.contains("mismatched input"))
+                    && offendingSymbol instanceof Token token) {
+                String tokenText = token.getText();
+                if (msg.contains("token recognition error") && tokenText != null && tokenText.contains("\"")) {
+                    msg = "Invalid string literal - possibly unterminated or contains invalid escape sequence: " + msg;
                 }
             }
 

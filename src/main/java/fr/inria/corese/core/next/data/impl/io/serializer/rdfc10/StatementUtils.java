@@ -146,20 +146,17 @@ public class StatementUtils {
             return SerializationConstants.EMPTY_STRING;
         }
 
-        if (value instanceof IRI) {
-            IRI iri = (IRI) value;
+        if (value instanceof IRI iri) {
             String uri = iri.stringValue();
-
             return SerializationConstants.LT + uri + SerializationConstants.GT;
         }
 
-
-        if (value instanceof BNode) {
-            return serializeBNode((BNode) value);
+        if (value instanceof BNode bnode) {
+            return serializeBNode(bnode);
         }
 
-        if (value instanceof Literal) {
-            return serializeLiteral((Literal) value);
+        if (value instanceof Literal literal) {
+            return serializeLiteral(literal);
         }
 
         return value.toString();
@@ -192,16 +189,11 @@ public class StatementUtils {
         sb.append('"').append(escapedLabel).append('"');
 
         String datatype = null;
-        String language = null;
+        String language = literal.getLanguage().orElse(null);
 
         // Get datatype
         if (literal.getDatatype() != null) {
             datatype = literal.getDatatype().stringValue();
-        }
-
-        // Get language (getLanguage() returns Optional<String>)
-        if (literal.getLanguage().isPresent()) {
-            language = literal.getLanguage().get();
         }
 
         // If language tag exists, use it (language takes precedence over datatype)
