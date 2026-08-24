@@ -11,9 +11,11 @@ import fr.inria.corese.core.next.storage.impl.memory.MemoryStorageManager;
  */
 public class MemoryStoragePlugin implements StoragePlugin {
 
+    private static final String PLUGIN_NAME = "memory";
+
     @Override
     public String getName() {
-        return "memory";
+        return PLUGIN_NAME;
     }
 
     @Override
@@ -27,7 +29,7 @@ public class MemoryStoragePlugin implements StoragePlugin {
             return false;
         }
         return config.getType()
-                .map("memory"::equalsIgnoreCase)
+                .map(PLUGIN_NAME::equalsIgnoreCase)
                 .orElse(false);
     }
 

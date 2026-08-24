@@ -15,12 +15,12 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 /**
  * Manager for discovering and creating StorageManager plugins.
  */
-@SuppressWarnings({"java:S3077", "java:S3064", "java:S2629"})
 public final class StoragePluginManager {
 
     private static final Logger logger = LoggerFactory.getLogger(StoragePluginManager.class);
@@ -38,7 +38,8 @@ public final class StoragePluginManager {
     /**
      * Cache of discovered plugins (thread-safe)
      */
-    private static volatile List<StoragePlugin> cachedPlugins;
+    private static final AtomicReference<List<StoragePlugin>> cachedPlugins =
+            new AtomicReference<>();
 
     /**
      * Plugin lookup cache by name (thread-safe)
@@ -120,9 +121,11 @@ public final class StoragePluginManager {
      * @return unmodifiable list of available plugins (never null, may be empty)
      */
     public static List<StoragePlugin> getAvailablePlugins() {
-        if (cachedPlugins == null) {
+        List<StoragePlugin> result = cachedPlugins.get();
+        if (result == null) {
             synchronized (StoragePluginManager.class) {
-                if (cachedPlugins == null) {
+                result = cachedPlugins.get();
+                if (result == null) {
                     Map<String, StoragePlugin> uniquePlugins = new HashMap<>();
 
                     // Search all registered ClassLoaders
@@ -148,18 +151,20 @@ public final class StoragePluginManager {
                     plugins.sort(Comparator.comparingInt(StoragePlugin::getPriority).reversed());
 
                     // Make immutable
-                    cachedPlugins = Collections.unmodifiableList(plugins);
+                    result = Collections.unmodifiableList(plugins);
+                    cachedPlugins.set(result);
 
-                    logger.debug("Discovered {} plugin(s): {}",
-                            cachedPlugins.size(),
-                            cachedPlugins.stream()
-                                    .map(p -> p.getName() + "(" + p.getPriority() + ")")
-                                    .collect(Collectors.joining(", ")));
+                    if (logger.isDebugEnabled()) {
+                        String pluginSummary = result.stream()
+                                .map(p -> p.getName() + "(" + p.getPriority() + ")")
+                                .collect(Collectors.joining(", "));
+                        logger.debug("Discovered {} plugin(s): {}", result.size(), pluginSummary);
+                    }
                 }
             }
         }
 
-        return cachedPlugins;
+        return result;
     }
 
     /**
@@ -170,14 +175,11 @@ public final class StoragePluginManager {
      */
     public static void registerClassLoader(ClassLoader classLoader) {
         if (classLoader == null) {
-            throw new IllegalArgumentException("ClassLoader cannot be null");
+            throw new IllegalArgumentException("ClassLoader must not be null");
         }
-
-        synchronized (classLoaders) {
-            if (!classLoaders.contains(classLoader)) {
-                classLoaders.add(classLoader);
-                logger.debug("Registered ClassLoader: {}", classLoader.getClass().getSimpleName());
-            }
+        if (!classLoaders.contains(classLoader)) {
+            classLoaders.add(classLoader);
+            reload();
         }
     }
 
@@ -205,7 +207,7 @@ public final class StoragePluginManager {
      */
     public static void reload() {
         synchronized (StoragePluginManager.class) {
-            cachedPlugins = null;
+            cachedPlugins.set(null);
             pluginsByName.clear();
             logger.debug("Plugin cache cleared");
         }

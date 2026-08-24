@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 /**
  * Implementation of the {@link Model} interface backed by a {@link StorageManager}.
  */
+@SuppressWarnings("java:S2160")
 public final class StorageModel extends AbstractModel {
 
     private final StorageManager storage;

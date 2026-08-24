@@ -9,6 +9,8 @@ import fr.inria.corese.core.next.storage.api.operations.MutationOperations;
 import fr.inria.corese.core.next.storage.api.operations.QueryOperations;
 import fr.inria.corese.core.next.storage.api.transaction.TransactionManager;
 
+import java.util.Objects;
+
 /**
  * In-memory {@link StorageManager} implementation for testing and small datasets.
  */
@@ -28,6 +30,7 @@ public final class MemoryStorageManager implements StorageManager {
      * @param builder the builder with configuration
      */
     private MemoryStorageManager(Builder builder) {
+        Objects.requireNonNull(builder, "Builder cannot be null");
         this.adapter = new InMemoryStatementStore();
         this.queryOps = new MemoryQueryOperations(adapter);
         this.mutationOps = new MemoryMutationOperations(adapter);

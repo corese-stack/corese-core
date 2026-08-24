@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -35,10 +36,9 @@ public final class ExternalPluginLoader {
      * @param jarFile the JAR file containing plugins
      * @return the number of plugins loaded from this JAR
      * @throws IllegalArgumentException if jarFile is null or doesn't exist
-     * @throws Exception                if loading fails
+     * @throws PluginException          if loading fails
      */
-    @SuppressWarnings("java:S112")
-    public static int loadPluginsFromJar(File jarFile) throws Exception {
+    public static int loadPluginsFromJar(File jarFile) throws PluginException {
         if (jarFile == null) {
             throw new IllegalArgumentException("JAR file cannot be null");
         }
@@ -49,40 +49,44 @@ public final class ExternalPluginLoader {
         logger.info("Loading plugins from JAR: {} ({} bytes)",
                 jarFile.getName(), jarFile.length());
 
-        // Create ClassLoader for the JAR
-        URLClassLoader classLoader = new URLClassLoader(
-                new URL[]{jarFile.toURI().toURL()},
-                ExternalPluginLoader.class.getClassLoader()
-        );
+        try {
+            // Create ClassLoader for the JAR
+            URLClassLoader classLoader = new URLClassLoader(
+                    new URL[]{jarFile.toURI().toURL()},
+                    ExternalPluginLoader.class.getClassLoader()
+            );
 
-        // Keep reference to prevent garbage collection
-        loadedClassLoaders.add(classLoader);
+            // Keep reference to prevent garbage collection
+            loadedClassLoaders.add(classLoader);
 
-        // Register ClassLoader with StoragePluginManager
-        StoragePluginManager.registerClassLoader(classLoader);
+            // Register ClassLoader with StoragePluginManager
+            StoragePluginManager.registerClassLoader(classLoader);
 
-        // Load plugins using ServiceLoader
-        ServiceLoader<StoragePlugin> loader = ServiceLoader.load(
-                StoragePlugin.class,
-                classLoader
-        );
+            // Load plugins using ServiceLoader
+            ServiceLoader<StoragePlugin> loader = ServiceLoader.load(
+                    StoragePlugin.class,
+                    classLoader
+            );
 
-        int count = 0;
-        for (StoragePlugin plugin : loader) {
-            logger.info("Loaded plugin: {} (priority={}, jar={})",
-                    plugin.getName(),
-                    plugin.getPriority(),
-                    jarFile.getName());
-            count++;
+            int count = 0;
+            for (StoragePlugin plugin : loader) {
+                logger.info("Loaded plugin: {} (priority={}, jar={})",
+                        plugin.getName(),
+                        plugin.getPriority(),
+                        jarFile.getName());
+                count++;
+            }
+
+            // Refresh the plugin cache
+            if (count > 0) {
+                StoragePluginManager.reload();
+                logger.info("Plugin cache refreshed");
+            }
+
+            return count;
+        } catch (IOException e) {
+            throw new PluginException("Failed to load plugin JAR: " + jarFile, e);
         }
-
-        // Refresh the plugin cache
-        if (count > 0) {
-            StoragePluginManager.reload();
-            logger.info("Plugin cache refreshed");
-        }
-
-        return count;
     }
 
 }
