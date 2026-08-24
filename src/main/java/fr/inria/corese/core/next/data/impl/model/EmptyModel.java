@@ -19,6 +19,7 @@ import fr.inria.corese.core.next.data.api.support.model.AbstractModel;
  * operations.
  * Typically used as a view when all statements are filtered out.
  */
+@SuppressWarnings("java:S2160")
 public class EmptyModel extends AbstractModel {
 
     // --- Fields ---

@@ -336,9 +336,10 @@ public class PrefixHandler implements PrefixMapping, Cloneable {
         String bestPrefix = null;
         int bestLength = 0;
 
-        for (String namespace : namespaceToPrefix.keySet()) {
+        for (Map.Entry<String, String> entry : namespaceToPrefix.entrySet()) {
+            String namespace = entry.getKey();
             if (iri.startsWith(namespace) && namespace.length() > bestLength) {
-                bestPrefix = namespaceToPrefix.get(namespace);
+                bestPrefix = entry.getValue();
                 bestLength = namespace.length();
             }
         }
@@ -397,6 +398,7 @@ public class PrefixHandler implements PrefixMapping, Cloneable {
      *
      * @return a new PrefixHandler instance with same mappings
      */
+    @SuppressWarnings("java:S2975")
     @Override
     public PrefixHandler clone() {
         try {
@@ -413,11 +415,11 @@ public class PrefixHandler implements PrefixMapping, Cloneable {
     public String toString() {
         StringBuilder sb = new StringBuilder("PrefixHandler{");
         boolean first = true;
-        for (String prefix : prefixToNamespace.keySet()) {
+        for (Map.Entry<String, String> entry : prefixToNamespace.entrySet()) {
             if (!first) {
                 sb.append(", ");
             }
-            sb.append('"').append(prefix).append("\": \"").append(prefixToNamespace.get(prefix)).append('"');
+            sb.append('"').append(entry.getKey()).append("\": \"").append(entry.getValue()).append('"');
             first = false;
         }
         if (defaultNamespace != null) {
