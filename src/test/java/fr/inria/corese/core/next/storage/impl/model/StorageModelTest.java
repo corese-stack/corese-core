@@ -167,19 +167,25 @@ class StorageModelTest {
         @Test
         @DisplayName("Should throw when subject is null")
         void shouldThrowWhenSubjectIsNull() {
-            assertThrows(NullPointerException.class, () -> model.add(null, mock(IRI.class), mock(Value.class)));
+            IRI predicate = mock(IRI.class);
+            Value object = mock(Value.class);
+            assertThrows(NullPointerException.class, () -> model.add(null, predicate, object));
         }
 
         @Test
         @DisplayName("Should throw when predicate is null")
         void shouldThrowWhenPredicateIsNull() {
-            assertThrows(NullPointerException.class, () -> model.add(mock(Resource.class), null, mock(Value.class)));
+            Resource subject = mock(Resource.class);
+            Value object = mock(Value.class);
+            assertThrows(NullPointerException.class, () -> model.add(subject, null, object));
         }
 
         @Test
         @DisplayName("Should throw when object is null")
         void shouldThrowWhenObjectIsNull() {
-            assertThrows(NullPointerException.class, () -> model.add(mock(Resource.class), mock(IRI.class), null));
+            Resource subject = mock(Resource.class);
+            IRI predicate = mock(IRI.class);
+            assertThrows(NullPointerException.class, () -> model.add(subject, predicate, null));
         }
     }
 
@@ -489,16 +495,22 @@ class StorageModelTest {
         @DisplayName("Should throw when adding to unmodifiable model")
         void shouldThrowWhenAddingToUnmodifiableModel() {
             Model unmodifiable = model.unmodifiable();
+            Resource subject = mock(Resource.class);
+            IRI predicate = mock(IRI.class);
+            Value object = mock(Value.class);
 
-            assertThrows(IncorrectOperationException.class, () -> unmodifiable.add(mock(Resource.class), mock(IRI.class), mock(Value.class)));
+            assertThrows(IncorrectOperationException.class, () -> unmodifiable.add(subject, predicate, object));
         }
 
         @Test
         @DisplayName("Should throw when removing from unmodifiable model")
         void shouldThrowWhenRemovingFromUnmodifiableModel() {
             Model unmodifiable = model.unmodifiable();
+            Resource subject = mock(Resource.class);
+            IRI predicate = mock(IRI.class);
+            Value object = mock(Value.class);
 
-            assertThrows(IncorrectOperationException.class, () -> unmodifiable.remove(mock(Resource.class), mock(IRI.class), mock(Value.class)));
+            assertThrows(IncorrectOperationException.class, () -> unmodifiable.remove(subject, predicate, object));
         }
 
         @Test
@@ -513,8 +525,9 @@ class StorageModelTest {
         @DisplayName("Should throw when setting namespace on unmodifiable model")
         void shouldThrowWhenSettingNamespaceOnUnmodifiableModel() {
             Model unmodifiable = model.unmodifiable();
+            Namespace ns = mock(Namespace.class);
 
-            assertThrows(IncorrectOperationException.class, () -> unmodifiable.setNamespace(mock(Namespace.class)));
+            assertThrows(IncorrectOperationException.class, () -> unmodifiable.setNamespace(ns));
         }
 
         @Test

@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.storage.impl.memory;
 
 import fr.inria.corese.core.next.storage.api.lifecycle.LifecycleState;
 import fr.inria.corese.core.next.storage.api.config.StorageConfig;
+import fr.inria.corese.core.next.storage.api.transaction.TransactionManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -143,7 +144,8 @@ class MemoryStorageManagerTest {
         @Test
         @DisplayName("Should throw when beginning transaction")
         void shouldThrowWhenBeginningTransaction() {
-            assertThrows(UnsupportedOperationException.class, () -> storageManager.getTransactionManager().beginTransaction());
+            TransactionManager txManager = storageManager.getTransactionManager();
+            assertThrows(UnsupportedOperationException.class, txManager::beginTransaction);
         }
     }
 
