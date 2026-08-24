@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.io.serializer;
 
+import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.api.io.ResultFormat;
 import fr.inria.corese.core.next.query.api.io.serializer.BooleanResultSerializer;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
@@ -57,7 +58,7 @@ class DefaultResultSerializerFactoryTest {
     void rejectsUnknownTupleResultFormat() {
         ResultFormat custom = new ResultFormat("CUSTOM", List.of("custom"), List.of("application/x-custom"));
         assertThrows(
-                IllegalArgumentException.class,
+                UnsupportedQueryFeatureException.class,
                 () -> factory.createTupleSerializer(custom, dummyResults));
     }
 }

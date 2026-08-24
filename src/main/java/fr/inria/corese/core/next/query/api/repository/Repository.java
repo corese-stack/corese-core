@@ -3,8 +3,6 @@ package fr.inria.corese.core.next.query.api.repository;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.query.api.exception.RepositoryException;
 
-import java.io.File;
-
 /**
  * A Corese repository that contains RDF data that can be queried and updated.
  *
@@ -12,20 +10,6 @@ import java.io.File;
  */
 public interface Repository {
 
-    /**
-     * Sets the data directory where repository files will be stored.
-     *
-     * @param dataDir the directory for repository data
-     * @throws IllegalStateException if the repository is already initialized
-     */
-    void setDataDir(File dataDir);
-
-    /**
-     * Returns the data directory where repository files are stored.
-     *
-     * @return the data directory, or {@code null} if not set
-     */
-    File getDataDir();
 
     /**
      * Initializes the repository, making it ready for use.

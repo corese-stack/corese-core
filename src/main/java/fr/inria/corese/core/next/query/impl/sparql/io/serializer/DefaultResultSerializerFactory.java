@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.io.serializer;
 
 import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.api.io.ResultFormat;
 import fr.inria.corese.core.next.query.api.io.serializer.BooleanResultSerializer;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializerFactory;
@@ -72,7 +73,7 @@ public final class DefaultResultSerializerFactory implements ResultSerializerFac
         throw unsupported(format);
     }
 
-    private static IllegalArgumentException unsupported(ResultFormat format) {
-        return new IllegalArgumentException("Unsupported SPARQL result format: " + format);
+    private static UnsupportedQueryFeatureException unsupported(ResultFormat format) {
+        return new UnsupportedQueryFeatureException("Unsupported SPARQL result format: " + format);
     }
 }

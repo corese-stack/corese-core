@@ -39,6 +39,7 @@ public interface GraphQueryResult extends Closeable, Iterable<Statement> {
      * @return an iterator over the statements in this result
      */
     @Override
+    @SuppressWarnings("NullableProblems")
     default Iterator<Statement> iterator() {
         return new Iterator<>() {
             @Override

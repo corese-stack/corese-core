@@ -54,6 +54,7 @@ public interface TupleQueryResult extends Closeable, Iterable<BindingSet> {
      * @return an iterator over the binding sets in this result
      */
     @Override
+    @SuppressWarnings("NullableProblems")
     default Iterator<BindingSet> iterator() {
         return new Iterator<>() {
             @Override
