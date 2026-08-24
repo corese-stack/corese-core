@@ -5,7 +5,7 @@ import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.data.api.io.option.IOOptions;
 import fr.inria.corese.core.next.data.api.vocabulary.XSD;
 import fr.inria.corese.core.next.data.api.exception.SerializationException;
-import fr.inria.corese.core.next.data.impl.io.serializer.TestStatementFactory;
+import fr.inria.corese.core.next.data.impl.io.serializer.support.MockStatementFactory;
 import fr.inria.corese.core.next.data.api.io.serializer.option.LiteralDatatypePolicy;
 import fr.inria.corese.core.next.data.api.io.serializer.option.PrefixOrdering;
 import org.junit.jupiter.api.AfterEach;
@@ -29,7 +29,7 @@ class RDFXMLSerializerTest {
     @Mock
     private Model mockModel;
     RDFXMLSerializerOptions mockConfig;
-    private TestStatementFactory factory;
+    private MockStatementFactory factory;
     private StringWriter writer;
     private AutoCloseable closeable;
 
@@ -37,7 +37,7 @@ class RDFXMLSerializerTest {
     void setUp() {
         closeable = MockitoAnnotations.openMocks(this);
         writer = new StringWriter();
-        factory = new TestStatementFactory();
+        factory = new MockStatementFactory();
         mockConfig = RDFXMLSerializerOptions.defaultConfig();
     }
 

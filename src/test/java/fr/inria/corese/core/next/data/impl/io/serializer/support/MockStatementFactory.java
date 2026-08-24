@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.data.impl.io.serializer;
+package fr.inria.corese.core.next.data.impl.io.serializer.support;
 
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Literal;
@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
  * for use in unit tests. This centralizes the creation logic and reduces duplication
  * across various serializer test classes.
  */
-public class TestStatementFactory {
+public class MockStatementFactory {
 
     /**
      * Creates a mocked Statement object with a subject, predicate, and object.

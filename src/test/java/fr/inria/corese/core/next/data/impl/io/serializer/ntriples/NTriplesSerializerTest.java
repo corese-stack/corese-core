@@ -6,7 +6,7 @@ import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Literal;
 import fr.inria.corese.core.next.data.api.term.Resource;
-import fr.inria.corese.core.next.data.impl.io.serializer.TestStatementFactory;
+import fr.inria.corese.core.next.data.impl.io.serializer.support.MockStatementFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,7 +26,7 @@ class NTriplesSerializerTest {
 
     private Model model;
     private NTriplesSerializer nTriplesSerializer;
-    private TestStatementFactory factory;
+    private MockStatementFactory factory;
 
     private Resource mockExPerson;
     private IRI mockExName;
@@ -45,7 +45,7 @@ class NTriplesSerializerTest {
         model = mock(Model.class);
         NTriplesSerializerOptions config = NTriplesSerializerOptions.defaultConfig();
         nTriplesSerializer = new NTriplesSerializer(model, config);
-        factory = new TestStatementFactory();
+        factory = new MockStatementFactory();
 
         mockExPerson = factory.createIRI("http://example.org/Person");
         mockExName = factory.createIRI("http://example.org/name");

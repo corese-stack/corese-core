@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.data.impl.io.serializer.nquads;
 
 import fr.inria.corese.core.next.data.api.term.*;
 import fr.inria.corese.core.next.data.api.model.*;
-import fr.inria.corese.core.next.data.impl.io.serializer.TestStatementFactory;
+import fr.inria.corese.core.next.data.impl.io.serializer.support.MockStatementFactory;
 import fr.inria.corese.core.next.data.api.exception.SerializationException;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +24,7 @@ class NQuadsSerializerTest {
 
     private Model model;
     private NQuadsSerializer nQuadsSerializer;
-    private TestStatementFactory factory;
+    private MockStatementFactory factory;
 
     private Resource mockExPerson;
     private IRI mockExName;
@@ -43,7 +43,7 @@ class NQuadsSerializerTest {
         model = mock(Model.class);
         NQuadsSerializerOptions config = NQuadsSerializerOptions.defaultConfig();
         nQuadsSerializer = new NQuadsSerializer(model, config);
-        factory = new TestStatementFactory();
+        factory = new MockStatementFactory();
 
         mockExPerson = factory.createIRI("http://example.org/Person");
         mockExName = factory.createIRI("http://example.org/name");

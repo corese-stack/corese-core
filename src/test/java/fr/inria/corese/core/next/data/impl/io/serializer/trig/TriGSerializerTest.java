@@ -6,7 +6,7 @@ import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.data.api.vocabulary.RDF;
 import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 import fr.inria.corese.core.next.data.api.exception.SerializationException;
-import fr.inria.corese.core.next.data.impl.io.serializer.TestStatementFactory;
+import fr.inria.corese.core.next.data.impl.io.serializer.support.MockStatementFactory;
 import fr.inria.corese.core.next.data.api.io.serializer.option.LiteralDatatypePolicy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,13 +27,13 @@ class TriGSerializerTest {
 
     private Model mockModel;
     private TriGSerializerOptions defaultConfig;
-    private TestStatementFactory factory;
+    private MockStatementFactory factory;
 
     @BeforeEach
     void setUp() {
         mockModel = mock(Model.class);
         defaultConfig = TriGSerializerOptions.defaultConfig();
-        factory = new TestStatementFactory();
+        factory = new MockStatementFactory();
     }
 
     /**

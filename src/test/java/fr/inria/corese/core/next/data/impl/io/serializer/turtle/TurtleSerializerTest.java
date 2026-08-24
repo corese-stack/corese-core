@@ -5,7 +5,7 @@ import fr.inria.corese.core.next.data.api.model.*;
 import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 import fr.inria.corese.core.next.data.api.vocabulary.RDF;
 import fr.inria.corese.core.next.data.api.exception.SerializationException;
-import fr.inria.corese.core.next.data.impl.io.serializer.TestStatementFactory;
+import fr.inria.corese.core.next.data.impl.io.serializer.support.MockStatementFactory;
 import fr.inria.corese.core.next.data.api.io.serializer.option.LiteralDatatypePolicy;
 import fr.inria.corese.core.next.data.impl.io.parser.support.ParserTestBase;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,13 +30,13 @@ class TurtleSerializerTest extends ParserTestBase {
 
     private Model mockModel;
     private TurtleSerializerOptions defaultConfig;
-    private TestStatementFactory factory;
+    private MockStatementFactory factory;
 
     @BeforeEach
     void setUp() {
         mockModel = mock(Model.class);
         defaultConfig = TurtleSerializerOptions.defaultConfig();
-        factory = new TestStatementFactory();
+        factory = new MockStatementFactory();
     }
 
     /**
