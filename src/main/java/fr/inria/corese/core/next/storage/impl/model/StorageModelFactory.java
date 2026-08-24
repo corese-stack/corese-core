@@ -27,6 +27,12 @@ import fr.inria.corese.core.next.storage.api.config.StorageConfig;
  */
 public record StorageModelFactory(ValueFactory valueFactory) {
 
+    private static final String TYPE_PROPERTY = "type";
+    private static final String GRAPH_TYPE = "graph";
+    private static final String MEMORY_TYPE = "memory";
+    private static final String GRAPH_PROPERTY = "graph";
+    private static final String VALUE_FACTORY_PROPERTY = "valueFactory";
+
     /**
      * Constructs a new StorageModelFactory with the specified ValueFactory.
      *
@@ -56,7 +62,7 @@ public record StorageModelFactory(ValueFactory valueFactory) {
         // Create minimal config with just the type
         // Let StoragePluginManager discover and select the appropriate plugin
         StorageConfig config = StorageConfig.builder()
-                .property("type", storageType.trim())
+                .property(TYPE_PROPERTY, storageType.trim())
                 .build();
 
         return createModel(config);
@@ -137,9 +143,9 @@ public record StorageModelFactory(ValueFactory valueFactory) {
         }
 
         StorageConfig config = StorageConfig.builder()
-                .property("type", "graph")
-                .property("graph", graph)
-                .property("valueFactory", valueFactory)
+                .property(TYPE_PROPERTY, GRAPH_TYPE)
+                .property(GRAPH_PROPERTY, graph)
+                .property(VALUE_FACTORY_PROPERTY, valueFactory)
                 .build();
 
         return createModel(config);
@@ -152,7 +158,7 @@ public record StorageModelFactory(ValueFactory valueFactory) {
      */
     private StorageConfig createMemoryConfig() {
         return StorageConfig.builder()
-                .property("type", "memory")
+                .property(TYPE_PROPERTY, MEMORY_TYPE)
                 .build();
     }
 
@@ -163,9 +169,9 @@ public record StorageModelFactory(ValueFactory valueFactory) {
      */
     private StorageConfig createGraphConfig() {
         return StorageConfig.builder()
-                .property("type", "graph")
-                .property("graph", Graph.create())
-                .property("valueFactory", valueFactory)
+                .property(TYPE_PROPERTY, GRAPH_TYPE)
+                .property(GRAPH_PROPERTY, Graph.create())
+                .property(VALUE_FACTORY_PROPERTY, valueFactory)
                 .build();
     }
 }
