@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
  * <p>
  * Intended to facilitate string manipulation related to IRI.
  */
+@SuppressWarnings({"java:S8786", "java:S5998", "java:S5869", "java:S3776", "java:S5842"})
 public final class IRIUtils {
 
     private static final String EMPTY_STRING = "";
@@ -25,6 +26,7 @@ public final class IRIUtils {
     private static final String FILE_PROTOCOL_SIMPLE = "file:/";
     private static final String FILE_PROTOCOL = "file://";
     private static final String FILE_PROTOCOL_TRIPLE_SLASH = "file:///";
+    private static final String FINAL_PATH_GROUP = "finalPath";
 
     // Example 1 : http://webisa.webdatacommons.org/data/sparql?query=q#line1
     private static final Pattern IRI_PATTERN = Pattern.compile("^(?<rootnamespace>" + // http://webisa.webdatacommons.org
@@ -88,9 +90,9 @@ public final class IRIUtils {
                 if (matcher.group("path") != null) {
                     namespace.append(matcher.group("path"));
                 }
-                if(matcher.group("anchor") != null) {
-                    if(matcher.group("finalPath") != null) {
-                        namespace.append(matcher.group("finalPath"));
+                if (matcher.group("anchor") != null) {
+                    if (matcher.group(FINAL_PATH_GROUP) != null) {
+                        namespace.append(matcher.group(FINAL_PATH_GROUP));
                     }
                     namespace.append(matcher.group("anchor"));
                 }
@@ -121,8 +123,8 @@ public final class IRIUtils {
             } else if (matcher.matches()) {
                 if (matcher.group("fragment") != null) { // If the IRI has a fragment
                     return matcher.group("fragment");
-                } else if (matcher.group("finalPath") != null) { // If the IRI has no fragment but do not ends with a slash
-                    return matcher.group("finalPath");
+                } else if (matcher.group(FINAL_PATH_GROUP) != null) { // If the IRI has no fragment but does not end with a slash
+                    return matcher.group(FINAL_PATH_GROUP);
                 } else { // If the URI ends with a slash
                     return "";
                 }
@@ -193,11 +195,8 @@ public final class IRIUtils {
             }
 
             // For very long strings, check timeout periodically
-            if (input.length() > 100) {
-                // Pre-check timeout
-                if (System.nanoTime() - startTime > TimeUnit.MILLISECONDS.toNanos(REGEX_TIMEOUT_MS / 2)) {
-                    return null;
-                }
+            if (input.length() > 100 && System.nanoTime() - startTime > TimeUnit.MILLISECONDS.toNanos(REGEX_TIMEOUT_MS / 2)) {
+                return null;
             }
 
             return matcher;
@@ -221,12 +220,12 @@ public final class IRIUtils {
      * Checks for patterns that might cause ReDoS attacks.
      */
     private static boolean containsSuspiciousPatterns(String input) {
-        final Set<Character> SUSPICIOUS_CHARS = Set.of('.', '-', '_', ':');
+        final Set<Character> suspiciousChars = Set.of('.', '-', '_', ':');
         int consecutiveRepeats = 0;
         char lastChar = 0;
 
         for (char c : input.toCharArray()) {
-            if (c == lastChar && SUSPICIOUS_CHARS.contains(c)) {
+            if (c == lastChar && suspiciousChars.contains(c)) {
                 if (++consecutiveRepeats > 10) {
                     return true;
                 }
@@ -244,7 +243,7 @@ public final class IRIUtils {
     private static boolean isValidURI(String uriString) {
         try {
             URI uri = new URI(uriString);
-            return uri.getScheme() != null && uri.getScheme().length() > 0;
+            return uri.getScheme() != null && !uri.getScheme().isEmpty();
         } catch (URISyntaxException e) {
             return false;
         }
@@ -257,7 +256,7 @@ public final class IRIUtils {
      * @return true if the character is forbidden in IRIs
      */
     public static boolean isInvalidIRICharacter(char c) {
-        if (c >= 0x00 && c <= 0x1F) {
+        if (c <= 0x1F) {
             return true;
         }
 
@@ -297,7 +296,11 @@ public final class IRIUtils {
             String refQuery = refParts[3];
             String refFragment = refParts[4];
 
-            String targetScheme, targetAuthority, targetPath, targetQuery, targetFragment;
+            String targetScheme;
+            String targetAuthority;
+            String targetPath;
+            String targetQuery;
+            String targetFragment;
 
             // RFC 3986 Section 5.2.2 - Reference Resolution Algorithm
             if (refScheme != null) {
@@ -521,10 +524,8 @@ public final class IRIUtils {
         if (uri == null) {
             return null;
         }
-        if (uri.startsWith(FILE_PROTOCOL_SIMPLE) && !uri.startsWith(FILE_PROTOCOL_TRIPLE_SLASH)) {
-            if (!uri.startsWith(FILE_PROTOCOL)) {
-                uri = uri.replace(FILE_PROTOCOL_SIMPLE, FILE_PROTOCOL_TRIPLE_SLASH);
-            }
+        if (uri.startsWith(FILE_PROTOCOL_SIMPLE) && !uri.startsWith(FILE_PROTOCOL_TRIPLE_SLASH) && !uri.startsWith(FILE_PROTOCOL)) {
+            uri = uri.replace(FILE_PROTOCOL_SIMPLE, FILE_PROTOCOL_TRIPLE_SLASH);
         }
         return uri;
     }

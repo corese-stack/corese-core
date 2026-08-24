@@ -188,7 +188,7 @@ public abstract class AbstractLiteral implements Literal {
         int hash = 7;
         hash = 31 * hash + (this.getLabel() == null ? 0 : this.getLabel().hashCode());
         hash = 31 * hash + (this.getDatatype() == null ? 0 : this.getDatatype().hashCode());
-        hash = 31 * hash + (this.getLanguage().isEmpty() ? 0 : this.getLanguage().get().hashCode());
+        hash = 31 * hash + this.getLanguage().map(String::hashCode).orElse(0);
         return hash;
     }
 

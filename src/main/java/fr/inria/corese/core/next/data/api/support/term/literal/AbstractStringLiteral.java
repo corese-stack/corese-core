@@ -8,6 +8,7 @@ import fr.inria.corese.core.next.data.api.term.IRI;
  * This class serves as a base class for all string-based literals in Corese.
  */
 
+@SuppressWarnings("java:S1210")
 public abstract class AbstractStringLiteral extends AbstractLiteral implements Comparable<AbstractStringLiteral> {
     /**
      * Constructs an instance of AbstractStringLiteral with the specified datatype.

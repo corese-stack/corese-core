@@ -29,8 +29,7 @@ public abstract class AbstractBNode implements BNode {
      */
     @Override
     public boolean equals(Object o) {
-        return this == o || o instanceof BNode
-                && getID().equals(((BNode) o).getID());
+        return this == o || (o instanceof BNode bnode && getID().equals(bnode.getID()));
     }
 
     /**
