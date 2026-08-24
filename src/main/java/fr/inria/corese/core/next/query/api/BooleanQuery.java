@@ -2,6 +2,9 @@ package fr.inria.corese.core.next.query.api;
 
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 
+/**
+ * Compiled SPARQL query corresponding to an ASK query.
+ */
 public interface BooleanQuery extends Query<Boolean> {
     /**
      * Evaluates this ASK query and returns whether any solutions exist.

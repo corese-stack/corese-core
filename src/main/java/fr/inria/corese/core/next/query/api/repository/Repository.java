@@ -14,8 +14,8 @@ public interface Repository {
     /**
      * Initializes the repository, making it ready for use.
      *
-     * @throws RepositoryException   if initialization fails (e.g., I/O errors, corrupt data)
-     * @throws IllegalStateException if already initialized
+     * @throws RepositoryException if initialization fails (e.g., I/O errors, corrupt data)
+     *                             or if the repository is already initialized
      */
     void init() throws RepositoryException;
 

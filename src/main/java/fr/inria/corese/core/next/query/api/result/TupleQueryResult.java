@@ -42,9 +42,11 @@ public interface TupleQueryResult extends Closeable, Iterable<BindingSet> {
 
     /**
      * Returns the next solution in the result sequence.
-     * <p>
-     * If no next element exists, this method may throw an exception
-     * @return the next {@link BindingSet}
+     *
+     * @return the next {@link BindingSet} (never {@code null})
+     * @throws NoSuchElementException if no more solutions are available
+     *         (i.e., {@link #hasNext()} would return {@code false})
+     * @throws IllegalStateException if this result has been closed
      */
     BindingSet next();
 

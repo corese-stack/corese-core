@@ -121,24 +121,24 @@ public interface RepositoryConnection extends AutoCloseable {
     /**
      * Begins a new transaction, if supported by the backend.
      *
-     * @throws RepositoryException if transactions are not supported or if a transaction is already active
-     * @throws IllegalStateException if the connection is closed
+     * @throws RepositoryException if transactions are not supported, if a transaction is already active,
+     *                             or if the connection is closed
      */
     void begin() throws RepositoryException;
 
     /**
      * Commits the active transaction, making all changes permanent.
      *
-     * @throws RepositoryException if commit fails or no transaction is active
-     * @throws IllegalStateException if the connection is closed
+     * @throws RepositoryException if commit fails, no transaction is active,
+     *                             or the connection is closed
      */
     void commit() throws RepositoryException;
 
     /**
      * Rolls back the active transaction, discarding all uncommitted changes.
      *
-     * @throws RepositoryException if rollback fails or no transaction is active
-     * @throws IllegalStateException if the connection is closed
+     * @throws RepositoryException if rollback fails, no transaction is active,
+     *                             or the connection is closed
      */
     void rollback() throws RepositoryException;
 

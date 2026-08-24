@@ -31,23 +31,11 @@ public interface ResultSerializerFactory {
      * @param format The {@link ResultFormat} to use for serialization.
      * @param results The {@link TupleQueryResult} results to be serialized
      * @param options Options to configure the serialization
-     * @return a new instance of {@link ResultSerializer} with default configuration.
+     * @return a new instance of {@link ResultSerializer} configured with the given options.
      */
     ResultSerializer createTupleSerializer(
             ResultFormat format,
             TupleQueryResult results,
             IOOptions options);
 
-    /**
-     * Creates a serializer for the given boolean result in the given {@link ResultFormat format}
-     *
-     * @param format  The {@link ResultFormat} to use for serialization.
-     * @param result The boolean result to be serialized
-     * @param options Options to configure the serialization
-     * @return a new instance of {@link ResultSerializer} with default configuration.
-     */
-    BooleanResultSerializer createBooleanSerializer(
-            ResultFormat format,
-            boolean result,
-            IOOptions options);
 }
