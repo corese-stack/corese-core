@@ -1,8 +1,9 @@
 package fr.inria.corese.core.next.query.impl.query;
 
-import fr.inria.corese.core.next.query.api.Query;
+import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.query.api.QueryLanguage;
 import fr.inria.corese.core.next.query.api.TupleQuery;
+import fr.inria.corese.core.next.query.api.dataset.Dataset;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 import fr.inria.corese.core.next.query.impl.sparql.execution.NextSparqlPipelineExecutor;
@@ -25,7 +26,43 @@ public final class CoreseTupleQuery extends AbstractCoreseOperation implements T
     }
 
     @Override
-    public Query<TupleQueryResult> setTimeout(long timeoutMillis) {
+    public CoreseTupleQuery setBinding(String name, Value value) {
+        super.setBinding(name, value);
+        return this;
+    }
+
+    @Override
+    public CoreseTupleQuery removeBinding(String name) {
+        super.removeBinding(name);
+        return this;
+    }
+
+    @Override
+    public CoreseTupleQuery clearBindings() {
+        super.clearBindings();
+        return this;
+    }
+
+    @Override
+    public CoreseTupleQuery setDataset(Dataset dataset) {
+        super.setDataset(dataset);
+        return this;
+    }
+
+    @Override
+    public CoreseTupleQuery setIncludeInferred(boolean includeInferred) {
+        super.setIncludeInferred(includeInferred);
+        return this;
+    }
+
+    @Override
+    public CoreseTupleQuery setMaxExecutionTime(int maxExecutionTimeSeconds) {
+        super.setMaxExecutionTime(maxExecutionTimeSeconds);
+        return this;
+    }
+
+    @Override
+    public CoreseTupleQuery setTimeout(long timeoutMillis) {
         this.timeoutMillis = timeoutMillis;
         return this;
     }

@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query.api;
 
+import fr.inria.corese.core.next.data.api.term.Value;
+import fr.inria.corese.core.next.query.api.dataset.Dataset;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 
 /**
@@ -14,4 +16,25 @@ public interface BooleanQuery extends Query<Boolean> {
      */
     @Override
     Boolean evaluate() throws QueryEvaluationException;
+
+    @Override
+    BooleanQuery setBinding(String name, Value value);
+
+    @Override
+    BooleanQuery removeBinding(String name);
+
+    @Override
+    BooleanQuery clearBindings();
+
+    @Override
+    BooleanQuery setDataset(Dataset dataset);
+
+    @Override
+    BooleanQuery setIncludeInferred(boolean includeInferred);
+
+    @Override
+    BooleanQuery setMaxExecutionTime(int maxExecutionTimeSeconds);
+
+    @Override
+    BooleanQuery setTimeout(long timeoutMillis);
 }

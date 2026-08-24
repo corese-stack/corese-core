@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query.api;
 
+import fr.inria.corese.core.next.data.api.term.Value;
+import fr.inria.corese.core.next.query.api.dataset.Dataset;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 
@@ -16,5 +18,24 @@ public interface TupleQuery extends Query<TupleQueryResult> {
     @Override
     TupleQueryResult evaluate() throws QueryEvaluationException;
 
+    @Override
+    TupleQuery setBinding(String name, Value value);
 
+    @Override
+    TupleQuery removeBinding(String name);
+
+    @Override
+    TupleQuery clearBindings();
+
+    @Override
+    TupleQuery setDataset(Dataset dataset);
+
+    @Override
+    TupleQuery setIncludeInferred(boolean includeInferred);
+
+    @Override
+    TupleQuery setMaxExecutionTime(int maxExecutionTimeSeconds);
+
+    @Override
+    TupleQuery setTimeout(long timeoutMillis);
 }

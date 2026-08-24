@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query.api;
 
+import fr.inria.corese.core.next.data.api.term.Value;
+import fr.inria.corese.core.next.query.api.dataset.Dataset;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.result.GraphQueryResult;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
@@ -73,4 +75,21 @@ public interface Query<T> extends Operation {
      */
     T evaluate() throws QueryEvaluationException;
 
+    @Override
+    Query<T> setBinding(String name, Value value);
+
+    @Override
+    Query<T> removeBinding(String name);
+
+    @Override
+    Query<T> clearBindings();
+
+    @Override
+    Query<T> setDataset(Dataset dataset);
+
+    @Override
+    Query<T> setIncludeInferred(boolean includeInferred);
+
+    @Override
+    Query<T> setMaxExecutionTime(int maxExecutionTimeSeconds);
 }

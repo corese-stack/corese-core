@@ -1,8 +1,9 @@
 package fr.inria.corese.core.next.query.impl.query;
 
+import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.query.api.BooleanQuery;
-import fr.inria.corese.core.next.query.api.Query;
 import fr.inria.corese.core.next.query.api.QueryLanguage;
+import fr.inria.corese.core.next.query.api.dataset.Dataset;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.impl.sparql.execution.NextSparqlPipelineExecutor;
 
@@ -22,7 +23,43 @@ public final class CoreseBooleanQuery extends AbstractCoreseOperation implements
     }
 
     @Override
-    public Query<Boolean> setTimeout(long timeoutMillis) {
+    public CoreseBooleanQuery setBinding(String name, Value value) {
+        super.setBinding(name, value);
+        return this;
+    }
+
+    @Override
+    public CoreseBooleanQuery removeBinding(String name) {
+        super.removeBinding(name);
+        return this;
+    }
+
+    @Override
+    public CoreseBooleanQuery clearBindings() {
+        super.clearBindings();
+        return this;
+    }
+
+    @Override
+    public CoreseBooleanQuery setDataset(Dataset dataset) {
+        super.setDataset(dataset);
+        return this;
+    }
+
+    @Override
+    public CoreseBooleanQuery setIncludeInferred(boolean includeInferred) {
+        super.setIncludeInferred(includeInferred);
+        return this;
+    }
+
+    @Override
+    public CoreseBooleanQuery setMaxExecutionTime(int maxExecutionTimeSeconds) {
+        super.setMaxExecutionTime(maxExecutionTimeSeconds);
+        return this;
+    }
+
+    @Override
+    public CoreseBooleanQuery setTimeout(long timeoutMillis) {
         this.timeoutMillis = timeoutMillis;
         return this;
     }

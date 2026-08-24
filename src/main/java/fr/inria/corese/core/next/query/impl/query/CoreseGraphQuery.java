@@ -1,8 +1,9 @@
 package fr.inria.corese.core.next.query.impl.query;
 
+import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.query.api.GraphQuery;
-import fr.inria.corese.core.next.query.api.Query;
 import fr.inria.corese.core.next.query.api.QueryLanguage;
+import fr.inria.corese.core.next.query.api.dataset.Dataset;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.result.GraphQueryResult;
 import fr.inria.corese.core.next.query.impl.sparql.execution.NextSparqlPipelineExecutor;
@@ -26,7 +27,43 @@ public final class CoreseGraphQuery extends AbstractCoreseOperation implements G
     }
 
     @Override
-    public Query<GraphQueryResult> setTimeout(long timeoutMillis) {
+    public CoreseGraphQuery setBinding(String name, Value value) {
+        super.setBinding(name, value);
+        return this;
+    }
+
+    @Override
+    public CoreseGraphQuery removeBinding(String name) {
+        super.removeBinding(name);
+        return this;
+    }
+
+    @Override
+    public CoreseGraphQuery clearBindings() {
+        super.clearBindings();
+        return this;
+    }
+
+    @Override
+    public CoreseGraphQuery setDataset(Dataset dataset) {
+        super.setDataset(dataset);
+        return this;
+    }
+
+    @Override
+    public CoreseGraphQuery setIncludeInferred(boolean includeInferred) {
+        super.setIncludeInferred(includeInferred);
+        return this;
+    }
+
+    @Override
+    public CoreseGraphQuery setMaxExecutionTime(int maxExecutionTimeSeconds) {
+        super.setMaxExecutionTime(maxExecutionTimeSeconds);
+        return this;
+    }
+
+    @Override
+    public CoreseGraphQuery setTimeout(long timeoutMillis) {
         this.timeoutMillis = timeoutMillis;
         return this;
     }

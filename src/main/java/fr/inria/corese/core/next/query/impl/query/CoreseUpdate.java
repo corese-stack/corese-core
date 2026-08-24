@@ -63,8 +63,38 @@ public final class CoreseUpdate extends AbstractCoreseOperation implements Updat
     }
 
     @Override
-    public Update setBinding(String name, Value value) {
+    public CoreseUpdate setBinding(String name, Value value) {
         super.setBinding(name, value);
+        return this;
+    }
+
+    @Override
+    public CoreseUpdate removeBinding(String name) {
+        super.removeBinding(name);
+        return this;
+    }
+
+    @Override
+    public CoreseUpdate clearBindings() {
+        super.clearBindings();
+        return this;
+    }
+
+    @Override
+    public CoreseUpdate setDataset(fr.inria.corese.core.next.query.api.dataset.Dataset dataset) {
+        super.setDataset(dataset);
+        return this;
+    }
+
+    @Override
+    public CoreseUpdate setIncludeInferred(boolean includeInferred) {
+        super.setIncludeInferred(includeInferred);
+        return this;
+    }
+
+    @Override
+    public CoreseUpdate setMaxExecutionTime(int maxExecutionTimeSeconds) {
+        super.setMaxExecutionTime(maxExecutionTimeSeconds);
         return this;
     }
 
