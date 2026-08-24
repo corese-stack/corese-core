@@ -1,11 +1,14 @@
 package fr.inria.corese.core.next.common.exception;
 
+import java.io.Serial;
+
 /**
  * CoreseException is the superclass for all exceptions thrown by the Corese framework.
  * It extends RuntimeException, allowing it to be used as an unchecked exception.
  * Its constructors are redirection to the constructors of RuntimeException.
  */
 public abstract class CoreseException extends RuntimeException {
+    @Serial
     private static final long serialVersionUID = 6828854064356034698L;
 
     /**

@@ -5,16 +5,8 @@ package fr.inria.corese.core.next.common.exception;
  */
 public class ConfigurationException extends CoreseException {
 
-    public ConfigurationException() {
-        super();
-    }
-
     public ConfigurationException(String msg) {
         super(msg);
-    }
-
-    public ConfigurationException(Throwable t) {
-        super(t);
     }
 
     public ConfigurationException(String msg, Throwable t) {
