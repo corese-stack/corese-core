@@ -6,7 +6,6 @@ import fr.inria.corese.core.next.query.api.dataset.Dataset;
 
 /**
  * A generic SPARQL operation (query or update) on a Corese repository.
- *
  * It allows predefined variable bindings, a custom dataset, and execution options
  * such as inference and timeout.
  */

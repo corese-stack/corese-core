@@ -82,7 +82,6 @@ public enum RDFS implements Vocabulary {
      * Constructor for the RDFS vocabulary enum.
      *
      * @param localName the local name of the IRI
-     * @throws IncorrectFormatException if the namespace and the local name do not form a correct IRI
      */
     RDFS(String localName) {
         this.iri = new SimpleIRI(getNamespace(), localName);

@@ -19,15 +19,6 @@ public class CoreseTime extends CoreseDatetime {
         super(value);
     }
 
-    /**
-     * Constructor for CoreseTime.
-     *
-     * @param value the value of the time literal
-     * @param datatype the datatype of the literal
-     */
-    public CoreseTime(String value, IRI datatype) {
-        super(value, datatype);
-    }
 
     /**
      * Constructor for CoreseTime.

@@ -39,7 +39,6 @@ public enum RDFa implements Vocabulary {
      * Constructor for the RDFa vocabulary enum.
      *
      * @param localName the local name of the IRI
-     * @throws IncorrectFormatException if the namespace and the local name do not form a correct IRI
      */
     RDFa(String localName) {
         this.iri = new SimpleIRI(getNamespace(), localName);

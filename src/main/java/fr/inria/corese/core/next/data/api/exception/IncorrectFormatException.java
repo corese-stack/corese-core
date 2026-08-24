@@ -21,29 +21,4 @@ public class IncorrectFormatException extends CoreseException {
         super(message);
     }
 
-    /**
-     * Constructor for IncorrectFormatException with a cause.
-     *
-     * @param message the error message
-     * @param cause   the cause of the exception
-     */
-    public IncorrectFormatException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    /**
-     * Constructor for IncorrectFormatException with a cause.
-     *
-     * @param cause the cause of the exception
-     */
-    public IncorrectFormatException(Throwable cause) {
-        super(cause);
-    }
-
-    /**
-     * Default constructor for IncorrectFormatException.
-     */
-    public IncorrectFormatException() {
-        super();
-    }
 }

@@ -178,7 +178,7 @@ public enum XSDDatatype implements CoreDatatype {
     TOKEN(XSD.xsdToken.getIRI()),
 
     /**
-     * Language tags per &lt;a href="https://www.rfc-editor.org/rfc/rfc5646">rfc5646&lt;/>
+     * Language tags per &lt;a href="<a href="https://www.rfc-editor.org/rfc/rfc5646">...</a>">rfc5646&lt;/>
      */
     LANGUAGE(XSD.xsdLanguage.getIRI()),
 

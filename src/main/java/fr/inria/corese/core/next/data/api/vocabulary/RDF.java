@@ -5,7 +5,6 @@ import fr.inria.corese.core.next.data.api.term.SimpleIRI;
 
 /**
  * Defines the RDF vocabulary.
- *
  * Each constant represents one term in the RDF namespace.
  */
 @SuppressWarnings("java:S115")
@@ -42,7 +41,6 @@ public enum RDF implements Vocabulary {
      * Constructor for the RDF vocabulary enum.
      *
      * @param localName the local name of the IRI
-     * @throws IncorrectFormatException if the namespace and the local name do not form a correct IRI
      */
     RDF(String localName) {
         this.iri = new SimpleIRI(getNamespace(), localName);

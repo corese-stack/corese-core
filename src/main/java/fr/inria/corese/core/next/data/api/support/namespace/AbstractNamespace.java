@@ -26,10 +26,9 @@ public abstract class AbstractNamespace implements Namespace {
         if (this == object) {
             return true;
         }
-        if (!(object instanceof Namespace)) {
+        if (!(object instanceof Namespace ns)) {
             return false;
         }
-        Namespace ns = (Namespace) object;
         return Objects.equals(getPrefix(), ns.getPrefix())
                 && Objects.equals(getNamespace(), ns.getNamespace());
     }

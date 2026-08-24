@@ -4,7 +4,7 @@ import fr.inria.corese.core.next.data.api.term.BNode;
 
 /**
  * Abstract implementation of the {@link BNode} interface, providing common functionality for blank node representations.
- * A blank node (BNode) https://www.w3.org/TR/rdf12-concepts/#section-blank-nodes
+ * A blank node (BNode) <a href="https://www.w3.org/TR/rdf12-concepts/#section-blank-nodes">...</a>
  */
 public abstract class AbstractBNode implements BNode {
 

@@ -36,8 +36,6 @@ public final class IOConstants {
 
     public static final String QUOTE = "\"";
 
-    public static final String SINGLE_QUOTE = "'";
-
     public static final String AT = "@";
 
     public static final String LT = "<"; // Less than

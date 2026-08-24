@@ -5,7 +5,6 @@ import com.apicatalog.jsonld.JsonLdOptions;
 import com.apicatalog.jsonld.document.Document;
 import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.processor.ToRdfProcessor;
-import com.apicatalog.rdf.api.RdfConsumerException;
 import com.apicatalog.rdf.api.RdfQuadConsumer;
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Resource;
@@ -83,7 +82,6 @@ public class JSONLDParser extends AbstractRDFParser {
      * If baseURI is null, the base URI defined in the option for this parser will be used.
      * @param in      The InputStream to read RDF data from.
      * @param baseURI The base URI for resolving relative URIs in the RDF data.
-     * @throws ParsingException
      */
     @Override
     public void parse(InputStream in, String baseURI) {
@@ -134,7 +132,7 @@ public class JSONLDParser extends AbstractRDFParser {
     private RdfQuadConsumer getConsumer() {
         return new RdfQuadConsumer() {
             @Override
-            public RdfQuadConsumer quad(String subject, String predicate, String object, String datatype, String language, String direction, String graph) throws RdfConsumerException {
+            public RdfQuadConsumer quad(String subject, String predicate, String object, String datatype, String language, String direction, String graph) {
                 Resource subjResource = createSubject(subject);
                 IRI predicateIRI = getValueFactory().createIRI(predicate);
                 Value objValue = createObject(object, datatype, language, direction);

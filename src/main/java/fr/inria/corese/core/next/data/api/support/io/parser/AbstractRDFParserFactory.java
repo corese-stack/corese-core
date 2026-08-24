@@ -13,7 +13,6 @@ public abstract class AbstractRDFParserFactory implements RDFParserFactory {
 
     /**
      * Default constructor for AbstractRDFParserFactory.
-     *
      * The constructor is protected to prevent instantiation from outside the
      * package.
      */
@@ -27,7 +26,7 @@ public abstract class AbstractRDFParserFactory implements RDFParserFactory {
      * @param model   The {@link Model} to which the parsed data will be added.
      * @param factory The {@link ValueFactory} factory to use for creating RDF
      *                values.
-     * @return
+     * @return The created {@link RDFParser} instance.
      */
     @Override
     public RDFParser createRDFParser(RDFFormat format, Model model, ValueFactory factory) {

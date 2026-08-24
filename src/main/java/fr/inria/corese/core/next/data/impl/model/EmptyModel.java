@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.data.impl.model;
 
+import java.io.Serial;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Optional;
@@ -22,6 +23,7 @@ public class EmptyModel extends AbstractModel {
 
     // --- Fields ---
 
+    @Serial
     private static final long serialVersionUID = 3123007631452759092L;
 
     private final Model model;

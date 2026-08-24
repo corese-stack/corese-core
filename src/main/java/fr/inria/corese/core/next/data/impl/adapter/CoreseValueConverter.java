@@ -35,34 +35,19 @@ public final class CoreseValueConverter {
      * @throws IllegalArgumentException if the Value type is unsupported
      */
     public Node toCoreseNode(Value value) {
-        if (value == null) {
-            return null;
-        }
-
-        if (value instanceof CoreseNodeAdapter) {
-            return ((CoreseNodeAdapter) value).getCoreseNode();
-        }
-
-        if (value instanceof IRI) {
-            IRI iri = (IRI) value;
-            return ((CoreseNodeAdapter) factory.createIRI(iri.stringValue())).getCoreseNode();
-        }
-
-        if (value instanceof BNode) {
-            BNode bnode = (BNode) value;
-            return ((CoreseNodeAdapter) factory.createBNode(bnode.getID())).getCoreseNode();
-        }
-
-        if (value instanceof Literal) {
-            Literal literal = (Literal) value;
-            return literal.getLanguage()
+        return switch (value) {
+            case null -> null;
+            case CoreseNodeAdapter coreseNodeAdapter -> coreseNodeAdapter.getCoreseNode();
+            case IRI iri -> ((CoreseNodeAdapter) factory.createIRI(iri.stringValue())).getCoreseNode();
+            case BNode bnode -> ((CoreseNodeAdapter) factory.createBNode(bnode.getID())).getCoreseNode();
+            case Literal literal -> literal.getLanguage()
                     .map(lang -> ((CoreseNodeAdapter) factory.createLiteral(literal.getLabel(), lang)).getCoreseNode())
                     .orElseGet(
                             () -> ((CoreseNodeAdapter) factory.createLiteral(literal.getLabel(), literal.getDatatype()))
                                     .getCoreseNode());
-        }
+            default -> throw new IllegalArgumentException("Unsupported Value type: " + value.getClass());
+        };
 
-        throw new IllegalArgumentException("Unsupported Value type: " + value.getClass());
     }
 
     /**
@@ -75,26 +60,6 @@ public final class CoreseValueConverter {
         return (context != null) ? toCoreseNode(context) : DEFAULT_CORESE_CONTEXT;
     }
 
-    /**
-     * Converts an array of data API resource contexts into Corese nodes.
-     *
-     * @param contexts resource contexts
-     * @return the corresponding Corese context nodes
-     */
-    public Node[] toCoreseContextArray(Resource[] contexts) {
-        if (contexts == null || (contexts.length == 1 && contexts[0] == null)) {
-            return new Node[] { DEFAULT_CORESE_CONTEXT };
-        }
-        if (contexts.length == 0) {
-            return new Node[0];
-        }
-
-        Node[] result = new Node[contexts.length];
-        for (int i = 0; i < contexts.length; i++) {
-            result[i] = toCoreseContext(contexts[i]);
-        }
-        return result;
-    }
 
     // --- Corese to data API conversion methods ---
 

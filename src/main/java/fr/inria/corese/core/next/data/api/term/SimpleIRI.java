@@ -3,11 +3,14 @@ package fr.inria.corese.core.next.data.api.term;
 import fr.inria.corese.core.next.data.api.support.term.AbstractIRI;
 import fr.inria.corese.core.next.data.api.exception.IncorrectFormatException;
 
+import java.io.Serial;
+
 /**
  * Immutable default implementation of an RDF IRI.
  */
 public final class SimpleIRI extends AbstractIRI {
 
+    @Serial
     private static final long serialVersionUID = -2444556019914696994L;
 
     /**

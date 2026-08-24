@@ -47,8 +47,7 @@ public class CoreseStatement extends AbstractStatement implements CoreseEdgeAdap
         Node objectNode = converter.toCoreseNode(object);
         Node contextNode = converter.toCoreseContext(context);
 
-        EdgeImpl edgeImpl = EdgeImpl.create(contextNode, subjectNode, predicateNode, objectNode);
-        this.edge = edgeImpl;
+        this.edge = EdgeImpl.create(contextNode, subjectNode, predicateNode, objectNode);
     }
 
     /**

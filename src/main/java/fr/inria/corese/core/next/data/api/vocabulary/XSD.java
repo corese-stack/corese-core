@@ -5,7 +5,6 @@ import fr.inria.corese.core.next.data.api.term.SimpleIRI;
 
 /**
  * Defines the XSD vocabulary.
- *
  * Because a lot of the datatype names are also Java keywords, the names are exceptions to the naming convention.
  */
 @SuppressWarnings("java:S115")
@@ -199,7 +198,7 @@ public enum XSD implements Vocabulary {
     public static final String NAMESPACE = "http://www.w3.org/2001/XMLSchema#";
     public static final String PREFERRED_PREFIX = "xsd";
 
-    private IRI iri;
+    private final IRI iri;
 
     XSD(String localName) {
         this.iri = new SimpleIRI(getNamespace() + localName);

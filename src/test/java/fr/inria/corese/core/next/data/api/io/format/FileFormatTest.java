@@ -62,8 +62,8 @@ class FileFormatTest {
                 () -> assertEquals(name, format.getName(), "name"),
                 () -> assertEquals(extensions, format.getExtensions(), "extensions"),
                 () -> assertEquals(mimeTypes, format.getMimeTypes(), "mimeTypes"),
-                () -> assertEquals(extensions.get(0), format.getDefaultExtension(), "defaultExtension"),
-                () -> assertEquals(mimeTypes.get(0), format.getDefaultMimeType(), "defaultMimeType"));
+                () -> assertEquals(extensions.getFirst(), format.getDefaultExtension(), "defaultExtension"),
+                () -> assertEquals(mimeTypes.getFirst(), format.getDefaultMimeType(), "defaultMimeType"));
     }
 
     /*
