@@ -28,8 +28,8 @@ class RDFaParserTest extends ParserTestBase {
 
     private static final Logger logger = LoggerFactory.getLogger(RDFaParserTest.class);
 
-    private DefaultRDFParserFactory parserFactory = new DefaultRDFParserFactory();
-    private ValueFactory valueFactory = new CoreseValueFactory();
+    private final DefaultRDFParserFactory parserFactory = new DefaultRDFParserFactory();
+    private final ValueFactory valueFactory = new CoreseValueFactory();
     private final String defaultTurtlePrefixes = """
             @prefix bibo: 	<http://purl.org/ontology/bibo/> .
             @prefix cc: 	<http://creativecommons.org/ns#> .
@@ -515,6 +515,6 @@ class RDFaParserTest extends ParserTestBase {
         StringWriter outWriter = new StringWriter();
         RDFSerializer serializer = (new DefaultRDFSerializerFactory()).createSerializer(RDFFormat.TURTLE, model);
         serializer.write(outWriter);
-        logger.info("{}", outWriter.toString());
+        logger.info("{}", outWriter);
     }
 }

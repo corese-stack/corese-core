@@ -76,8 +76,7 @@ class MemoryMetadataOperationsTest {
 
             Set<IRI> result = metadataOps.getPredicates();
 
-            assertThrows(UnsupportedOperationException.class,
-                    () -> result.add(mock(IRI.class)));
+            assertThrows(UnsupportedOperationException.class, result::clear);
         }
 
         @Test
@@ -119,8 +118,7 @@ class MemoryMetadataOperationsTest {
 
             Set<Resource> result = metadataOps.getSubjects();
 
-            assertThrows(UnsupportedOperationException.class,
-                    () -> result.add(mock(Resource.class)));
+            assertThrows(UnsupportedOperationException.class, result::clear);
         }
     }
 
@@ -154,8 +152,7 @@ class MemoryMetadataOperationsTest {
 
             Set<Value> result = metadataOps.getObjects();
 
-            assertThrows(UnsupportedOperationException.class,
-                    () -> result.add(mock(Value.class)));
+            assertThrows(UnsupportedOperationException.class, result::clear);
         }
     }
 
@@ -187,8 +184,7 @@ class MemoryMetadataOperationsTest {
 
             Set<Resource> result = metadataOps.getContexts();
 
-            assertThrows(UnsupportedOperationException.class,
-                    () -> result.add(mock(Resource.class)));
+            assertThrows(UnsupportedOperationException.class, result::clear);
         }
 
         @Test

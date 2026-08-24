@@ -101,9 +101,8 @@ public class TestExternalPlugin {
     /**
      * Tests the demo plugin with basic operations.
      *
-     * @throws Exception if any operation fails
      */
-    private static void testDemoPlugin() throws Exception {
+    private static void testDemoPlugin() {
         logger.info("Starting plugin tests");
 
         // 1. Create StorageConfig with type="demo"

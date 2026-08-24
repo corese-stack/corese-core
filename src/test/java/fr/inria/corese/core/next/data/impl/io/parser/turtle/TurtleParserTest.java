@@ -22,12 +22,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TurtleParserTest extends ParserTestBase {
 
-    private ValueFactory factory = new CoreseValueFactory();
+    private final ValueFactory factory = new CoreseValueFactory();
 
     @Test
     public void testParseWithPrefixAndTriple() {
-        String turtle = " @prefix ex: <http://example.org/> . " +
-            "ex:Alice ex:knows ex:Bob .";
+        String turtle = """
+                @prefix ex: <http://example.org/> .
+                ex:Alice ex:knows ex:Bob .""";
 
         Model model = createTestModel();
         RDFParser parser = new TurtleParser(model, factory, new TurtleParserOptions.Builder().baseIRI("http://inria.fr/").build());
@@ -38,9 +39,10 @@ public class TurtleParserTest extends ParserTestBase {
 
     @Test
     public void testTripleQuoteLiteralWithDoubleQuoteIncludedTextBefore() {
-        String turtle = "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n" +
-                "<#0214> \n" +
-                "    rdfs:comment \"\"\"blabla\"abc\"\"\"\" .";
+        String turtle = """
+                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+                <#0214>\s
+                    rdfs:comment \"""blabla"abc""\"" .""";
 
         Model model = createTestModel();
         RDFParser parser = new TurtleParser(model, factory, new TurtleParserOptions.Builder().baseIRI("http://inria.fr/").build());
@@ -51,9 +53,10 @@ public class TurtleParserTest extends ParserTestBase {
 
     @Test
     public void testTripleQuoteLiteralWithDoubleQuoteIncludedTextAfter() {
-        String turtle = "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n" +
-                "<#0214> \n" +
-                "    rdfs:comment \"\"\"\"abc\"blabla\"\"\" .";
+        String turtle = """
+                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+                <#0214>\s
+                    rdfs:comment ""\""abc"blabla\""" .""";
 
         Model model = createTestModel();
         RDFParser parser = new TurtleParser(model, factory, new TurtleParserOptions.Builder().baseIRI("http://inria.fr/").build());
@@ -64,9 +67,10 @@ public class TurtleParserTest extends ParserTestBase {
 
     @Test
     public void testTripleQuoteLiteralWithDoubleQuoteIncludedTextBeforeAndAfter() {
-        String turtle = "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n" +
-                "<#0214> \n" +
-                "    rdfs:comment \"\"\"blabla\"abc\"blabla\"\"\" .";
+        String turtle = """
+                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+                <#0214>\s
+                    rdfs:comment \"""blabla"abc"blabla\""" .""";
 
         Model model = createTestModel();
         RDFParser parser = new TurtleParser(model, factory, new TurtleParserOptions.Builder().baseIRI("http://inria.fr/").build());
@@ -99,7 +103,7 @@ public class TurtleParserTest extends ParserTestBase {
                 <#0006> rdfs:label \"""Test 0006: @rel and @rev\""";
                   rdfs:comment \"""Tests @rev and @rel together, with the object being specified by @href, ignoring content\""";
                   .
-                  """;
+                 \s""";
 
         Model model = createTestModel();
         RDFParser parser = new TurtleParser(model, factory, new TurtleParserOptions.Builder().baseIRI("http://inria.fr/").build());

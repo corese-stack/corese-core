@@ -148,7 +148,7 @@ class GraphStorageManagerTest {
 
         @Test
         @DisplayName("Should initialize successfully")
-        void shouldInitializeSuccessfully() throws Exception {
+        void shouldInitializeSuccessfully() {
             StorageConfig config = StorageConfig.builder().build();
 
             storageManager.getLifecycle().initialize(config);
@@ -160,7 +160,7 @@ class GraphStorageManagerTest {
 
         @Test
         @DisplayName("Should shutdown successfully")
-        void shouldShutdownSuccessfully() throws Exception {
+        void shouldShutdownSuccessfully() {
             StorageConfig config = StorageConfig.builder().build();
             storageManager.getLifecycle().initialize(config);
 

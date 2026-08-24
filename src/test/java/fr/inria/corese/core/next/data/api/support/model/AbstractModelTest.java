@@ -459,6 +459,7 @@ class AbstractModelTest {
         private final Map<String, Namespace> namespaces = new HashMap<>();
 
         @Override
+        @SuppressWarnings("NullableProblems")
         public Iterator<Statement> iterator() {
             return statements.iterator();
         }
