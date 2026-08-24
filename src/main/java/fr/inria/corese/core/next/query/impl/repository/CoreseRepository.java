@@ -47,19 +47,6 @@ public final class CoreseRepository implements Repository {
     }
 
     @Override
-    public void setDataDir(File dataDir) {
-        if (isInitialized()) {
-            throw new IllegalStateException("Cannot set data directory after the repository has been initialized.");
-        }
-        this.dataDir = dataDir;
-    }
-
-    @Override
-    public File getDataDir() {
-        return dataDir;
-    }
-
-    @Override
     public void init() throws RepositoryException {
         if (isInitialized()) {
             throw new IllegalStateException("Repository is already initialized.");
