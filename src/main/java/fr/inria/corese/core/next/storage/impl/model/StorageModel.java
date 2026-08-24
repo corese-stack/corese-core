@@ -24,12 +24,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Implementation of the {@link Model} interface backed by a {@link StorageManager}.
+ *
+ * <p>This model is a live view over runtime services. The inherited Java
+ * serialization marker does not imply that its storage manager or value factory
+ * can be serialized independently.</p>
  */
-@SuppressWarnings("java:S2160")
+@SuppressWarnings({"java:S2160", "java:S1948"})
 public final class StorageModel extends AbstractModel {
 
     private final StorageManager storage;
@@ -135,7 +138,8 @@ public final class StorageModel extends AbstractModel {
                 Statement stmt = valueFactory.createStatement(subject, predicate, object);
                 return storage.getMutationOperations()
                         .insertStatement(stmt)
-                        .isSuccess();
+                        .getAffectedStatement()
+                        .isPresent();
             }
 
             // Add once per context
@@ -144,7 +148,8 @@ public final class StorageModel extends AbstractModel {
                 Statement stmt = valueFactory.createStatement(subject, predicate, object, context);
                 changed |= storage.getMutationOperations()
                         .insertStatement(stmt)
-                        .isSuccess();
+                        .getAffectedStatement()
+                        .isPresent();
             }
             return changed;
 
@@ -203,7 +208,7 @@ public final class StorageModel extends AbstractModel {
             StatementPattern pattern = StatementPattern.of(subject, predicate, object, contexts);
             return storage.getQueryOperations()
                     .query(pattern)
-                    .collect(Collectors.toList());
+                    .toList();
         } catch (StorageException e) {
             throw new ModelException(ModelOperation.QUERY,
                     "Failed to query statements", e);
@@ -397,7 +402,7 @@ public final class StorageModel extends AbstractModel {
             StatementPattern pattern = StatementPattern.of(subject, predicate, object, contexts);
             List<Statement> statements = storage.getQueryOperations()
                     .query(pattern)
-                    .collect(Collectors.toList());
+                    .toList();
             return new ModelIterator(statements.iterator());
         } catch (StorageException e) {
             throw new ModelException(ModelOperation.ITERATE,

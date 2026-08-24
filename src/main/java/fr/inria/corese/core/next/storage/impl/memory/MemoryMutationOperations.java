@@ -41,7 +41,7 @@ final class MemoryMutationOperations implements MutationOperations {
         try {
             boolean added = adapter.add(statement);
             return added ? MutationResult.success(statement, "Inserted")
-                    : MutationResult.success(statement, "Already exists");
+                    : MutationResult.success(null, "Already exists");
         } catch (Exception e) {
             throw new StorageException(ErrorCode.MUTATION_FAILED, "Insert failed", e);
         }

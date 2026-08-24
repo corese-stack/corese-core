@@ -125,6 +125,21 @@ class StorageModelTest {
         }
 
         @Test
+        @DisplayName("Should return false when the statement already exists")
+        void shouldReportUnchangedDuplicateInsert() throws StorageException {
+            Resource subject = mock(Resource.class);
+            IRI predicate = mock(IRI.class);
+            Value object = mock(Value.class);
+            Statement stmt = mock(Statement.class);
+
+            when(mockValueFactory.createStatement(subject, predicate, object)).thenReturn(stmt);
+            when(mockMutationOps.insertStatement(stmt))
+                    .thenReturn(MutationResult.success(null, "Already exists"));
+
+            assertFalse(model.add(subject, predicate, object));
+        }
+
+        @Test
         @DisplayName("Should add statement with context")
         void shouldAddStatementWithContext() throws StorageException {
             Resource subject = mock(Resource.class);
@@ -156,7 +171,9 @@ class StorageModelTest {
 
             when(mockValueFactory.createStatement(subject, predicate, object, context1)).thenReturn(stmt1);
             when(mockValueFactory.createStatement(subject, predicate, object, context2)).thenReturn(stmt2);
-            when(mockMutationOps.insertStatement(any())).thenReturn(MutationResult.success(null, "Added"));
+            when(mockMutationOps.insertStatement(any()))
+                    .thenReturn(MutationResult.success(stmt1, "Added"))
+                    .thenReturn(MutationResult.success(stmt2, "Added"));
 
             boolean added = model.add(subject, predicate, object, context1, context2);
 

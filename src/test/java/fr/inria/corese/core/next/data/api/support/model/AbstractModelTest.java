@@ -175,6 +175,19 @@ class AbstractModelTest {
         assertEquals(2, model.size());
     }
 
+    @Test
+    @DisplayName("Model equality and hashCode should follow the Set contract")
+    void testSetEqualityContract() {
+        model.add(subject1, predicate1, object1);
+        model.add(subject2, predicate2, object2, context1);
+        Set<Statement> statementSet = new HashSet<>();
+        model.forEach(statementSet::add);
+
+        assertEquals(model, statementSet);
+        assertEquals(statementSet, model);
+        assertEquals(statementSet.hashCode(), model.hashCode());
+    }
+
     /**
      * Tests removing a statement via remove(Object).
      */

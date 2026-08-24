@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -605,14 +606,17 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof Model model && this.size() == model.size() && model.containsAll(this);
+        return this == o
+                || (o instanceof Set<?> set
+                && size() == set.size()
+                && containsAll(set));
     }
 
     @Override
     public int hashCode() {
-        int hash = 13;
+        int hash = 0;
         for (Statement stat : this) {
-            hash = 31 * hash + stat.hashCode();
+            hash += Objects.hashCode(stat);
         }
         return hash;
     }
