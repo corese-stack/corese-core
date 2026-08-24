@@ -53,17 +53,17 @@ public class NQuadsSerializer extends AbstractLineBasedSerializer {
     public NQuadsSerializer(Model model, IOOptions config) {
         this(model);
         Objects.requireNonNull(config, "NQuadsConfig cannot be null");
-        if(config instanceof AbstractNFamilyOptions nFamilyOptions) {
+        if (config instanceof AbstractNFamilyOptions nFamilyOptions) {
             this.config = nFamilyOptions;
         } else {
-            NTriplesSerializerOptions.Builder optionBuilder = new NTriplesSerializerOptions.Builder();
-            if(config instanceof BaseIRIOptions baseIRIOptions) {
+            NQuadsSerializerOptions.Builder optionBuilder = new NQuadsSerializerOptions.Builder();
+            if (config instanceof BaseIRIOptions baseIRIOptions) {
                 optionBuilder.baseIRI(baseIRIOptions.getBaseIRI());
             }
-            if(config instanceof LineEndingOptions lineEndingOptions) {
+            if (config instanceof LineEndingOptions lineEndingOptions) {
                 optionBuilder.lineEnding(lineEndingOptions.getLineEnding());
             }
-            if(config instanceof BlankNodeIdGenerationOptions blankNodeIdGenerationOptions) {
+            if (config instanceof BlankNodeIdGenerationOptions blankNodeIdGenerationOptions) {
                 optionBuilder.stableBlankNodeIds(blankNodeIdGenerationOptions.stableBlankNodeIds());
             }
             this.config = optionBuilder.build();

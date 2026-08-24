@@ -52,17 +52,17 @@ public class NTriplesSerializer extends AbstractLineBasedSerializer {
     public NTriplesSerializer(Model model, IOOptions config) {
         this(model);
         Objects.requireNonNull(config, "NTriplesConfig cannot be null");
-        if(config instanceof AbstractNFamilyOptions nFamilyOptions) {
+        if (config instanceof AbstractNFamilyOptions nFamilyOptions) {
             this.config = nFamilyOptions;
         } else {
             NTriplesSerializerOptions.Builder optionBuilder = new NTriplesSerializerOptions.Builder();
-            if(config instanceof BaseIRIOptions baseIRIOptions) {
+            if (config instanceof BaseIRIOptions baseIRIOptions) {
                 optionBuilder.baseIRI(baseIRIOptions.getBaseIRI());
             }
-            if(config instanceof LineEndingOptions lineEndingOptions) {
+            if (config instanceof LineEndingOptions lineEndingOptions) {
                 optionBuilder.lineEnding(lineEndingOptions.getLineEnding());
             }
-            if(config instanceof BlankNodeIdGenerationOptions blankNodeIdGenerationOptions) {
+            if (config instanceof BlankNodeIdGenerationOptions blankNodeIdGenerationOptions) {
                 optionBuilder.stableBlankNodeIds(blankNodeIdGenerationOptions.stableBlankNodeIds());
             }
             this.config = optionBuilder.build();
