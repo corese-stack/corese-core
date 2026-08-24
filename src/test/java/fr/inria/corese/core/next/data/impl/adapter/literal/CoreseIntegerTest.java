@@ -1,13 +1,11 @@
 package fr.inria.corese.core.next.data.impl.adapter.literal;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.api.Test;
 
 import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 import fr.inria.corese.core.sparql.datatype.CoreseNumber;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CoreseIntegerTest extends AbstractCoreseNumberTest {
 
@@ -22,7 +20,7 @@ public class CoreseIntegerTest extends AbstractCoreseNumberTest {
     public void getCoreseNode() {
         CoreseInteger coreseInteger = new CoreseInteger(1);
         assertNotNull(coreseInteger.getCoreseNode());
-        assertTrue(coreseInteger.getCoreseNode() instanceof CoreseNumber);
+        assertInstanceOf(CoreseNumber.class, coreseInteger.getCoreseNode());
     }
 
     @Override

@@ -1,10 +1,12 @@
 package fr.inria.corese.core.next.data.impl.io.serializer.ntriples;
 
-import fr.inria.corese.core.next.data.api.term.*;
-import fr.inria.corese.core.next.data.api.model.*;
-import fr.inria.corese.core.next.data.impl.io.serializer.TestStatementFactory;
 import fr.inria.corese.core.next.data.api.exception.SerializationException;
-import org.junit.jupiter.api.Assertions;
+import fr.inria.corese.core.next.data.api.model.Model;
+import fr.inria.corese.core.next.data.api.model.Statement;
+import fr.inria.corese.core.next.data.api.term.IRI;
+import fr.inria.corese.core.next.data.api.term.Literal;
+import fr.inria.corese.core.next.data.api.term.Resource;
+import fr.inria.corese.core.next.data.impl.io.serializer.TestStatementFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -87,7 +89,7 @@ class NTriplesSerializerTest {
                 mockExName.stringValue(),
                 escapeNTriplesString(lexJohn)) + " .\n";
 
-        Assertions.assertEquals(expected, writer.toString());
+        assertEquals(expected, writer.toString());
     }
 
     @Test
@@ -110,7 +112,7 @@ class NTriplesSerializerTest {
                 mockExName.stringValue(),
                 escapeNTriplesString(lexJohn)) + " .\n";
 
-        Assertions.assertEquals(expected, writer.toString());
+        assertEquals(expected, writer.toString());
     }
 
     @Test
@@ -131,7 +133,7 @@ class NTriplesSerializerTest {
                 mockExKnows.stringValue(),
                 mockBNode2.stringValue()) + " .\n";
 
-        Assertions.assertEquals(expected, writer.toString());
+        assertEquals(expected, writer.toString());
     }
 
     @Test
@@ -257,7 +259,7 @@ class NTriplesSerializerTest {
                 mockExName.stringValue(),
                 expectedEscapedLiteral) + " .\n";
 
-        Assertions.assertEquals(expectedOutput, writer.toString());
+        assertEquals(expectedOutput, writer.toString());
     }
 
     @Test
@@ -282,7 +284,7 @@ class NTriplesSerializerTest {
                 escapeNTriplesString(hello),
                 languageTag) + " .\n";
 
-        Assertions.assertEquals(expectedOutput, writer.toString());
+        assertEquals(expectedOutput, writer.toString());
     }
 
 

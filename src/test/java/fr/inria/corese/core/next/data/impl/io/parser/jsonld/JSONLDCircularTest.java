@@ -103,7 +103,7 @@ class JSONLDCircularTest extends ParserTestBase {
                 .storage(StoragePluginManager.create(config))
                 .valueFactory(valueFactory)
                 .build();
-        ;
+
 
         IRI subject1 = valueFactory.createIRI(SUBJECT_1);
         IRI subject2 = valueFactory.createIRI(SUBJECT_2);
@@ -441,13 +441,11 @@ class JSONLDCircularTest extends ParserTestBase {
         // Verify both have blank nodes in correct positions
         assertTrue(originalStmt.getSubject().isBNode(),
                 "Original subject should be blank node");
-        assertTrue(originalStmt.getObject() instanceof BNode,
-                "Original object should be blank node");
+        assertInstanceOf(BNode.class, originalStmt.getObject(), "Original object should be blank node");
 
         assertTrue(deserializedStmt.getSubject().isBNode(),
                 "Deserialized subject should be blank node");
-        assertTrue(deserializedStmt.getObject() instanceof BNode,
-                "Deserialized object should be blank node");
+        assertInstanceOf(BNode.class, deserializedStmt.getObject(), "Deserialized object should be blank node");
 
         // Verify predicates match
         assertEquals(originalStmt.getPredicate(), deserializedStmt.getPredicate(),

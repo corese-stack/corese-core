@@ -25,15 +25,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class JSONLDSerializerTest {
 
     private Model model;
-    private ValueFactory factory = new CoreseValueFactory();
-    private IRI iriNode = factory.createIRI("http://example.org/iri1");
-    private IRI iriPred = factory.createIRI("http://example.org/pred1");
-    private Literal basicLiteral = factory.createLiteral("literal1");
-    private Literal typedLiteral = factory.createLiteral("literal2", factory.createIRI("http://example.org/datatype1"));
-    private Literal langLiteral = factory.createLiteral("literal3", "en");
-    private BNode blankNode = factory.createBNode("blank1");
-    private IRI graph1 = factory.createIRI("http://example.org/graph1");
-    private IRI graph2 = factory.createIRI("http://example.org/graph2");
+    private final ValueFactory factory = new CoreseValueFactory();
+    private final IRI iriNode = factory.createIRI("http://example.org/iri1");
+    private final IRI iriPred = factory.createIRI("http://example.org/pred1");
+    private final Literal basicLiteral = factory.createLiteral("literal1");
+    private final Literal typedLiteral = factory.createLiteral("literal2", factory.createIRI("http://example.org/datatype1"));
+    private final Literal langLiteral = factory.createLiteral("literal3", "en");
+    private final BNode blankNode = factory.createBNode("blank1");
+    private final IRI graph1 = factory.createIRI("http://example.org/graph1");
+    private final IRI graph2 = factory.createIRI("http://example.org/graph2");
 
     @BeforeEach
     public void setUp() {

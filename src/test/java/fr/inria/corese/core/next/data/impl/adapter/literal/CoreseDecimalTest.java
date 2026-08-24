@@ -18,7 +18,7 @@ public class CoreseDecimalTest extends AbstractCoreseNumberTest {
     public void getCoreseNode() {
         CoreseDecimal coreseDecimal = new CoreseDecimal(1.0);
         assertNotNull(coreseDecimal.getCoreseNode());
-        assertTrue(coreseDecimal.getCoreseNode() instanceof CoreseNumber);
+        assertInstanceOf(CoreseNumber.class, coreseDecimal.getCoreseNode());
     }
 
     @Override

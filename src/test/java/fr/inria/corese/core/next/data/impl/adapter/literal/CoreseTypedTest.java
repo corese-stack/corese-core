@@ -76,9 +76,7 @@ public class CoreseTypedTest {
         // Test for creating CoreseTyped with an invalid datatype (e.g., mismatched CoreDatatype and IRI)
         IRI invalidIRI = new CoreseIRI("http://example.com/invalidDatatype");
 
-        Exception exception = assertThrows(IncorrectOperationException.class, () -> {
-            new CoreseTyped(testValue, invalidIRI, testCoreDatatype);
-        });
+        Exception exception = assertThrows(IncorrectOperationException.class, () -> new CoreseTyped(testValue, invalidIRI, testCoreDatatype));
 
         assertEquals("Datatype IRI does not match CoreDatatype's IRI", exception.getMessage());
     }
@@ -105,7 +103,7 @@ public class CoreseTypedTest {
         IDatatype coreseObject = coreseTyped.getIDatatype();
 
         // Validate that getIDatatype() returns the correct CoreseString object
-        assertTrue(coreseObject instanceof CoreseString);
+        assertInstanceOf(CoreseString.class, coreseObject);
     }
 
     @Test
@@ -113,7 +111,7 @@ public class CoreseTypedTest {
         CoreseTyped coreseTyped = new CoreseTyped(testValue);
 
         // Validate that getCoreseNode() returns the correct CoreseString node
-        assertTrue(coreseTyped.getCoreseNode() instanceof CoreseString);
+        assertInstanceOf(CoreseString.class, coreseTyped.getCoreseNode());
     }
 
     @Test
@@ -121,9 +119,7 @@ public class CoreseTypedTest {
         CoreseTyped coreseTyped = new CoreseTyped(testValue);
 
         // Test that setCoreDatatype throws IncorrectOperationException, as it's not allowed
-        assertThrows(IncorrectOperationException.class, () -> {
-            coreseTyped.setCoreDatatype(XSDDatatype.STRING);
-        });
+        assertThrows(IncorrectOperationException.class, () -> coreseTyped.setCoreDatatype(XSDDatatype.STRING));
     }
 
     @Test
@@ -140,6 +136,6 @@ public class CoreseTypedTest {
         CoreseIRI unknown = new CoreseIRI("http://example.org");
         // Expect the default XSDDatatype.STRING
         Literal coreseTyped = new CoreseTyped(testValue, unknown);
-        assertEquals(coreseTyped.getCoreDatatype(), CoreDatatype.NONE);
+        assertEquals(CoreDatatype.NONE, coreseTyped.getCoreDatatype());
     }
 }
