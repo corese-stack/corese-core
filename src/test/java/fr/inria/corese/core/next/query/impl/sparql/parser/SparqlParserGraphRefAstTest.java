@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class SparqlParserGraphRefAstTest extends AbstractSparqlParserFeatureTest {
+class SparqlParserGraphRefAstTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     void constructorGraph() {

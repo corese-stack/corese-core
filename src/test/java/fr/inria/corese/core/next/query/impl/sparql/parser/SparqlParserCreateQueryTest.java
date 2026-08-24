@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class SparqlParserCreateQueryTest extends AbstractSparqlParserFeatureTest {
+class SparqlParserCreateQueryTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("should parse a CREATE GRAPH <iri> query")

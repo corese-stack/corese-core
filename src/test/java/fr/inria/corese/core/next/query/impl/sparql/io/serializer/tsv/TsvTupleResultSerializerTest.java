@@ -7,7 +7,7 @@ import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 import fr.inria.corese.core.next.query.impl.sparql.io.serializer.DefaultResultSerializerFactory;
 import fr.inria.corese.core.next.query.impl.sparql.io.serializer.support.AbstractResultSerializerTest;
 
-public class TsvTupleResultSerializerTest extends AbstractResultSerializerTest {
+class TsvTupleResultSerializerTest extends AbstractResultSerializerTest {
 
     @Override
     protected ResultSerializer getResultSerializer(TupleQueryResult results) {

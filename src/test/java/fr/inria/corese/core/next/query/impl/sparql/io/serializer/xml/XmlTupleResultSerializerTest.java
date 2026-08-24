@@ -15,7 +15,7 @@ import java.io.StringWriter;
 import static fr.inria.corese.core.next.query.impl.sparql.io.serializer.xml.XmlResultConstants.YES_PROPERTY_VALUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class XmlTupleResultSerializerTest extends AbstractResultSerializerTest implements LinksSerializerTest {
+class XmlTupleResultSerializerTest extends AbstractResultSerializerTest implements LinksSerializerTest {
     @Override
     protected ResultSerializer getResultSerializer(TupleQueryResult results) {
         XmlResultSerializerOptions options = new XmlResultSerializerOptions.Builder().setXMLSetting(OutputKeys.STANDALONE, YES_PROPERTY_VALUE).build();
@@ -278,7 +278,7 @@ public class XmlTupleResultSerializerTest extends AbstractResultSerializerTest i
 
     @Test
     @DisplayName("Tests the serialization of results including several links")
-    public void linksTest() {
+    void linksTest() {
         IOOptions options = getOptionsWithLinks();
         ResultSerializer serializer = getResultSerializer(getLinksTestResults(), options);
         StringWriter writer = new StringWriter();

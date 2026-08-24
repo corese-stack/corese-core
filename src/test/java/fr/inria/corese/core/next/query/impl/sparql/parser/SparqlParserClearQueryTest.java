@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class SparqlParserClearQueryTest extends AbstractSparqlParserFeatureTest {
+class SparqlParserClearQueryTest extends AbstractSparqlParserFeatureTest {
     @Test
     void graphQueryTest() {
         QueryParser parser = newParserDefault();

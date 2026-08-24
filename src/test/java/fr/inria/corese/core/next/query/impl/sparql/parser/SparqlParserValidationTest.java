@@ -359,7 +359,7 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Nested
-    public class OperandTypeTest {
+    class OperandTypeTest {
 
         @Test
         @DisplayName("Should accept + operator with numerics")

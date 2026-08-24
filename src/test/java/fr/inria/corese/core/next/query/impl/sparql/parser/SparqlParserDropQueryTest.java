@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class SparqlParserDropQueryTest extends AbstractSparqlParserFeatureTest {
+class SparqlParserDropQueryTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("should parse DROP GRAPH <iri>")

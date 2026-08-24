@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
-public class SparqlParserAskQueryTest extends AbstractSparqlParserFeatureTest {
+class SparqlParserAskQueryTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("should parse a basic ASK WHERE {?s ?p ?o} query")
@@ -386,7 +386,7 @@ public class SparqlParserAskQueryTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("ASK should parse ORDER BY on a visible variable")
-    public void shouldParseAskWithOrderBy() {
+    void shouldParseAskWithOrderBy() {
         SparqlParser parser = newParserDefault();
         QueryAst queryAst = parser.parse("""
                 ASK

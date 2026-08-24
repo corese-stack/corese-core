@@ -4,7 +4,7 @@ import fr.inria.corese.core.next.data.api.io.option.IOOptions;
 import fr.inria.corese.core.next.query.api.io.ResultFormat;
 import fr.inria.corese.core.next.query.api.io.serializer.BooleanResultSerializer;
 
-public class BooleanStringSerializerTest extends AbstractBooleanResultSerializerTest {
+class BooleanStringSerializerTest extends AbstractBooleanResultSerializerTest {
     @Override
     protected BooleanResultSerializer getSerializer(boolean result) {
         return new BooleanStringSerializer(result, ResultFormat.CSV);

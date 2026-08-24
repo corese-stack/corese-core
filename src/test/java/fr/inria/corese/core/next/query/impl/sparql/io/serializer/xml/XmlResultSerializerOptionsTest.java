@@ -12,7 +12,7 @@ import java.util.List;
 import static fr.inria.corese.core.next.query.impl.sparql.io.serializer.support.ResultSerializerTestUtils.MockQueryResults;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class XmlResultSerializerOptionsTest {
+class XmlResultSerializerOptionsTest {
 
     @Test
     @DisplayName("Tests the application of the indent XML option to the serializer")

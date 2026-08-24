@@ -12,7 +12,7 @@ import java.io.StringWriter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class JsonBooleanResultSerializerTest extends AbstractBooleanResultSerializerTest implements LinksSerializerTest {
+class JsonBooleanResultSerializerTest extends AbstractBooleanResultSerializerTest implements LinksSerializerTest {
     @Override
     protected BooleanResultSerializer getSerializer(boolean result) {
         return new JsonBooleanResultSerializer(result);
@@ -51,7 +51,7 @@ public class JsonBooleanResultSerializerTest extends AbstractBooleanResultSerial
 
     @Test
     @DisplayName("Tests the serialization of results including several links")
-    public void linksTest() {
+    void linksTest() {
         ResultSerializer serializer = getSerializer(getLinksTestResults(), getOptionsWithLinks());
         StringWriter writer = new StringWriter();
         serializer.write(writer);
