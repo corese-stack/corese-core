@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.data.api.io.parser;
 
 import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.api.exception.ParsingException;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -26,29 +27,33 @@ public interface RDFParser {
      * Parses RDF data from the specified InputStream or Reader and adds it to the model.
      *
      * @param in      The InputStream to read RDF data from.
+     * @throws ParsingException if an error occurs during parsing
      */
-    void parse(InputStream in);
+    void parse(InputStream in) throws ParsingException;
 
     /**
      * Parses RDF data from the specified InputStream or Reader and adds it to the model.
      *
      * @param in      The InputStream to read RDF data from.
      * @param baseURI The base URI for resolving relative URIs in the RDF data.
+     * @throws ParsingException if an error occurs during parsing
      */
-    void parse(InputStream in, String baseURI);
+    void parse(InputStream in, String baseURI) throws ParsingException;
 
     /**
      * Parses RDF data from the specified InputStream or Reader and adds it to the model.
      *
      * @param reader  The Reader to read RDF data from.
+     * @throws ParsingException if an error occurs during parsing
      */
-    void parse(Reader reader);
+    void parse(Reader reader) throws ParsingException;
 
     /**
      * Parses RDF data from the specified InputStream or Reader and adds it to the model.
      *
      * @param reader  The Reader to read RDF data from.
      * @param baseURI The base URI for resolving relative URIs in the RDF data.
+     * @throws ParsingException if an error occurs during parsing
      */
-    void parse(Reader reader, String baseURI);
+    void parse(Reader reader, String baseURI) throws ParsingException;
 }

@@ -9,8 +9,9 @@ import java.util.Objects;
 import fr.inria.corese.core.next.data.api.model.Model;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.support.io.AbstractIOOptions;
-import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.api.exception.ParsingException;
 import fr.inria.corese.core.next.data.api.io.option.BaseIRIOptions;
+import fr.inria.corese.core.next.data.api.io.option.IOOptions;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
 
 /**
@@ -70,7 +71,7 @@ public abstract class AbstractRDFParser implements RDFParser {
     }
 
     @Override
-    public void parse(InputStream in) {
+    public void parse(InputStream in) throws ParsingException {
         if (getConfig() instanceof BaseIRIOptions baseIRIOptions) {
             String baseIRI = baseIRIOptions.getBaseIRI();
             parse(new InputStreamReader(in, StandardCharsets.UTF_8), baseIRI);
@@ -80,7 +81,7 @@ public abstract class AbstractRDFParser implements RDFParser {
     }
 
     @Override
-    public void parse(Reader reader) {
+    public void parse(Reader reader) throws ParsingException {
         if (getConfig() instanceof BaseIRIOptions baseIRIOptions) {
             String baseIRI = baseIRIOptions.getBaseIRI();
             parse(reader, baseIRI);

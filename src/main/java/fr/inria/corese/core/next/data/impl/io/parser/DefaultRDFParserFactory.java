@@ -39,21 +39,19 @@ public class DefaultRDFParserFactory extends AbstractRDFParserFactory {
      */
     @Override
     public RDFParser createRDFParser(RDFFormat format, Model model, ValueFactory factory, IOOptions config) {
-        if (format == RDFFormat.JSONLD) {
+        if (RDFFormat.JSONLD.equals(format)) {
             return new JSONLDParser(model, factory, config);
-        } else if (format == RDFFormat.TURTLE) {
+        } else if (RDFFormat.TURTLE.equals(format)) {
             return new TurtleParser(model, factory, config);
-        } else if (format == RDFFormat.NTRIPLES) {
+        } else if (RDFFormat.NTRIPLES.equals(format)) {
             return new NTriplesParser(model, factory, config);
-        } else if (format == RDFFormat.NQUADS) {
+        } else if (RDFFormat.NQUADS.equals(format) || RDFFormat.RDFC_1_0.equals(format)) {
             return new NQuadsParser(model, factory, config);
-        } else if (format == RDFFormat.RDFXML) {
+        } else if (RDFFormat.RDFXML.equals(format)) {
             return new RDFXMLParser(model, factory, config);
-        } else if (format == RDFFormat.TRIG) {
-             return new TriGParser(model, factory, config);
-        } else if(format == RDFFormat.RDFC_1_0) {
-            return new NQuadsParser(model, factory, config);
-        } else if (format == RDFFormat.RDFA) {
+        } else if (RDFFormat.TRIG.equals(format)) {
+            return new TriGParser(model, factory, config);
+        } else if (RDFFormat.RDFA.equals(format)) {
             return new RDFaParser(model, factory, config);
         }
         throw new IllegalArgumentException("Unsupported format: " + format);
@@ -68,19 +66,19 @@ public class DefaultRDFParserFactory extends AbstractRDFParserFactory {
      */
     @Override
     public RDFParser createRDFParser(RDFFormat format, Model model, ValueFactory factory) {
-        if (format == RDFFormat.JSONLD) {
+        if (RDFFormat.JSONLD.equals(format)) {
             return new JSONLDParser(model, factory);
-        } else if (format == RDFFormat.TURTLE) {
+        } else if (RDFFormat.TURTLE.equals(format)) {
             return new TurtleParser(model, factory);
-        } else if (format == RDFFormat.NTRIPLES) {
+        } else if (RDFFormat.NTRIPLES.equals(format)) {
             return new NTriplesParser(model, factory);
-        } else if (format == RDFFormat.NQUADS) {
+        } else if (RDFFormat.NQUADS.equals(format) || RDFFormat.RDFC_1_0.equals(format)) {
             return new NQuadsParser(model, factory);
-        } else if (format == RDFFormat.RDFXML) {
+        } else if (RDFFormat.RDFXML.equals(format)) {
             return new RDFXMLParser(model, factory);
-        } else if (format == RDFFormat.TRIG) {
+        } else if (RDFFormat.TRIG.equals(format)) {
             return new TriGParser(model, factory);
-        } else if (format == RDFFormat.RDFA) {
+        } else if (RDFFormat.RDFA.equals(format)) {
             return new RDFaParser(model, factory);
         }
         throw new IllegalArgumentException("Unsupported format: " + format);
