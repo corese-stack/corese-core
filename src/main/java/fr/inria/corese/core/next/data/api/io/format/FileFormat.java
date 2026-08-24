@@ -68,7 +68,7 @@ public class FileFormat {
      * @return The first extension in the list.
      */
     public String getDefaultExtension() {
-        return extensions.get(0);
+        return extensions.getFirst();
     }
 
     /**
@@ -77,7 +77,7 @@ public class FileFormat {
      * @return The first MIME type in the list.
      */
     public String getDefaultMimeType() {
-        return mimeTypes.get(0);
+        return mimeTypes.getFirst();
     }
 
     @Override
@@ -101,5 +101,4 @@ public class FileFormat {
         return Objects.hash(name.toLowerCase(), extensions, mimeTypes);
     }
 
-    public static final FileFormat PLAIN_TEXT = new FileFormat("plain text", List.of("txt"), List.of("text/plain"));
 }

@@ -2,11 +2,14 @@ package fr.inria.corese.core.next.data.api.exception;
 
 import fr.inria.corese.core.next.common.exception.CoreseException;
 
+import java.io.Serial;
+
 /**
  * Exception thrown when RDF input cannot be parsed.
  */
 public class ParsingException extends CoreseException {
 
+    @Serial
     private static final long serialVersionUID = -2053549958572141648L;
 
     /**

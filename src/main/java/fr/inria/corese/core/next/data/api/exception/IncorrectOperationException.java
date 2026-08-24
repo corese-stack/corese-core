@@ -2,11 +2,14 @@ package fr.inria.corese.core.next.data.api.exception;
 
 import fr.inria.corese.core.next.common.exception.CoreseException;
 
+import java.io.Serial;
+
 /**
  * Used to indicate that a function should not be used with the current object or with the object in its current state
  */
 public class IncorrectOperationException extends CoreseException {
 
+    @Serial
     private static final long serialVersionUID = 5310252146173604452L;
     /**
      * Constructor for IncorrectOperationException.
