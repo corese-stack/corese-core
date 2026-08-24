@@ -41,6 +41,7 @@ public final class CoreseBindingSet implements BindingSet {
     }
 
     @Override
+    @SuppressWarnings("NullableProblems")
     public Iterator<Binding> iterator() {
         return this.mapping.getMap().entrySet().stream()
                 .<Binding>map(entry -> new CoreseBinding(

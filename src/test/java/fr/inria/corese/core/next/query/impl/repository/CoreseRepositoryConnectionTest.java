@@ -43,13 +43,12 @@ class CoreseRepositoryConnectionTest {
     private static final String KNOWS = "http://example.org/knows";
 
     private ValueFactory vf;
-    private MemoryStorageManager storage;
     private CoreseRepository repository;
 
     @BeforeEach
     void setUp() throws RepositoryException {
         vf = new CoreseValueFactory();
-        storage = MemoryStorageManager.builder().build();
+        MemoryStorageManager storage = MemoryStorageManager.builder().build();
         repository = new CoreseRepository(storage);
         repository.init();
 
@@ -68,7 +67,7 @@ class CoreseRepositoryConnectionTest {
 
         @Test
         @DisplayName("Returns TupleQuery for a SELECT query")
-        void returnsTupleQueryForSelect() throws Exception {
+        void returnsTupleQueryForSelect() {
             try (RepositoryConnection conn = repository.getConnection()) {
                 TupleQuery q = conn.prepareTupleQuery(QueryLanguage.SPARQL, "SELECT * WHERE { ?s ?p ?o }");
                 assertNotNull(q);
@@ -78,24 +77,24 @@ class CoreseRepositoryConnectionTest {
 
         @Test
         @DisplayName("evaluate() returns the matching triples")
-        void evaluateReturnsMatchingTriples() throws Exception {
+        void evaluateReturnsMatchingTriples() {
             try (RepositoryConnection conn = repository.getConnection()) {
                 TupleQuery q = conn.prepareTupleQuery(QueryLanguage.SPARQL, "SELECT * WHERE { ?s ?p ?o }");
-                TupleQueryResult result = q.evaluate();
-
-                assertEquals(List.of("s", "p", "o"), result.getBindingNames());
-                assertTrue(result.hasNext());
-                BindingSet bs = result.next();
-                assertEquals(ALICE, bs.getValue("s").stringValue());
-                assertEquals(KNOWS, bs.getValue("p").stringValue());
-                assertEquals(BOB, bs.getValue("o").stringValue());
-                assertFalse(result.hasNext());
+                try (TupleQueryResult result = q.evaluate()) {
+                    assertEquals(List.of("s", "p", "o"), result.getBindingNames());
+                    assertTrue(result.hasNext());
+                    BindingSet bs = result.next();
+                    assertEquals(ALICE, bs.getValue("s").stringValue());
+                    assertEquals(KNOWS, bs.getValue("p").stringValue());
+                    assertEquals(BOB, bs.getValue("o").stringValue());
+                    assertFalse(result.hasNext());
+                }
             }
         }
 
         @Test
         @DisplayName("Throws QuerySyntaxException for a non-SELECT query string")
-        void throwsSyntaxExceptionForAsk() throws Exception {
+        void throwsSyntaxExceptionForAsk() {
             try (RepositoryConnection conn = repository.getConnection()) {
                 assertThrows(QuerySyntaxException.class, () ->
                         conn.prepareTupleQuery(QueryLanguage.SPARQL, "ASK WHERE { ?s ?p ?o }"));
@@ -104,7 +103,7 @@ class CoreseRepositoryConnectionTest {
 
         @Test
         @DisplayName("Throws QuerySyntaxException for invalid SPARQL")
-        void throwsSyntaxExceptionForInvalidSparql() throws Exception {
+        void throwsSyntaxExceptionForInvalidSparql() {
             try (RepositoryConnection conn = repository.getConnection()) {
                 assertThrows(QuerySyntaxException.class, () ->
                         conn.prepareTupleQuery(QueryLanguage.SPARQL, "THIS IS NOT SPARQL"));
@@ -122,7 +121,7 @@ class CoreseRepositoryConnectionTest {
 
         @Test
         @DisplayName("Returns BooleanQuery for an ASK query")
-        void returnsBooleanQueryForAsk() throws Exception {
+        void returnsBooleanQueryForAsk() {
             try (RepositoryConnection conn = repository.getConnection()) {
                 BooleanQuery q = conn.prepareBooleanQuery(QueryLanguage.SPARQL, "ASK WHERE { ?s ?p ?o }");
                 assertNotNull(q);
@@ -132,7 +131,7 @@ class CoreseRepositoryConnectionTest {
 
         @Test
         @DisplayName("evaluate() returns true when data matches")
-        void evaluateReturnsTrueWhenDataExists() throws Exception {
+        void evaluateReturnsTrueWhenDataExists() {
             try (RepositoryConnection conn = repository.getConnection()) {
                 BooleanQuery q = conn.prepareBooleanQuery(QueryLanguage.SPARQL, "ASK WHERE { ?s ?p ?o }");
                 assertTrue(q.evaluate());
@@ -141,7 +140,7 @@ class CoreseRepositoryConnectionTest {
 
         @Test
         @DisplayName("evaluate() returns false when no data matches")
-        void evaluateReturnsFalseWhenNoMatch() throws Exception {
+        void evaluateReturnsFalseWhenNoMatch() {
             try (RepositoryConnection conn = repository.getConnection()) {
                 BooleanQuery q = conn.prepareBooleanQuery(QueryLanguage.SPARQL,
                         "ASK WHERE { <http://example.org/nobody> ?p ?o }");
@@ -151,7 +150,7 @@ class CoreseRepositoryConnectionTest {
 
         @Test
         @DisplayName("Throws QuerySyntaxException for a non-ASK query string")
-        void throwsSyntaxExceptionForSelect() throws Exception {
+        void throwsSyntaxExceptionForSelect() {
             try (RepositoryConnection conn = repository.getConnection()) {
                 assertThrows(QuerySyntaxException.class, () ->
                         conn.prepareBooleanQuery(QueryLanguage.SPARQL, "SELECT * WHERE { ?s ?p ?o }"));
@@ -169,7 +168,7 @@ class CoreseRepositoryConnectionTest {
 
         @Test
         @DisplayName("Returns GraphQuery for a CONSTRUCT query")
-        void returnsGraphQueryForConstruct() throws Exception {
+        void returnsGraphQueryForConstruct() {
             try (RepositoryConnection conn = repository.getConnection()) {
                 GraphQuery q = conn.prepareGraphQuery(QueryLanguage.SPARQL,
                         "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o }");
@@ -180,35 +179,36 @@ class CoreseRepositoryConnectionTest {
 
         @Test
         @DisplayName("CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o } returns the stored triple")
-        void constructSpoReturnsStoredTriple() throws Exception {
+        void constructSpoReturnsStoredTriple() {
             try (RepositoryConnection conn = repository.getConnection()) {
                 GraphQuery q = conn.prepareGraphQuery(QueryLanguage.SPARQL,
                         "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o }");
-                GraphQueryResult result = q.evaluate();
-
-                assertTrue(result.hasNext(), "Expected at least one constructed statement");
-                Statement stmt = result.next();
-                assertEquals(ALICE, stmt.getSubject().stringValue());
-                assertEquals(KNOWS, stmt.getPredicate().stringValue());
-                assertEquals(BOB,   stmt.getObject().stringValue());
-                assertFalse(result.hasNext(), "Expected exactly one statement");
+                try (GraphQueryResult result = q.evaluate()) {
+                    assertTrue(result.hasNext(), "Expected at least one constructed statement");
+                    Statement stmt = result.next();
+                    assertEquals(ALICE, stmt.getSubject().stringValue());
+                    assertEquals(KNOWS, stmt.getPredicate().stringValue());
+                    assertEquals(BOB,   stmt.getObject().stringValue());
+                    assertFalse(result.hasNext(), "Expected exactly one statement");
+                }
             }
         }
 
         @Test
         @DisplayName("CONSTRUCT returns empty result when WHERE clause matches nothing")
-        void constructReturnsEmptyWhenNoMatch() throws Exception {
+        void constructReturnsEmptyWhenNoMatch() {
             try (RepositoryConnection conn = repository.getConnection()) {
                 GraphQuery q = conn.prepareGraphQuery(QueryLanguage.SPARQL,
                         "CONSTRUCT { ?s ?p ?o } WHERE { ?s <http://example.org/missing> ?o }");
-                GraphQueryResult result = q.evaluate();
-                assertFalse(result.hasNext(), "Expected no statements when WHERE has no match");
+                try (GraphQueryResult result = q.evaluate()) {
+                    assertFalse(result.hasNext(), "Expected no statements when WHERE has no match");
+                }
             }
         }
 
         @Test
         @DisplayName("Throws QuerySyntaxException for a non-CONSTRUCT/DESCRIBE query string")
-        void throwsSyntaxExceptionForSelect() throws Exception {
+        void throwsSyntaxExceptionForSelect() {
             try (RepositoryConnection conn = repository.getConnection()) {
                 assertThrows(QuerySyntaxException.class, () ->
                         conn.prepareGraphQuery(QueryLanguage.SPARQL, "SELECT * WHERE { ?s ?p ?o }"));
@@ -226,7 +226,7 @@ class CoreseRepositoryConnectionTest {
 
         @Test
         @DisplayName("Returns Update for a valid INSERT DATA")
-        void returnsUpdateForInsertData() throws Exception {
+        void returnsUpdateForInsertData() {
             try (RepositoryConnection conn = repository.getConnection()) {
                 Update u = conn.prepareUpdate(QueryLanguage.SPARQL,
                         "INSERT DATA { <http://ex.org/s> <http://ex.org/p> <http://ex.org/o> }");
@@ -236,7 +236,7 @@ class CoreseRepositoryConnectionTest {
 
         @Test
         @DisplayName("INSERT DATA inserts a triple into the store")
-        void insertDataInsertsTriple() throws Exception {
+        void insertDataInsertsTriple() {
             String carol = "http://example.org/carol";
             try (RepositoryConnection conn = repository.getConnection()) {
                 Update u = conn.prepareUpdate(QueryLanguage.SPARQL,
@@ -247,11 +247,12 @@ class CoreseRepositoryConnectionTest {
             try (RepositoryConnection conn = repository.getConnection()) {
                 TupleQuery q = conn.prepareTupleQuery(QueryLanguage.SPARQL,
                         "SELECT ?o WHERE { <" + ALICE + "> <" + KNOWS + "> ?o }");
-                TupleQueryResult result = q.evaluate();
                 boolean foundCarol = false;
-                while (result.hasNext()) {
-                    if (carol.equals(result.next().getValue("o").stringValue())) {
-                        foundCarol = true;
+                try (TupleQueryResult result = q.evaluate()) {
+                    while (result.hasNext()) {
+                        if (carol.equals(result.next().getValue("o").stringValue())) {
+                            foundCarol = true;
+                        }
                     }
                 }
                 assertTrue(foundCarol, "INSERT DATA should have added alice→knows→carol");
@@ -260,7 +261,7 @@ class CoreseRepositoryConnectionTest {
 
         @Test
         @DisplayName("DELETE DATA removes a triple from the store")
-        void deleteDataRemovesTriple() throws Exception {
+        void deleteDataRemovesTriple() {
             try (RepositoryConnection conn = repository.getConnection()) {
                 Update u = conn.prepareUpdate(QueryLanguage.SPARQL,
                         "DELETE DATA { <" + ALICE + "> <" + KNOWS + "> <" + BOB + "> }");
@@ -284,7 +285,7 @@ class CoreseRepositoryConnectionTest {
 
         @Test
         @DisplayName("setBinding / getBindings round-trip")
-        void bindingsRoundTrip() throws Exception {
+        void bindingsRoundTrip() {
             try (RepositoryConnection conn = repository.getConnection()) {
                 TupleQuery q = conn.prepareTupleQuery(QueryLanguage.SPARQL, "SELECT * WHERE { ?s ?p ?o }");
                 Value v = vf.createIRI("http://example.org/x");
@@ -298,7 +299,7 @@ class CoreseRepositoryConnectionTest {
 
         @Test
         @DisplayName("removeBinding removes the binding")
-        void removeBindingWorks() throws Exception {
+        void removeBindingWorks() {
             try (RepositoryConnection conn = repository.getConnection()) {
                 TupleQuery q = conn.prepareTupleQuery(QueryLanguage.SPARQL, "SELECT * WHERE { ?s ?p ?o }");
                 Value v = vf.createIRI("http://example.org/x");
@@ -312,7 +313,7 @@ class CoreseRepositoryConnectionTest {
 
         @Test
         @DisplayName("clearBindings removes all bindings")
-        void clearBindingsWorks() throws Exception {
+        void clearBindingsWorks() {
             try (RepositoryConnection conn = repository.getConnection()) {
                 TupleQuery q = conn.prepareTupleQuery(QueryLanguage.SPARQL, "SELECT * WHERE { ?s ?p ?o }");
 
@@ -327,7 +328,7 @@ class CoreseRepositoryConnectionTest {
 
         @Test
         @DisplayName("setDataset / getDataset round-trip")
-        void datasetRoundTrip() throws Exception {
+        void datasetRoundTrip() {
             try (RepositoryConnection conn = repository.getConnection()) {
                 TupleQuery q = conn.prepareTupleQuery(QueryLanguage.SPARQL, "SELECT * WHERE { ?s ?p ?o }");
                 Dataset ds = new CoreseDataset().addDefaultGraph("http://example.org/g");
@@ -340,7 +341,7 @@ class CoreseRepositoryConnectionTest {
 
         @Test
         @DisplayName("setMaxExecutionTime / getMaxExecutionTime round-trip")
-        void timeoutRoundTrip() throws Exception {
+        void timeoutRoundTrip() {
             try (RepositoryConnection conn = repository.getConnection()) {
                 TupleQuery q = conn.prepareTupleQuery(QueryLanguage.SPARQL, "SELECT * WHERE { ?s ?p ?o }");
 
@@ -352,7 +353,7 @@ class CoreseRepositoryConnectionTest {
 
         @Test
         @DisplayName("setIncludeInferred defaults to true")
-        void includeInferredDefaultsToTrue() throws Exception {
+        void includeInferredDefaultsToTrue() {
             try (RepositoryConnection conn = repository.getConnection()) {
                 TupleQuery q = conn.prepareTupleQuery(QueryLanguage.SPARQL, "SELECT * WHERE { ?s ?p ?o }");
                 assertTrue(q.isIncludeInferred());

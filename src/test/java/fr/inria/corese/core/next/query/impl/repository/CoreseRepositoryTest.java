@@ -12,12 +12,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class CoreseRepositoryTest {
 
-    private MemoryStorageManager storage;
     private CoreseRepository repository;
 
     @BeforeEach
     void setUp() {
-        storage = MemoryStorageManager.builder().build();
+        MemoryStorageManager storage = MemoryStorageManager.builder().build();
         repository = new CoreseRepository(storage);
     }
 
@@ -39,10 +38,10 @@ class CoreseRepositoryTest {
         }
 
         @Test
-        @DisplayName("init() twice throws IllegalStateException")
+        @DisplayName("init() twice throws RepositoryException")
         void initTwiceThrows() throws RepositoryException {
             repository.init();
-            assertThrows(IllegalStateException.class, repository::init);
+            assertThrows(RepositoryException.class, repository::init);
         }
 
         @Test

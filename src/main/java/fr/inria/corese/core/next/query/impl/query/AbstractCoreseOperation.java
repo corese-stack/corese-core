@@ -98,34 +98,29 @@ abstract class AbstractCoreseOperation implements Operation {
         return maxExecutionTime;
     }
 
-    private static final class MapBackedBindingSet implements BindingSet {
-
-        private final Map<String, Value> map;
-
-        MapBackedBindingSet(Map<String, Value> map) {
-            this.map = map;
-        }
+    private record MapBackedBindingSet(Map<String, Value> map) implements BindingSet {
 
         @Override
-        public Set<String> getBindingNames() {
-            return Collections.unmodifiableSet(map.keySet());
-        }
+            public Set<String> getBindingNames() {
+                return Collections.unmodifiableSet(map.keySet());
+            }
 
-        @Override
-        public boolean hasBinding(String name) {
-            return map.containsKey(name);
-        }
+            @Override
+            public boolean hasBinding(String name) {
+                return map.containsKey(name);
+            }
 
-        @Override
-        public Value getValue(String name) {
-            return map.get(name);
-        }
+            @Override
+            public Value getValue(String name) {
+                return map.get(name);
+            }
 
-        @Override
-        public Iterator<Binding> iterator() {
-            return map.entrySet().stream()
-                    .<Binding>map(e -> new CoreseBinding(e.getKey(), e.getValue()))
-                    .iterator();
+            @Override
+            @SuppressWarnings("NullableProblems")
+            public Iterator<Binding> iterator() {
+                return map.entrySet().stream()
+                        .<Binding>map(e -> new CoreseBinding(e.getKey(), e.getValue()))
+                        .iterator();
+            }
         }
-    }
 }

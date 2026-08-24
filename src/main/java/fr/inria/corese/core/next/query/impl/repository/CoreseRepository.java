@@ -10,7 +10,6 @@ import fr.inria.corese.core.next.storage.api.lifecycle.LifecycleState;
 import fr.inria.corese.core.next.storage.api.config.StorageConfig;
 import fr.inria.corese.core.next.storage.api.exception.StorageException;
 
-import java.io.File;
 
 /**
  * Corese implementation of {@link Repository}.
@@ -39,7 +38,6 @@ public final class CoreseRepository implements Repository {
 
     private final StorageManager storage;
     private final ValueFactory valueFactory;
-    private File dataDir;
 
     public CoreseRepository(StorageManager storage) {
         this.storage = storage;
@@ -49,7 +47,7 @@ public final class CoreseRepository implements Repository {
     @Override
     public void init() throws RepositoryException {
         if (isInitialized()) {
-            throw new IllegalStateException("Repository is already initialized.");
+            throw new RepositoryException("Repository is already initialized.");
         }
         try {
             storage.getLifecycle().initialize(StorageConfig.builder().build());
