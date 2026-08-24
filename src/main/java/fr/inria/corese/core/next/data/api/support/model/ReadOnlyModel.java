@@ -17,6 +17,7 @@ import fr.inria.corese.core.next.data.api.term.Value;
  * A read-only wrapper for a {@link Model}. All modification operations throw
  * {@link UnsupportedOperationException}.
  */
+@SuppressWarnings("java:S2160")
 public class ReadOnlyModel extends AbstractModel {
 
 	@Serial

@@ -71,7 +71,7 @@ public abstract class AbstractRDFParser implements RDFParser {
 
     @Override
     public void parse(InputStream in) {
-        if(getConfig() instanceof BaseIRIOptions baseIRIOptions) {
+        if (getConfig() instanceof BaseIRIOptions baseIRIOptions) {
             String baseIRI = baseIRIOptions.getBaseIRI();
             parse(new InputStreamReader(in, StandardCharsets.UTF_8), baseIRI);
         } else {
@@ -81,7 +81,7 @@ public abstract class AbstractRDFParser implements RDFParser {
 
     @Override
     public void parse(Reader reader) {
-        if(getConfig() instanceof BaseIRIOptions baseIRIOptions) {
+        if (getConfig() instanceof BaseIRIOptions baseIRIOptions) {
             String baseIRI = baseIRIOptions.getBaseIRI();
             parse(reader, baseIRI);
         } else {

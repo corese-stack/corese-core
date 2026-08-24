@@ -7,6 +7,9 @@ import fr.inria.corese.core.next.data.api.io.option.IOOptions;
  */
 public abstract class AbstractIOOptions implements IOOptions {
 
+    protected AbstractIOOptions() {
+    }
+
     /**
      * Builder class for constructing instances of IOOptions.
      */

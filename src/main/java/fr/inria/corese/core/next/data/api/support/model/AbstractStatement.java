@@ -27,11 +27,11 @@ public abstract class AbstractStatement implements Statement {
      */
     @Override
     public boolean equals(Object obj) {
-        return this == obj || obj instanceof Statement
-                && getObject().equals(((Statement) obj).getObject())
-                && getSubject().equals(((Statement) obj).getSubject())
-                && getPredicate().equals(((Statement) obj).getPredicate())
-                && Objects.equals(getContext(), ((Statement) obj).getContext());
+        return this == obj || (obj instanceof Statement statement
+                && getObject().equals(statement.getObject())
+                && getSubject().equals(statement.getSubject())
+                && getPredicate().equals(statement.getPredicate())
+                && Objects.equals(getContext(), statement.getContext()));
     }
 
     /**
