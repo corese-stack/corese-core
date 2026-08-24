@@ -13,9 +13,11 @@ import fr.inria.corese.core.next.storage.impl.graph.GraphStorageManager;
  */
 public class GraphStoragePlugin implements StoragePlugin {
 
+    private static final String PLUGIN_NAME = "graph";
+
     @Override
     public String getName() {
-        return "graph";
+        return PLUGIN_NAME;
     }
 
     @Override
@@ -29,14 +31,14 @@ public class GraphStoragePlugin implements StoragePlugin {
             return false;
         }
         return config.getType()
-                .map("graph"::equalsIgnoreCase)
+                .map(PLUGIN_NAME::equalsIgnoreCase)
                 .orElse(false);
     }
 
     @Override
     public StorageManager create(StorageConfig config) throws PluginException {
         try {
-            Graph graph = config.getProperty("graph", Graph.class)
+            Graph graph = config.getProperty(PLUGIN_NAME, Graph.class)
                     .orElseThrow(() -> new PluginException("Graph instance required in config properties"));
 
             ValueFactory factory = config.getProperty("valueFactory", ValueFactory.class)

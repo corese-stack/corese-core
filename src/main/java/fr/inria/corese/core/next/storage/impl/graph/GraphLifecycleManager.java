@@ -12,6 +12,7 @@ import java.util.Optional;
 /**
  * Lifecycle manager for {@link GraphStorageManager}.
  */
+@SuppressWarnings("java:S3077")
 final class GraphLifecycleManager implements StorageLifecycle {
 
     private final Graph graph;

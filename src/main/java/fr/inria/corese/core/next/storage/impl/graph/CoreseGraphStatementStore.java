@@ -3,13 +3,18 @@ package fr.inria.corese.core.next.storage.impl.graph;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.next.data.api.term.*;
-import fr.inria.corese.core.next.data.api.model.*;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
+import fr.inria.corese.core.next.data.api.model.Statement;
+import fr.inria.corese.core.next.data.api.term.BNode;
+import fr.inria.corese.core.next.data.api.term.IRI;
+import fr.inria.corese.core.next.data.api.term.Literal;
+import fr.inria.corese.core.next.data.api.term.Resource;
+import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -382,8 +387,9 @@ record CoreseGraphStatementStore(Graph graph, ValueFactory valueFactory) {
             Literal literal = (Literal) value;
             String label = literal.getLabel();
 
-            if (literal.getLanguage().isPresent()) {
-                String lang = literal.getLanguage().get();
+            Optional<String> langOpt = literal.getLanguage();
+            if (langOpt.isPresent()) {
+                String lang = langOpt.get();
                 return graph.addLiteral(label, null, lang);
             } else if (literal.getDatatype() != null) {
                 String datatypeIRI = literal.getDatatype().stringValue();
