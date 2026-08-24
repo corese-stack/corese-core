@@ -20,12 +20,13 @@ import fr.inria.corese.core.sparql.api.IDatatype;
  * {@link CoreseDatatypeAdapter}.
  */
 
+@SuppressWarnings("java:S2160")
 public class CoreseLanguageTaggedStringLiteral extends AbstractStringLiteral implements CoreseDatatypeAdapter {
     /**
      * The Corese object that holds the literal value and language tag in the old
      * API.
      */
-    private final fr.inria.corese.core.sparql.datatype.CoreseLiteral coreseObject;
+    private final transient fr.inria.corese.core.sparql.datatype.CoreseLiteral coreseObject;
 
     /**
      * The language tag associated with the literal.
@@ -50,8 +51,8 @@ public class CoreseLanguageTaggedStringLiteral extends AbstractStringLiteral imp
      */
     public CoreseLanguageTaggedStringLiteral(IDatatype coreseObject) {
         super(new CoreseIRI(coreseObject.getDatatypeURI()));
-        if (coreseObject instanceof fr.inria.corese.core.sparql.datatype.CoreseLiteral) {
-            this.coreseObject = (fr.inria.corese.core.sparql.datatype.CoreseLiteral) coreseObject;
+        if (coreseObject instanceof fr.inria.corese.core.sparql.datatype.CoreseLiteral literal) {
+            this.coreseObject = literal;
             this.language = coreseObject.getLang();
             this.value = coreseObject.getLabel();
         } else {
@@ -76,6 +77,7 @@ public class CoreseLanguageTaggedStringLiteral extends AbstractStringLiteral imp
 
     @Override
     public void setCoreDatatype(CoreDatatype coreDatatype) {
+        // Intentionally no-op: language-tagged string literal datatype is fixed to rdf:langString.
     }
 
     @Override
@@ -95,6 +97,7 @@ public class CoreseLanguageTaggedStringLiteral extends AbstractStringLiteral imp
      * @return An {@link Optional} containing the language tag, or an empty
      *         {@link Optional} if no language is set.
      */
+    @Override
     public Optional<String> getLanguage() {
         return Optional.ofNullable(language);
     }
@@ -120,6 +123,7 @@ public class CoreseLanguageTaggedStringLiteral extends AbstractStringLiteral imp
      *
      * @return The datatype IRI for language-tagged string literals.
      */
+    @Override
     public IRI getDatatype() {
         return RDFDatatype.LANGSTRING.getIRI();
     }

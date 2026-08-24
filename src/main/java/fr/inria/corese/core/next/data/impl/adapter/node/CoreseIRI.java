@@ -9,9 +9,10 @@ import fr.inria.corese.core.sparql.datatype.CoreseURI;
 /**
  * Wrapper for Corese Node that represents an IRI
  */
+@SuppressWarnings("java:S2160")
 public class CoreseIRI extends AbstractIRI implements CoreseNodeAdapter {
 
-    private final Node node;
+    private final transient Node node;
 
     /**
      * Constructor for CoreseIRI.
@@ -40,7 +41,7 @@ public class CoreseIRI extends AbstractIRI implements CoreseNodeAdapter {
      */
     public CoreseIRI(Node node) {
         super(node.getLabel());
-        if(node.isConstant() && ! node.isBlank() && node.getNodeKind() == IDatatype.NodeKind.URI ) {
+        if (node.isConstant() && !node.isBlank() && node.getNodeKind() == IDatatype.NodeKind.URI) {
             this.node = node;
         } else {
             throw new IllegalArgumentException("Node must be an URI");

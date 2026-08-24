@@ -15,11 +15,12 @@ import fr.inria.corese.core.sparql.datatype.CoreseBlankNode;
  * creating a BNode either from a Corese blank node object or a given string
  * identifier.
  */
+@SuppressWarnings("java:S2160")
 public class CoreseBNode extends AbstractBNode implements CoreseNodeAdapter {
     /**
      * The Corese object representing the blank node in the old API.
      */
-    private final CoreseBlankNode coreseObject;
+    private final transient CoreseBlankNode coreseObject;
 
     /**
      * The unique identifier (ID) for the blank node.
@@ -39,8 +40,8 @@ public class CoreseBNode extends AbstractBNode implements CoreseNodeAdapter {
      *                                     {@link fr.inria.corese.core.sparql.datatype.CoreseBlankNode}.
      */
     public CoreseBNode(IDatatype coreseObject) {
-        if (coreseObject instanceof fr.inria.corese.core.sparql.datatype.CoreseBlankNode) {
-            this.coreseObject = (fr.inria.corese.core.sparql.datatype.CoreseBlankNode) coreseObject;
+        if (coreseObject instanceof fr.inria.corese.core.sparql.datatype.CoreseBlankNode blankNode) {
+            this.coreseObject = blankNode;
             this.id = this.coreseObject.getID();
         } else {
             throw new IncorrectOperationException("Cannot create CoreseLiteral from a non-literal Corese object");

@@ -45,6 +45,7 @@ public class CoreseValueFactory implements ValueFactory {
     private final AtomicLong nodeID = new AtomicLong(secureRandom.nextLong());
 
     public CoreseValueFactory() {
+        // Default constructor
     }
 
     /**
@@ -122,9 +123,9 @@ public class CoreseValueFactory implements ValueFactory {
         }
 
         // Numeric types
-        else if(AbstractLiteral.isIriOfIntegerCoreDatatype(datatype)) {
+        else if (AbstractLiteral.isIriOfIntegerCoreDatatype(datatype)) {
             return new CoreseInteger(new BigInteger(label));
-        } else if(AbstractLiteral.isIriOfDecimalCoreDatatype(datatype)) {
+        } else if (AbstractLiteral.isIriOfDecimalCoreDatatype(datatype)) {
             return new CoreseDecimal(new BigDecimal(label));
         }
 
@@ -162,9 +163,9 @@ public class CoreseValueFactory implements ValueFactory {
         }
 
         // Numeric types
-        else if(AbstractLiteral.isIntegerCoreDatatype(coreDatatype)) {
+        else if (AbstractLiteral.isIntegerCoreDatatype(coreDatatype)) {
             return new CoreseInteger(label, coreDatatype.getIRI(), coreDatatype);
-        } else if(AbstractLiteral.isDecimalCoreDatatype(coreDatatype)) {
+        } else if (AbstractLiteral.isDecimalCoreDatatype(coreDatatype)) {
             return new CoreseDecimal(label, coreDatatype.getIRI(), coreDatatype);
         }
 
@@ -201,9 +202,9 @@ public class CoreseValueFactory implements ValueFactory {
         }
 
         // Numeric types
-        else if(AbstractLiteral.isIntegerCoreDatatype(coreDatatype)) {
+        else if (AbstractLiteral.isIntegerCoreDatatype(coreDatatype)) {
             return new CoreseInteger(label, datatype, coreDatatype);
-        } else if(AbstractLiteral.isDecimalCoreDatatype(coreDatatype)) {
+        } else if (AbstractLiteral.isDecimalCoreDatatype(coreDatatype)) {
             return new CoreseDecimal(label, datatype, coreDatatype);
         }
 
@@ -311,13 +312,13 @@ public class CoreseValueFactory implements ValueFactory {
      */
     @Override
     public Literal createLiteral(TemporalAccessor value) {
-        if(value.isSupported(ChronoField.HOUR_OF_DAY) && value.isSupported(ChronoField.MINUTE_OF_HOUR) && value.isSupported(ChronoField.SECOND_OF_MINUTE)) {
-            if(value.isSupported(ChronoField.YEAR) && value.isSupported(ChronoField.MONTH_OF_YEAR) && value.isSupported(ChronoField.DAY_OF_MONTH)) {
+        if (value.isSupported(ChronoField.HOUR_OF_DAY) && value.isSupported(ChronoField.MINUTE_OF_HOUR) && value.isSupported(ChronoField.SECOND_OF_MINUTE)) {
+            if (value.isSupported(ChronoField.YEAR) && value.isSupported(ChronoField.MONTH_OF_YEAR) && value.isSupported(ChronoField.DAY_OF_MONTH)) {
                 return new CoreseDatetime(value.toString());
             } else {
                 return new CoreseTime(value.toString());
             }
-        } else if(value.isSupported(ChronoField.YEAR) && value.isSupported(ChronoField.MONTH_OF_YEAR) && value.isSupported(ChronoField.DAY_OF_MONTH)) {
+        } else if (value.isSupported(ChronoField.YEAR) && value.isSupported(ChronoField.MONTH_OF_YEAR) && value.isSupported(ChronoField.DAY_OF_MONTH)) {
             return new CoreseDate(value.toString());
         } else {
             return new CoreseDatetime(value.toString());

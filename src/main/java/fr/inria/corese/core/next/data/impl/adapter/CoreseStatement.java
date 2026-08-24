@@ -14,11 +14,12 @@ import fr.inria.corese.core.next.data.api.support.model.AbstractStatement;
  * and an optional context. This class provides methods to access these
  * components
  */
+@SuppressWarnings("java:S2160")
 public class CoreseStatement extends AbstractStatement implements CoreseEdgeAdapter {
 
-    private final CoreseValueConverter converter;
+    private static final CoreseValueConverter CONVERTER = new CoreseValueConverter();
 
-    private final Edge edge;
+    private final transient Edge edge;
     private final Resource subject;
     private final IRI predicate;
     private final Value object;
@@ -35,17 +36,15 @@ public class CoreseStatement extends AbstractStatement implements CoreseEdgeAdap
      * @param context   the context (or graph) of the statement (can be null)
      */
     public CoreseStatement(Resource subject, IRI predicate, Value object, Resource context) {
-        this.converter = new CoreseValueConverter();
-
         this.subject = subject;
         this.predicate = predicate;
         this.object = object;
         this.context = context;
 
-        Node subjectNode = converter.toCoreseNode(subject);
-        Node predicateNode = converter.toCoreseNode(predicate);
-        Node objectNode = converter.toCoreseNode(object);
-        Node contextNode = converter.toCoreseContext(context);
+        Node subjectNode = CONVERTER.toCoreseNode(subject);
+        Node predicateNode = CONVERTER.toCoreseNode(predicate);
+        Node objectNode = CONVERTER.toCoreseNode(object);
+        Node contextNode = CONVERTER.toCoreseContext(context);
 
         this.edge = EdgeImpl.create(contextNode, subjectNode, predicateNode, objectNode);
     }
@@ -60,16 +59,14 @@ public class CoreseStatement extends AbstractStatement implements CoreseEdgeAdap
      *             the V4 Corese API (non-null)
      */
     public CoreseStatement(Edge edge) {
-        this.converter = new CoreseValueConverter();
-
         if (edge == null) {
             throw new IllegalArgumentException("Edge cannot be null");
         }
 
-        Resource subjectValue = (Resource) converter.fromCoreseNode(edge.getSubjectValue());
-        IRI predicateValue = (IRI) converter.fromCoreseNode(edge.getPredicateValue());
-        Value objectValue = converter.fromCoreseNode(edge.getObjectValue());
-        Resource contextValue = converter.fromCoreseContext(edge.getGraph());
+        Resource subjectValue = (Resource) CONVERTER.fromCoreseNode(edge.getSubjectValue());
+        IRI predicateValue = (IRI) CONVERTER.fromCoreseNode(edge.getPredicateValue());
+        Value objectValue = CONVERTER.fromCoreseNode(edge.getObjectValue());
+        Resource contextValue = CONVERTER.fromCoreseContext(edge.getGraph());
 
         this.subject = subjectValue;
         this.predicate = predicateValue;
