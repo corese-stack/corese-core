@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.storage.api.model;
 import fr.inria.corese.core.next.data.api.model.Statement;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import static org.mockito.Mockito.mock;
 
 import java.util.Optional;
 
@@ -18,7 +18,7 @@ class MutationResultTest {
     @Test
     @DisplayName("Should create successful single mutation result")
     void testSuccessSingle() {
-        Statement stmt = Mockito.mock(Statement.class);
+        Statement stmt = mock(Statement.class);
         MutationResult result = MutationResult.success(stmt);
 
         assertTrue(result.isSuccess());
@@ -34,7 +34,7 @@ class MutationResultTest {
     @Test
     @DisplayName("Should create successful result with custom message")
     void testSuccessWithMessage() {
-        Statement stmt = Mockito.mock(Statement.class);
+        Statement stmt = mock(Statement.class);
         MutationResult result = MutationResult.success(stmt, "Custom message");
 
         assertTrue(result.isSuccess());
@@ -67,8 +67,8 @@ class MutationResultTest {
     @Test
     @DisplayName("Should build bulk result with mixed successes and failures")
     void testBulkBuilder() {
-        Statement stmt1 = Mockito.mock(Statement.class);
-        Statement stmt2 = Mockito.mock(Statement.class);
+        Statement stmt1 = mock(Statement.class);
+        Statement stmt2 = mock(Statement.class);
 
         MutationResult result = MutationResult.bulkBuilder()
                 .totalAttempted(3)
@@ -89,8 +89,8 @@ class MutationResultTest {
     @Test
     @DisplayName("Should recognize complete success in bulk operations")
     void testBulkCompleteSuccess() {
-        Statement stmt1 = Mockito.mock(Statement.class);
-        Statement stmt2 = Mockito.mock(Statement.class);
+        Statement stmt1 = mock(Statement.class);
+        Statement stmt2 = mock(Statement.class);
 
         MutationResult result = MutationResult.bulkBuilder()
                 .totalAttempted(2)
@@ -118,8 +118,8 @@ class MutationResultTest {
     @Test
     @DisplayName("Should throw IllegalStateException when getting single statement from bulk result")
     void testGetAffectedStatementThrowsForMultiple() {
-        Statement stmt1 = Mockito.mock(Statement.class);
-        Statement stmt2 = Mockito.mock(Statement.class);
+        Statement stmt1 = mock(Statement.class);
+        Statement stmt2 = mock(Statement.class);
 
         MutationResult result = MutationResult.bulkBuilder()
                 .totalAttempted(2)
@@ -133,7 +133,7 @@ class MutationResultTest {
     @Test
     @DisplayName("Should track error details for failed mutations")
     void testErrorTracking() {
-        Statement stmt = Mockito.mock(Statement.class);
+        Statement stmt = mock(Statement.class);
         Exception error = new RuntimeException("Test");
 
         MutationResult result = MutationResult.bulkBuilder()

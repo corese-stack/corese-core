@@ -75,17 +75,15 @@ class StorageModelTest {
         @Test
         @DisplayName("Should throw when storage is null")
         void shouldThrowWhenStorageIsNull() {
-            assertThrows(IllegalStateException.class, () -> StorageModel.builder()
-                    .valueFactory(mockValueFactory)
-                    .build());
+            StorageModel.Builder builder = StorageModel.builder().valueFactory(mockValueFactory);
+            assertThrows(IllegalStateException.class, builder::build);
         }
 
         @Test
         @DisplayName("Should throw when valueFactory is null")
         void shouldThrowWhenValueFactoryIsNull() {
-            assertThrows(IllegalStateException.class, () -> StorageModel.builder()
-                    .storage(mockStorage)
-                    .build());
+            StorageModel.Builder builder = StorageModel.builder().storage(mockStorage);
+            assertThrows(IllegalStateException.class, builder::build);
         }
 
         @Test
@@ -94,13 +92,13 @@ class StorageModelTest {
             Namespace ns = mock(Namespace.class);
             Set<Namespace> namespaces = new HashSet<>(Collections.singletonList(ns));
 
-            StorageModel model = StorageModel.builder()
+            StorageModel builtModel = StorageModel.builder()
                     .storage(mockStorage)
                     .valueFactory(mockValueFactory)
                     .namespaces(namespaces)
                     .build();
 
-            assertTrue(model.getNamespaces().contains(ns));
+            assertTrue(builtModel.getNamespaces().contains(ns));
         }
     }
 

@@ -54,10 +54,10 @@ class CoreseGraphStatementStoreTest {
         @Test
         @DisplayName("Should create adapter with valid parameters")
         void shouldCreateAdapterWithValidParameters() {
-            CoreseGraphStatementStore adapter = new CoreseGraphStatementStore(mockGraph, mockFactory);
-            assertNotNull(adapter);
-            assertEquals(mockGraph, adapter.graph());
-            assertEquals(mockFactory, adapter.valueFactory());
+            CoreseGraphStatementStore createdStore = new CoreseGraphStatementStore(mockGraph, mockFactory);
+            assertNotNull(createdStore);
+            assertEquals(mockGraph, createdStore.graph());
+            assertEquals(mockFactory, createdStore.valueFactory());
         }
     }
 

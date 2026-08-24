@@ -5,7 +5,7 @@ import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.term.Value;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import static org.mockito.Mockito.mock;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,11 +18,11 @@ class StatementPatternTest {
     @Test
     @DisplayName("Should build pattern with all components using builder")
     void testBuilder() {
-        Resource subject = Mockito.mock(Resource.class);
-        IRI predicate = Mockito.mock(IRI.class);
-        Value object = Mockito.mock(Value.class);
-        Resource ctx1 = Mockito.mock(Resource.class);
-        Resource ctx2 = Mockito.mock(Resource.class);
+        Resource subject = mock(Resource.class);
+        IRI predicate = mock(IRI.class);
+        Value object = mock(Value.class);
+        Resource ctx1 = mock(Resource.class);
+        Resource ctx2 = mock(Resource.class);
 
         StatementPattern pattern = StatementPattern.builder()
                 .subject(subject)
@@ -52,10 +52,10 @@ class StatementPatternTest {
     @Test
     @DisplayName("Should create pattern using factory method of()")
     void testFactoryMethod() {
-        Resource subject = Mockito.mock(Resource.class);
-        IRI predicate = Mockito.mock(IRI.class);
-        Value object = Mockito.mock(Value.class);
-        Resource ctx = Mockito.mock(Resource.class);
+        Resource subject = mock(Resource.class);
+        IRI predicate = mock(IRI.class);
+        Value object = mock(Value.class);
+        Resource ctx = mock(Resource.class);
 
         StatementPattern pattern = StatementPattern.of(subject, predicate, object, ctx);
 
@@ -76,7 +76,7 @@ class StatementPatternTest {
         assertTrue(allWildcards.isObjectWildcard());
         assertTrue(allWildcards.isContextWildcard());
 
-        Resource subject = Mockito.mock(Resource.class);
+        Resource subject = mock(Resource.class);
         StatementPattern withSubject = StatementPattern.builder()
                 .subject(subject)
                 .build();
@@ -90,8 +90,8 @@ class StatementPatternTest {
     @Test
     @DisplayName("Should implement equals() and hashCode() correctly")
     void testEquality() {
-        Resource subject = Mockito.mock(Resource.class);
-        IRI predicate = Mockito.mock(IRI.class);
+        Resource subject = mock(Resource.class);
+        IRI predicate = mock(IRI.class);
 
         StatementPattern pattern1 = StatementPattern.builder()
                 .subject(subject)
@@ -119,8 +119,8 @@ class StatementPatternTest {
     @Test
     @DisplayName("Should ensure contexts array is immutable")
     void testContextsImmutability() {
-        Resource ctx1 = Mockito.mock(Resource.class);
-        Resource ctx2 = Mockito.mock(Resource.class);
+        Resource ctx1 = mock(Resource.class);
+        Resource ctx2 = mock(Resource.class);
 
         StatementPattern pattern = StatementPattern.builder()
                 .contexts(ctx1, ctx2)

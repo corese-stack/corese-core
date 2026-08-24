@@ -46,10 +46,10 @@ class StorageModelFactoryTest {
         @Test
         @DisplayName("Should create factory with valid ValueFactory")
         void shouldCreateFactoryWithValidValueFactory() {
-            StorageModelFactory factory = new StorageModelFactory(valueFactory);
+            StorageModelFactory customFactory = new StorageModelFactory(valueFactory);
 
-            assertNotNull(factory);
-            assertEquals(valueFactory, factory.valueFactory());
+            assertNotNull(customFactory);
+            assertEquals(valueFactory, customFactory.valueFactory());
         }
 
         @Test
@@ -294,9 +294,9 @@ class StorageModelFactoryTest {
         void shouldWorkWithDifferentValueFactoryImplementations() throws PluginException {
             // This test assumes CoreseValueFactory works
             ValueFactory vf = new CoreseValueFactory();
-            StorageModelFactory factory = new StorageModelFactory(vf);
+            StorageModelFactory createdFactory = new StorageModelFactory(vf);
 
-            Model model = factory.createMemoryModel();
+            Model model = createdFactory.createMemoryModel();
             assertNotNull(model);
 
             IRI testIRI = vf.createIRI("http://test.org/resource");

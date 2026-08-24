@@ -8,6 +8,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import fr.inria.corese.core.next.data.api.model.Statement;
+import static org.mockito.Mockito.mock;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("MemoryLifecycleManager tests")
@@ -101,7 +104,7 @@ class MemoryLifecycleManagerTest {
         @DisplayName("Should not clear data on shutdown")
         void shouldNotClearDataOnShutdown() throws StorageException {
             // Add some data
-            adapter.add(org.mockito.Mockito.mock(fr.inria.corese.core.next.data.api.model.Statement.class));
+            adapter.add(mock(Statement.class));
             int sizeBefore = adapter.size();
 
             // Initialize and shutdown
