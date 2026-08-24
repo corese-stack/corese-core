@@ -6,6 +6,7 @@ import fr.inria.corese.core.next.storage.api.exception.StorageException;
 /**
  * Exception thrown when a plugin fails to create a StorageManager instance.
  */
+@SuppressWarnings("java:S110")
 public class PluginException extends StorageException {
 
     public PluginException(String message) {

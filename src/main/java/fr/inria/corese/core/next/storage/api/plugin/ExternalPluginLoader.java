@@ -37,6 +37,7 @@ public final class ExternalPluginLoader {
      * @throws IllegalArgumentException if jarFile is null or doesn't exist
      * @throws Exception                if loading fails
      */
+    @SuppressWarnings("java:S112")
     public static int loadPluginsFromJar(File jarFile) throws Exception {
         if (jarFile == null) {
             throw new IllegalArgumentException("JAR file cannot be null");

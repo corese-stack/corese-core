@@ -5,13 +5,22 @@ import fr.inria.corese.core.next.storage.api.config.StorageConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 /**
  * Manager for discovering and creating StorageManager plugins.
  */
+@SuppressWarnings({"java:S3077", "java:S3064", "java:S2629"})
 public final class StoragePluginManager {
 
     private static final Logger logger = LoggerFactory.getLogger(StoragePluginManager.class);
@@ -19,7 +28,7 @@ public final class StoragePluginManager {
     /**
      * ServiceLoader for discovering plugins
      */
-    private static final List<ClassLoader> classLoaders = Collections.synchronizedList(new ArrayList<>());
+    private static final List<ClassLoader> classLoaders = new CopyOnWriteArrayList<>();
 
     static {
         // Always include the system ClassLoader for internal plugins
