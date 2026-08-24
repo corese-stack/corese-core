@@ -76,6 +76,14 @@ public interface PrefixMapping {
      */
     Map<String, String> getNamespaceMap();
 
+    /**
+     * Returns all namespace objects as an immutable set.
+     * Each Namespace object contains both prefix and IRI.
+     *
+     * @return a set of Namespace objects
+     */
+    Set<Namespace> getNamespaceObjects();
+
 
     /**
      * Sets or updates a prefix mapping.
