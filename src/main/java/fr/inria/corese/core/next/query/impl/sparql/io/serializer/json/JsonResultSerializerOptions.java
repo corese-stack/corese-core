@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.io.serializer.json;
 
 import fr.inria.corese.core.next.data.api.support.io.AbstractIOOptions;
-import fr.inria.corese.core.next.query.api.io.serializer.LinksOptions;
+import fr.inria.corese.core.next.query.api.io.serializer.option.LinksOptions;
 
 import java.util.ArrayList;
 import java.util.Collection;

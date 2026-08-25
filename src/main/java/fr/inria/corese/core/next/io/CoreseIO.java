@@ -15,11 +15,11 @@ import fr.inria.corese.core.next.data.api.model.Model;
 import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.data.impl.io.parser.DefaultRDFParserFactory;
 import fr.inria.corese.core.next.data.impl.io.serializer.DefaultRDFSerializerFactory;
-import fr.inria.corese.core.next.query.api.io.ResultFormat;
+import fr.inria.corese.core.next.query.api.io.format.ResultFormat;
 import fr.inria.corese.core.next.query.api.io.serializer.BooleanResultSerializer;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializerFactory;
-import fr.inria.corese.core.next.query.api.io.serializer.ResultIOOptions;
+import fr.inria.corese.core.next.query.api.io.serializer.option.ResultSerializationOptions;
 import fr.inria.corese.core.next.query.api.repository.Repository;
 import fr.inria.corese.core.next.query.api.repository.RepositoryConnection;
 import fr.inria.corese.core.next.query.api.result.GraphQueryResult;
@@ -210,7 +210,7 @@ public final class CoreseIO {
     public static ResultSerializer serializer(
             TupleQueryResult source,
             ResultFormat format,
-            ResultIOOptions options) {
+            ResultSerializationOptions options) {
         return RESULT_SERIALIZERS.createTupleSerializer(format, source, options);
     }
 
@@ -221,7 +221,7 @@ public final class CoreseIO {
     public static BooleanResultSerializer serializer(
             boolean source,
             ResultFormat format,
-            ResultIOOptions options) {
+            ResultSerializationOptions options) {
         return RESULT_SERIALIZERS.createBooleanSerializer(format, source, options);
     }
 
@@ -256,7 +256,7 @@ public final class CoreseIO {
     public static void write(
             TupleQueryResult source,
             ResultFormat format,
-            ResultIOOptions options,
+            ResultSerializationOptions options,
             Writer destination) {
         serializer(source, format, options).write(destination);
     }
@@ -300,7 +300,7 @@ public final class CoreseIO {
     public static void write(
             boolean source,
             ResultFormat format,
-            ResultIOOptions options,
+            ResultSerializationOptions options,
             Writer destination) {
         serializer(source, format, options).write(destination);
     }
@@ -334,7 +334,7 @@ public final class CoreseIO {
     public static String writeToString(
             TupleQueryResult source,
             ResultFormat format,
-            ResultIOOptions options) {
+            ResultSerializationOptions options) {
         return serializer(source, format, options).writeToString();
     }
 
@@ -345,7 +345,7 @@ public final class CoreseIO {
     public static String writeToString(
             boolean source,
             ResultFormat format,
-            ResultIOOptions options) {
+            ResultSerializationOptions options) {
         return serializer(source, format, options).writeToString();
     }
 
@@ -371,7 +371,7 @@ public final class CoreseIO {
             Repository repository,
             String sparql,
             ResultFormat format,
-            ResultIOOptions options,
+            ResultSerializationOptions options,
             Writer destination) {
         try (RepositoryConnection connection = repository.getConnection();
              TupleQueryResult result = connection
@@ -400,7 +400,7 @@ public final class CoreseIO {
             Repository repository,
             String sparql,
             ResultFormat format,
-            ResultIOOptions options,
+            ResultSerializationOptions options,
             Writer destination) {
         try (RepositoryConnection connection = repository.getConnection()) {
             boolean result = connection

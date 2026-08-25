@@ -1,11 +1,9 @@
 /**
  * Concrete implementations of the public repository API.
  *
- * <p>Entry point for users: create a {@link fr.inria.corese.core.next.query.impl.repository.CoreseRepository}
- * backed by any {@link fr.inria.corese.core.next.storage.api.StorageManager},
- * call {@code init()}, then open a
- * {@link fr.inria.corese.core.next.query.api.repository.RepositoryConnection} via
- * {@code getConnection()}.</p>
+ * <p>This package is internal. Applications create repositories through
+ * {@link fr.inria.corese.core.next.query.Repositories} and use the contracts in
+ * {@code next.query.api.repository}.</p>
  *
  * <p>The parser, AST, bridge, and KGRAM engine are invisible from this package.
  * {@link fr.inria.corese.core.next.query.impl.repository.CoreseRepositoryConnection}

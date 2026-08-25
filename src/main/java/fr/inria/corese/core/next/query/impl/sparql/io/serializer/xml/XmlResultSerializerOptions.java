@@ -1,8 +1,8 @@
 package fr.inria.corese.core.next.query.impl.sparql.io.serializer.xml;
 
 import fr.inria.corese.core.next.data.api.support.io.AbstractIOOptions;
-import fr.inria.corese.core.next.query.api.io.serializer.LinksOptions;
-import fr.inria.corese.core.next.query.api.io.serializer.XmlOutputOptions;
+import fr.inria.corese.core.next.query.api.io.serializer.option.LinksOptions;
+import fr.inria.corese.core.next.query.api.io.serializer.option.XmlSerializationOptions;
 
 import javax.xml.transform.OutputKeys;
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class XmlResultSerializerOptions extends AbstractIOOptions implements LinksOptions, XmlOutputOptions {
+public class XmlResultSerializerOptions extends AbstractIOOptions implements LinksOptions, XmlSerializationOptions {
     private final Map<String, String> xmlSettings;
     private final Collection<String> links;
 

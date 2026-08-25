@@ -9,9 +9,9 @@ import fr.inria.corese.core.next.data.api.term.BNode;
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Literal;
 import fr.inria.corese.core.next.data.api.term.Value;
-import fr.inria.corese.core.next.query.api.io.ResultFormat;
-import fr.inria.corese.core.next.query.api.io.serializer.LinksOptions;
+import fr.inria.corese.core.next.query.api.io.format.ResultFormat;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
+import fr.inria.corese.core.next.query.api.io.serializer.option.LinksOptions;
 import fr.inria.corese.core.next.query.api.result.BindingSet;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 

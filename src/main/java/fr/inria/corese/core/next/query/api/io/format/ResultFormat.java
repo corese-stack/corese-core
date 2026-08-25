@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.query.api.io;
+package fr.inria.corese.core.next.query.api.io.format;
 
 import fr.inria.corese.core.next.data.api.io.format.FileFormat;
 

@@ -3,13 +3,13 @@ package fr.inria.corese.core.next.query.impl.sparql.io.serializer;
 import fr.inria.corese.core.next.data.api.io.serializer.option.LineEndingOptions;
 import fr.inria.corese.core.next.data.api.support.io.IOConstants;
 import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
-import fr.inria.corese.core.next.query.api.io.ResultFormat;
+import fr.inria.corese.core.next.query.api.io.format.ResultFormat;
 import fr.inria.corese.core.next.query.api.io.serializer.BooleanResultSerializer;
-import fr.inria.corese.core.next.query.api.io.serializer.LinksOptions;
-import fr.inria.corese.core.next.query.api.io.serializer.ResultIOOptions;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializerFactory;
-import fr.inria.corese.core.next.query.api.io.serializer.XmlOutputOptions;
+import fr.inria.corese.core.next.query.api.io.serializer.option.LinksOptions;
+import fr.inria.corese.core.next.query.api.io.serializer.option.ResultSerializationOptions;
+import fr.inria.corese.core.next.query.api.io.serializer.option.XmlSerializationOptions;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 import fr.inria.corese.core.next.query.impl.sparql.io.serializer.csv.CsvTupleResultSerializer;
 import fr.inria.corese.core.next.query.impl.sparql.io.serializer.json.JsonBooleanResultSerializer;
@@ -56,7 +56,7 @@ public final class DefaultResultSerializerFactory implements ResultSerializerFac
     public ResultSerializer createTupleSerializer(
             ResultFormat format,
             TupleQueryResult results,
-            ResultIOOptions options) {
+            ResultSerializationOptions options) {
         Objects.requireNonNull(results, "results");
         ResultFormat standard = standardFormat(format);
         validateOptions(standard, options, false);
@@ -76,7 +76,7 @@ public final class DefaultResultSerializerFactory implements ResultSerializerFac
     public BooleanResultSerializer createBooleanSerializer(
             ResultFormat format,
             boolean result,
-            ResultIOOptions options) {
+            ResultSerializationOptions options) {
         ResultFormat standard = standardFormat(format);
         validateOptions(standard, options, true);
         if (standard.equals(ResultFormat.CSV) || standard.equals(ResultFormat.TSV)) {
@@ -98,7 +98,7 @@ public final class DefaultResultSerializerFactory implements ResultSerializerFac
 
     private static void validateOptions(
             ResultFormat format,
-            ResultIOOptions options,
+            ResultSerializationOptions options,
             boolean booleanResult) {
         Objects.requireNonNull(options, "options");
         if ((format.equals(ResultFormat.CSV) || format.equals(ResultFormat.TSV))
@@ -107,7 +107,7 @@ public final class DefaultResultSerializerFactory implements ResultSerializerFac
             throw new IllegalArgumentException(format.getName() + " cannot represent result links");
         }
         if (!format.equals(ResultFormat.XML)
-                && options instanceof XmlOutputOptions xmlOptions
+                && options instanceof XmlSerializationOptions xmlOptions
                 && !xmlOptions.xmlOutputProperties().isEmpty()) {
             throw new IllegalArgumentException(
                     format.getName() + " does not support XML output properties");

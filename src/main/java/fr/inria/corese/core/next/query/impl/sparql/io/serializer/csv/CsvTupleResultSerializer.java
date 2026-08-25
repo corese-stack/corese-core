@@ -5,7 +5,7 @@ import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.data.api.io.format.FileFormat;
 import fr.inria.corese.core.next.data.api.io.option.IOOptions;
 import fr.inria.corese.core.next.data.api.support.io.IOConstants;
-import fr.inria.corese.core.next.query.api.io.ResultFormat;
+import fr.inria.corese.core.next.query.api.io.format.ResultFormat;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 import fr.inria.corese.core.next.query.impl.sparql.io.serializer.support.CharacterSeparatedValuesSerializer;
 
@@ -41,7 +41,7 @@ public class CsvTupleResultSerializer extends CharacterSeparatedValuesSerializer
             || value.stringValue().contains(IOConstants.CARRIAGE_RETURN)
             || value.stringValue().contains(IOConstants.LINE_FEED)) {
             if(value.stringValue().contains(IOConstants.QUOTE)) {
-                return "\"" + value.stringValue().replaceAll("\"", "\"\"") + "\"";
+                return "\"" + value.stringValue().replace("\"", "\"\"") + "\"";
             }
             return "\"" + value.stringValue() + "\"";
         }

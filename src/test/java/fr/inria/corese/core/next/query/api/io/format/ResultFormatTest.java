@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.query.api.io;
+package fr.inria.corese.core.next.query.api.io.format;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

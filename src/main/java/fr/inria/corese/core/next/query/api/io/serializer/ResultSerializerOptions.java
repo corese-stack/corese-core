@@ -2,6 +2,8 @@ package fr.inria.corese.core.next.query.api.io.serializer;
 
 import fr.inria.corese.core.next.data.api.io.serializer.option.LineEndingOptions;
 import fr.inria.corese.core.next.data.api.support.io.IOConstants;
+import fr.inria.corese.core.next.query.api.io.serializer.option.LinksOptions;
+import fr.inria.corese.core.next.query.api.io.serializer.option.XmlSerializationOptions;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,7 +20,7 @@ import java.util.Objects;
  * selected format cannot represent instead of silently ignoring them.</p>
  */
 public final class ResultSerializerOptions
-        implements LinksOptions, LineEndingOptions, XmlOutputOptions {
+        implements LinksOptions, LineEndingOptions, XmlSerializationOptions {
 
     private final List<String> links;
     private final String lineEnding;

@@ -70,6 +70,28 @@ class NextModuleBoundaryTest {
                         && imported.contains(".impl."));
     }
 
+    @Test
+    void publicApiPackagesMustBeDocumented() throws IOException {
+        List<String> violations = new ArrayList<>();
+        for (Path apiDirectory : publicApiDirectories()) {
+            try (Stream<Path> paths = Files.walk(apiDirectory)) {
+                for (Path packageDirectory : paths.filter(Files::isDirectory).toList()) {
+                    try (Stream<Path> sources = Files.list(packageDirectory)) {
+                        boolean containsTypes = sources.anyMatch(source ->
+                                source.toString().endsWith(".java")
+                                        && !source.getFileName().toString().equals("package-info.java"));
+                        if (containsTypes && !Files.exists(packageDirectory.resolve("package-info.java"))) {
+                            violations.add(NEXT_SOURCES.relativize(packageDirectory).toString());
+                        }
+                    }
+                }
+            }
+        }
+        if (!violations.isEmpty()) {
+            fail("Undocumented public API packages:\n" + String.join("\n", violations));
+        }
+    }
+
     private static List<Path> publicApiDirectories() {
         return List.of(
                 NEXT_SOURCES.resolve("data/api"),

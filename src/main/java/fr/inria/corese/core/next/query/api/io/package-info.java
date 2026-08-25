@@ -1,9 +1,11 @@
 /**
- * SPARQL result format descriptors for the query API.
+ * Public SPARQL result I/O contracts.
  *
- * <p>The central class is {@link fr.inria.corese.core.next.query.api.io.ResultFormat},
- * which enumerates the supported serialization formats for SPARQL SELECT and ASK results
- * (CSV, TSV, JSON, XML). Serializer contracts live in the {@code io.serializer} sub-package.
+ * <p>{@link fr.inria.corese.core.next.query.api.io.format.ResultFormat}
+ * enumerates the supported serialization formats for SPARQL SELECT and ASK
+ * results (CSV, TSV, JSON, XML). Serializer contracts live in
+ * {@code io.serializer}; reusable option facets live in
+ * {@code io.serializer.option}.
  * The recommended high-level entry point is {@link
  * fr.inria.corese.core.next.io.CoreseIO}.</p>
  */

@@ -2,8 +2,8 @@ package fr.inria.corese.core.next.query.impl.sparql.io.serializer.xml;
 
 import fr.inria.corese.core.next.data.api.exception.SerializationException;
 import fr.inria.corese.core.next.data.api.io.option.IOOptions;
-import fr.inria.corese.core.next.query.api.io.ResultFormat;
-import fr.inria.corese.core.next.query.api.io.serializer.XmlOutputOptions;
+import fr.inria.corese.core.next.query.api.io.format.ResultFormat;
+import fr.inria.corese.core.next.query.api.io.serializer.option.XmlSerializationOptions;
 
 import javax.xml.XMLConstants;
 import javax.xml.stream.XMLOutputFactory;
@@ -38,7 +38,7 @@ final class XmlResultWriter {
 
     XmlResultWriter(Writer destination, IOOptions options) {
         this.destination = Objects.requireNonNull(destination, "writer");
-        Map<String, String> properties = options instanceof XmlOutputOptions xmlOptions
+        Map<String, String> properties = options instanceof XmlSerializationOptions xmlOptions
                 ? xmlOptions.xmlOutputProperties()
                 : Map.of();
         properties.keySet().stream()

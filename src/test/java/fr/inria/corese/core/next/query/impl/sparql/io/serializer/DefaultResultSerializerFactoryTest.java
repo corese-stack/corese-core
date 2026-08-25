@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.io.serializer;
 
 import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
-import fr.inria.corese.core.next.query.api.io.ResultFormat;
+import fr.inria.corese.core.next.query.api.io.format.ResultFormat;
 import fr.inria.corese.core.next.query.api.io.serializer.BooleanResultSerializer;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
 import fr.inria.corese.core.next.query.api.result.BindingSet;
@@ -34,7 +34,7 @@ class DefaultResultSerializerFactoryTest {
 
         @Override
         public void close() {
-
+            // Dummy test double implementation - no resources to release
         }
     };
 
