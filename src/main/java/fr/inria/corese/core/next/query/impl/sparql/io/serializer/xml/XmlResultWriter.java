@@ -33,7 +33,7 @@ final class XmlResultWriter {
 
     private final Writer destination;
     private final XMLStreamWriter xml;
-    private final boolean indent;
+    private final boolean shouldIndent;
     private int depth;
 
     XmlResultWriter(Writer destination, IOOptions options) {
@@ -48,7 +48,7 @@ final class XmlResultWriter {
                     throw new IllegalArgumentException("Unsupported XML output property: " + property);
                 });
 
-        this.indent = YES.equalsIgnoreCase(properties.getOrDefault(OutputKeys.INDENT, "no"));
+        this.shouldIndent = YES.equalsIgnoreCase(properties.getOrDefault(OutputKeys.INDENT, "no"));
         writeDeclaration(properties);
         try {
             this.xml = XMLOutputFactory.newFactory().createXMLStreamWriter(destination);
@@ -69,7 +69,7 @@ final class XmlResultWriter {
     void endDocument() {
         end();
         try {
-            if (indent) {
+            if (shouldIndent) {
                 xml.writeCharacters("\n");
             }
             xml.flush();
@@ -101,7 +101,7 @@ final class XmlResultWriter {
     void end() {
         depth--;
         try {
-            if (indent) {
+            if (shouldIndent) {
                 xml.writeCharacters("\n" + INDENT.repeat(depth));
             }
             xml.writeEndElement();
@@ -150,7 +150,7 @@ final class XmlResultWriter {
     }
 
     private void beforeElement() {
-        if (!indent || depth == 0) {
+        if (!shouldIndent || depth == 0) {
             return;
         }
         try {
@@ -175,7 +175,7 @@ final class XmlResultWriter {
             destination.write("\" standalone=\"");
             destination.write(standalone);
             destination.write("\"?>");
-            if (indent) {
+            if (shouldIndent) {
                 destination.write('\n');
             }
         } catch (IOException e) {

@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @see RepositoryConnection
  */
-public interface Repository {
+public interface Repository extends AutoCloseable {
 
     /**
      * Initializes the repository, making it ready for use.
@@ -40,6 +40,16 @@ public interface Repository {
      * @throws RepositoryException if shutdown fails (e.g., unable to flush data)
      */
     void shutDown() throws RepositoryException;
+
+    /**
+     * Closes the repository by calling {@link #shutDown()}.
+     *
+     * @throws RepositoryException if shutdown fails
+     */
+    @Override
+    default void close() throws RepositoryException {
+        shutDown();
+    }
 
     /**
      * Checks whether the repository supports write operations.

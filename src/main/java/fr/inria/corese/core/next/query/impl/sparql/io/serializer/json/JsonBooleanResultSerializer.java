@@ -29,6 +29,7 @@ public class JsonBooleanResultSerializer implements BooleanResultSerializer {
     }
 
     @Override
+    @SuppressWarnings("java:S2095") // JsonGenerator.close() would close the caller-owned Writer
     public void write(Writer writer) throws SerializationException {
         Objects.requireNonNull(writer, "writer");
         try {

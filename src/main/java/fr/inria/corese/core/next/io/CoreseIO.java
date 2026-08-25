@@ -120,13 +120,15 @@ public final class CoreseIO {
         return target;
     }
 
+    private static final String PARAM_SOURCE = "source";
+
     /** Reads RDF into an existing model and returns that model. */
     public static Model read(
             Reader source,
             RDFFormat format,
             Model target,
             ValueFactory valueFactory) {
-        Objects.requireNonNull(source, "source");
+        Objects.requireNonNull(source, PARAM_SOURCE);
         RDF_PARSERS.createRDFParser(format, target, valueFactory).parse(source);
         return target;
     }
@@ -138,7 +140,7 @@ public final class CoreseIO {
             Model target,
             ValueFactory valueFactory,
             RDFParsingOptions options) {
-        Objects.requireNonNull(source, "source");
+        Objects.requireNonNull(source, PARAM_SOURCE);
         RDF_PARSERS.createRDFParser(format, target, valueFactory, options).parse(source);
         return target;
     }
@@ -149,7 +151,7 @@ public final class CoreseIO {
             RDFFormat format,
             Model target,
             ValueFactory valueFactory) {
-        Objects.requireNonNull(source, "source");
+        Objects.requireNonNull(source, PARAM_SOURCE);
         RDF_PARSERS.createRDFParser(format, target, valueFactory).parse(source);
         return target;
     }
@@ -161,7 +163,7 @@ public final class CoreseIO {
             Model target,
             ValueFactory valueFactory,
             RDFParsingOptions options) {
-        Objects.requireNonNull(source, "source");
+        Objects.requireNonNull(source, PARAM_SOURCE);
         RDF_PARSERS.createRDFParser(format, target, valueFactory, options).parse(source);
         return target;
     }

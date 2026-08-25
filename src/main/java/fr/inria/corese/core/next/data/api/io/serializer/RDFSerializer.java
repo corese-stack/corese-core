@@ -1,6 +1,5 @@
 package fr.inria.corese.core.next.data.api.io.serializer;
 
-import fr.inria.corese.core.next.data.api.model.Model;
 import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 
 /**

@@ -48,6 +48,8 @@ import java.util.function.Function;
  */
 public class DefaultRDFSerializerFactory implements RDFSerializerFactory {
 
+    private static final String RDF_FORMAT_CANNOT_BE_NULL = "RDFFormat cannot be null";
+
     private final Map<RDFFormat, BiFunction<Model, IOOptions, RDFSerializer>> registry;
     private final Map<RDFFormat, Function<Model, RDFSerializer>> defaultRegistry;
     private final ValueFactory coreseValueFactory;
@@ -133,7 +135,7 @@ public class DefaultRDFSerializerFactory implements RDFSerializerFactory {
             Model model,
             RDFSerializationOptions config) {
 
-        Objects.requireNonNull(format, "RDFFormat cannot be null");
+        Objects.requireNonNull(format, RDF_FORMAT_CANNOT_BE_NULL);
         Objects.requireNonNull(model, "Model cannot be null");
         Objects.requireNonNull(config, "SerializationConfig cannot be null");
 
@@ -165,7 +167,7 @@ public class DefaultRDFSerializerFactory implements RDFSerializerFactory {
     @Override
     public RDFSerializer createSerializer(RDFFormat format, Model model) {
 
-        Objects.requireNonNull(format, "RDFFormat cannot be null");
+        Objects.requireNonNull(format, RDF_FORMAT_CANNOT_BE_NULL);
         Objects.requireNonNull(model, "Model cannot be null");
 
         Function<Model, RDFSerializer> constructor = defaultRegistry.get(format);
@@ -182,7 +184,7 @@ public class DefaultRDFSerializerFactory implements RDFSerializerFactory {
 
     @Override
     public RDFSerializer createSerializer(RDFFormat format, Iterable<Statement> statements) {
-        Objects.requireNonNull(format, "RDFFormat cannot be null");
+        Objects.requireNonNull(format, RDF_FORMAT_CANNOT_BE_NULL);
         Objects.requireNonNull(statements, "Statements cannot be null");
         if (RDFFormat.NTRIPLES.equals(format)) {
             return new NTriplesSerializer(statements);
@@ -198,7 +200,7 @@ public class DefaultRDFSerializerFactory implements RDFSerializerFactory {
             RDFFormat format,
             Iterable<Statement> statements,
             RDFSerializationOptions config) {
-        Objects.requireNonNull(format, "RDFFormat cannot be null");
+        Objects.requireNonNull(format, RDF_FORMAT_CANNOT_BE_NULL);
         Objects.requireNonNull(statements, "Statements cannot be null");
         Objects.requireNonNull(config, "SerializationConfig cannot be null");
         RDFSerializationOptions normalized = normalizeOptions(format, config);
@@ -215,38 +217,45 @@ public class DefaultRDFSerializerFactory implements RDFSerializerFactory {
             RDFFormat format,
             RDFSerializationOptions options) {
         if (options instanceof RDFSerializerOptions) {
-            if (RDFFormat.TURTLE.equals(format)) {
-                return new TurtleSerializerOptions.Builder(options).build();
-            }
-            if (RDFFormat.TRIG.equals(format)) {
-                return new TriGSerializerOptions.Builder(options).build();
-            }
-            if (RDFFormat.RDFXML.equals(format)) {
-                return new RDFXMLSerializerOptions.Builder(options).build();
-            }
-            if (RDFFormat.NTRIPLES.equals(format) || RDFFormat.NQUADS.equals(format)) {
-                return options;
-            }
-            if (RDFFormat.JSONLD.equals(format)) {
-                JSONLDOptions.Builder builder = new JSONLDOptions.Builder();
-                String baseIRI = ((BaseIRIOptions) options).getBaseIRI();
-                return baseIRI == null ? builder.build() : builder.base(baseIRI).build();
-            }
+            return normalizeGenericOptions(format, options);
+        }
+        if (!isCompatibleOptionType(format, options)) {
             throw invalidOptions(format, options);
         }
+        return options;
+    }
 
-        boolean compatible =
-                (RDFFormat.TURTLE.equals(format) && options instanceof TurtleSerializerOptions)
+    private static RDFSerializationOptions normalizeGenericOptions(
+            RDFFormat format,
+            RDFSerializationOptions options) {
+        if (RDFFormat.TURTLE.equals(format)) {
+            return new TurtleSerializerOptions.Builder(options).build();
+        }
+        if (RDFFormat.TRIG.equals(format)) {
+            return new TriGSerializerOptions.Builder(options).build();
+        }
+        if (RDFFormat.RDFXML.equals(format)) {
+            return new RDFXMLSerializerOptions.Builder(options).build();
+        }
+        if (RDFFormat.NTRIPLES.equals(format) || RDFFormat.NQUADS.equals(format)) {
+            return options;
+        }
+        if (RDFFormat.JSONLD.equals(format)) {
+            JSONLDOptions.Builder builder = new JSONLDOptions.Builder();
+            String baseIRI = ((BaseIRIOptions) options).getBaseIRI();
+            return baseIRI == null ? builder.build() : builder.base(baseIRI).build();
+        }
+        throw invalidOptions(format, options);
+    }
+
+    private static boolean isCompatibleOptionType(RDFFormat format, RDFSerializationOptions options) {
+        return (RDFFormat.TURTLE.equals(format) && options instanceof TurtleSerializerOptions)
                 || (RDFFormat.TRIG.equals(format) && options instanceof TriGSerializerOptions)
                 || (RDFFormat.NTRIPLES.equals(format) && options instanceof NTriplesSerializerOptions)
                 || (RDFFormat.NQUADS.equals(format) && options instanceof NQuadsSerializerOptions)
                 || (RDFFormat.RDFXML.equals(format) && options instanceof RDFXMLSerializerOptions)
                 || (RDFFormat.JSONLD.equals(format) && options instanceof JSONLDOptions)
                 || (RDFFormat.RDFC_1_0.equals(format) && options instanceof RDFC10SerializerOptions);
-        if (!compatible) {
-            throw invalidOptions(format, options);
-        }
-        return options;
     }
 
     private static SerializationException invalidOptions(RDFFormat format, IOOptions options) {

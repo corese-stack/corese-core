@@ -89,8 +89,9 @@ class CoreseIOTest {
                 .lineEnding("\r\n")
                 .build();
         assertTrue(CoreseIO.writeToString(tupleResult(), ResultFormat.CSV, csv).endsWith("\r\n"));
+        TestTupleResult result = tupleResult();
         assertThrows(IllegalArgumentException.class,
-                () -> CoreseIO.writeToString(tupleResult(), ResultFormat.CSV, links));
+                () -> CoreseIO.writeToString(result, ResultFormat.CSV, links));
 
         Model model = CoreseIO.read(
                 new StringReader("<http://example/s> <http://example/p> \"é\" ."),
@@ -124,10 +125,9 @@ class CoreseIOTest {
     }
 
     @Test
-    void evaluatesAndExportsRepositoryQueriesInOneCall() {
-        CoreseRepository repository = new CoreseRepository(MemoryStorageManager.builder().build());
-        repository.init();
-        try {
+    void evaluatesAndExportsRepositoryQueriesInOneCall() throws Exception {
+        try (CoreseRepository repository = new CoreseRepository(MemoryStorageManager.builder().build())) {
+            repository.init();
             repository.update("INSERT DATA { <http://example/s> <http://example/p> <http://example/o> }");
 
             StringWriter select = new StringWriter();
@@ -145,8 +145,6 @@ class CoreseIOTest {
                     RDFFormat.NTRIPLES,
                     graph);
             assertEquals("<http://example/s> <http://example/p> <http://example/o> .\n", graph.toString());
-        } finally {
-            repository.shutDown();
         }
     }
 

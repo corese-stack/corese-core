@@ -32,54 +32,66 @@ class CsvTupleResultSerializerTest extends AbstractResultSerializerTest {
 
     @Override
     protected String getResultsWithUrisString() {
-        return "email,homepage\n" +
-                "mailto:jlow@example.com,https://bsky.app/profile/johnnyleeoutlaw\n" +
-                "mailto:peter@example.org,https://peter.goodguy.com\n";
+        return """
+                email,homepage
+                mailto:jlow@example.com,https://bsky.app/profile/johnnyleeoutlaw
+                mailto:peter@example.org,https://peter.goodguy.com
+                """;
     }
 
     @Override
     protected String getResultsWithLiteralsString() {
-        return "email,name\n" +
-                "mailto:jlow@example.com,Johnny Lee Outlaw\n" +
-                "mailto:peter@example.org,Peter Goodguy\n" +
-                "mailto:carol@example.org,Carol Patoune\n";
+        return """
+                email,name
+                mailto:jlow@example.com,Johnny Lee Outlaw
+                mailto:peter@example.org,Peter Goodguy
+                mailto:carol@example.org,Carol Patoune
+                """;
     }
 
     @Override
     protected String getResultsWithBlankNodesString() {
-        return "nb\n" +
-                "_:a\n" +
-                "_:b\n" +
-                "_:c\n";
+        return """
+                nb
+                _:a
+                _:b
+                _:c
+                """;
     }
 
     @Override
     protected String getResultsWithMultiLinesLiteralString() {
-        return "mail,depiction\n" +
-                "mailto:carol@example.org,\"All this work and no play makes Carols a dull girl,\n" +
-                "All this work and no play makes Carols a dull girl,\n" +
-                "All this work and no play makes Carols a dull girl,\n" +
-                "All this work and no play makes Carols a dull girl.\"\n";
+        return """
+                mail,depiction
+                mailto:carol@example.org,"All this work and no play makes Carols a dull girl,
+                All this work and no play makes Carols a dull girl,
+                All this work and no play makes Carols a dull girl,
+                All this work and no play makes Carols a dull girl."
+                """;
     }
 
     @Override
     protected String getResultWithLiteralContainingQuotesString() {
-        return "name,desc\n" +
-                "Alice,Literal with a single quote'\n" +
-                "Bernard,\"Literal with a quote\"\"\"\n" +
-                "Charles,\"Literal both quotes single ' and double \"\"\"\n";
+        return """
+                name,desc
+                Alice,Literal with a single quote'
+                Bernard,"Literal with a quote\"\""
+                Charles,"Literal both quotes single ' and double \"\""
+                """;
     }
 
     @Override
     protected String getSVStandardResultsString() {
-        return "x,literal\n" +
-                "http://example/x,String\n" +
-                "http://example/x,\"String-with-dquote\"\"\"\n" +
-                "_:blank0,Blank node\n" +
-                ",Missing 'x'\n" +
-                ",\n" +
-                "http://example/x,\n" +
-                "_:blank1,String-with-lang\n" +
-                "_:blank1,123\n";
+        return """
+                x,literal
+                http://example/x,String
+                http://example/x,"String-with-dquote\"\""
+                _:blank0,Blank node
+                ,Missing 'x'
+                ,
+                http://example/x,
+                _:blank1,String-with-lang
+                _:blank1,123
+                """;
     }
 }

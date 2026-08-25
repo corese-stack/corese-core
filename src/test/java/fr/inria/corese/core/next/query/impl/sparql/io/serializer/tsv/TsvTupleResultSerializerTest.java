@@ -30,54 +30,66 @@ class TsvTupleResultSerializerTest extends AbstractResultSerializerTest {
 
     @Override
     protected String getResultsWithUrisString() {
-        return "?email\t?homepage\n" +
-            "<mailto:jlow@example.com>\t<https://bsky.app/profile/johnnyleeoutlaw>\n" +
-            "<mailto:peter@example.org>\t<https://peter.goodguy.com>\n";
+        return """
+                ?email\t?homepage
+                <mailto:jlow@example.com>\t<https://bsky.app/profile/johnnyleeoutlaw>
+                <mailto:peter@example.org>\t<https://peter.goodguy.com>
+                """;
     }
 
     @Override
     protected String getResultsWithLiteralsString() {
-        return "?email\t?name\n" +
-                "<mailto:jlow@example.com>\t\"Johnny Lee Outlaw\"\n" +
-                "<mailto:peter@example.org>\t\"Peter Goodguy\"\n" +
-                "<mailto:carol@example.org>\t\"Carol Patoune\"\n";
+        return """
+                ?email\t?name
+                <mailto:jlow@example.com>\t"Johnny Lee Outlaw"
+                <mailto:peter@example.org>\t"Peter Goodguy"
+                <mailto:carol@example.org>\t"Carol Patoune"
+                """;
     }
 
     @Override
     protected String getResultsWithBlankNodesString() {
-        return "?nb\n" +
-                "_:a\n" +
-                "_:b\n" +
-                "_:c\n";
+        return """
+                ?nb
+                _:a
+                _:b
+                _:c
+                """;
     }
 
     @Override
     protected String getResultsWithMultiLinesLiteralString() {
-        return "?mail\t?depiction\n" +
-                "<mailto:carol@example.org>\t\"All this work and no play makes Carols a dull girl,\n" +
-                "All this work and no play makes Carols a dull girl,\n" +
-                "All this work and no play makes Carols a dull girl,\n" +
-                "All this work and no play makes Carols a dull girl.\"\n";
+        return """
+                ?mail\t?depiction
+                <mailto:carol@example.org>\t"All this work and no play makes Carols a dull girl,
+                All this work and no play makes Carols a dull girl,
+                All this work and no play makes Carols a dull girl,
+                All this work and no play makes Carols a dull girl."
+                """;
     }
 
     @Override
     protected String getResultWithLiteralContainingQuotesString() {
-        return "?name\t?desc\n" +
-                "\"Alice\"\t\"Literal with a single quote'\"\n" +
-                "\"Bernard\"\t\"Literal with a quote\\\"\"\n" +
-                "\"Charles\"\t\"Literal both quotes single ' and double \\\"\"\n";
+        return """
+                ?name\t?desc
+                "Alice"\t"Literal with a single quote'"
+                "Bernard"\t"Literal with a quote\\""
+                "Charles"\t"Literal both quotes single ' and double \\""
+                """;
     }
 
     @Override
     protected String getSVStandardResultsString() {
-        return "?x\t?literal\n" +
-                "<http://example/x>\t\"String\"\n" +
-                "<http://example/x>\t\"String-with-dquote\\\"\"\n" +
-                "_:blank0\t\"Blank node\"\n" +
-                "\t\"Missing 'x'\"\n" +
-                "\t\n" +
-                "<http://example/x>\t\n" +
-                "_:blank1\t\"String-with-lang\"@en\n" +
-                "_:blank1\t123\n";
+        return """
+                ?x\t?literal
+                <http://example/x>\t"String"
+                <http://example/x>\t"String-with-dquote\\""
+                _:blank0\t"Blank node"
+                \t"Missing 'x'"
+                \t
+                <http://example/x>\t
+                _:blank1\t"String-with-lang"@en
+                _:blank1\t123
+                """;
     }
 }
