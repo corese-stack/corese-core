@@ -23,10 +23,6 @@ public class AccessRightDefinition {
     private AccessMap graphAccess;
     private AccessMap predicateAccess;
     
-    private boolean debug = false;
-    private boolean inheritDefault = false;
-    
-    
     
     static {
         setSingleton(new AccessRightDefinition());
@@ -92,7 +88,6 @@ public class AccessRightDefinition {
     
     public void inheritDefault() {
         inherit(getSingleton());
-        setInheritDefault(true);
     }
     
     
@@ -243,13 +238,6 @@ public class AccessRightDefinition {
 
 
     /**
-     * @param debug the debug to set
-     */
-    public void setDebug(boolean debug) {
-        this.debug = debug;
-    }
-
-    /**
      * @return the singleton
      */
     public static AccessRightDefinition getSingleton() {
@@ -304,18 +292,5 @@ public class AccessRightDefinition {
     public void setPredicateAccess(AccessMap predicateAccess) {
         this.predicateAccess = predicateAccess;
     }
-
-
-    /**
-     * @param inheritDefault the inheritDefault to set
-     */
-    public void setInheritDefault(boolean inheritDefault) {
-        this.inheritDefault = inheritDefault;
-    }
-    
-    
-    
-    
-    
     
 }
