@@ -1,14 +1,34 @@
 package fr.inria.corese.core.next.query.impl.sparql.io.serializer.tsv;
 
 import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
+import fr.inria.corese.core.next.data.impl.adapter.literal.CoreseTyped;
 import fr.inria.corese.core.next.query.api.io.format.ResultFormat;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
 import fr.inria.corese.core.next.query.api.io.serializer.option.ResultSerializationOptions;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 import fr.inria.corese.core.next.query.impl.sparql.io.serializer.DefaultResultSerializerFactory;
 import fr.inria.corese.core.next.query.impl.sparql.io.serializer.support.AbstractResultSerializerTest;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Map;
+
+import static fr.inria.corese.core.next.query.impl.sparql.io.serializer.support.ResultSerializerTestUtils.MockQueryResults;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TsvTupleResultSerializerTest extends AbstractResultSerializerTest {
+
+    @Test
+    void recognizesEquivalentStringDatatypeIris() {
+        var datatype = getFactory().createIRI(XSDDatatype.STRING.getIRI().stringValue());
+        var literal = new CoreseTyped("value", datatype);
+        var results = new MockQueryResults(
+                List.of("literal"),
+                List.of(Map.of("literal", literal)));
+
+        assertEquals("?literal\n\"value\"\n", getResultSerializer(results).writeToString());
+    }
 
     @Override
     protected ResultSerializer getResultSerializer(TupleQueryResult results) {
