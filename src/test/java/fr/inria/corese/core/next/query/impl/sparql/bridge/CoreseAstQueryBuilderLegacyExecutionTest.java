@@ -235,7 +235,7 @@ class CoreseAstQueryBuilderLegacyExecutionTest extends AbstractSparqlParserFeatu
 
         private static ASTQuery selectAst() {
             ASTQuery ast = ASTQuery.create();
-            ast.setResultForm(ASTQuery.QT_SELECT);
+            ast.setResultForm(ASTQuery.ResultForm.QT_SELECT);
             ast.setSelectAll(true);
             return ast;
         }
