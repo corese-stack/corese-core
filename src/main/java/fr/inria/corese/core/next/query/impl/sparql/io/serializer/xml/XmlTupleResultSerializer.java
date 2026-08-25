@@ -69,9 +69,7 @@ public class XmlTupleResultSerializer implements ResultSerializer {
             root.appendChild(head);
 
             // Results
-            this.results.forEach(bindingSet -> {
-                resultsElement.appendChild(bindingSetToXML(bindingSet, resultDocument));
-            });
+            this.results.forEach(bindingSet -> resultsElement.appendChild(bindingSetToXML(bindingSet, resultDocument)));
 
             root.appendChild(resultsElement);
             resultDocument.appendChild(root);

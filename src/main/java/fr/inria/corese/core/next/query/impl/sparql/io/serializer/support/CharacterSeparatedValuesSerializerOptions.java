@@ -6,7 +6,7 @@ import fr.inria.corese.core.next.data.api.support.io.IOConstants;
 
 public abstract class CharacterSeparatedValuesSerializerOptions extends AbstractIOOptions implements LineEndingOptions {
 
-    private AbstractBuilder<?> builder;
+    private final AbstractBuilder<?> builder;
 
     protected CharacterSeparatedValuesSerializerOptions(AbstractBuilder<?> builder) {
         this.builder = builder;

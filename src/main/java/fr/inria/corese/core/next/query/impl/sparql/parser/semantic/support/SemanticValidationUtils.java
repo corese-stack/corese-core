@@ -18,7 +18,7 @@ public class SemanticValidationUtils {
             RDF.langString.getIRI().stringValue());
 
     /**
-     * Valid numeric datatypes as defined in https://www.w3.org/TR/sparql11-query/#operandDataTypes
+     * Valid numeric datatypes as defined in <a href="https://www.w3.org/TR/sparql11-query/#operandDataTypes">...</a>
      */
     private static final Set<String> NUMERIC_DATATYPES = Set.of(
             XSD.xsdInteger.getIRI().stringValue(),

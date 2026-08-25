@@ -36,7 +36,7 @@ public final class SparqlParserOptions
     private final List<QueryDiagnostic> diagnostics;
 
 
-    protected SparqlParserOptions(SparqlParserOptions.Builder builder) {
+    private SparqlParserOptions(SparqlParserOptions.Builder builder) {
         this.baseIRI = builder.baseIRI;
         this.strictMode = builder.strictMode;
         this.failFast = builder.failFast;
@@ -143,13 +143,13 @@ public final class SparqlParserOptions
      */
     public static final class Builder {
 
-        protected String baseIRI = IOConstants.getDefaultBaseURI();
+        private String baseIRI = IOConstants.getDefaultBaseURI();
 
-        protected boolean strictMode;
+        private boolean strictMode;
 
-        protected boolean failFast = true;
+        private boolean failFast = true;
 
-        protected boolean collectErrors = true;
+        private boolean collectErrors = true;
 
         public SparqlParserOptions build() {
             return new SparqlParserOptions(this);

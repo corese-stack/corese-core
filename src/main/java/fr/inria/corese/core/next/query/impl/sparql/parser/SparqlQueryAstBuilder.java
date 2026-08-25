@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.parser;
 
+import fr.inria.corese.core.next.common.text.RdfText;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
@@ -245,7 +246,7 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
                                 entry -> stripVariableMarker(entry.getKey()),
                                 entry -> entry.getValue() == null ? Set.of() : entry.getValue().stream()
                                         .filter(Objects::nonNull)
-                                        .map(s -> stripVariableMarker(s))
+                                        .map(RdfText::stripVariableMarker)
                                         .filter(s -> !s.isBlank())
                                         .collect(Collectors.toUnmodifiableSet())));
 

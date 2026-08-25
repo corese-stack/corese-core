@@ -59,7 +59,6 @@ public class ValuesAstListener extends AbstractSparqlQueryAstListener {
 
     /**
      *
-     * @param dataBlockValueList
      * @return A list of terms or null for UNDEF values
      */
     private Map<VarAst, TermAst> termAstFromDataBlockValues(List<VarAst> variables, List<SparqlParser.DataBlockValueContext> dataBlockValueList) {
