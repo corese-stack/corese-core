@@ -26,7 +26,6 @@ class RepositoriesTest {
     void defaultRepositoryIsImmediatelyUsableThroughPublicApi() {
         try (Repository repository = Repositories.create()) {
             assertTrue(repository.isOpen());
-            assertTrue(repository.isWritable());
             assertNotNull(repository.getValueFactory());
 
             repository.update("INSERT DATA { <urn:s> <urn:p> <urn:o> }");

@@ -45,13 +45,6 @@ public interface Repository extends AutoCloseable {
     void close() throws RepositoryException;
 
     /**
-     * Checks whether the repository supports write operations.
-     *
-     * @return {@code true} if write operations are supported, {@code false} for read-only
-     */
-    boolean isWritable();
-
-    /**
      * Opens a new connection to this repository.
      *
      * @return a new {@link RepositoryConnection}

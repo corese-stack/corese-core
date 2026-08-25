@@ -22,6 +22,7 @@ import fr.inria.corese.core.next.query.api.io.serializer.ResultIOOptions;
 import fr.inria.corese.core.next.query.api.repository.Repository;
 import fr.inria.corese.core.next.query.api.repository.RepositoryConnection;
 import fr.inria.corese.core.next.query.api.result.GraphQueryResult;
+import fr.inria.corese.core.next.query.api.result.StatementResult;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 import fr.inria.corese.core.next.query.impl.sparql.io.serializer.DefaultResultSerializerFactory;
 
@@ -182,7 +183,7 @@ public final class CoreseIO {
         return RDF_SERIALIZERS.createSerializer(format, source);
     }
 
-    public static RDFSerializer serializer(GraphQueryResult source, RDFFormat format) {
+    public static RDFSerializer serializer(StatementResult source, RDFFormat format) {
         return RDF_SERIALIZERS.createSerializer(format, source);
     }
 
@@ -194,7 +195,7 @@ public final class CoreseIO {
     }
 
     public static RDFSerializer serializer(
-            GraphQueryResult source,
+            StatementResult source,
             RDFFormat format,
             RDFSerializationOptions options) {
         return RDF_SERIALIZERS.createSerializer(format, source, options);
@@ -234,12 +235,12 @@ public final class CoreseIO {
         serializer(source, format, options).write(destination);
     }
 
-    public static void write(GraphQueryResult source, RDFFormat format, Writer destination) {
+    public static void write(StatementResult source, RDFFormat format, Writer destination) {
         serializer(source, format).write(destination);
     }
 
     public static void write(
-            GraphQueryResult source,
+            StatementResult source,
             RDFFormat format,
             RDFSerializationOptions options,
             Writer destination) {
@@ -266,7 +267,7 @@ public final class CoreseIO {
         serializer(source, format).write(destination);
     }
 
-    public static void write(GraphQueryResult source, RDFFormat format, OutputStream destination) {
+    public static void write(StatementResult source, RDFFormat format, OutputStream destination) {
         serializer(source, format).write(destination);
     }
 
@@ -282,7 +283,7 @@ public final class CoreseIO {
         serializer(source, format).write(destination);
     }
 
-    public static void write(GraphQueryResult source, RDFFormat format, Path destination) {
+    public static void write(StatementResult source, RDFFormat format, Path destination) {
         serializer(source, format).write(destination);
     }
 
@@ -313,12 +314,12 @@ public final class CoreseIO {
         return serializer(source, format, options).writeToString();
     }
 
-    public static String writeToString(GraphQueryResult source, RDFFormat format) {
+    public static String writeToString(StatementResult source, RDFFormat format) {
         return serializer(source, format).writeToString();
     }
 
     public static String writeToString(
-            GraphQueryResult source,
+            StatementResult source,
             RDFFormat format,
             RDFSerializationOptions options) {
         return serializer(source, format, options).writeToString();

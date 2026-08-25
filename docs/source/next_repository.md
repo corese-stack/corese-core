@@ -27,6 +27,58 @@ The `select` and `graph` shortcuts materialize their complete result before
 returning it. They are convenient and connection-safe, but their memory usage
 grows with the result size. `ask` and `update` do not materialize a result.
 
+## RDF data access
+
+A connection exposes the same RDF terms and statements as the data API. Files
+are parsed with `CoreseIO`, then their model can be added directly:
+
+```java
+try (Repository repository = Repositories.create();
+     RepositoryConnection connection = repository.getConnection()) {
+    Model model = CoreseIO.read(Path.of("data.ttl"), RDFFormat.TURTLE);
+    connection.add(model);
+
+    ValueFactory values = connection.getValueFactory();
+    boolean present = connection.hasStatement(
+            values.createIRI("urn:subject"),
+            values.createIRI("urn:predicate"),
+            null);
+}
+```
+
+`CoreseIO.read` currently builds an in-memory `Model` before insertion. This is
+the simple path for ordinary files; direct parser-to-repository streaming will
+be added when the parser exposes a public statement sink.
+
+Statements can also be created and modified without SPARQL:
+
+```java
+ValueFactory values = connection.getValueFactory();
+IRI subject = values.createIRI("urn:subject");
+IRI predicate = values.createIRI("urn:predicate");
+IRI object = values.createIRI("urn:object");
+IRI graph = values.createIRI("urn:graph");
+
+connection.add(subject, predicate, object);        // default graph
+connection.add(subject, predicate, object, graph); // named graph
+connection.remove(subject, predicate, object, graph);
+```
+
+For `getStatements`, `hasStatement`, `remove`, `size`, and `clear`, omitting the
+contexts means every graph. Passing an explicit `(Resource) null` selects only
+the default graph. For `add`, omitting the context adds to the default graph.
+With several contexts, `add` creates one statement in each selected graph.
+
+`getStatements` is progressive and its result must be closed before its
+connection. It can be exported directly through the same I/O facade:
+
+```java
+try (StatementResult statements =
+         connection.getStatements(null, null, null)) {
+    CoreseIO.write(statements, RDFFormat.NQUADS, outputStream);
+}
+```
+
 ## Progressive and configured queries
 
 Use a connection when results must be consumed progressively or when an

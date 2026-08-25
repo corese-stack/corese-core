@@ -1,6 +1,10 @@
 package fr.inria.corese.core.next.query.api.repository;
 
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
+import fr.inria.corese.core.next.data.api.model.Statement;
+import fr.inria.corese.core.next.data.api.term.IRI;
+import fr.inria.corese.core.next.data.api.term.Resource;
+import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.query.api.BooleanQuery;
 import fr.inria.corese.core.next.query.api.GraphQuery;
 import fr.inria.corese.core.next.query.api.TupleQuery;
@@ -8,6 +12,7 @@ import fr.inria.corese.core.next.query.api.Update;
 import fr.inria.corese.core.next.query.api.dataset.Dataset;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.api.exception.RepositoryException;
+import fr.inria.corese.core.next.query.api.result.StatementResult;
 
 /**
  * A connection to a Corese {@link Repository}, providing access to query
@@ -22,6 +27,7 @@ import fr.inria.corese.core.next.query.api.exception.RepositoryException;
  * connection or their repository is closed. Closing a connection is idempotent
  * and never closes its repository.</p>
  *
+ * <p>A connection is a mutable session and is not safe for concurrent use.</p>
  *
  * @see Repository
  * @see TupleQuery
@@ -45,6 +51,130 @@ public interface RepositoryConnection extends AutoCloseable {
      * @return the value factory
      */
     ValueFactory getValueFactory();
+
+    // --- RDF data access ---
+
+    /**
+     * Adds a statement to the repository. Adding an existing statement has no
+     * effect.
+     *
+     * @param statement statement to add
+     * @throws NullPointerException if {@code statement} is {@code null}
+     * @throws RepositoryException if the operation fails or the connection is closed
+     */
+    void add(Statement statement) throws RepositoryException;
+
+    /**
+     * Adds every statement supplied by an iterable. This method consumes the
+     * iterable progressively and does not retain it in memory.
+     *
+     * @param statements statements to add
+     * @throws NullPointerException if the iterable or one of its statements is {@code null}
+     * @throws RepositoryException if the operation fails or the connection is closed
+     */
+    void add(Iterable<? extends Statement> statements) throws RepositoryException;
+
+    /**
+     * Adds a statement assembled from RDF terms. With no context, the statement
+     * is added to the default graph. With several contexts, one statement is
+     * added to each graph; a {@code null} context denotes the default graph.
+     *
+     * @param subject statement subject
+     * @param predicate statement predicate
+     * @param object statement object
+     * @param contexts target contexts, or none for the default graph
+     * @throws NullPointerException if a required RDF term is {@code null}
+     * @throws RepositoryException if the operation fails or the connection is closed
+     */
+    void add(Resource subject, IRI predicate, Value object, Resource... contexts)
+            throws RepositoryException;
+
+    /**
+     * Removes a statement if it is present.
+     *
+     * @param statement statement to remove
+     * @throws NullPointerException if {@code statement} is {@code null}
+     * @throws RepositoryException if the operation fails or the connection is closed
+     */
+    void remove(Statement statement) throws RepositoryException;
+
+    /**
+     * Removes every supplied statement that is present.
+     *
+     * @param statements statements to remove
+     * @throws NullPointerException if the iterable or one of its statements is {@code null}
+     * @throws RepositoryException if the operation fails or the connection is closed
+     */
+    void remove(Iterable<? extends Statement> statements) throws RepositoryException;
+
+    /**
+     * Removes statements matching an RDF pattern. A {@code null} subject,
+     * predicate, or object is a wildcard. No contexts means every graph; an
+     * explicit {@code null} context selects only the default graph.
+     *
+     * @param subject subject to match, or {@code null}
+     * @param predicate predicate to match, or {@code null}
+     * @param object object to match, or {@code null}
+     * @param contexts contexts to match, or none for every graph
+     * @throws RepositoryException if the operation fails or the connection is closed
+     */
+    void remove(Resource subject, IRI predicate, Value object, Resource... contexts)
+            throws RepositoryException;
+
+    /**
+     * Removes all statements from the selected contexts. No contexts clears the
+     * whole repository; an explicit {@code null} context clears only the default
+     * graph.
+     *
+     * @param contexts contexts to clear, or none to clear every graph
+     * @throws RepositoryException if the operation fails or the connection is closed
+     */
+    void clear(Resource... contexts) throws RepositoryException;
+
+    /**
+     * Tests whether at least one statement matches an RDF pattern. A
+     * {@code null} term is a wildcard. No contexts means every graph; an explicit
+     * {@code null} context selects only the default graph.
+     *
+     * @param subject subject to match, or {@code null}
+     * @param predicate predicate to match, or {@code null}
+     * @param object object to match, or {@code null}
+     * @param contexts contexts to match, or none for every graph
+     * @return whether a matching statement exists
+     * @throws RepositoryException if the operation fails or the connection is closed
+     */
+    boolean hasStatement(Resource subject, IRI predicate, Value object, Resource... contexts)
+            throws RepositoryException;
+
+    /**
+     * Returns the number of statements in the selected contexts. No contexts
+     * means every graph; an explicit {@code null} context selects only the
+     * default graph.
+     *
+     * @param contexts contexts to count, or none for every graph
+     * @return number of matching statements
+     * @throws RepositoryException if the operation fails or the connection is closed
+     */
+    long size(Resource... contexts) throws RepositoryException;
+
+    /**
+     * Returns a progressive result containing statements matching an RDF
+     * pattern. A {@code null} term is a wildcard. No contexts means every graph;
+     * an explicit {@code null} context selects only the default graph.
+     *
+     * <p>The result depends on this connection and must be closed before the
+     * connection is closed.</p>
+     *
+     * @param subject subject to match, or {@code null}
+     * @param predicate predicate to match, or {@code null}
+     * @param object object to match, or {@code null}
+     * @param contexts contexts to match, or none for every graph
+     * @return a closeable, single-use statement result
+     * @throws RepositoryException if the operation fails or the connection is closed
+     */
+    StatementResult getStatements(
+            Resource subject, IRI predicate, Value object, Resource... contexts)
+            throws RepositoryException;
 
     /**
      * Indicates whether this connection is still open and usable.

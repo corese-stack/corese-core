@@ -82,11 +82,6 @@ public final class CoreseRepository implements Repository {
     }
 
     @Override
-    public boolean isWritable() {
-        return isOpen();
-    }
-
-    @Override
     public RepositoryConnection getConnection() throws RepositoryException {
         if (!isOpen()) {
             throw new RepositoryException("This repository is closed.");
