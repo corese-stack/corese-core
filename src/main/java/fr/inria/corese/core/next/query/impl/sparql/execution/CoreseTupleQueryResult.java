@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.query.impl.result;
+package fr.inria.corese.core.next.query.impl.sparql.execution;
 
 import fr.inria.corese.core.next.query.api.result.BindingSet;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Wrapper around Mappings
+ * Adapts a KGRAM {@link Mappings} result to the {@link TupleQueryResult} API.
  */
 public final class CoreseTupleQueryResult implements TupleQueryResult {
 

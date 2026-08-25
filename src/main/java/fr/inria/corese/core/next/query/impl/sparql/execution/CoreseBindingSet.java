@@ -1,17 +1,18 @@
-package fr.inria.corese.core.next.query.impl.result;
+package fr.inria.corese.core.next.query.impl.sparql.execution;
 
 import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.data.impl.adapter.CoreseValueConverter;
 import fr.inria.corese.core.next.query.api.result.Binding;
 import fr.inria.corese.core.next.query.api.result.BindingSet;
 import fr.inria.corese.core.next.query.impl.kgram.core.Mapping;
+import fr.inria.corese.core.next.query.impl.result.CoreseBinding;
 
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 
 /**
- * Wrapper around Mapping
+ * Adapts a KGRAM {@link Mapping} to the {@link BindingSet} API.
  */
 public final class CoreseBindingSet implements BindingSet {
 
@@ -34,7 +35,7 @@ public final class CoreseBindingSet implements BindingSet {
 
     @Override
     public Value getValue(String name) {
-        if(this.hasBinding(name)) {
+        if (this.hasBinding(name)) {
             return CONVERTER.fromCoreseNode(this.mapping.getValue(name));
         }
         return null;

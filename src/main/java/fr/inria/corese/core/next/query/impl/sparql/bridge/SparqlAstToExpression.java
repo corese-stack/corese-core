@@ -130,7 +130,7 @@ public final class SparqlAstToExpression {
     }
 
     private static String normalizeDatatypeIri(String dt) {
-        String d =  RdfText.stripAngleBrackets(dt);
+        String d = RdfText.stripAngleBrackets(dt);
         return NSManager.nsm().toNamespace(d);
     }
 

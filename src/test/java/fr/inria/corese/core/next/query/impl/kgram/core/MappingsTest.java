@@ -2,10 +2,6 @@ package fr.inria.corese.core.next.query.impl.kgram.core;
 
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Edge;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Node;
-import fr.inria.corese.core.next.query.impl.kgram.core.Eval;
-import fr.inria.corese.core.next.query.impl.kgram.core.Mapping;
-import fr.inria.corese.core.next.query.impl.kgram.core.Mappings;
-import fr.inria.corese.core.next.query.impl.kgram.core.Query;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
