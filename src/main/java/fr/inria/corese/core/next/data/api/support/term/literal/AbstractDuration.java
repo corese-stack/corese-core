@@ -31,7 +31,6 @@ public abstract class AbstractDuration extends AbstractLiteral implements Compar
 
     /**
      * Comparison between two temporal literals using their temporal amount values.
-     * @param o
      * @return -1 if this is less than o, 0 if they are equal, 1 if this is greater than o
      */
     @Override

@@ -75,9 +75,9 @@ public class RDFC10SerializerOptions extends AbstractSerializerOptions {
      * specific to the Canonical RDF format.
      */
     public static class Builder extends AbstractSerializerOptions.AbstractBuilder<Builder> {
-        private HashAlgorithm hashAlgorithm = HashAlgorithm.SHA_256;
-        private int depthFactor = 5;
-        private int permutationLimit = 50000;
+        private final HashAlgorithm hashAlgorithm = HashAlgorithm.SHA_256;
+        private final int depthFactor = 5;
+        private final int permutationLimit = 50000;
 
         /**
          * Default constructor for the Builder.

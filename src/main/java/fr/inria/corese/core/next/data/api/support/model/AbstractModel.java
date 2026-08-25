@@ -51,7 +51,7 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
 
     @Override
     public Set<Resource> subjects() {
-        return new ValueSet<Resource>() {
+        return new ValueSet<>() {
 
             @Override
             public boolean contains(Object object) {
@@ -88,7 +88,7 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
 
     @Override
     public Set<IRI> predicates() {
-        return new ValueSet<IRI>() {
+        return new ValueSet<>() {
 
             @Override
             public boolean contains(Object object) {
@@ -125,7 +125,7 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
 
     @Override
     public Set<Value> objects() {
-        return new ValueSet<Value>() {
+        return new ValueSet<>() {
 
             @Override
             public boolean contains(Object object) {
@@ -162,7 +162,7 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
 
     @Override
     public Set<Resource> contexts() {
-        return new ValueSet<Resource>() {
+        return new ValueSet<>() {
 
             @Override
             public boolean contains(Object object) {
@@ -259,6 +259,7 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
         }
 
         @Override
+        @SuppressWarnings("NullableProblems")
         public Iterator<V> iterator() {
             return new ValueSetIterator(AbstractModel.this.iterator());
         }
@@ -303,6 +304,7 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
         }
 
         @Override
+        @SuppressWarnings("NullableProblems")
         public Object[] toArray() {
             Iterator<Statement> iterator = AbstractModel.this.iterator();
             try {
@@ -317,6 +319,7 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
         }
 
         @Override
+        @SuppressWarnings("NullableProblems")
         public <T> T[] toArray(T[] array) {
             Iterator<Statement> iterator = AbstractModel.this.iterator();
             try {
@@ -364,6 +367,7 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
         }
 
         @Override
+        @SuppressWarnings("NullableProblems")
         public boolean retainAll(Collection<?> collection) {
             Iterator<V> iterator = iterator();
             try {
@@ -423,6 +427,7 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
     }
 
     @Override
+    @SuppressWarnings("NullableProblems")
     public Object[] toArray() {
         Iterator<Statement> iterator = iterator();
         try {
@@ -439,6 +444,7 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
     }
 
     @Override
+    @SuppressWarnings("NullableProblems")
     public <T> T[] toArray(T[] array) {
         Iterator<Statement> iterator = iterator();
         try {
@@ -512,6 +518,7 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
     }
 
     @Override
+    @SuppressWarnings("NullableProblems")
     public boolean retainAll(Collection<?> collection) {
         boolean modified = false;
 

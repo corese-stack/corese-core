@@ -45,7 +45,7 @@ import fr.inria.corese.core.next.data.impl.io.parser.support.ParserConstants;
  */
 public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
 
-    private Model model;
+    private final Model model;
 
     /**
      * Constructor for TitaniumRDFDatasetSerializationAdapter that initializes the model.

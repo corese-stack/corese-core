@@ -111,6 +111,7 @@ public class ReadOnlyModel extends AbstractModel {
 	 * Returns an unmodifiable iterator over the statements in the model.
 	 */
 	@Override
+	@SuppressWarnings("NullableProblems")
 	public Iterator<Statement> iterator() {
 		return Collections.unmodifiableSet(delegate).iterator();
 	}

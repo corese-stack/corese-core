@@ -21,8 +21,8 @@ import java.util.Objects;
  */
 public class JSONLDSerializer implements RDFSerializer {
 
-    private Model model;
-    private IOOptions config;
+    private final Model model;
+    private final IOOptions config;
 
     /**
      * Constructor.
@@ -36,7 +36,6 @@ public class JSONLDSerializer implements RDFSerializer {
 
     /**
      * Constructor for a JSON-LD with default options.
-     * @param model
      */
     public JSONLDSerializer(Model model) {
         this(model, new JSONLDOptions.Builder().build());

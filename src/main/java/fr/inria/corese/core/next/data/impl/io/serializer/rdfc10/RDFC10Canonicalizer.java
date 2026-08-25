@@ -23,7 +23,7 @@ public class RDFC10Canonicalizer {
     private final int maxCallsHashNDegreeQuads;
     private final StatementUtils statementUtils;
     private int callsHashNDegreeQuads = 0;
-    private Set<String> currentPathVisited = new HashSet<>();
+    private final Set<String> currentPathVisited = new HashSet<>();
 
     /**
      * Constructs a new Rdfc10Canonicalizer with specified configuration.

@@ -1,6 +1,5 @@
 package fr.inria.corese.core.next.data.impl.io.serializer.ntriples;
 
-import java.io.IOException;
 import java.io.Writer;
 import java.util.Objects;
 
@@ -85,10 +84,9 @@ public class NTriplesSerializer extends AbstractLineBasedSerializer {
      *
      * @param writer the {@link Writer} to which the context will be written.
      * @param stmt   the {@link Statement} whose context should be written.
-     * @throws IOException if an I/O error occurs.
      */
     @Override
-    protected void writeContext(Writer writer, Statement stmt) throws IOException {
+    protected void writeContext(Writer writer, Statement stmt) {
         Resource context = stmt.getContext();
 
         if (context != null && logger.isWarnEnabled()) {

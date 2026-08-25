@@ -21,9 +21,9 @@ class SimpleTripleTest {
 
         Triple triple = values.createTriple(subject, predicate, object);
 
-        assertEquals(subject, triple.getSubject());
-        assertEquals(predicate, triple.getPredicate());
-        assertEquals(object, triple.getObject());
+        assertEquals(subject, triple.subject());
+        assertEquals(predicate, triple.predicate());
+        assertEquals(object, triple.object());
         assertTrue(triple.isTriple());
         assertFalse(triple.isResource());
     }

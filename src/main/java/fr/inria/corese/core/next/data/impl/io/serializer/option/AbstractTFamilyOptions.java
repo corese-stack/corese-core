@@ -391,7 +391,7 @@ public abstract class AbstractTFamilyOptions extends AbstractSerializerOptions i
          * Adds a custom prefix mapping to the PrefixHandler.
          *
          * @param prefix    The prefix name (e.g., "ex"). Must not be null.
-         * @param namespace The namespace URI (e.g., "http://example.org/"). Must not be null.
+         * @param namespace The namespace URI (e.g., "<a href="http://example.org/">...</a>"). Must not be null.
          * @return The builder instance for fluent chaining.
          * @throws NullPointerException if prefix or namespace is null.
          */

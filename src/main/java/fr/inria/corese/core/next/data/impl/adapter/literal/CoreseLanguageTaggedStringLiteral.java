@@ -34,7 +34,7 @@ public class CoreseLanguageTaggedStringLiteral extends AbstractStringLiteral imp
     /**
      * The language tag associated with the literal.
      */
-    private String language;
+    private final String language;
     /**
      * The value of the language-tagged string literal.
      */

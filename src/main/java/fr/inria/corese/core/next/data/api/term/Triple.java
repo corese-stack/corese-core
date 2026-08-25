@@ -11,17 +11,17 @@ public interface Triple extends Value {
 	/**
 	 * @return the subject of this triple
 	 */
-	Resource getSubject();
+	Resource subject();
 
 	/**
 	 * @return the predicate of this triple
 	 */
-	IRI getPredicate();
+	IRI predicate();
 
 	/**
 	 * @return the object of this triple
 	 */
-	Value getObject();
+	Value object();
 
 	@Override
 	boolean equals(Object other);
