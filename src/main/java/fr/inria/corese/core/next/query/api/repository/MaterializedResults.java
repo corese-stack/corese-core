@@ -134,6 +134,7 @@ final class MaterializedResults {
         }
 
         @Override
+        @SuppressWarnings("NullableProblems")
         public Iterator<Binding> iterator() {
             return values.entrySet().stream()
                     .<Binding>map(entry -> new ImmutableBinding(entry.getKey(), entry.getValue()))
