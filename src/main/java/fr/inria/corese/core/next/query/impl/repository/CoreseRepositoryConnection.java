@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.query.impl.repository;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.query.api.BooleanQuery;
 import fr.inria.corese.core.next.query.api.GraphQuery;
-import fr.inria.corese.core.next.query.api.QueryLanguage;
+import fr.inria.corese.core.next.query.api.Query;
 import fr.inria.corese.core.next.query.api.TupleQuery;
 import fr.inria.corese.core.next.query.api.Update;
 import fr.inria.corese.core.next.query.api.dataset.Dataset;
@@ -24,6 +24,11 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.UpdateRequestAst;
 import fr.inria.corese.core.next.query.impl.sparql.execution.NextSparqlPipelineExecutor;
 import fr.inria.corese.core.next.storage.api.StorageManager;
+import fr.inria.corese.core.next.storage.api.exception.StorageException;
+import fr.inria.corese.core.next.storage.api.transaction.Transaction;
+import fr.inria.corese.core.next.storage.api.transaction.TransactionManager;
+
+import java.util.Objects;
 
 /**
  * Connection to a Corese repository.
@@ -40,6 +45,7 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
     private final NextSparqlPipelineExecutor executor;
     private final SparqlParser parser;
     private Dataset connectionDataset;
+    private Transaction transaction;
     private boolean open = true;
 
     CoreseRepositoryConnection(Repository repository, StorageManager storage) {
@@ -66,67 +72,79 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
 
     @Override
     public void close() throws RepositoryException {
-        open = false;
+        if (!open) {
+            return;
+        }
+        try {
+            if (transaction != null && transaction.isActive()) {
+                transaction.close();
+            }
+        } catch (StorageException | IllegalStateException e) {
+            throw new RepositoryException("Could not roll back the active transaction", e);
+        } finally {
+            transaction = null;
+            open = false;
+        }
     }
 
+    private static final String PARAM_QUERY_STRING = "queryString";
+
     @Override
-    public TupleQuery prepareTupleQuery(QueryLanguage queryLanguage, String queryString)
+    public TupleQuery prepareTupleQuery(String queryString)
             throws QuerySyntaxException, RepositoryException {
         checkOpen();
-        checkLanguage(queryLanguage);
-        QueryAst ast = parse(queryString);
+        String source = requireSource(queryString, PARAM_QUERY_STRING);
+        QueryAst ast = parse(source);
         if (!(ast instanceof SelectQueryAst)) {
             throw new QuerySyntaxException(
                     "Expected a SELECT query, got: " + ast.getClass().getSimpleName());
         }
-        CoreseTupleQuery q = new CoreseTupleQuery(queryString, queryLanguage, executor);
+        CoreseTupleQuery q = new CoreseTupleQuery(source, executor, this::checkOpen);
         applyConnectionDataset(q);
         return q;
     }
 
     @Override
-    public GraphQuery prepareGraphQuery(QueryLanguage queryLanguage, String queryString)
+    public GraphQuery prepareGraphQuery(String queryString)
             throws QuerySyntaxException, RepositoryException {
         checkOpen();
-        checkLanguage(queryLanguage);
-        QueryAst ast = parse(queryString);
+        String source = requireSource(queryString, PARAM_QUERY_STRING);
+        QueryAst ast = parse(source);
         if (!(ast instanceof ConstructQueryAst) && !(ast instanceof DescribeQueryAst)) {
             throw new QuerySyntaxException(
                     "Expected a CONSTRUCT or DESCRIBE query, got: " + ast.getClass().getSimpleName());
         }
-        CoreseGraphQuery q = new CoreseGraphQuery(queryString, queryLanguage, executor);
+        CoreseGraphQuery q = new CoreseGraphQuery(source, executor, this::checkOpen);
         applyConnectionDataset(q);
         return q;
     }
 
     @Override
-    public BooleanQuery prepareBooleanQuery(QueryLanguage queryLanguage, String queryString)
+    public BooleanQuery prepareBooleanQuery(String queryString)
             throws QuerySyntaxException, RepositoryException {
         checkOpen();
-        checkLanguage(queryLanguage);
-        QueryAst ast = parse(queryString);
+        String source = requireSource(queryString, PARAM_QUERY_STRING);
+        QueryAst ast = parse(source);
         if (!(ast instanceof AskQueryAst)) {
             throw new QuerySyntaxException(
                     "Expected an ASK query, got: " + ast.getClass().getSimpleName());
         }
-        CoreseBooleanQuery q = new CoreseBooleanQuery(queryString, queryLanguage, executor);
+        CoreseBooleanQuery q = new CoreseBooleanQuery(source, executor, this::checkOpen);
         applyConnectionDataset(q);
         return q;
     }
 
     @Override
-    public Update prepareUpdate(QueryLanguage queryLanguage, String updateString)
+    public Update prepareUpdate(String updateString)
             throws QuerySyntaxException, RepositoryException {
         checkOpen();
-        checkLanguage(queryLanguage);
-        QueryAst ast = parse(updateString);
+        String source = requireSource(updateString, "updateString");
+        QueryAst ast = parse(source);
         if (!(ast instanceof UpdateRequestAst)) {
             throw new QuerySyntaxException(
                     "Expected a SPARQL UPDATE request, got: " + ast.getClass().getSimpleName());
         }
-        CoreseUpdate u = new CoreseUpdate(updateString, queryLanguage, storage, parser);
-        applyConnectionDataset(u);
-        return u;
+        return new CoreseUpdate(source, storage, parser, this::checkOpen);
     }
 
     @Override
@@ -142,23 +160,72 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
     }
 
     @Override
+    public boolean supportsTransactions() {
+        checkOpen();
+        return transactionManager().supportsTransactions();
+    }
+
+    @Override
+    public boolean isActive() {
+        checkOpen();
+        return transaction != null && transaction.isActive();
+    }
+
+    @Override
     public void begin() throws RepositoryException {
-        checkTransactionsSupported();
+        checkOpen();
+        if (isActive()) {
+            throw new RepositoryException("A transaction is already active on this connection.");
+        }
+        TransactionManager manager = transactionManager();
+        if (!manager.supportsTransactions()) {
+            throw new RepositoryException("Transactions are not supported by this repository.");
+        }
+        try {
+            transaction = manager.beginTransaction();
+        } catch (StorageException | UnsupportedOperationException e) {
+            throw new RepositoryException("Could not begin transaction", e);
+        }
     }
 
     @Override
     public void commit() throws RepositoryException {
-        checkTransactionsSupported();
+        Transaction active = requireActiveTransaction();
+        try {
+            active.commit();
+        } catch (StorageException | IllegalStateException e) {
+            throw new RepositoryException("Could not commit transaction", e);
+        } finally {
+            if (!active.isActive()) {
+                transaction = null;
+            }
+        }
     }
 
     @Override
     public void rollback() throws RepositoryException {
-        checkTransactionsSupported();
+        Transaction active = requireActiveTransaction();
+        try {
+            active.rollback();
+        } catch (StorageException | IllegalStateException e) {
+            throw new RepositoryException("Could not roll back transaction", e);
+        } finally {
+            if (!active.isActive()) {
+                transaction = null;
+            }
+        }
     }
 
-    private void checkTransactionsSupported() throws RepositoryException {
+    private Transaction requireActiveTransaction() {
         checkOpen();
-        throw new RepositoryException("Transactions are not yet supported.");
+        if (!isActive()) {
+            throw new RepositoryException("No transaction is active on this connection.");
+        }
+        return transaction;
+    }
+
+    private TransactionManager transactionManager() {
+        return storage.getTransactionManager();
     }
 
     private void checkOpen() {
@@ -167,19 +234,13 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
         }
     }
 
-    private void checkLanguage(QueryLanguage queryLanguage) {
-        if (queryLanguage != QueryLanguage.SPARQL) {
-            throw new RepositoryException("Only SPARQL is supported by the next query pipeline.");
-        }
-    }
-
     /**
      * Applies the connection-level dataset to an operation as its initial dataset,
      * only when no query-level dataset has been set yet.
-     * The user can still override it by calling {@link fr.inria.corese.core.next.query.api.Operation#setDataset(Dataset)}
+     * The user can still override it by calling {@link Query#setDataset(Dataset)}
      * on the returned operation.
      */
-    private void applyConnectionDataset(fr.inria.corese.core.next.query.api.Operation operation) {
+    private void applyConnectionDataset(Query<?> operation) {
         if (connectionDataset != null && operation.getDataset() == null) {
             operation.setDataset(connectionDataset);
         }
@@ -190,5 +251,13 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
      */
     private QueryAst parse(String queryString) throws QuerySyntaxException {
         return parser.parse(queryString);
+    }
+
+    private String requireSource(String source, String parameterName) {
+        String checkedSource = Objects.requireNonNull(source, parameterName);
+        if (checkedSource.isBlank()) {
+            throw new QuerySyntaxException("SPARQL source must not be blank.");
+        }
+        return checkedSource;
     }
 }

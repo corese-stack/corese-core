@@ -112,11 +112,11 @@ class CoreseRepositoryTest {
         }
 
         @Test
-        @DisplayName("construct() 1-liner executes CONSTRUCT query and returns materialized safe result")
+        @DisplayName("graph() 1-liner executes CONSTRUCT query and returns materialized safe result")
         void constructOneLinerTest() throws RepositoryException {
             repository.update("INSERT DATA { <http://ex.org/s> <http://ex.org/p> <http://ex.org/o> }");
 
-            var result = repository.construct("CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o }");
+            var result = repository.graph("CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o }");
             try (result) {
                 assertTrue(result.hasNext());
                 var stmt = result.next();

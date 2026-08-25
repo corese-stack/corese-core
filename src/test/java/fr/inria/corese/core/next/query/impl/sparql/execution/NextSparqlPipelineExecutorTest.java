@@ -12,7 +12,6 @@ import fr.inria.corese.core.next.query.api.result.Binding;
 import fr.inria.corese.core.next.query.api.result.BindingSet;
 import fr.inria.corese.core.next.query.api.result.GraphQueryResult;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
-import fr.inria.corese.core.next.query.impl.dataset.CoreseDataset;
 import fr.inria.corese.core.next.storage.impl.memory.MemoryStorageManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -173,7 +172,7 @@ class NextSparqlPipelineExecutorTest {
         insertInGraph(iri(ALICE), iri(KNOWS), iri(BOB), iri(graph1));
         insertInGraph(iri(ALICE), iri(KNOWS), iri(carol), iri(graph2));
 
-        Dataset dataset = new CoreseDataset().addDefaultGraph(graph1);
+        Dataset dataset = Dataset.builder().defaultGraph(iri(graph1)).build();
         TupleQueryResult result = executor.evaluateTuple(
                 "SELECT ?o WHERE { <" + ALICE + "> <" + KNOWS + "> ?o }",
                 null, dataset, 0L);
@@ -188,12 +187,35 @@ class NextSparqlPipelineExecutorTest {
     void selectWithDatasetFromReturnsNothingForEmptyNamedGraph() {
         String emptyGraph = "http://example.org/empty";
 
-        Dataset dataset = new CoreseDataset().addDefaultGraph(emptyGraph);
+        Dataset dataset = Dataset.builder().defaultGraph(iri(emptyGraph)).build();
         TupleQueryResult result = executor.evaluateTuple(
                 "SELECT * WHERE { ?s ?p ?o }",
                 null, dataset, 0L);
 
         assertFalse(result.hasNext(), "No results expected for an empty named graph");
+    }
+
+    @Test
+    @DisplayName("An explicit empty dataset hides repository data")
+    void explicitEmptyDatasetHasNoDefaultGraph() {
+        TupleQueryResult result = executor.evaluateTuple(
+                "SELECT * WHERE { ?s ?p ?o }",
+                null, Dataset.empty(), 0L);
+
+        assertFalse(result.hasNext());
+    }
+
+    @Test
+    @DisplayName("A named-only dataset has an empty default graph")
+    void namedOnlyDatasetHasNoDefaultGraph() {
+        String graph = "http://example.org/graph";
+        insertInGraph(iri(ALICE), iri(KNOWS), iri(BOB), iri(graph));
+        Dataset dataset = Dataset.builder().namedGraph(iri(graph)).build();
+
+        TupleQueryResult defaultResult = executor.evaluateTuple(
+                "SELECT * WHERE { ?s ?p ?o }", null, dataset, 0L);
+
+        assertFalse(defaultResult.hasNext());
     }
 
     // -------------------------------------------------------------------------
@@ -290,12 +312,15 @@ class NextSparqlPipelineExecutorTest {
 
         // Cross-product of 201 triples × 201 triples = 40 401 combinations — expensive enough
         // to reliably exceed a 1 ms timeout on any machine.
-        assertThrows(QueryTimeoutException.class, () ->
-                executor.evaluateTuple(
-                        "SELECT * WHERE { ?s1 ?p1 ?o1 . ?s2 ?p2 ?o2 }",
-                        null, null, 1L) // 1 ms
-                        .stream()
-                        .count());
+        assertThrows(QueryTimeoutException.class, this::evaluateAndConsumeTimeoutQuery);
+    }
+
+    private void evaluateAndConsumeTimeoutQuery() {
+        try (TupleQueryResult result = executor.evaluateTuple(
+                "SELECT * WHERE { ?s1 ?p1 ?o1 . ?s2 ?p2 ?o2 }",
+                null, null, 1L)) {
+            result.stream().count();
+        }
     }
 
     // -------------------------------------------------------------------------

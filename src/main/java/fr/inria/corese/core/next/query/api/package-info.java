@@ -14,10 +14,10 @@
  *   <li>{@link fr.inria.corese.core.next.query.api.Update} — SPARQL 1.1 UPDATE</li>
  * </ul>
  *
- * <p>All types implement {@link fr.inria.corese.core.next.query.api.Operation}, which provides
- * initial bindings ({@code setBinding}), dataset override ({@code setDataset}),
- * and execution-time limit ({@code setMaxExecutionTime}).
- * Query types additionally expose {@code setTimeout(long millis)} for millisecond precision.</p>
+ * <p>Prepared queries provide initial bindings ({@code setBinding}), an immutable
+ * dataset override ({@code setDataset}), and a type-safe execution timeout
+ * ({@code setTimeout(Duration)}). SPARQL is implicit because it is the sole
+ * query language exposed by this API.</p>
  *
  * <p>No internal types (parser, AST, bridge, KGRAM) appear in this package or its sub-packages.
  * All errors are reported via the exception hierarchy rooted at

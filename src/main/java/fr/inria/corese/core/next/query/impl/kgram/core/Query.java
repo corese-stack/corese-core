@@ -124,6 +124,7 @@ public class Query extends Exp  {
     private ASTExtension extension;
 
     private boolean isCompiled = false;
+    private boolean datasetSpecified;
 
     boolean isCheck = false;
     private boolean isUseBind = true;
@@ -399,6 +400,7 @@ public class Query extends Exp  {
         if (!isService()) {
             setFrom(q.getFrom());
             setNamed(q.getNamed());
+            setDatasetSpecified(q.isDatasetSpecified());
         }
     }
 
@@ -490,6 +492,19 @@ public class Query extends Exp  {
 
     public void setNamed(List<Node> l) {
         named = l;
+    }
+
+    /**
+     * Records whether an active dataset was explicitly supplied, even when one
+     * of its graph sets is empty.
+     */
+    public void setDatasetSpecified(boolean datasetSpecified) {
+        this.datasetSpecified = datasetSpecified;
+    }
+
+    /** Returns whether the query has an explicit active dataset. */
+    public boolean isDatasetSpecified() {
+        return datasetSpecified;
     }
 
     public List<Node> getPatternNodes() {

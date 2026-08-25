@@ -5,7 +5,6 @@ import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
-import fr.inria.corese.core.next.query.api.QueryLanguage;
 import fr.inria.corese.core.next.query.api.Update;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
@@ -34,68 +33,40 @@ import java.util.Objects;
  * pipeline. Other update forms (LOAD, CLEAR, DROP, DELETE/INSERT WHERE, etc.) throw
  * {@link UnsupportedQueryFeatureException}.</p>
  */
-public final class CoreseUpdate extends AbstractCoreseOperation implements Update {
+public final class CoreseUpdate implements Update {
 
+    private final String updateString;
     private final StorageManager storage;
     private final SparqlParser parser;
+    private final Runnable executionGuard;
 
-    public CoreseUpdate(String updateString, QueryLanguage language, StorageManager storage, SparqlParser parser) {
-        super(updateString, language);
+    public CoreseUpdate(
+            String updateString,
+            StorageManager storage,
+            SparqlParser parser,
+            Runnable executionGuard) {
+        this.updateString = Objects.requireNonNull(updateString, "updateString");
         this.storage = Objects.requireNonNull(storage, "storage");
         this.parser  = Objects.requireNonNull(parser,  "parser");
+        this.executionGuard = Objects.requireNonNull(executionGuard, "executionGuard");
     }
 
     @Override
     public void execute() throws QueryEvaluationException {
-        UpdateRequestAst request = (UpdateRequestAst) parser.parse(getQueryString());
+        executionGuard.run();
+        UpdateRequestAst request = (UpdateRequestAst) parser.parse(updateString);
         MutationOperations mutations = storage.getMutationOperations();
         CoreseValueFactory factory = new CoreseValueFactory();
 
         for (UpdateRequestUnitAst operation : request.operations()) {
             switch (operation) {
-                case InsertDataRequestAst insert -> applyQuads(insert.data(), mutations, factory, true);
-                case DeleteDataRequestAst delete -> applyQuads(delete.data(), mutations, factory, false);
+                case InsertDataRequestAst(QuadsAst data) -> applyQuads(data, mutations, factory, true);
+                case DeleteDataRequestAst(QuadsAst data) -> applyQuads(data, mutations, factory, false);
                 default -> throw new UnsupportedQueryFeatureException(
                         "SPARQL UPDATE operation not yet supported: "
                                 + operation.getClass().getSimpleName());
             }
         }
-    }
-
-    @Override
-    public CoreseUpdate setBinding(String name, Value value) {
-        super.setBinding(name, value);
-        return this;
-    }
-
-    @Override
-    public CoreseUpdate removeBinding(String name) {
-        super.removeBinding(name);
-        return this;
-    }
-
-    @Override
-    public CoreseUpdate clearBindings() {
-        super.clearBindings();
-        return this;
-    }
-
-    @Override
-    public CoreseUpdate setDataset(fr.inria.corese.core.next.query.api.dataset.Dataset dataset) {
-        super.setDataset(dataset);
-        return this;
-    }
-
-    @Override
-    public CoreseUpdate setIncludeInferred(boolean includeInferred) {
-        super.setIncludeInferred(includeInferred);
-        return this;
-    }
-
-    @Override
-    public CoreseUpdate setMaxExecutionTime(int maxExecutionTimeSeconds) {
-        super.setMaxExecutionTime(maxExecutionTimeSeconds);
-        return this;
     }
 
     // -------------------------------------------------------------------------
@@ -130,11 +101,11 @@ public final class CoreseUpdate extends AbstractCoreseOperation implements Updat
         Value object  = termToValue(triple.object(), factory);
 
         // Resolve predicate — INSERT/DELETE DATA only allows simple predicate IRIs
-        if (!(triple.predicate() instanceof PredicatePathAst pp)) {
+        if (!(triple.predicate() instanceof PredicatePathAst(TermAst pp))) {
             throw new UnsupportedQueryFeatureException(
                     "Property paths are not allowed in INSERT/DELETE DATA");
         }
-        Value predicate = termToValue(pp.predicate(), factory);
+        Value predicate = termToValue(pp, factory);
 
         if (!(subject instanceof Resource s)) {
             throw new QueryEvaluationException("UPDATE subject must be a Resource, got: " + subject);
@@ -150,15 +121,15 @@ public final class CoreseUpdate extends AbstractCoreseOperation implements Updat
 
     private Value termToValue(TermAst term, CoreseValueFactory factory) {
         return switch (term) {
-            case IriAst iri -> factory.createIRI(RdfText.stripAngleBrackets(iri.raw()));
-            case LiteralAst lit -> {
-                if (lit.lang() != null && !lit.lang().isBlank()) {
-                    yield factory.createLiteral(lit.lexical(), lit.lang());
+            case IriAst(String raw) -> factory.createIRI(RdfText.stripAngleBrackets(raw));
+            case LiteralAst(String lexical, String datatype, String lang) -> {
+                if (lang != null && !lang.isBlank()) {
+                    yield factory.createLiteral(lexical, lang);
                 }
-                if (lit.datatype() != null && !lit.datatype().isBlank()) {
-                    yield factory.createLiteral(lit.lexical(), factory.createIRI(lit.datatype()));
+                if (datatype != null && !datatype.isBlank()) {
+                    yield factory.createLiteral(lexical, factory.createIRI(datatype));
                 }
-                yield factory.createLiteral(lit.lexical());
+                yield factory.createLiteral(lexical);
             }
             default -> throw new UnsupportedQueryFeatureException(
                     "Variables are not allowed in INSERT/DELETE DATA: " + term);

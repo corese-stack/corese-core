@@ -76,10 +76,16 @@ public final class StorageManagerProducer extends ProducerDefault {
 
     @Override
     public Iterable<Node> getGraphNodes(Node graphNode, List<Node> from, Environment environment) {
+        List<Node> namedGraphs = isExplicitDataset(environment)
+                ? environment.getQuery().getNamed()
+                : from;
+        if (isExplicitDataset(environment) && (namedGraphs == null || namedGraphs.isEmpty())) {
+            return List.of();
+        }
         List<Node> nodes = new ArrayList<>();
         for (Resource context : storage.getMetadataOperations().getContexts()) {
             Node node = StorageManagerKgramValues.node(context);
-            if (matchesFrom(node, from, environment)) {
+            if (matchesFrom(node, namedGraphs, environment)) {
                 nodes.add(node);
             }
         }
@@ -252,31 +258,40 @@ public final class StorageManagerProducer extends ProducerDefault {
      * Language - Evaluation of Graph</a>
      */
     private ContextSelection contextSelection(Node graphNode, List<Node> from, Environment environment) {
+        List<Node> activeGraphs = from;
+        if (isExplicitDataset(environment)) {
+            activeGraphs = graphNode == null
+                    ? environment.getQuery().getFrom()
+                    : environment.getQuery().getNamed();
+        }
         if (graphNode != null) {
             // GRAPH <g>: evaluate in the requested named graph, provided it belongs
             // to the active named dataset restriction.
             Node resolvedGraphNode = resolve(graphNode, environment);
             if (resolvedGraphNode == null) {
-                return ContextSelection.allContexts();
+                return isExplicitDataset(environment) && (activeGraphs == null || activeGraphs.isEmpty())
+                        ? ContextSelection.emptyResult()
+                        : ContextSelection.allContexts();
             }
             Value value = StorageManagerKgramValues.rdfValue(resolvedGraphNode, valueFactory);
             if (!(value instanceof Resource resource)) {
                 return ContextSelection.emptyResult();
             }
-            if (!matchesFrom(resolvedGraphNode, from, environment)) {
+            if (!matchesFrom(resolvedGraphNode, activeGraphs, environment)) {
                 return ContextSelection.emptyResult();
             }
             return ContextSelection.of(List.of(resource));
         }
 
-        if (from == null || from.isEmpty()) {
-            // No GRAPH and no dataset restriction: leave storage contexts unrestricted.
-            return ContextSelection.allContexts();
+        if (activeGraphs == null || activeGraphs.isEmpty()) {
+            return isExplicitDataset(environment)
+                    ? ContextSelection.emptyResult()
+                    : ContextSelection.allContexts();
         }
 
         // No explicit GRAPH: use the dataset restriction as storage contexts.
         List<Resource> contexts = new ArrayList<>();
-        for (Node node : from) {
+        for (Node node : activeGraphs) {
             Node resolvedNode = resolve(node, environment);
             if (resolvedNode == null) {
                 continue;
@@ -300,7 +315,7 @@ public final class StorageManagerProducer extends ProducerDefault {
      */
     private boolean matchesFrom(Node graphNode, List<Node> from, Environment environment) {
         if (from == null || from.isEmpty()) {
-            return true;
+            return !isExplicitDataset(environment);
         }
         for (Node fromNode : from) {
             Node resolvedNode = resolve(fromNode, environment);
@@ -309,6 +324,12 @@ public final class StorageManagerProducer extends ProducerDefault {
             }
         }
         return false;
+    }
+
+    private boolean isExplicitDataset(Environment environment) {
+        return environment != null
+                && environment.getQuery() != null
+                && environment.getQuery().isDatasetSpecified();
     }
 
     /**

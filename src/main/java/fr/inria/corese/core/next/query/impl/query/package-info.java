@@ -9,7 +9,8 @@
  *   <li>{@link fr.inria.corese.core.next.query.impl.query.CoreseUpdate} — SPARQL UPDATE (INSERT DATA / DELETE DATA)</li>
  * </ul>
  *
- * <p>All classes extend {@link fr.inria.corese.core.next.query.impl.query.AbstractCoreseOperation},
+ * <p>Prepared query classes extend
+ * {@link fr.inria.corese.core.next.query.impl.query.AbstractCoreseQuery},
  * which manages initial bindings, dataset override, timeout, and inference flag.
  * None of these classes expose the parser, AST, bridge, or KGRAM engine.</p>
  */

@@ -56,9 +56,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * SPARQL string -> next parser -> next AST -> next KGRAM -> StorageManagerProducer -> StorageManager
  * </pre>
  *
- * <p>Only simple SELECT and ASK execution are supported here. A stable public
- * query API, graph query execution, updates, and advanced SPARQL 1.1 runtime
- * features still need to be designed separately.</p>
+ * <p>The executor handles SELECT, ASK, CONSTRUCT, and DESCRIBE through the next
+ * storage path. Individual SPARQL 1.1 algebra features are enabled explicitly
+ * as their runtime implementations become available.</p>
  */
 public final class NextSparqlPipelineExecutor {
 
@@ -208,16 +208,13 @@ public final class NextSparqlPipelineExecutor {
      */
     public GraphQueryResult evaluateGraph(String sparql, BindingSet bindings, Dataset dataset, long timeoutMillis) {
         QueryAst ast = parser.parse(sparql);
-        Query kgramQuery;
-        if (ast instanceof ConstructQueryAst construct) {
-            kgramQuery = queryBuilder.toNextQuery(construct);
-        } else if (ast instanceof DescribeQueryAst describe) {
-            kgramQuery = queryBuilder.toNextQuery(describe);
-        } else {
-            throw new IllegalArgumentException(
+        Query kgramQuery = switch (ast) {
+            case ConstructQueryAst construct -> queryBuilder.toNextQuery(construct);
+            case DescribeQueryAst describe -> queryBuilder.toNextQuery(describe);
+            default -> throw new IllegalArgumentException(
                     "Graph evaluation requires a CONSTRUCT or DESCRIBE query, got: "
                             + ast.getClass().getSimpleName());
-        }
+        };
         Mappings mappings = evaluate(kgramQuery, bindings, dataset, timeoutMillis);
         List<Statement> statements = buildConstructStatements(kgramQuery, mappings);
         return new CoreseGraphQueryResult(statements.iterator());
@@ -361,27 +358,20 @@ public final class NextSparqlPipelineExecutor {
     /**
      * Overrides the FROM / FROM NAMED clauses of a KGRAM query with the API dataset.
      *
-     * <p>A non-empty {@link Dataset#getDefaultGraphs()} replaces the KGRAM {@code from}
-     * list; a non-empty {@link Dataset#getNamedGraphs()} replaces the {@code named} list.
-     * Empty sets leave the corresponding KGRAM list untouched so that inline FROM clauses
-     * in the query string remain effective when the dataset is only partial.</p>
+     * <p>Both graph sets replace the corresponding query clauses. Empty graph
+     * sets remain significant: for example, a named-only dataset has an empty
+     * default graph.</p>
      */
     private void applyDataset(Query kgramQuery, Dataset dataset) {
-        List<String> defaultGraphs = new ArrayList<>(dataset.getDefaultGraphs());
-        List<String> namedGraphs = new ArrayList<>(dataset.getNamedGraphs());
-
-        if (!defaultGraphs.isEmpty()) {
-            kgramQuery.setFrom(urisToKgramNodes(defaultGraphs));
-        }
-        if (!namedGraphs.isEmpty()) {
-            kgramQuery.setNamed(urisToKgramNodes(namedGraphs));
-        }
+        kgramQuery.setFrom(irisToKgramNodes(dataset.getDefaultGraphs()));
+        kgramQuery.setNamed(irisToKgramNodes(dataset.getNamedGraphs()));
+        kgramQuery.setDatasetSpecified(true);
     }
 
-    private List<Node> urisToKgramNodes(List<String> uris) {
-        List<Node> nodes = new ArrayList<>(uris.size());
-        for (String uri : uris) {
-            nodes.add(NodeImpl.forIRI(uri));
+    private List<Node> irisToKgramNodes(Iterable<IRI> iris) {
+        List<Node> nodes = new ArrayList<>();
+        for (IRI iri : iris) {
+            nodes.add(NodeImpl.forIRI(iri.stringValue()));
         }
         return nodes;
     }

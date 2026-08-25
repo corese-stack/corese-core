@@ -1,10 +1,13 @@
 package fr.inria.corese.core.next.query.api.repository;
 
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
+import fr.inria.corese.core.next.query.api.BooleanQuery;
+import fr.inria.corese.core.next.query.api.GraphQuery;
+import fr.inria.corese.core.next.query.api.TupleQuery;
+import fr.inria.corese.core.next.query.api.Update;
 import fr.inria.corese.core.next.query.api.dataset.Dataset;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.api.exception.RepositoryException;
-import fr.inria.corese.core.next.query.api.*;
 
 /**
  * A connection to a Corese {@link Repository}, providing access to query
@@ -15,8 +18,9 @@ import fr.inria.corese.core.next.query.api.*;
  * manage datasets (FROM / FROM NAMED), and optionally participate in transactions.
  * </p>
  *
- * <p>Connections are invalidated when either the connection or their repository
- * is closed. Closing a connection is idempotent and never closes its repository.</p>
+ * <p>Connections and their prepared operations are invalidated when either the
+ * connection or their repository is closed. Closing a connection is idempotent
+ * and never closes its repository.</p>
  *
  *
  * @see Repository
@@ -54,49 +58,45 @@ public interface RepositoryConnection extends AutoCloseable {
     /**
      * Creates a prepared SPARQL SELECT query.
      *
-     * @param queryLanguage the query language (typically SPARQL)
      * @param queryString the textual query form
      * @return an executable {@link TupleQuery}
      * @throws QuerySyntaxException if the query string is syntactically invalid
      * @throws RepositoryException if the connection is closed
      */
-    TupleQuery prepareTupleQuery(QueryLanguage queryLanguage, String queryString)
+    TupleQuery prepareTupleQuery(String queryString)
             throws QuerySyntaxException, RepositoryException;
 
     /**
      * Creates a prepared SPARQL CONSTRUCT or DESCRIBE query.
      *
-     * @param queryLanguage the query language (typically SPARQL)
      * @param queryString the textual query form
      * @return an executable {@link GraphQuery}
      * @throws QuerySyntaxException if the query string is syntactically invalid
      * @throws RepositoryException if the connection is closed
      */
-    GraphQuery prepareGraphQuery(QueryLanguage queryLanguage, String queryString)
+    GraphQuery prepareGraphQuery(String queryString)
             throws QuerySyntaxException, RepositoryException;
 
     /**
      * Creates a prepared SPARQL ASK query.
      *
-     * @param queryLanguage the query language (typically SPARQL)
      * @param queryString the textual query form
      * @return an executable {@link BooleanQuery}
      * @throws QuerySyntaxException if the query string is syntactically invalid
      * @throws RepositoryException if the connection is closed
      */
-    BooleanQuery prepareBooleanQuery(QueryLanguage queryLanguage, String queryString)
+    BooleanQuery prepareBooleanQuery(String queryString)
             throws QuerySyntaxException, RepositoryException;
 
     /**
-     * Creates a prepared SPARQL 1.1 UPDATE.
+     * Creates a prepared SPARQL update request.
      *
-     * @param queryLanguage the update language (typically SPARQL)
      * @param updateString the textual update form
      * @return an executable {@link Update}
      * @throws QuerySyntaxException if the update string is syntactically invalid
      * @throws RepositoryException if the connection is closed
      */
-    Update prepareUpdate(QueryLanguage queryLanguage, String updateString)
+    Update prepareUpdate(String updateString)
             throws QuerySyntaxException, RepositoryException;
 
 
@@ -107,7 +107,7 @@ public interface RepositoryConnection extends AutoCloseable {
      * by this connection. This overrides any dataset declared inside
      * the query itself.
      *
-     * @param dataset the dataset to enforce
+     * @param dataset the dataset to enforce, or {@code null} to clear it
      */
     void setDataset(Dataset dataset);
 
@@ -120,6 +120,12 @@ public interface RepositoryConnection extends AutoCloseable {
     Dataset getDataset();
 
     // --- Transactions (optional, depending on backend) ---
+
+    /** Returns whether the backing storage supports transactions. */
+    boolean supportsTransactions();
+
+    /** Returns whether this connection currently owns an active transaction. */
+    boolean isActive();
 
     /**
      * Begins a new transaction, if supported by the backend.
@@ -147,7 +153,7 @@ public interface RepositoryConnection extends AutoCloseable {
 
     /**
      * Closes this connection and releases any resources it holds. Repeated calls
-     * have no effect.
+     * have no effect. An active transaction is rolled back before closing.
      *
      * @throws RepositoryException if closing the connection fails
      */

@@ -23,7 +23,7 @@ try (Repository repository = Repositories.create()) {
 owns that backend and closes it when the repository is closed. `close()` is
 idempotent, and closing a repository invalidates all its existing connections.
 
-The `select` and `construct` shortcuts materialize their complete result before
+The `select` and `graph` shortcuts materialize their complete result before
 returning it. They are convenient and connection-safe, but their memory usage
 grows with the result size. `ask` and `update` do not materialize a result.
 
@@ -36,8 +36,7 @@ operation needs bindings, a dataset, or execution options:
 try (Repository repository = Repositories.create();
      RepositoryConnection connection = repository.getConnection();
      TupleQueryResult result = connection
-             .prepareTupleQuery(QueryLanguage.SPARQL,
-                     "SELECT ?s WHERE { ?s ?p ?o }")
+             .prepareTupleQuery("SELECT ?s WHERE { ?s ?p ?o }")
              .evaluate()) {
     while (result.hasNext()) {
         System.out.println(result.next());
@@ -47,6 +46,56 @@ try (Repository repository = Repositories.create();
 
 Closing a connection never closes its repository. Closing the repository makes
 all its connections unusable.
+
+SPARQL is implicit in this API because it is the only query language supported:
+there is no language enum to repeat at every preparation call. Preparation
+checks both the syntax and the expected query form. A SELECT string passed to
+`prepareBooleanQuery`, for example, is rejected immediately.
+
+## Query options
+
+Prepared queries expose only options that the next execution pipeline applies:
+
+```java
+Dataset dataset = Dataset.builder()
+        .defaultGraph(repository.getValueFactory().createIRI("urn:default"))
+        .namedGraph(repository.getValueFactory().createIRI("urn:named"))
+        .build();
+
+try (RepositoryConnection connection = repository.getConnection();
+     TupleQueryResult result = connection
+             .prepareTupleQuery("SELECT ?o { ?s <urn:p> ?o }")
+             .setBinding("s", repository.getValueFactory().createIRI("urn:subject"))
+             .setDataset(dataset)
+             .setTimeout(Duration.ofSeconds(5))
+             .evaluate()) {
+    result.forEach(System.out::println);
+}
+```
+
+Binding names never include `?` or `$`. `Duration.ZERO` disables the timeout.
+The immutable `Dataset` replaces every `FROM` and `FROM NAMED` clause in the
+query text; `setDataset(null)` removes this override. A dataset set on the query
+overrides the connection-level dataset.
+
+Prepared updates intentionally expose only `execute()` today. Bindings,
+datasets, inference switches, and timeouts are not advertised for updates until
+the execution pipeline can honor their complete semantics.
+
+## Transactions
+
+Call `supportsTransactions()` before `begin()`. `isActive()` reports the state
+of the transaction owned by the connection. `commit()` and `rollback()` require
+an active transaction, and closing a connection rolls one back automatically.
+The standard in-memory backend currently reports transactions as unsupported.
+
+## SPARQL feature coverage
+
+The public contract follows SPARQL query forms and dataset semantics, but the
+next evaluator is still being completed feature by feature. A valid construct
+that is not implemented yet fails explicitly with
+`UnsupportedQueryFeatureException`; it is not silently delegated to the legacy
+pipeline. SPARQL UPDATE currently executes `INSERT DATA` and `DELETE DATA`.
 
 ## Custom storage
 

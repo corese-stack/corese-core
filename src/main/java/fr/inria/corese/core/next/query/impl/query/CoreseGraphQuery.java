@@ -1,12 +1,11 @@
 package fr.inria.corese.core.next.query.impl.query;
 
-import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.query.api.GraphQuery;
-import fr.inria.corese.core.next.query.api.QueryLanguage;
-import fr.inria.corese.core.next.query.api.dataset.Dataset;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.result.GraphQueryResult;
 import fr.inria.corese.core.next.query.impl.sparql.execution.NextSparqlPipelineExecutor;
+
+import java.util.Objects;
 
 /**
  * Prepared SPARQL CONSTRUCT or DESCRIBE query.
@@ -16,74 +15,21 @@ import fr.inria.corese.core.next.query.impl.sparql.execution.NextSparqlPipelineE
  * on each {@link #evaluate()} call. The CONSTRUCT template is applied to each
  * WHERE-clause result mapping to materialise the output statements.</p>
  */
-public final class CoreseGraphQuery extends AbstractCoreseOperation implements GraphQuery {
+public final class CoreseGraphQuery extends AbstractCoreseQuery<GraphQueryResult> implements GraphQuery {
 
     private final NextSparqlPipelineExecutor executor;
-    private long timeoutMillis = 0;
 
-    public CoreseGraphQuery(String queryString, QueryLanguage language, NextSparqlPipelineExecutor executor) {
-        super(queryString, language);
-        this.executor = executor;
-    }
-
-    @Override
-    public CoreseGraphQuery setBinding(String name, Value value) {
-        super.setBinding(name, value);
-        return this;
-    }
-
-    @Override
-    public CoreseGraphQuery removeBinding(String name) {
-        super.removeBinding(name);
-        return this;
-    }
-
-    @Override
-    public CoreseGraphQuery clearBindings() {
-        super.clearBindings();
-        return this;
-    }
-
-    @Override
-    public CoreseGraphQuery setDataset(Dataset dataset) {
-        super.setDataset(dataset);
-        return this;
-    }
-
-    @Override
-    public CoreseGraphQuery setIncludeInferred(boolean includeInferred) {
-        super.setIncludeInferred(includeInferred);
-        return this;
-    }
-
-    @Override
-    public CoreseGraphQuery setMaxExecutionTime(int maxExecutionTimeSeconds) {
-        super.setMaxExecutionTime(maxExecutionTimeSeconds);
-        return this;
-    }
-
-    @Override
-    public CoreseGraphQuery setTimeout(long timeoutMillis) {
-        this.timeoutMillis = timeoutMillis;
-        return this;
-    }
-
-    @Override
-    public QueryType getQueryType() {
-        return QueryType.GRAPH;
+    public CoreseGraphQuery(
+            String queryString,
+            NextSparqlPipelineExecutor executor,
+            Runnable executionGuard) {
+        super(queryString, executionGuard);
+        this.executor = Objects.requireNonNull(executor, "executor");
     }
 
     @Override
     public GraphQueryResult evaluate() throws QueryEvaluationException {
-        return executor.evaluateGraph(getQueryString(), getBindings(), getDataset(), effectiveTimeoutMillis());
-    }
-
-    private long effectiveTimeoutMillis() {
-        long fromQuery = this.timeoutMillis;
-        long fromOperation = (long) getMaxExecutionTime() * 1000L;
-        if (fromQuery > 0 && fromOperation > 0) {
-            return Math.min(fromQuery, fromOperation);
-        }
-        return fromQuery > 0 ? fromQuery : fromOperation;
+        checkExecutable();
+        return executor.evaluateGraph(getQueryString(), getBindings(), getDataset(), timeoutMillis());
     }
 }

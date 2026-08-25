@@ -3,40 +3,20 @@ package fr.inria.corese.core.next.query.api;
 import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.query.api.dataset.Dataset;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
+import fr.inria.corese.core.next.query.api.result.BindingSet;
 import fr.inria.corese.core.next.query.api.result.GraphQueryResult;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
+
+import java.time.Duration;
 
 /**
  * A prepared SPARQL query that can be evaluated against a repository.
  *
  * <p>Concrete subtypes are {@link TupleQuery} (SELECT), {@link BooleanQuery} (ASK),
  * and {@link GraphQuery} (CONSTRUCT / DESCRIBE).
- * All evaluation state (bindings, dataset, timeout) is carried by the
- * {@link Operation} supertype and propagated on each {@link #evaluate()} call.</p>
+ * Bindings, dataset, and timeout are applied on each {@link #evaluate()} call.</p>
  */
-
-public interface Query<T> extends Operation {
-
-    /**
-     * The different types of queries supported by the engine:
-     * boolean, graph, and tuple queries.
-     */
-    enum QueryType {
-        /**
-         * Boolean queries (e.g., SPARQL ASK) return a single {@code true} / {@code false} result.
-         */
-        BOOLEAN,
-
-        /**
-         * Graph queries (e.g., SPARQL CONSTRUCT / DESCRIBE) return a sequence of RDF triples.
-         */
-        GRAPH,
-
-        /**
-         * Tuple queries (e.g., SPARQL SELECT) return a sequence of variable bindings.
-         */
-        TUPLE
-    }
+public interface Query<T> {
 
     /**
      * @return the textual representation of this query (e.g., SPARQL string)
@@ -44,26 +24,21 @@ public interface Query<T> extends Operation {
     String getQueryString();
 
     /**
-     * @return the query language of this query (typically {@link QueryLanguage})
-     */
-    QueryLanguage getLanguage();
-
-    /**
-     * Sets a fine-grained execution timeout for this specific query, expressed in milliseconds.
+     * Sets the maximum evaluation duration. {@link Duration#ZERO} means no limit.
      *
-     * <p>When both this value and {@link Operation#setMaxExecutionTime(int)} are set,
-     * the shorter of the two limits is enforced. A value of {@code 0} disables this
-     * query-level timeout.</p>
-     *
-     * @param timeoutMillis maximum evaluation time in milliseconds; 0 means no limit
+     * @param timeout non-negative timeout
      * @return this
+     * @throws NullPointerException if {@code timeout} is {@code null}
+     * @throws IllegalArgumentException if {@code timeout} is negative
      */
-    Query<T> setTimeout(long timeoutMillis);
+    Query<T> setTimeout(Duration timeout);
 
     /**
-     * @return the type of this query (BOOLEAN / GRAPH / TUPLE)
+     * Returns the configured evaluation timeout.
+     *
+     * @return a non-negative duration; zero means no limit
      */
-    QueryType getQueryType();
+    Duration getTimeout();
 
     /**
      * Evaluates the query against the dataset.
@@ -75,21 +50,30 @@ public interface Query<T> extends Operation {
      */
     T evaluate() throws QueryEvaluationException;
 
-    @Override
+    /**
+     * Sets or replaces an initial variable binding.
+     *
+     * @param name variable name without a leading {@code ?} or {@code $}
+     * @param value non-null RDF value
+     * @return this query
+     */
     Query<T> setBinding(String name, Value value);
 
-    @Override
+    /** Removes an initial binding when present and returns this query. */
     Query<T> removeBinding(String name);
 
-    @Override
+    /** Removes every initial binding and returns this query. */
     Query<T> clearBindings();
 
-    @Override
+    /**
+     * Sets a dataset that replaces the query's {@code FROM}/{@code FROM NAMED}
+     * clauses, or clears the override when {@code null}.
+     */
     Query<T> setDataset(Dataset dataset);
 
-    @Override
-    Query<T> setIncludeInferred(boolean includeInferred);
+    /** Returns an immutable snapshot of the current initial bindings. */
+    BindingSet getBindings();
 
-    @Override
-    Query<T> setMaxExecutionTime(int maxExecutionTimeSeconds);
+    /** Returns the explicit dataset override, or {@code null} when none is set. */
+    Dataset getDataset();
 }

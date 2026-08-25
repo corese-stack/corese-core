@@ -267,6 +267,8 @@ public final class CoreseAstQueryBuilder {
     private void applyDataset(Query query, DatasetClauseAst datasetClause) {
         query.setFrom(toNodeList(datasetClause.graphs()));
         query.setNamed(toNodeList(datasetClause.namedGraphs()));
+        query.setDatasetSpecified(
+                !datasetClause.graphs().isEmpty() || !datasetClause.namedGraphs().isEmpty());
     }
 
     private List<Node> toNodeList(Iterable<IriAst> iris) {

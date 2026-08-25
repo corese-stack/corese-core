@@ -6,8 +6,6 @@ import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
 import fr.inria.corese.core.next.query.api.BooleanQuery;
 import fr.inria.corese.core.next.query.api.GraphQuery;
-import fr.inria.corese.core.next.query.api.Query;
-import fr.inria.corese.core.next.query.api.QueryLanguage;
 import fr.inria.corese.core.next.query.api.TupleQuery;
 import fr.inria.corese.core.next.query.api.Update;
 import fr.inria.corese.core.next.query.api.dataset.Dataset;
@@ -18,7 +16,6 @@ import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.query.api.repository.RepositoryConnection;
 import fr.inria.corese.core.next.query.api.result.BindingSet;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
-import fr.inria.corese.core.next.query.impl.dataset.CoreseDataset;
 import fr.inria.corese.core.next.storage.impl.memory.MemoryStorageManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +23,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -74,9 +72,8 @@ class CoreseRepositoryConnectionTest {
         @DisplayName("Returns TupleQuery for a SELECT query")
         void returnsTupleQueryForSelect() {
             try (RepositoryConnection conn = repository.getConnection()) {
-                TupleQuery q = conn.prepareTupleQuery(QueryLanguage.SPARQL, "SELECT * WHERE { ?s ?p ?o }");
+                TupleQuery q = conn.prepareTupleQuery("SELECT * WHERE { ?s ?p ?o }");
                 assertNotNull(q);
-                assertEquals(Query.QueryType.TUPLE, q.getQueryType());
             }
         }
 
@@ -84,7 +81,7 @@ class CoreseRepositoryConnectionTest {
         @DisplayName("evaluate() returns the matching triples")
         void evaluateReturnsMatchingTriples() {
             try (RepositoryConnection conn = repository.getConnection()) {
-                TupleQuery q = conn.prepareTupleQuery(QueryLanguage.SPARQL, "SELECT * WHERE { ?s ?p ?o }");
+                TupleQuery q = conn.prepareTupleQuery("SELECT * WHERE { ?s ?p ?o }");
                 try (TupleQueryResult result = q.evaluate()) {
                     assertEquals(List.of("s", "p", "o"), result.getBindingNames());
                     assertTrue(result.hasNext());
@@ -102,7 +99,7 @@ class CoreseRepositoryConnectionTest {
         void throwsSyntaxExceptionForAsk() {
             try (RepositoryConnection conn = repository.getConnection()) {
                 assertThrows(QuerySyntaxException.class, () ->
-                        conn.prepareTupleQuery(QueryLanguage.SPARQL, "ASK WHERE { ?s ?p ?o }"));
+                        conn.prepareTupleQuery("ASK WHERE { ?s ?p ?o }"));
             }
         }
 
@@ -111,7 +108,7 @@ class CoreseRepositoryConnectionTest {
         void throwsSyntaxExceptionForInvalidSparql() {
             try (RepositoryConnection conn = repository.getConnection()) {
                 assertThrows(QuerySyntaxException.class, () ->
-                        conn.prepareTupleQuery(QueryLanguage.SPARQL, "THIS IS NOT SPARQL"));
+                        conn.prepareTupleQuery("THIS IS NOT SPARQL"));
             }
         }
     }
@@ -128,9 +125,8 @@ class CoreseRepositoryConnectionTest {
         @DisplayName("Returns BooleanQuery for an ASK query")
         void returnsBooleanQueryForAsk() {
             try (RepositoryConnection conn = repository.getConnection()) {
-                BooleanQuery q = conn.prepareBooleanQuery(QueryLanguage.SPARQL, "ASK WHERE { ?s ?p ?o }");
+                BooleanQuery q = conn.prepareBooleanQuery("ASK WHERE { ?s ?p ?o }");
                 assertNotNull(q);
-                assertEquals(Query.QueryType.BOOLEAN, q.getQueryType());
             }
         }
 
@@ -138,7 +134,7 @@ class CoreseRepositoryConnectionTest {
         @DisplayName("evaluate() returns true when data matches")
         void evaluateReturnsTrueWhenDataExists() {
             try (RepositoryConnection conn = repository.getConnection()) {
-                BooleanQuery q = conn.prepareBooleanQuery(QueryLanguage.SPARQL, "ASK WHERE { ?s ?p ?o }");
+                BooleanQuery q = conn.prepareBooleanQuery("ASK WHERE { ?s ?p ?o }");
                 assertTrue(q.evaluate());
             }
         }
@@ -147,7 +143,7 @@ class CoreseRepositoryConnectionTest {
         @DisplayName("evaluate() returns false when no data matches")
         void evaluateReturnsFalseWhenNoMatch() {
             try (RepositoryConnection conn = repository.getConnection()) {
-                BooleanQuery q = conn.prepareBooleanQuery(QueryLanguage.SPARQL,
+                BooleanQuery q = conn.prepareBooleanQuery(
                         "ASK WHERE { <http://example.org/nobody> ?p ?o }");
                 assertFalse(q.evaluate());
             }
@@ -158,7 +154,7 @@ class CoreseRepositoryConnectionTest {
         void throwsSyntaxExceptionForSelect() {
             try (RepositoryConnection conn = repository.getConnection()) {
                 assertThrows(QuerySyntaxException.class, () ->
-                        conn.prepareBooleanQuery(QueryLanguage.SPARQL, "SELECT * WHERE { ?s ?p ?o }"));
+                        conn.prepareBooleanQuery("SELECT * WHERE { ?s ?p ?o }"));
             }
         }
     }
@@ -175,10 +171,9 @@ class CoreseRepositoryConnectionTest {
         @DisplayName("Returns GraphQuery for a CONSTRUCT query")
         void returnsGraphQueryForConstruct() {
             try (RepositoryConnection conn = repository.getConnection()) {
-                GraphQuery q = conn.prepareGraphQuery(QueryLanguage.SPARQL,
+                GraphQuery q = conn.prepareGraphQuery(
                         "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o }");
                 assertNotNull(q);
-                assertEquals(Query.QueryType.GRAPH, q.getQueryType());
             }
         }
 
@@ -186,7 +181,7 @@ class CoreseRepositoryConnectionTest {
         @DisplayName("CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o } returns the stored triple")
         void constructSpoReturnsStoredTriple() {
             try (RepositoryConnection conn = repository.getConnection()) {
-                GraphQuery q = conn.prepareGraphQuery(QueryLanguage.SPARQL,
+                GraphQuery q = conn.prepareGraphQuery(
                         "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o }");
                 try (GraphQueryResult result = q.evaluate()) {
                     assertTrue(result.hasNext(), "Expected at least one constructed statement");
@@ -203,7 +198,7 @@ class CoreseRepositoryConnectionTest {
         @DisplayName("CONSTRUCT returns empty result when WHERE clause matches nothing")
         void constructReturnsEmptyWhenNoMatch() {
             try (RepositoryConnection conn = repository.getConnection()) {
-                GraphQuery q = conn.prepareGraphQuery(QueryLanguage.SPARQL,
+                GraphQuery q = conn.prepareGraphQuery(
                         "CONSTRUCT { ?s ?p ?o } WHERE { ?s <http://example.org/missing> ?o }");
                 try (GraphQueryResult result = q.evaluate()) {
                     assertFalse(result.hasNext(), "Expected no statements when WHERE has no match");
@@ -216,7 +211,7 @@ class CoreseRepositoryConnectionTest {
         void throwsSyntaxExceptionForSelect() {
             try (RepositoryConnection conn = repository.getConnection()) {
                 assertThrows(QuerySyntaxException.class, () ->
-                        conn.prepareGraphQuery(QueryLanguage.SPARQL, "SELECT * WHERE { ?s ?p ?o }"));
+                        conn.prepareGraphQuery("SELECT * WHERE { ?s ?p ?o }"));
             }
         }
     }
@@ -233,7 +228,7 @@ class CoreseRepositoryConnectionTest {
         @DisplayName("Returns Update for a valid INSERT DATA")
         void returnsUpdateForInsertData() {
             try (RepositoryConnection conn = repository.getConnection()) {
-                Update u = conn.prepareUpdate(QueryLanguage.SPARQL,
+                Update u = conn.prepareUpdate(
                         "INSERT DATA { <http://ex.org/s> <http://ex.org/p> <http://ex.org/o> }");
                 assertNotNull(u);
             }
@@ -244,13 +239,13 @@ class CoreseRepositoryConnectionTest {
         void insertDataInsertsTriple() {
             String carol = "http://example.org/carol";
             try (RepositoryConnection conn = repository.getConnection()) {
-                Update u = conn.prepareUpdate(QueryLanguage.SPARQL,
+                Update u = conn.prepareUpdate(
                         "INSERT DATA { <" + ALICE + "> <" + KNOWS + "> <" + carol + "> }");
                 u.execute();
             }
             // verify via SELECT
             try (RepositoryConnection conn = repository.getConnection()) {
-                TupleQuery q = conn.prepareTupleQuery(QueryLanguage.SPARQL,
+                TupleQuery q = conn.prepareTupleQuery(
                         "SELECT ?o WHERE { <" + ALICE + "> <" + KNOWS + "> ?o }");
                 boolean foundCarol = false;
                 try (TupleQueryResult result = q.evaluate()) {
@@ -268,12 +263,12 @@ class CoreseRepositoryConnectionTest {
         @DisplayName("DELETE DATA removes a triple from the store")
         void deleteDataRemovesTriple() {
             try (RepositoryConnection conn = repository.getConnection()) {
-                Update u = conn.prepareUpdate(QueryLanguage.SPARQL,
+                Update u = conn.prepareUpdate(
                         "DELETE DATA { <" + ALICE + "> <" + KNOWS + "> <" + BOB + "> }");
                 u.execute();
             }
             try (RepositoryConnection conn = repository.getConnection()) {
-                BooleanQuery q = conn.prepareBooleanQuery(QueryLanguage.SPARQL,
+                BooleanQuery q = conn.prepareBooleanQuery(
                         "ASK WHERE { <" + ALICE + "> <" + KNOWS + "> <" + BOB + "> }");
                 assertFalse(q.evaluate(), "DELETE DATA should have removed alice→knows→bob");
             }
@@ -281,18 +276,18 @@ class CoreseRepositoryConnectionTest {
     }
 
     // -------------------------------------------------------------------------
-    // Operation API (bindings, dataset, timeout, inferredStatements)
+    // Query options (bindings, dataset, timeout)
     // -------------------------------------------------------------------------
 
     @Nested
-    @DisplayName("Operation API")
-    class OperationApi {
+    @DisplayName("Query options")
+    class QueryOptions {
 
         @Test
         @DisplayName("setBinding / getBindings round-trip")
         void bindingsRoundTrip() {
             try (RepositoryConnection conn = repository.getConnection()) {
-                TupleQuery q = conn.prepareTupleQuery(QueryLanguage.SPARQL, "SELECT * WHERE { ?s ?p ?o }");
+                TupleQuery q = conn.prepareTupleQuery("SELECT * WHERE { ?s ?p ?o }");
                 Value v = vf.createIRI("http://example.org/x");
 
                 q.setBinding("x", v);
@@ -306,7 +301,7 @@ class CoreseRepositoryConnectionTest {
         @DisplayName("removeBinding removes the binding")
         void removeBindingWorks() {
             try (RepositoryConnection conn = repository.getConnection()) {
-                TupleQuery q = conn.prepareTupleQuery(QueryLanguage.SPARQL, "SELECT * WHERE { ?s ?p ?o }");
+                TupleQuery q = conn.prepareTupleQuery("SELECT * WHERE { ?s ?p ?o }");
                 Value v = vf.createIRI("http://example.org/x");
 
                 q.setBinding("x", v);
@@ -320,7 +315,7 @@ class CoreseRepositoryConnectionTest {
         @DisplayName("clearBindings removes all bindings")
         void clearBindingsWorks() {
             try (RepositoryConnection conn = repository.getConnection()) {
-                TupleQuery q = conn.prepareTupleQuery(QueryLanguage.SPARQL, "SELECT * WHERE { ?s ?p ?o }");
+                TupleQuery q = conn.prepareTupleQuery("SELECT * WHERE { ?s ?p ?o }");
 
                 q.setBinding("x", vf.createIRI("http://example.org/x"));
                 q.setBinding("y", vf.createIRI("http://example.org/y"));
@@ -335,8 +330,8 @@ class CoreseRepositoryConnectionTest {
         @DisplayName("setDataset / getDataset round-trip")
         void datasetRoundTrip() {
             try (RepositoryConnection conn = repository.getConnection()) {
-                TupleQuery q = conn.prepareTupleQuery(QueryLanguage.SPARQL, "SELECT * WHERE { ?s ?p ?o }");
-                Dataset ds = new CoreseDataset().addDefaultGraph("http://example.org/g");
+                TupleQuery q = conn.prepareTupleQuery("SELECT * WHERE { ?s ?p ?o }");
+                Dataset ds = Dataset.builder().defaultGraph(iri("http://example.org/g")).build();
 
                 q.setDataset(ds);
 
@@ -345,23 +340,36 @@ class CoreseRepositoryConnectionTest {
         }
 
         @Test
-        @DisplayName("setMaxExecutionTime / getMaxExecutionTime round-trip")
+        @DisplayName("setTimeout / getTimeout round-trip")
         void timeoutRoundTrip() {
             try (RepositoryConnection conn = repository.getConnection()) {
-                TupleQuery q = conn.prepareTupleQuery(QueryLanguage.SPARQL, "SELECT * WHERE { ?s ?p ?o }");
+                TupleQuery q = conn.prepareTupleQuery("SELECT * WHERE { ?s ?p ?o }");
 
-                q.setMaxExecutionTime(30);
+                q.setTimeout(Duration.ofSeconds(30));
 
-                assertEquals(30, q.getMaxExecutionTime());
+                assertEquals(Duration.ofSeconds(30), q.getTimeout());
             }
         }
 
         @Test
-        @DisplayName("setIncludeInferred defaults to true")
-        void includeInferredDefaultsToTrue() {
+        @DisplayName("Negative timeouts are rejected")
+        void negativeTimeoutRejected() {
             try (RepositoryConnection conn = repository.getConnection()) {
-                TupleQuery q = conn.prepareTupleQuery(QueryLanguage.SPARQL, "SELECT * WHERE { ?s ?p ?o }");
-                assertTrue(q.isIncludeInferred());
+                TupleQuery q = conn.prepareTupleQuery("SELECT * WHERE { ?s ?p ?o }");
+                Duration negativeTimeout = Duration.ofMillis(-1);
+                assertThrows(IllegalArgumentException.class,
+                        () -> q.setTimeout(negativeTimeout));
+            }
+        }
+
+        @Test
+        @DisplayName("Binding names do not include the SPARQL variable prefix")
+        void bindingPrefixRejected() {
+            try (RepositoryConnection conn = repository.getConnection()) {
+                TupleQuery q = conn.prepareTupleQuery("SELECT * WHERE { ?s ?p ?o }");
+                Value value = vf.createIRI("http://example.org/x");
+
+                assertThrows(IllegalArgumentException.class, () -> q.setBinding("?s", value));
             }
         }
     }
@@ -393,16 +401,36 @@ class CoreseRepositoryConnectionTest {
             RepositoryConnection conn = repository.getConnection();
             conn.close();
             assertThrows(RepositoryException.class, () ->
-                    conn.prepareTupleQuery(QueryLanguage.SPARQL, "SELECT * WHERE { ?s ?p ?o }"));
+                    conn.prepareTupleQuery("SELECT * WHERE { ?s ?p ?o }"));
+        }
+
+        @Test
+        @DisplayName("Prepared operations are invalidated when their connection closes")
+        void preparedOperationInvalidatedAfterClose() {
+            RepositoryConnection conn = repository.getConnection();
+            TupleQuery query = conn.prepareTupleQuery("SELECT * WHERE { ?s ?p ?o }");
+            conn.close();
+
+            assertThrows(RepositoryException.class, query::evaluate);
         }
 
         @Test
         @DisplayName("Dataset scoped at connection level")
         void connectionDatasetRoundTrip() throws RepositoryException {
             try (RepositoryConnection conn = repository.getConnection()) {
-                Dataset ds = new CoreseDataset().addNamedGraph("http://example.org/g");
+                Dataset ds = Dataset.builder().namedGraph(iri("http://example.org/g")).build();
                 conn.setDataset(ds);
                 assertSame(ds, conn.getDataset());
+            }
+        }
+
+        @Test
+        @DisplayName("Memory repositories report that transactions are unsupported")
+        void transactionsAreReportedAsUnsupported() {
+            try (RepositoryConnection conn = repository.getConnection()) {
+                assertFalse(conn.supportsTransactions());
+                assertFalse(conn.isActive());
+                assertThrows(RepositoryException.class, conn::begin);
             }
         }
     }

@@ -2,7 +2,6 @@ package fr.inria.corese.core.next.query.api.repository;
 
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.model.Statement;
-import fr.inria.corese.core.next.query.api.QueryLanguage;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.api.exception.RepositoryException;
 import fr.inria.corese.core.next.query.api.result.BindingSet;
@@ -89,7 +88,7 @@ public interface Repository extends AutoCloseable {
         List<String> names;
         List<BindingSet> bindings = new ArrayList<>();
         try (RepositoryConnection conn = getConnection();
-             TupleQueryResult raw = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparqlSelect).evaluate()) {
+             TupleQueryResult raw = conn.prepareTupleQuery(sparqlSelect).evaluate()) {
             names = List.copyOf(raw.getBindingNames());
             while (raw.hasNext()) {
                 bindings.add(raw.next());
@@ -108,7 +107,7 @@ public interface Repository extends AutoCloseable {
      */
     default boolean ask(String sparqlAsk) throws QuerySyntaxException, RepositoryException {
         try (RepositoryConnection conn = getConnection()) {
-            return conn.prepareBooleanQuery(QueryLanguage.SPARQL, sparqlAsk).evaluate();
+            return conn.prepareBooleanQuery(sparqlAsk).evaluate();
         }
     }
 
@@ -122,15 +121,15 @@ public interface Repository extends AutoCloseable {
      * and keep it open while consuming the result returned by the prepared graph
      * query.</p>
      *
-     * @param sparqlConstruct the SPARQL CONSTRUCT or DESCRIBE query text
+     * @param sparqlGraph the SPARQL CONSTRUCT or DESCRIBE query text
      * @return a materialized {@link GraphQueryResult} containing output statements
      * @throws QuerySyntaxException if the query string is syntactically invalid
      * @throws RepositoryException if evaluation fails
      */
-    default GraphQueryResult construct(String sparqlConstruct) throws QuerySyntaxException, RepositoryException {
+    default GraphQueryResult graph(String sparqlGraph) throws QuerySyntaxException, RepositoryException {
         List<Statement> statements = new ArrayList<>();
         try (RepositoryConnection conn = getConnection();
-             GraphQueryResult raw = conn.prepareGraphQuery(QueryLanguage.SPARQL, sparqlConstruct).evaluate()) {
+             GraphQueryResult raw = conn.prepareGraphQuery(sparqlGraph).evaluate()) {
             while (raw.hasNext()) {
                 statements.add(raw.next());
             }
@@ -147,7 +146,7 @@ public interface Repository extends AutoCloseable {
      */
     default void update(String sparqlUpdate) throws QuerySyntaxException, RepositoryException {
         try (RepositoryConnection conn = getConnection()) {
-            conn.prepareUpdate(QueryLanguage.SPARQL, sparqlUpdate).execute();
+            conn.prepareUpdate(sparqlUpdate).execute();
         }
     }
 }

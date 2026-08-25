@@ -6,6 +6,6 @@
  * It can be applied at the connection level
  * ({@link fr.inria.corese.core.next.query.api.repository.RepositoryConnection#setDataset})
  * or overridden per individual query
- * ({@link fr.inria.corese.core.next.query.api.Operation#setDataset}).</p>
+ * ({@link fr.inria.corese.core.next.query.api.Query#setDataset}).</p>
  */
 package fr.inria.corese.core.next.query.api.dataset;

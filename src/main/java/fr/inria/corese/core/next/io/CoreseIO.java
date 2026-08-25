@@ -19,7 +19,6 @@ import fr.inria.corese.core.next.query.api.io.serializer.BooleanResultSerializer
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializerFactory;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultIOOptions;
-import fr.inria.corese.core.next.query.api.QueryLanguage;
 import fr.inria.corese.core.next.query.api.repository.Repository;
 import fr.inria.corese.core.next.query.api.repository.RepositoryConnection;
 import fr.inria.corese.core.next.query.api.result.GraphQueryResult;
@@ -358,7 +357,7 @@ public final class CoreseIO {
             Writer destination) {
         try (RepositoryConnection connection = repository.getConnection();
              TupleQueryResult result = connection
-                     .prepareTupleQuery(QueryLanguage.SPARQL, sparql)
+                     .prepareTupleQuery(sparql)
                      .evaluate()) {
             write(result, format, destination);
         }
@@ -373,7 +372,7 @@ public final class CoreseIO {
             Writer destination) {
         try (RepositoryConnection connection = repository.getConnection();
              TupleQueryResult result = connection
-                     .prepareTupleQuery(QueryLanguage.SPARQL, sparql)
+                     .prepareTupleQuery(sparql)
                      .evaluate()) {
             write(result, format, options, destination);
         }
@@ -387,7 +386,7 @@ public final class CoreseIO {
             Writer destination) {
         try (RepositoryConnection connection = repository.getConnection()) {
             boolean result = connection
-                    .prepareBooleanQuery(QueryLanguage.SPARQL, sparql)
+                    .prepareBooleanQuery(sparql)
                     .evaluate();
             write(result, format, destination);
         }
@@ -402,7 +401,7 @@ public final class CoreseIO {
             Writer destination) {
         try (RepositoryConnection connection = repository.getConnection()) {
             boolean result = connection
-                    .prepareBooleanQuery(QueryLanguage.SPARQL, sparql)
+                    .prepareBooleanQuery(sparql)
                     .evaluate();
             write(result, format, options, destination);
         }
@@ -416,7 +415,7 @@ public final class CoreseIO {
             Writer destination) {
         try (RepositoryConnection connection = repository.getConnection();
              GraphQueryResult result = connection
-                     .prepareGraphQuery(QueryLanguage.SPARQL, sparql)
+                     .prepareGraphQuery(sparql)
                      .evaluate()) {
             write(result, format, destination);
         }
@@ -431,7 +430,7 @@ public final class CoreseIO {
             Writer destination) {
         try (RepositoryConnection connection = repository.getConnection();
              GraphQueryResult result = connection
-                     .prepareGraphQuery(QueryLanguage.SPARQL, sparql)
+                     .prepareGraphQuery(sparql)
                      .evaluate()) {
             write(result, format, options, destination);
         }
