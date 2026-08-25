@@ -14,7 +14,6 @@ public interface Transaction extends AutoCloseable {
      */
     String getId();
 
-
     /**
      * Commits (validates) the transaction.
      * All modifications made in this transaction become permanent.
@@ -48,7 +47,6 @@ public interface Transaction extends AutoCloseable {
      */
     TransactionState getState();
 
-
     /**
      * Closes the transaction.
      * If transaction is still active, performs automatic rollback.
@@ -57,6 +55,4 @@ public interface Transaction extends AutoCloseable {
      */
     @Override
     void close() throws StorageException;
-
-
 }

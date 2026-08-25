@@ -34,7 +34,7 @@ class CoreseRepositoryConnectionTransactionTest {
         active = new AtomicBoolean();
 
         when(repository.isOpen()).thenReturn(true);
-        when(storage.getTransactionManager()).thenReturn(transactionManager);
+        when(storage.transactions()).thenReturn(transactionManager);
         when(transactionManager.supportsTransactions()).thenReturn(true);
         when(transactionManager.beginTransaction()).thenAnswer(invocation -> {
             active.set(true);

@@ -66,7 +66,7 @@ public final class StorageManagerProducer extends ProducerDefault {
         }
 
         try (Stream<fr.inria.corese.core.next.data.api.model.Statement> statements =
-                     storage.getQueryOperations().query(queryPattern.statementPattern())) {
+                     storage.queries().find(queryPattern.statementPattern())) {
             return statements
                     .map(StorageManagerEdge::new)
                     .map(Edge.class::cast)
@@ -83,7 +83,7 @@ public final class StorageManagerProducer extends ProducerDefault {
             return List.of();
         }
         List<Node> nodes = new ArrayList<>();
-        for (Resource context : storage.getMetadataOperations().getContexts()) {
+        for (Resource context : storage.metadata().getContexts()) {
             Node node = StorageManagerKgramValues.node(context);
             if (matchesFrom(node, namedGraphs, environment)) {
                 nodes.add(node);

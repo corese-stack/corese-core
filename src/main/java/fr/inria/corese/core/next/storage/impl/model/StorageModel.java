@@ -133,20 +133,14 @@ public final class StorageModel extends AbstractModel {
         try {
             if (contexts == null || contexts.length == 0) {
                 Statement stmt = valueFactory.createStatement(subject, predicate, object);
-                return storage.getMutationOperations()
-                        .insertStatement(stmt)
-                        .getAffectedStatement()
-                        .isPresent();
+                return storage.mutations().add(stmt);
             }
 
             // Add once per context
             boolean changed = false;
             for (Resource context : contexts) {
                 Statement stmt = valueFactory.createStatement(subject, predicate, object, context);
-                changed |= storage.getMutationOperations()
-                        .insertStatement(stmt)
-                        .getAffectedStatement()
-                        .isPresent();
+                changed |= storage.mutations().add(stmt);
             }
             return changed;
 
@@ -160,7 +154,7 @@ public final class StorageModel extends AbstractModel {
     public boolean contains(Resource subject, IRI predicate, Value object, Resource... contexts) {
         try {
             StatementPattern pattern = StatementPattern.of(subject, predicate, object, contexts);
-            return storage.getQueryOperations().exists(pattern);
+            return storage.queries().contains(pattern);
         } catch (StorageException e) {
             throw new ModelException(ModelOperation.CONTAINS,
                     "Failed to check statement existence", e);
@@ -172,9 +166,8 @@ public final class StorageModel extends AbstractModel {
         checkModifiable();
 
         try {
-            return storage.getMutationOperations()
-                    .deleteStatements(subject, predicate, object, contexts)
-                    .isSuccess();
+            return storage.mutations()
+                    .remove(StatementPattern.of(subject, predicate, object, contexts)) > 0;
         } catch (StorageException e) {
             throw new ModelException(ModelOperation.REMOVE,
                     "Failed to remove statements", e);
@@ -186,9 +179,7 @@ public final class StorageModel extends AbstractModel {
         checkModifiable();
 
         try {
-            return storage.getMutationOperations()
-                    .clear(contexts)
-                    .isSuccess();
+            return storage.mutations().clear(contexts) > 0;
         } catch (StorageException e) {
             throw new ModelException(ModelOperation.CLEAR,
                     "Failed to clear model"
@@ -203,9 +194,9 @@ public final class StorageModel extends AbstractModel {
     public Iterable<Statement> getStatements(Resource subject, IRI predicate, Value object, Resource... contexts) {
         try {
             StatementPattern pattern = StatementPattern.of(subject, predicate, object, contexts);
-            return storage.getQueryOperations()
-                    .query(pattern)
-                    .toList();
+            try (var statements = storage.queries().find(pattern)) {
+                return statements.toList();
+            }
         } catch (StorageException e) {
             throw new ModelException(ModelOperation.QUERY,
                     "Failed to query statements", e);
@@ -232,46 +223,6 @@ public final class StorageModel extends AbstractModel {
                 StorageModel.this.removeTermIteration(iterator, subject, predicate, object, contexts);
             }
         };
-    }
-
-    @Override
-    public Set<Resource> subjects() {
-        try {
-            return storage.getMetadataOperations().getSubjects();
-        } catch (StorageException e) {
-            throw new ModelException(ModelOperation.GET_SUBJECTS,
-                    "Failed to retrieve subjects", e);
-        }
-    }
-
-    @Override
-    public Set<IRI> predicates() {
-        try {
-            return storage.getMetadataOperations().getPredicates();
-        } catch (StorageException e) {
-            throw new ModelException(ModelOperation.GET_PREDICATES,
-                    "Failed to retrieve predicates", e);
-        }
-    }
-
-    @Override
-    public Set<Value> objects() {
-        try {
-            return storage.getMetadataOperations().getObjects();
-        } catch (StorageException e) {
-            throw new ModelException(ModelOperation.GET_OBJECTS,
-                    "Failed to retrieve objects", e);
-        }
-    }
-
-    @Override
-    public Set<Resource> contexts() {
-        try {
-            return storage.getMetadataOperations().getContexts();
-        } catch (StorageException e) {
-            throw new ModelException(ModelOperation.GET_CONTEXTS,
-                    "Failed to retrieve contexts", e);
-        }
     }
 
     @Override
@@ -314,7 +265,7 @@ public final class StorageModel extends AbstractModel {
     public int size() {
         try {
             StatementPattern pattern = StatementPattern.of(null, null, null);
-            return Math.toIntExact(storage.getQueryOperations().count(pattern));
+            return Math.toIntExact(storage.queries().count(pattern));
         } catch (StorageException e) {
             throw new ModelException(ModelOperation.SIZE,
                     "Failed to count statements", e);
@@ -397,10 +348,10 @@ public final class StorageModel extends AbstractModel {
 
         try {
             StatementPattern pattern = StatementPattern.of(subject, predicate, object, contexts);
-            List<Statement> statements = storage.getQueryOperations()
-                    .query(pattern)
-                    .toList();
-            return new ModelIterator(statements.iterator());
+            try (var matches = storage.queries().find(pattern)) {
+                List<Statement> statements = matches.toList();
+                return new ModelIterator(statements.iterator());
+            }
         } catch (StorageException e) {
             throw new ModelException(ModelOperation.ITERATE,
                     "Failed to create iterator", e);

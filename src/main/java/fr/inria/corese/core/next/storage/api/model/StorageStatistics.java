@@ -2,7 +2,6 @@ package fr.inria.corese.core.next.storage.api.model;
 
 /**
  * Statistics about the content and structure of an RDF storage backend.
- *
  */
 public record StorageStatistics(
         long statementCount,
@@ -23,5 +22,4 @@ public record StorageStatistics(
             throw new IllegalArgumentException("Counts cannot be negative");
         }
     }
-
 }

@@ -42,7 +42,7 @@ class GraphQueryOperationsTest {
         @Test
         @DisplayName("Should throw when adapter is null")
         void shouldThrowWhenAdapterIsNull() {
-            assertThrows(IllegalArgumentException.class,
+            assertThrows(NullPointerException.class,
                     () -> new GraphQueryOperations(null));
         }
     }
@@ -54,8 +54,8 @@ class GraphQueryOperationsTest {
         @Test
         @DisplayName("Should throw when pattern is null")
         void shouldThrowWhenPatternIsNull() {
-            assertThrows(IllegalArgumentException.class,
-                    () -> queryOps.query(null));
+            assertThrows(NullPointerException.class,
+                    () -> queryOps.find(null));
         }
 
         @Test
@@ -71,7 +71,7 @@ class GraphQueryOperationsTest {
             when(mockAdapter.find(null, null, null, null))
                     .thenAnswer(invocation -> new HashSet<>(mockResults));
 
-            Stream<Statement> result = queryOps.query(pattern);
+            Stream<Statement> result = queryOps.find(pattern);
 
             assertNotNull(result);
         }
@@ -84,7 +84,7 @@ class GraphQueryOperationsTest {
                     .thenThrow(new RuntimeException("Test error"));
 
             assertThrows(StorageException.class,
-                    () -> queryOps.query(pattern));
+                    () -> queryOps.find(pattern));
         }
     }
 
@@ -139,23 +139,10 @@ class GraphQueryOperationsTest {
             when(mockAdapter.find(null, null, null, null))
                     .thenReturn(Collections.emptySet());
 
-            boolean exists = queryOps.exists(pattern);
+            boolean exists = queryOps.contains(pattern);
 
             assertFalse(exists);
         }
     }
 
-    @Nested
-    @DisplayName("filter() tests")
-    class FilterTests {
-
-        @Test
-        @DisplayName("Should throw UnsupportedOperationException")
-        void shouldThrowUnsupportedOperationException() {
-            StatementPattern pattern = StatementPattern.of(null, null, null);
-
-            assertThrows(UnsupportedOperationException.class,
-                    () -> queryOps.filter(pattern));
-        }
-    }
 }

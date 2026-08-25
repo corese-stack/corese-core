@@ -277,11 +277,11 @@ class StorageManagerProducerTest {
 
     private void insert(Resource subject, IRI predicate, Value object, Resource... contexts) {
         if (contexts == null || contexts.length == 0) {
-            storage.getMutationOperations().insertStatement(valueFactory.createStatement(subject, predicate, object));
+            storage.mutations().add(valueFactory.createStatement(subject, predicate, object));
             return;
         }
         for (Resource context : contexts) {
-            storage.getMutationOperations().insertStatement(
+            storage.mutations().add(
                     valueFactory.createStatement(subject, predicate, object, context));
         }
     }

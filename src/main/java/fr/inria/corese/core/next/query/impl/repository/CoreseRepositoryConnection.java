@@ -31,7 +31,6 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.UpdateRequestAst;
 import fr.inria.corese.core.next.query.impl.sparql.execution.NextSparqlPipelineExecutor;
 import fr.inria.corese.core.next.storage.api.StorageManager;
 import fr.inria.corese.core.next.storage.api.exception.StorageException;
-import fr.inria.corese.core.next.storage.api.model.MutationResult;
 import fr.inria.corese.core.next.storage.api.model.StatementPattern;
 import fr.inria.corese.core.next.storage.api.transaction.Transaction;
 import fr.inria.corese.core.next.storage.api.transaction.TransactionManager;
@@ -78,9 +77,7 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
         checkOpen();
         Statement checkedStatement = Objects.requireNonNull(statement, "statement");
         try {
-            requireMutationSuccess(
-                    storage.getMutationOperations().insertStatement(checkedStatement),
-                    "Could not add statement");
+            storage.mutations().add(checkedStatement);
         } catch (StorageException | UnsupportedOperationException e) {
             throw new RepositoryException("Could not add statement", e);
         }
@@ -89,8 +86,10 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
     @Override
     public void add(Iterable<? extends Statement> statements) throws RepositoryException {
         checkOpen();
-        for (Statement statement : Objects.requireNonNull(statements, "statements")) {
-            add(statement);
+        try {
+            storage.mutations().addAll(Objects.requireNonNull(statements, "statements"));
+        } catch (StorageException | UnsupportedOperationException e) {
+            throw new RepositoryException("Could not add statements", e);
         }
     }
 
@@ -117,7 +116,7 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
         Statement checkedStatement = Objects.requireNonNull(statement, "statement");
         try {
             // Removing a statement that is not present is intentionally a no-op.
-            storage.getMutationOperations().deleteStatement(checkedStatement);
+            storage.mutations().remove(checkedStatement);
         } catch (StorageException | UnsupportedOperationException e) {
             throw new RepositoryException("Could not remove statement", e);
         }
@@ -126,8 +125,10 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
     @Override
     public void remove(Iterable<? extends Statement> statements) throws RepositoryException {
         checkOpen();
-        for (Statement statement : Objects.requireNonNull(statements, "statements")) {
-            remove(statement);
+        try {
+            storage.mutations().removeAll(Objects.requireNonNull(statements, "statements"));
+        } catch (StorageException | UnsupportedOperationException e) {
+            throw new RepositoryException("Could not remove statements", e);
         }
     }
 
@@ -136,10 +137,8 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
             throws RepositoryException {
         checkOpen();
         try {
-            requireMutationSuccess(
-                    storage.getMutationOperations()
-                            .deleteStatements(subject, predicate, object, contexts),
-                    "Could not remove statements");
+            storage.mutations().remove(
+                    StatementPattern.of(subject, predicate, object, contexts));
         } catch (StorageException | UnsupportedOperationException e) {
             throw new RepositoryException("Could not remove statements", e);
         }
@@ -149,11 +148,7 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
     public void clear(Resource... contexts) throws RepositoryException {
         checkOpen();
         try {
-            MutationResult result = contexts == null || contexts.length == 0
-                    ? storage.getMutationOperations().clear()
-                    : storage.getMutationOperations()
-                            .deleteStatements(null, null, null, contexts);
-            requireMutationSuccess(result, "Could not clear repository data");
+            storage.mutations().clear(contexts);
         } catch (StorageException | UnsupportedOperationException e) {
             throw new RepositoryException("Could not clear repository data", e);
         }
@@ -165,8 +160,8 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
             throws RepositoryException {
         checkOpen();
         try {
-            return storage.getQueryOperations()
-                    .exists(StatementPattern.of(subject, predicate, object, contexts));
+            return storage.queries()
+                    .contains(StatementPattern.of(subject, predicate, object, contexts));
         } catch (StorageException | UnsupportedOperationException e) {
             throw new RepositoryException("Could not test repository statements", e);
         }
@@ -176,7 +171,7 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
     public long size(Resource... contexts) throws RepositoryException {
         checkOpen();
         try {
-            return storage.getQueryOperations()
+            return storage.queries()
                     .count(StatementPattern.of(null, null, null, contexts));
         } catch (StorageException | UnsupportedOperationException e) {
             throw new RepositoryException("Could not count repository statements", e);
@@ -190,8 +185,8 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
         checkOpen();
         try {
             return new CoreseStatementResult(
-                    storage.getQueryOperations()
-                            .query(StatementPattern.of(subject, predicate, object, contexts)),
+                    storage.queries()
+                            .find(StatementPattern.of(subject, predicate, object, contexts)),
                     this::checkOpen);
         } catch (StorageException | UnsupportedOperationException e) {
             throw new RepositoryException("Could not read repository statements", e);
@@ -358,7 +353,7 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
     }
 
     private TransactionManager transactionManager() {
-        return storage.getTransactionManager();
+        return storage.transactions();
     }
 
     private void checkOpen() {
@@ -394,14 +389,4 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
         return checkedSource;
     }
 
-    private void requireMutationSuccess(MutationResult result, String operation) {
-        if (result.isFailure()) {
-            Throwable cause = result.getError().orElse(null);
-            String message = operation + ": " + result.getMessage();
-            if (cause == null) {
-                throw new RepositoryException(message);
-            }
-            throw new RepositoryException(message, cause);
-        }
-    }
 }

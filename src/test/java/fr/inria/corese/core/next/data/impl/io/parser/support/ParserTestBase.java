@@ -5,7 +5,7 @@ import fr.inria.corese.core.next.data.api.model.Model;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.storage.impl.model.StorageModel;
 import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
-import fr.inria.corese.core.next.storage.api.plugin.StoragePluginManager;
+import fr.inria.corese.core.next.storage.Storages;
 import fr.inria.corese.core.next.storage.api.config.StorageConfig;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -36,7 +36,7 @@ public abstract class ParserTestBase {
                 .build();
 
         return StorageModel.builder()
-                .storage(StoragePluginManager.create(config))
+                .storage(Storages.create(config))
                 .valueFactory(valueFactory)
                 .build();
     }

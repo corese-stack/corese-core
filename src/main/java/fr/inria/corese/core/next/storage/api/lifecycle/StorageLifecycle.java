@@ -41,5 +41,4 @@ public interface StorageLifecycle {
      * @return the initialization configuration, or empty before initialization and after shutdown
      */
     Optional<StorageConfig> getConfig();
-
 }

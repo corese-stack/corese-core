@@ -1,9 +1,7 @@
 package fr.inria.corese.core.next.storage.impl.memory;
 
 import fr.inria.corese.core.next.storage.api.StorageManager;
-import fr.inria.corese.core.next.storage.api.StorageManagerBuilder;
 import fr.inria.corese.core.next.storage.api.lifecycle.StorageLifecycle;
-import fr.inria.corese.core.next.storage.api.operations.BulkOperations;
 import fr.inria.corese.core.next.storage.api.operations.MetadataOperations;
 import fr.inria.corese.core.next.storage.api.operations.MutationOperations;
 import fr.inria.corese.core.next.storage.api.operations.QueryOperations;
@@ -20,7 +18,6 @@ public final class MemoryStorageManager implements StorageManager {
     private final QueryOperations queryOps;
     private final MutationOperations mutationOps;
     private final MetadataOperations metadataOps;
-    private final BulkOperations bulkOps;
     private final TransactionManager txManager;
     private final StorageLifecycle lifecycle;
 
@@ -35,38 +32,32 @@ public final class MemoryStorageManager implements StorageManager {
         this.queryOps = new MemoryQueryOperations(adapter);
         this.mutationOps = new MemoryMutationOperations(adapter);
         this.metadataOps = new MemoryMetadataOperations(adapter);
-        this.bulkOps = new MemoryBulkOperations(adapter);
         this.txManager = new MemoryTransactionManager();
         this.lifecycle = new MemoryLifecycleManager(adapter);
     }
 
     @Override
-    public QueryOperations getQueryOperations() {
+    public QueryOperations queries() {
         return queryOps;
     }
 
     @Override
-    public MutationOperations getMutationOperations() {
+    public MutationOperations mutations() {
         return mutationOps;
     }
 
     @Override
-    public MetadataOperations getMetadataOperations() {
+    public MetadataOperations metadata() {
         return metadataOps;
     }
 
     @Override
-    public BulkOperations getBulkOperations() {
-        return bulkOps;
-    }
-
-    @Override
-    public TransactionManager getTransactionManager() {
+    public TransactionManager transactions() {
         return txManager;
     }
 
     @Override
-    public StorageLifecycle getLifecycle() {
+    public StorageLifecycle lifecycle() {
         return lifecycle;
     }
 
@@ -82,7 +73,7 @@ public final class MemoryStorageManager implements StorageManager {
     /**
      * Builder for {@link MemoryStorageManager}.
      */
-    public static final class Builder implements StorageManagerBuilder {
+    public static final class Builder {
 
 
         public Builder() {
@@ -94,7 +85,6 @@ public final class MemoryStorageManager implements StorageManager {
          *
          * @return a new MemoryStorageManager
          */
-        @Override
         public MemoryStorageManager build() {
             return new MemoryStorageManager(this);
         }

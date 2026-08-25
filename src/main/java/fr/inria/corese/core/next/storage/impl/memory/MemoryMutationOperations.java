@@ -1,13 +1,13 @@
 package fr.inria.corese.core.next.storage.impl.memory;
 
-import fr.inria.corese.core.next.data.api.term.IRI;
-import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.model.Statement;
-import fr.inria.corese.core.next.data.api.term.Value;
+import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.storage.api.operations.MutationOperations;
 import fr.inria.corese.core.next.storage.api.exception.ErrorCode;
 import fr.inria.corese.core.next.storage.api.exception.StorageException;
-import fr.inria.corese.core.next.storage.api.model.MutationResult;
+import fr.inria.corese.core.next.storage.api.model.StatementPattern;
+
+import java.util.Objects;
 
 /**
  * Mutation operations implementation for {@link MemoryStorageManager}.
@@ -31,54 +31,33 @@ final class MemoryMutationOperations implements MutationOperations {
      * Inserts a statement into the store.
      *
      * @param statement the statement to insert (must not be null)
-     * @return a {@link MutationResult} indicating success (always succeeds)
-     * @throws IllegalArgumentException if statement is null
+     * @return whether the store changed
+     * @throws NullPointerException     if statement is null
      * @throws StorageException         if the insert operation fails
      */
     @Override
-    public MutationResult insertStatement(Statement statement) throws StorageException {
-        if (statement == null) throw new IllegalArgumentException("Statement cannot be null");
+    public boolean add(Statement statement) throws StorageException {
+        Objects.requireNonNull(statement, "statement");
         try {
-            boolean added = adapter.add(statement);
-            return added ? MutationResult.success(statement, "Inserted")
-                    : MutationResult.success(null, "Already exists");
+            return adapter.add(statement);
         } catch (Exception e) {
             throw new StorageException(ErrorCode.MUTATION_FAILED, "Insert failed", e);
         }
     }
 
     /**
-     * Inserts a statement constructed from individual components.
-     *
-     * @param s   the subject
-     * @param p   the predicate
-     * @param o   the object
-     * @param ctx optional contexts
-     * @return never returns (always throws)
-     */
-    @Override
-    public MutationResult insertStatement(Resource s, IRI p, Value o, Resource... ctx) {
-        throw new UnsupportedOperationException(
-                "Use insertStatement(Statement) instead. " +
-                        "Creating Statement from components not yet implemented."
-        );
-    }
-
-    /**
      * Deletes a statement from the store.
      *
      * @param statement the statement to delete (must not be null)
-     * @return a {@link MutationResult} indicating success or failure
-     * @throws IllegalArgumentException if statement is null
+     * @return whether the store changed
+     * @throws NullPointerException     if statement is null
      * @throws StorageException         if the delete operation fails
      */
     @Override
-    public MutationResult deleteStatement(Statement statement) throws StorageException {
-        if (statement == null) throw new IllegalArgumentException("Statement cannot be null");
+    public boolean remove(Statement statement) throws StorageException {
+        Objects.requireNonNull(statement, "statement");
         try {
-            boolean removed = adapter.remove(statement);
-            return removed ? MutationResult.success(statement, "Deleted")
-                    : MutationResult.failure("Not found");
+            return adapter.remove(statement);
         } catch (Exception e) {
             throw new StorageException(ErrorCode.MUTATION_FAILED, "Delete failed", e);
         }
@@ -87,52 +66,44 @@ final class MemoryMutationOperations implements MutationOperations {
     /**
      * Deletes all statements matching the given pattern.
      *
-     * @param s   subject filter (null = any)
-     * @param p   predicate filter (null = any)
-     * @param o   object filter (null = any)
-     * @param ctx context filters (null/empty = any)
-     * @return a {@link MutationResult} with the count of deleted statements
+     * @param pattern statement pattern
+     * @return number of deleted statements
      * @throws StorageException if the operation fails
      */
     @Override
-    public MutationResult deleteStatements(Resource s, IRI p, Value o, Resource... ctx)
-            throws StorageException {
+    public long remove(StatementPattern pattern) throws StorageException {
+        Objects.requireNonNull(pattern, "pattern");
         try {
-            var toRemove = adapter.find(s, p, o, ctx);
-            int count = toRemove.size();
+            var toRemove = adapter.find(
+                    pattern.getSubject(),
+                    pattern.getPredicate(),
+                    pattern.getObject(),
+                    pattern.getContexts());
+            long count = toRemove.size();
             toRemove.forEach(adapter::remove);
-            return MutationResult.bulkBuilder()
-                    .totalAttempted(count)
-                    .successCount(count)
-                    .message("Deleted " + count + " statement(s)")
-                    .build();
+            return count;
         } catch (Exception e) {
             throw new StorageException(ErrorCode.MUTATION_FAILED, "Delete failed", e);
         }
     }
 
     /**
-     * Clears statements from specified contexts (named graphs).
+     * Clears statements from specified contexts.
      *
-     * @param contexts the contexts to clear; null/empty clears entire store
-     * @return a {@link MutationResult} with the count of deleted statements
+     * @param contexts contexts to clear; null/empty clears every graph and an
+     *                 explicit null element clears the default graph
+     * @return number of deleted statements
      * @throws StorageException if the clear operation fails
      */
     @Override
-    public MutationResult clear(Resource... contexts) throws StorageException {
+    public long clear(Resource... contexts) throws StorageException {
         try {
-            int before = adapter.size();
-            if (contexts == null || contexts.length == 0) {
-                adapter.clear();
-            } else {
-                for (Resource ctx : contexts) adapter.clearContext(ctx);
+            if (contexts != null && contexts.length > 0) {
+                return remove(StatementPattern.of(null, null, null, contexts));
             }
-            int deleted = before - adapter.size();
-            return MutationResult.bulkBuilder()
-                    .totalAttempted(deleted)
-                    .successCount(deleted)
-                    .message("Cleared " + deleted + " statement(s)")
-                    .build();
+            int before = adapter.size();
+            adapter.clear();
+            return (long) before - adapter.size();
         } catch (Exception e) {
             throw new StorageException(ErrorCode.MUTATION_FAILED, "Clear failed", e);
         }

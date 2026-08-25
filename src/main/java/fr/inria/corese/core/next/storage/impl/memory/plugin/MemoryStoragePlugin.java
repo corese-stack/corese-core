@@ -6,6 +6,8 @@ import fr.inria.corese.core.next.storage.api.plugin.StoragePlugin;
 import fr.inria.corese.core.next.storage.api.config.StorageConfig;
 import fr.inria.corese.core.next.storage.impl.memory.MemoryStorageManager;
 
+import java.util.Objects;
+
 /**
  * Plugin for MemoryStorageManager
  */
@@ -20,7 +22,7 @@ public class MemoryStoragePlugin implements StoragePlugin {
 
     @Override
     public String getDescription() {
-        return "In-memory HashMap backend (testing only, no persistence)";
+        return "In-memory backend for tests and small datasets (no persistence)";
     }
 
     @Override
@@ -35,19 +37,11 @@ public class MemoryStoragePlugin implements StoragePlugin {
 
     @Override
     public StorageManager create(StorageConfig config) throws PluginException {
-        if (config == null) {
-            throw new IllegalArgumentException("StorageConfig must not be null");
-        }
-
-
+        StorageConfig checkedConfig = Objects.requireNonNull(config, "config");
         try {
             MemoryStorageManager storage = MemoryStorageManager.builder().build();
-
-            // Initialize lifecycle
-            storage.getLifecycle().initialize(config);
-
+            storage.lifecycle().initialize(checkedConfig);
             return storage;
-
         } catch (Exception e) {
             throw new PluginException("Failed to create MemoryStorageManager", e);
         }

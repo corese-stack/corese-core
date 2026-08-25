@@ -52,7 +52,7 @@ class RepositoriesTest {
         StorageManager storage = mock(StorageManager.class);
         StorageLifecycle lifecycle = mock(StorageLifecycle.class);
         StorageConfig config = StorageConfig.builder().type("test").build();
-        when(storage.getLifecycle()).thenReturn(lifecycle);
+        when(storage.lifecycle()).thenReturn(lifecycle);
         when(lifecycle.getState())
                 .thenReturn(LifecycleState.NOT_INITIALIZED)
                 .thenReturn(LifecycleState.RUNNING)
@@ -70,7 +70,7 @@ class RepositoriesTest {
     void adoptsAnAlreadyRunningStorageWithoutInitializingItAgain() {
         StorageManager storage = mock(StorageManager.class);
         StorageLifecycle lifecycle = mock(StorageLifecycle.class);
-        when(storage.getLifecycle()).thenReturn(lifecycle);
+        when(storage.lifecycle()).thenReturn(lifecycle);
         when(lifecycle.getState()).thenReturn(LifecycleState.RUNNING);
 
         try (Repository repository = Repositories.create(storage)) {
@@ -85,7 +85,7 @@ class RepositoriesTest {
     void rejectsStorageThatCannotBeAdopted() {
         StorageManager storage = mock(StorageManager.class);
         StorageLifecycle lifecycle = mock(StorageLifecycle.class);
-        when(storage.getLifecycle()).thenReturn(lifecycle);
+        when(storage.lifecycle()).thenReturn(lifecycle);
         when(lifecycle.getState()).thenReturn(LifecycleState.SHUTDOWN);
 
         assertThrows(RepositoryException.class, () -> Repositories.create(storage));

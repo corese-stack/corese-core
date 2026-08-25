@@ -5,7 +5,6 @@ import fr.inria.corese.core.next.storage.api.transaction.Transaction;
 import fr.inria.corese.core.next.storage.api.transaction.TransactionManager;
 
 import java.util.Collections;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -42,29 +41,6 @@ final class MemoryTransactionManager implements TransactionManager {
     @Override
     public Transaction beginTransaction(IsolationLevel level) {
         throw new UnsupportedOperationException("Transactions not supported by MemoryStorageManager");
-    }
-
-    /**
-     * Returns the current transaction for the calling thread.
-     *
-     * @return empty Optional
-     */
-    @Override
-    public Optional<Transaction> getCurrentTransaction() {
-        return Optional.empty();
-    }
-
-    /**
-     * Returns the default isolation level.
-     *
-     * <p>Returns {@link IsolationLevel#READ_COMMITTED} as a nominal value,
-     * even though transactions are not supported.</p>
-     *
-     * @return READ_COMMITTED (nominal)
-     */
-    @Override
-    public IsolationLevel getDefaultIsolationLevel() {
-        return IsolationLevel.READ_COMMITTED;
     }
 
     /**

@@ -5,8 +5,8 @@ import fr.inria.corese.core.next.query.api.repository.Repository;
 import fr.inria.corese.core.next.query.impl.repository.CoreseRepository;
 import fr.inria.corese.core.next.storage.api.StorageManager;
 import fr.inria.corese.core.next.storage.api.config.StorageConfig;
+import fr.inria.corese.core.next.storage.Storages;
 import fr.inria.corese.core.next.storage.api.plugin.PluginException;
-import fr.inria.corese.core.next.storage.api.plugin.StoragePluginManager;
 
 import java.util.Objects;
 
@@ -51,7 +51,7 @@ public final class Repositories {
     public static Repository create(StorageConfig config) {
         StorageConfig checkedConfig = Objects.requireNonNull(config, "config");
         try {
-            return new CoreseRepository(StoragePluginManager.create(checkedConfig), checkedConfig);
+            return new CoreseRepository(Storages.create(checkedConfig), checkedConfig);
         } catch (PluginException e) {
             throw new RepositoryException("Could not create repository storage", e);
         }

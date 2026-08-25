@@ -80,49 +80,41 @@ class GraphStorageManagerTest {
         @Test
         @DisplayName("Should return QueryOperations")
         void shouldReturnQueryOperations() {
-            assertNotNull(storageManager.getQueryOperations());
+            assertNotNull(storageManager.queries());
             assertInstanceOf(GraphQueryOperations.class,
-                    storageManager.getQueryOperations());
+                    storageManager.queries());
         }
 
         @Test
         @DisplayName("Should return MutationOperations")
         void shouldReturnMutationOperations() {
-            assertNotNull(storageManager.getMutationOperations());
+            assertNotNull(storageManager.mutations());
             assertInstanceOf(GraphMutationOperations.class,
-                    storageManager.getMutationOperations());
+                    storageManager.mutations());
         }
 
         @Test
         @DisplayName("Should return MetadataOperations")
         void shouldReturnMetadataOperations() {
-            assertNotNull(storageManager.getMetadataOperations());
+            assertNotNull(storageManager.metadata());
             assertInstanceOf(GraphMetadataOperations.class,
-                    storageManager.getMetadataOperations());
-        }
-
-        @Test
-        @DisplayName("Should return BulkOperations")
-        void shouldReturnBulkOperations() {
-            assertNotNull(storageManager.getBulkOperations());
-            assertInstanceOf(GraphBulkOperations.class,
-                    storageManager.getBulkOperations());
+                    storageManager.metadata());
         }
 
         @Test
         @DisplayName("Should return TransactionManager")
         void shouldReturnTransactionManager() {
-            assertNotNull(storageManager.getTransactionManager());
+            assertNotNull(storageManager.transactions());
             assertInstanceOf(GraphTransactionManager.class,
-                    storageManager.getTransactionManager());
+                    storageManager.transactions());
         }
 
         @Test
         @DisplayName("Should return StorageLifecycle")
         void shouldReturnStorageLifecycle() {
-            assertNotNull(storageManager.getLifecycle());
+            assertNotNull(storageManager.lifecycle());
             assertInstanceOf(GraphLifecycleManager.class,
-                    storageManager.getLifecycle());
+                    storageManager.lifecycle());
         }
     }
 
@@ -142,7 +134,7 @@ class GraphStorageManagerTest {
         @DisplayName("Should start in NOT_INITIALIZED state")
         void shouldStartInNotInitializedState() {
             assertEquals(LifecycleState.NOT_INITIALIZED,
-                    storageManager.getLifecycle().getState());
+                    storageManager.lifecycle().getState());
         }
 
         @Test
@@ -150,10 +142,10 @@ class GraphStorageManagerTest {
         void shouldInitializeSuccessfully() {
             StorageConfig config = StorageConfig.builder().build();
 
-            storageManager.getLifecycle().initialize(config);
+            storageManager.lifecycle().initialize(config);
 
             assertEquals(LifecycleState.RUNNING,
-                    storageManager.getLifecycle().getState());
+                    storageManager.lifecycle().getState());
             verify(mockGraph).init();
         }
 
@@ -161,12 +153,12 @@ class GraphStorageManagerTest {
         @DisplayName("Should shutdown successfully")
         void shouldShutdownSuccessfully() {
             StorageConfig config = StorageConfig.builder().build();
-            storageManager.getLifecycle().initialize(config);
+            storageManager.lifecycle().initialize(config);
 
-            storageManager.getLifecycle().shutdown();
+            storageManager.lifecycle().shutdown();
 
             assertEquals(LifecycleState.SHUTDOWN,
-                    storageManager.getLifecycle().getState());
+                    storageManager.lifecycle().getState());
         }
     }
 
@@ -185,13 +177,13 @@ class GraphStorageManagerTest {
         @Test
         @DisplayName("Should not support transactions")
         void shouldNotSupportTransactions() {
-            assertFalse(storageManager.getTransactionManager().supportsTransactions());
+            assertFalse(storageManager.transactions().supportsTransactions());
         }
 
         @Test
         @DisplayName("Should throw when beginning transaction")
         void shouldThrowWhenBeginningTransaction() {
-            TransactionManager txManager = storageManager.getTransactionManager();
+            TransactionManager txManager = storageManager.transactions();
             assertThrows(UnsupportedOperationException.class, txManager::beginTransaction);
         }
     }

@@ -12,7 +12,7 @@ import fr.inria.corese.core.next.data.impl.io.parser.DefaultRDFParserFactory;
 import fr.inria.corese.core.next.data.impl.io.serializer.DefaultRDFSerializerFactory;
 import fr.inria.corese.core.next.data.impl.io.parser.support.ParserTestBase;
 import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
-import fr.inria.corese.core.next.storage.api.plugin.StoragePluginManager;
+import fr.inria.corese.core.next.storage.Storages;
 import fr.inria.corese.core.next.storage.api.config.StorageConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -100,7 +100,7 @@ class JSONLDCircularTest extends ParserTestBase {
                 .build();
 
         Model model = StorageModel.builder()
-                .storage(StoragePluginManager.create(config))
+                .storage(Storages.create(config))
                 .valueFactory(valueFactory)
                 .build();
 
@@ -135,7 +135,7 @@ class JSONLDCircularTest extends ParserTestBase {
                 .build();
 
         Model model = StorageModel.builder()
-                .storage(StoragePluginManager.create(config))
+                .storage(Storages.create(config))
                 .valueFactory(valueFactory)
                 .build();
         // Basic IRI and string literal triple
@@ -184,7 +184,7 @@ class JSONLDCircularTest extends ParserTestBase {
                 .build();
 
         Model model = StorageModel.builder()
-                .storage(StoragePluginManager.create(config))
+                .storage(Storages.create(config))
                 .valueFactory(valueFactory)
                 .build();
 

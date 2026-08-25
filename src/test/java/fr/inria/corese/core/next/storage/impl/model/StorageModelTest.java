@@ -10,7 +10,6 @@ import fr.inria.corese.core.next.storage.api.operations.MetadataOperations;
 import fr.inria.corese.core.next.storage.api.operations.MutationOperations;
 import fr.inria.corese.core.next.storage.api.operations.QueryOperations;
 import fr.inria.corese.core.next.storage.api.exception.StorageException;
-import fr.inria.corese.core.next.storage.api.model.MutationResult;
 import fr.inria.corese.core.next.storage.api.model.StatementPattern;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -55,10 +54,10 @@ class StorageModelTest {
         MockitoAnnotations.openMocks(this);
 
         // Setup mock storage to return operations
-        when(mockStorage.getQueryOperations()).thenReturn(mockQueryOps);
-        when(mockStorage.getMutationOperations()).thenReturn(mockMutationOps);
-        when(mockStorage.getMetadataOperations()).thenReturn(mockMetadataOps);
-        when(mockStorage.getLifecycle()).thenReturn(mockLifecycle);
+        when(mockStorage.queries()).thenReturn(mockQueryOps);
+        when(mockStorage.mutations()).thenReturn(mockMutationOps);
+        when(mockStorage.metadata()).thenReturn(mockMetadataOps);
+        when(mockStorage.lifecycle()).thenReturn(mockLifecycle);
 
         // Build model
         model = StorageModel.builder()
@@ -114,13 +113,13 @@ class StorageModelTest {
             Statement stmt = mock(Statement.class);
 
             when(mockValueFactory.createStatement(subject, predicate, object)).thenReturn(stmt);
-            when(mockMutationOps.insertStatement(stmt)).thenReturn(MutationResult.success(stmt, "Added"));
+            when(mockMutationOps.add(stmt)).thenReturn(true);
 
             boolean added = model.add(subject, predicate, object);
 
             assertTrue(added);
             verify(mockValueFactory).createStatement(subject, predicate, object);
-            verify(mockMutationOps).insertStatement(stmt);
+            verify(mockMutationOps).add(stmt);
         }
 
         @Test
@@ -132,8 +131,7 @@ class StorageModelTest {
             Statement stmt = mock(Statement.class);
 
             when(mockValueFactory.createStatement(subject, predicate, object)).thenReturn(stmt);
-            when(mockMutationOps.insertStatement(stmt))
-                    .thenReturn(MutationResult.success(null, "Already exists"));
+            when(mockMutationOps.add(stmt)).thenReturn(false);
 
             assertFalse(model.add(subject, predicate, object));
         }
@@ -148,13 +146,13 @@ class StorageModelTest {
             Statement stmt = mock(Statement.class);
 
             when(mockValueFactory.createStatement(subject, predicate, object, context)).thenReturn(stmt);
-            when(mockMutationOps.insertStatement(stmt)).thenReturn(MutationResult.success(stmt, "Added"));
+            when(mockMutationOps.add(stmt)).thenReturn(true);
 
             boolean added = model.add(subject, predicate, object, context);
 
             assertTrue(added);
             verify(mockValueFactory).createStatement(subject, predicate, object, context);
-            verify(mockMutationOps).insertStatement(stmt);
+            verify(mockMutationOps).add(stmt);
         }
 
         @Test
@@ -170,14 +168,12 @@ class StorageModelTest {
 
             when(mockValueFactory.createStatement(subject, predicate, object, context1)).thenReturn(stmt1);
             when(mockValueFactory.createStatement(subject, predicate, object, context2)).thenReturn(stmt2);
-            when(mockMutationOps.insertStatement(any()))
-                    .thenReturn(MutationResult.success(stmt1, "Added"))
-                    .thenReturn(MutationResult.success(stmt2, "Added"));
+            when(mockMutationOps.add(any())).thenReturn(true, true);
 
             boolean added = model.add(subject, predicate, object, context1, context2);
 
             assertTrue(added);
-            verify(mockMutationOps, times(2)).insertStatement(any(Statement.class));
+            verify(mockMutationOps, times(2)).add(any(Statement.class));
         }
 
         @Test
@@ -216,12 +212,12 @@ class StorageModelTest {
             IRI predicate = mock(IRI.class);
             Value object = mock(Value.class);
 
-            when(mockQueryOps.exists(any(StatementPattern.class))).thenReturn(true);
+            when(mockQueryOps.contains(any(StatementPattern.class))).thenReturn(true);
 
             boolean contains = model.contains(subject, predicate, object);
 
             assertTrue(contains);
-            verify(mockQueryOps).exists(any(StatementPattern.class));
+            verify(mockQueryOps).contains(any(StatementPattern.class));
         }
 
         @Test
@@ -232,18 +228,18 @@ class StorageModelTest {
             Value object = mock(Value.class);
             Resource context = mock(Resource.class);
 
-            when(mockQueryOps.exists(any(StatementPattern.class))).thenReturn(false);
+            when(mockQueryOps.contains(any(StatementPattern.class))).thenReturn(false);
 
             boolean contains = model.contains(subject, predicate, object, context);
 
             assertFalse(contains);
-            verify(mockQueryOps).exists(any(StatementPattern.class));
+            verify(mockQueryOps).contains(any(StatementPattern.class));
         }
 
         @Test
         @DisplayName("Should support wildcard patterns")
         void shouldSupportWildcardPatterns() throws StorageException {
-            when(mockQueryOps.exists(any(StatementPattern.class))).thenReturn(true);
+            when(mockQueryOps.contains(any(StatementPattern.class))).thenReturn(true);
 
             boolean contains = model.contains(null, null, null);
 
@@ -262,13 +258,12 @@ class StorageModelTest {
             IRI predicate = mock(IRI.class);
             Value object = mock(Value.class);
 
-            when(mockMutationOps.deleteStatements(subject, predicate, object))
-                    .thenReturn(MutationResult.bulkBuilder().totalAttempted(1).successCount(1).build());
+            when(mockMutationOps.remove(any(StatementPattern.class))).thenReturn(1L);
 
             boolean removed = model.remove(subject, predicate, object);
 
             assertTrue(removed);
-            verify(mockMutationOps).deleteStatements(subject, predicate, object);
+            verify(mockMutationOps).remove(any(StatementPattern.class));
         }
 
 
@@ -278,8 +273,7 @@ class StorageModelTest {
             Resource context1 = mock(Resource.class);
             Resource context2 = mock(Resource.class);
 
-            when(mockMutationOps.clear(context1, context2))
-                    .thenReturn(MutationResult.success(null, "Cleared"));
+            when(mockMutationOps.clear(context1, context2)).thenReturn(1L);
 
             boolean cleared = model.clear(context1, context2);
 
@@ -300,14 +294,14 @@ class StorageModelTest {
             Value object = mock(Value.class);
             Statement stmt = mock(Statement.class);
 
-            when(mockQueryOps.query(any(StatementPattern.class)))
+            when(mockQueryOps.find(any(StatementPattern.class)))
                     .thenReturn(Stream.of(stmt));
 
             Iterable<Statement> statements = model.getStatements(subject, predicate, object);
 
             assertNotNull(statements);
             assertTrue(statements.iterator().hasNext());
-            verify(mockQueryOps).query(any(StatementPattern.class));
+            verify(mockQueryOps).find(any(StatementPattern.class));
         }
 
         @Test
@@ -327,7 +321,7 @@ class StorageModelTest {
             Statement stmt1 = mock(Statement.class);
             Statement stmt2 = mock(Statement.class);
 
-            when(mockQueryOps.query(any(StatementPattern.class)))
+            when(mockQueryOps.find(any(StatementPattern.class)))
                     .thenReturn(Stream.of(stmt1, stmt2));
 
             Iterator<Statement> iterator = model.iterator();
@@ -340,69 +334,29 @@ class StorageModelTest {
         }
     }
 
-    @Nested
-    @DisplayName("Metadata operations")
-    class MetadataOperationsTests {
+    @Test
+    @DisplayName("Term views are derived from statements and remain live")
+    void termViewsAreDerivedFromStatementsAndRemainLive() throws StorageException {
+        Resource subject = mock(Resource.class);
+        IRI predicate = mock(IRI.class);
+        Value object = mock(Value.class);
+        Resource context = mock(Resource.class);
+        Statement statement = mock(Statement.class);
+        when(statement.getSubject()).thenReturn(subject);
+        when(statement.getPredicate()).thenReturn(predicate);
+        when(statement.getObject()).thenReturn(object);
+        when(statement.getContext()).thenReturn(context);
+        when(mockQueryOps.find(any(StatementPattern.class)))
+                .thenAnswer(ignored -> Stream.of(statement));
+        when(mockMutationOps.remove(any(StatementPattern.class))).thenReturn(1L);
 
-        @Test
-        @DisplayName("Should get subjects")
-        void shouldGetSubjects() throws StorageException {
-            Resource subject = mock(Resource.class);
-            Set<Resource> subjects = new HashSet<>(Collections.singletonList(subject));
-
-            when(mockMetadataOps.getSubjects()).thenReturn(subjects);
-
-            Set<Resource> result = model.subjects();
-
-            assertEquals(1, result.size());
-            assertTrue(result.contains(subject));
-            verify(mockMetadataOps).getSubjects();
-        }
-
-        @Test
-        @DisplayName("Should get predicates")
-        void shouldGetPredicates() throws StorageException {
-            IRI predicate = mock(IRI.class);
-            Set<IRI> predicates = new HashSet<>(Collections.singletonList(predicate));
-
-            when(mockMetadataOps.getPredicates()).thenReturn(predicates);
-
-            Set<IRI> result = model.predicates();
-
-            assertEquals(1, result.size());
-            assertTrue(result.contains(predicate));
-            verify(mockMetadataOps).getPredicates();
-        }
-
-        @Test
-        @DisplayName("Should get objects")
-        void shouldGetObjects() throws StorageException {
-            Value object = mock(Value.class);
-            Set<Value> objects = new HashSet<>(Collections.singletonList(object));
-
-            when(mockMetadataOps.getObjects()).thenReturn(objects);
-
-            Set<Value> result = model.objects();
-
-            assertEquals(1, result.size());
-            assertTrue(result.contains(object));
-            verify(mockMetadataOps).getObjects();
-        }
-
-        @Test
-        @DisplayName("Should get contexts")
-        void shouldGetContexts() throws StorageException {
-            Resource context = mock(Resource.class);
-            Set<Resource> contexts = new HashSet<>(Collections.singletonList(context));
-
-            when(mockMetadataOps.getContexts()).thenReturn(contexts);
-
-            Set<Resource> result = model.contexts();
-
-            assertEquals(1, result.size());
-            assertTrue(result.contains(context));
-            verify(mockMetadataOps).getContexts();
-        }
+        assertIterableEquals(List.of(subject), model.subjects());
+        assertIterableEquals(List.of(predicate), model.predicates());
+        assertIterableEquals(List.of(object), model.objects());
+        assertIterableEquals(List.of(context), model.contexts());
+        assertTrue(model.subjects().remove(subject));
+        verify(mockMutationOps).remove(any(StatementPattern.class));
+        verifyNoInteractions(mockMetadataOps);
     }
 
     @Nested
@@ -552,7 +506,7 @@ class StorageModelTest {
         @Test
         @DisplayName("Should allow queries on unmodifiable model")
         void shouldAllowQueriesOnUnmodifiableModel() throws StorageException {
-            when(mockQueryOps.exists(any(StatementPattern.class))).thenReturn(true);
+            when(mockQueryOps.contains(any(StatementPattern.class))).thenReturn(true);
 
             Model unmodifiable = model.unmodifiable();
             boolean contains = unmodifiable.contains(null, null, null);

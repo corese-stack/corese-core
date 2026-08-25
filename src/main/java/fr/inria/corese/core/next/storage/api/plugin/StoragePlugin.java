@@ -4,7 +4,8 @@ import fr.inria.corese.core.next.storage.api.StorageManager;
 import fr.inria.corese.core.next.storage.api.config.StorageConfig;
 
 /**
- * Service Provider Interface (SPI) for StorageManager plugins.
+ * Service-provider interface for RDF storage backends discovered through
+ * {@link java.util.ServiceLoader}.
  */
 public interface StoragePlugin {
 
@@ -27,10 +28,9 @@ public interface StoragePlugin {
     /**
      * Checks if this plugin supports the given configuration.
      *
-     *
-     * @param config the storage configuration to check (never null)
-     * @return {@code true} if this plugin can create a StorageManager for this config
-     * @throws IllegalArgumentException if config is null
+     * @param config storage configuration to check
+     * @return {@code true} if this plugin can create a manager for the
+     *         configuration; {@code false} when unsupported or {@code null}
      */
     boolean supports(StorageConfig config);
 
@@ -38,41 +38,18 @@ public interface StoragePlugin {
      * Creates a StorageManager instance from the given configuration.
      *
      * @param config the storage configuration (never null)
-     * @return a configured StorageManager instance (never null)
+     * @return an initialized, open StorageManager instance (never null); ownership
+     *         is transferred to the caller
      * @throws PluginException          if the StorageManager cannot be created
-     * @throws IllegalArgumentException if config is null
+     * @throws NullPointerException if {@code config} is {@code null}
      */
     StorageManager create(StorageConfig config) throws PluginException;
 
     /**
-     * Returns the priority of this plugin.
+     * Returns the selection priority. Higher values win; equal priorities are
+     * ordered by plugin name.
      *
-     * <p>When multiple plugins support the same configuration (i.e., their
-     * {@link #supports(StorageConfig)} method returns {@code true}), the plugin
-     * with the <b>highest priority</b> is selected.
-     *
-     * <p><b>Priority Semantics:</b>
-     * <ul>
-     *   <li><b>Higher values = Higher priority:</b> A plugin with priority 100 will be
-     *       selected over one with priority 50</li>
-     *   <li><b>Default is 0:</b> If this method is not overridden, the plugin has priority 0</li>
-     *   <li><b>Negative values are allowed:</b> Use negative priorities for fallback plugins
-     *       that should only be used when no other plugin is available</li>
-     * </ul>
-     *
-     *
-     * <p><b>Built-in Priorities:</b>
-     * <ul>
-     *   <li>GraphStoragePlugin: 100</li>
-     *   <li>MemoryStoragePlugin: 50</li>
-     * </ul>
-     *
-     *
-     * <p><b>Tie-Breaking:</b> If multiple plugins have the same priority and support
-     * the same configuration, the selection is non-deterministic. Avoid this by ensuring
-     * each plugin has a unique priority for overlapping configurations.
-     *
-     * @return the plugin priority (higher values = higher priority, default is 0)
+     * @return selection priority, defaulting to zero
      */
     default int getPriority() {
         return 0;

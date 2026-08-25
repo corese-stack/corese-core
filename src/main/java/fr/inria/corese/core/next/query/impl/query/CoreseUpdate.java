@@ -55,7 +55,7 @@ public final class CoreseUpdate implements Update {
     public void execute() throws QueryEvaluationException {
         executionGuard.run();
         UpdateRequestAst request = (UpdateRequestAst) parser.parse(updateString);
-        MutationOperations mutations = storage.getMutationOperations();
+        MutationOperations mutations = storage.mutations();
         CoreseValueFactory factory = new CoreseValueFactory();
 
         for (UpdateRequestUnitAst operation : request.operations()) {
@@ -78,9 +78,9 @@ public final class CoreseUpdate implements Update {
         for (TriplePatternAst triple : quads.defaultTriples()) {
             Statement stmt = toStatement(triple, null, factory);
             if (insert) {
-                mutations.insertStatement(stmt);
+                mutations.add(stmt);
             } else {
-                mutations.deleteStatement(stmt);
+                mutations.remove(stmt);
             }
         }
         for (NamedGraphQuadsAst block : quads.namedGraphBlocks()) {
@@ -88,9 +88,9 @@ public final class CoreseUpdate implements Update {
             for (TriplePatternAst triple : block.triples()) {
                 Statement stmt = toStatement(triple, context, factory);
                 if (insert) {
-                    mutations.insertStatement(stmt);
+                    mutations.add(stmt);
                 } else {
-                    mutations.deleteStatement(stmt);
+                    mutations.remove(stmt);
                 }
             }
         }

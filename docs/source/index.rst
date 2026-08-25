@@ -106,4 +106,5 @@ Home Page
    RDF data API <next_data>
    RDF and SPARQL result I/O <next_io>
    Repository API <next_repository>
+   Storage provider API <next_storage>
    Java API <java_api/library_root>

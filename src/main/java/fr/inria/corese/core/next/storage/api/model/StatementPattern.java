@@ -5,24 +5,33 @@ import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.term.Value;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Pattern for matching statements in queries.
- * Each component can be null to act as a wildcard.
+ * Subject, predicate, and object may be {@code null} wildcards. No contexts
+ * means every graph; an explicit {@code null} context selects the default graph.
  */
 public final class StatementPattern {
 
     private final Resource subject;
     private final IRI predicate;
     private final Value object;
-    private final Resource[] contexts;
+    private final Set<Resource> contexts;
 
     private StatementPattern(Builder builder) {
         this.subject = builder.subject;
         this.predicate = builder.predicate;
         this.object = builder.object;
-        this.contexts = builder.contexts != null ? builder.contexts.clone() : new Resource[0];
+        if (builder.contexts == null || builder.contexts.length == 0) {
+            this.contexts = Collections.emptySet();
+        } else {
+            this.contexts = Collections.unmodifiableSet(
+                    new LinkedHashSet<>(Arrays.asList(builder.contexts)));
+        }
     }
 
     /**
@@ -49,7 +58,8 @@ public final class StatementPattern {
      * @param subject   Subject (null for any)
      * @param predicate Predicate (null for any)
      * @param object    Object (null for any)
-     * @param contexts  Contexts (null or empty for any)
+     * @param contexts  contexts to match; null or empty means every graph and an
+     *                  explicit null element means the default graph
      * @return Statement pattern
      */
     public static StatementPattern of(Resource subject, IRI predicate, Value object, Resource... contexts) {
@@ -91,10 +101,10 @@ public final class StatementPattern {
     /**
      * Gets the contexts pattern.
      *
-     * @return Array of contexts (empty for any)
+     * @return contexts in insertion order (empty for every graph)
      */
     public Resource[] getContexts() {
-        return contexts.clone();
+        return contexts.toArray(Resource[]::new);
     }
 
     /**
@@ -130,7 +140,7 @@ public final class StatementPattern {
      * @return true if contexts is empty
      */
     public boolean isContextWildcard() {
-        return contexts.length == 0;
+        return contexts.isEmpty();
     }
 
     /**
@@ -151,7 +161,7 @@ public final class StatementPattern {
                 "subject=" + subject +
                 ", predicate=" + predicate +
                 ", object=" + object +
-                ", contexts=" + Arrays.toString(contexts) +
+                ", contexts=" + contexts +
                 '}';
     }
 
@@ -163,14 +173,12 @@ public final class StatementPattern {
         return Objects.equals(subject, that.subject) &&
                 Objects.equals(predicate, that.predicate) &&
                 Objects.equals(object, that.object) &&
-                Arrays.equals(contexts, that.contexts);
+                contexts.equals(that.contexts);
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(subject, predicate, object);
-        result = 31 * result + Arrays.hashCode(contexts);
-        return result;
+        return Objects.hash(subject, predicate, object, contexts);
     }
 
     /**
@@ -221,7 +229,8 @@ public final class StatementPattern {
         /**
          * Sets the contexts pattern.
          *
-         * @param contexts Contexts (null or empty for wildcard)
+         * @param contexts contexts to match; null or empty means every graph and
+         *                 an explicit null element means the default graph
          * @return this builder
          */
         public Builder contexts(Resource... contexts) {

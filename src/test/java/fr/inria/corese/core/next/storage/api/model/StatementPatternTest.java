@@ -131,4 +131,21 @@ class StatementPatternTest {
 
         assertNotNull(pattern.getContexts()[0]);
     }
+
+    @Test
+    @DisplayName("Context selection is set-based and distinguishes the default graph")
+    void contextSelectionSemantics() {
+        Resource first = mock(Resource.class);
+        Resource second = mock(Resource.class);
+
+        StatementPattern oneOrder = StatementPattern.of(null, null, null, first, second, first);
+        StatementPattern reverseOrder = StatementPattern.of(null, null, null, second, first);
+        StatementPattern defaultGraph = StatementPattern.of(null, null, null, (Resource) null);
+
+        assertEquals(oneOrder, reverseOrder);
+        assertEquals(oneOrder.hashCode(), reverseOrder.hashCode());
+        assertArrayEquals(new Resource[]{first, second}, oneOrder.getContexts());
+        assertFalse(defaultGraph.isContextWildcard());
+        assertArrayEquals(new Resource[]{null}, defaultGraph.getContexts());
+    }
 }

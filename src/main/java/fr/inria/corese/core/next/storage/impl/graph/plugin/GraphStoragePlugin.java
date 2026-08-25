@@ -8,6 +8,8 @@ import fr.inria.corese.core.next.storage.api.plugin.StoragePlugin;
 import fr.inria.corese.core.next.storage.api.config.StorageConfig;
 import fr.inria.corese.core.next.storage.impl.graph.GraphStorageManager;
 
+import java.util.Objects;
+
 /**
  * Plugin for GraphStorageManager - wraps legacy Corese Graph backend.
  */
@@ -22,7 +24,7 @@ public class GraphStoragePlugin implements StoragePlugin {
 
     @Override
     public String getDescription() {
-        return "Legacy Corese Graph backend (production-ready, indexed, thread-safe)";
+        return "Compatibility adapter for the legacy Corese Graph backend";
     }
 
     @Override
@@ -37,11 +39,12 @@ public class GraphStoragePlugin implements StoragePlugin {
 
     @Override
     public StorageManager create(StorageConfig config) throws PluginException {
+        StorageConfig checkedConfig = Objects.requireNonNull(config, "config");
         try {
-            Graph graph = config.getProperty(PLUGIN_NAME, Graph.class)
+            Graph graph = checkedConfig.getProperty(PLUGIN_NAME, Graph.class)
                     .orElseThrow(() -> new PluginException("Graph instance required in config properties"));
 
-            ValueFactory factory = config.getProperty("valueFactory", ValueFactory.class)
+            ValueFactory factory = checkedConfig.getProperty("valueFactory", ValueFactory.class)
                     .orElseThrow(() -> new PluginException("ValueFactory required in config properties"));
 
             GraphStorageManager storage = GraphStorageManager.builder()
@@ -49,7 +52,7 @@ public class GraphStoragePlugin implements StoragePlugin {
                     .valueFactory(factory)
                     .build();
 
-            storage.getLifecycle().initialize(config);
+            storage.lifecycle().initialize(checkedConfig);
 
             return storage;
         } catch (PluginException e) {

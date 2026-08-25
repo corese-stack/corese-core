@@ -9,8 +9,7 @@ import fr.inria.corese.core.next.storage.api.model.StorageStatistics;
 import java.util.Set;
 
 /**
- * Metadata operations for the Model.
- * Provides access to model structure information (subjects, predicates, objects, contexts, statistics).
+ * Structural summaries exposed by an RDF storage backend.
  */
 public interface MetadataOperations {
 
@@ -39,7 +38,8 @@ public interface MetadataOperations {
     Set<Value> getObjects() throws StorageException;
 
     /**
-     * Returns all contexts (named graphs) in the model.
+     * Returns all named graph identifiers. The default graph is not a named
+     * context and is therefore not included.
      *
      * @return Set of context resources (unmodifiable)
      * @throws StorageException if query fails

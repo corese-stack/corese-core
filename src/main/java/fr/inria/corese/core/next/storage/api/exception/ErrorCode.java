@@ -19,29 +19,8 @@ public enum ErrorCode {
     /** Mutation failure */
     MUTATION_FAILED("MUTATION_FAIL", "Mutation failed"),
 
-    /** Invalid pattern */
-    INVALID_PATTERN("INVALID_PATTERN", "Invalid pattern"),
-
-    /** Context not found */
-    CONTEXT_NOT_FOUND("CTX_NOT_FOUND", "Context not found"),
-
-    /** Unsupported operation */
-    UNSUPPORTED_OPERATION("UNSUPPORTED", "Operation not supported"),
-
-    /** Invalid state */
-    INVALID_STATE("INVALID_STATE", "Invalid state"),
-
-    RESTART_FAILED_ROLLBACK_SUCCESS("RESTART_FAIL_ROLLBACK_OK",
-            "Restart failed but previous configuration restored"),
-
-    /** Restart failed and rollback also failed (critical) */
-    RESTART_FAILED_ROLLBACK_FAILED("RESTART_FAIL_ROLLBACK_FAIL",
-            "Restart failed and unable to restore previous configuration"),
-
-    /**
-     * Plugin failed to create StorageManager instance
-     */
-    PLUGIN_CREATION_FAILED("PLUGIN_CREATION_FAILED", "Plugin failed to create StorageManager instance"),
+    /** Storage plugin discovery, selection, or creation failure */
+    PLUGIN_FAILED("PLUGIN_FAIL", "Storage plugin failure"),
     ;
 
     private final String code;

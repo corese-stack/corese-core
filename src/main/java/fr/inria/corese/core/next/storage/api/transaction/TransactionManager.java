@@ -3,7 +3,6 @@ package fr.inria.corese.core.next.storage.api.transaction;
 
 import fr.inria.corese.core.next.storage.api.exception.StorageException;
 
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -37,20 +36,6 @@ public interface TransactionManager {
      * @throws IllegalArgumentException      if isolation level is not supported
      */
     Transaction beginTransaction(IsolationLevel isolationLevel) throws StorageException;
-
-    /**
-     * Gets the current transaction of the current thread.
-     *
-     * @return Current transaction, or Optional.empty() if no active transaction
-     */
-    Optional<Transaction> getCurrentTransaction();
-
-    /**
-     * Returns the default isolation level used for new transactions.
-     *
-     * @return Default isolation level
-     */
-    IsolationLevel getDefaultIsolationLevel();
 
     /**
      * Returns the isolation levels supported by this manager.

@@ -38,19 +38,6 @@ class MemoryTransactionManagerTest {
     }
 
     @Test
-    @DisplayName("Should return empty current transaction")
-    void shouldReturnEmptyCurrentTransaction() {
-        assertTrue(transactionManager.getCurrentTransaction().isEmpty());
-    }
-
-    @Test
-    @DisplayName("Should return READ_COMMITTED as default isolation level")
-    void shouldReturnReadCommittedAsDefaultIsolationLevel() {
-        assertEquals(IsolationLevel.READ_COMMITTED,
-                transactionManager.getDefaultIsolationLevel());
-    }
-
-    @Test
     @DisplayName("Should return empty set of supported isolation levels")
     void shouldReturnEmptySetOfSupportedIsolationLevels() {
         assertTrue(transactionManager.getSupportedIsolationLevels().isEmpty());

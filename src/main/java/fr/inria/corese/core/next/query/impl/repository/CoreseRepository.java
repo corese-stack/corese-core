@@ -38,7 +38,7 @@ public final class CoreseRepository implements Repository {
 
     public CoreseRepository(StorageManager storage, StorageConfig config) {
         this.storage = Objects.requireNonNull(storage, "storage");
-        this.lifecycle = Objects.requireNonNull(storage.getLifecycle(), "storage lifecycle");
+        this.lifecycle = Objects.requireNonNull(storage.lifecycle(), "storage lifecycle");
         this.valueFactory = new CoreseValueFactory();
         initialize(Objects.requireNonNull(config, "config"));
         this.open = true;

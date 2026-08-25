@@ -3,9 +3,7 @@ package fr.inria.corese.core.next.storage.impl.graph;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.storage.api.StorageManager;
-import fr.inria.corese.core.next.storage.api.StorageManagerBuilder;
 import fr.inria.corese.core.next.storage.api.lifecycle.StorageLifecycle;
-import fr.inria.corese.core.next.storage.api.operations.BulkOperations;
 import fr.inria.corese.core.next.storage.api.operations.MetadataOperations;
 import fr.inria.corese.core.next.storage.api.operations.MutationOperations;
 import fr.inria.corese.core.next.storage.api.operations.QueryOperations;
@@ -21,7 +19,6 @@ public final class GraphStorageManager implements StorageManager {
     private final QueryOperations queryOps;
     private final MutationOperations mutationOps;
     private final MetadataOperations metadataOps;
-    private final BulkOperations bulkOps;
     private final TransactionManager txManager;
     private final StorageLifecycle lifecycle;
 
@@ -37,38 +34,32 @@ public final class GraphStorageManager implements StorageManager {
         this.queryOps = new GraphQueryOperations(adapter);
         this.mutationOps = new GraphMutationOperations(adapter);
         this.metadataOps = new GraphMetadataOperations(adapter);
-        this.bulkOps = new GraphBulkOperations(adapter);
         this.txManager = new GraphTransactionManager();
         this.lifecycle = new GraphLifecycleManager(builder.graph);
     }
 
     @Override
-    public QueryOperations getQueryOperations() {
+    public QueryOperations queries() {
         return queryOps;
     }
 
     @Override
-    public MutationOperations getMutationOperations() {
+    public MutationOperations mutations() {
         return mutationOps;
     }
 
     @Override
-    public MetadataOperations getMetadataOperations() {
+    public MetadataOperations metadata() {
         return metadataOps;
     }
 
     @Override
-    public BulkOperations getBulkOperations() {
-        return bulkOps;
-    }
-
-    @Override
-    public TransactionManager getTransactionManager() {
+    public TransactionManager transactions() {
         return txManager;
     }
 
     @Override
-    public StorageLifecycle getLifecycle() {
+    public StorageLifecycle lifecycle() {
         return lifecycle;
     }
 
@@ -88,7 +79,7 @@ public final class GraphStorageManager implements StorageManager {
     /**
      * Builder for GraphStorageManager.
      */
-    public static final class Builder implements StorageManagerBuilder {
+    public static final class Builder {
         private Graph graph;
         private ValueFactory valueFactory;
 
@@ -114,7 +105,6 @@ public final class GraphStorageManager implements StorageManager {
             return this;
         }
 
-        @Override
         public GraphStorageManager build() {
             if (graph == null) {
                 throw new IllegalStateException("Graph must be set before building");

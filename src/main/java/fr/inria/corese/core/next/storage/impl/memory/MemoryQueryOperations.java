@@ -1,12 +1,12 @@
 package fr.inria.corese.core.next.storage.impl.memory;
 
-import fr.inria.corese.core.next.data.api.model.Model;
 import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.storage.api.operations.QueryOperations;
 import fr.inria.corese.core.next.storage.api.exception.ErrorCode;
 import fr.inria.corese.core.next.storage.api.exception.StorageException;
 import fr.inria.corese.core.next.storage.api.model.StatementPattern;
 
+import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
@@ -20,11 +20,10 @@ final class MemoryQueryOperations implements QueryOperations {
      * Constructs a new MemoryQueryOperations.
      *
      * @param adapter the InMemoryStatementStore for data access (must not be null)
-     * @throws IllegalArgumentException if adapter is null
+     * @throws NullPointerException if adapter is null
      */
     public MemoryQueryOperations(InMemoryStatementStore adapter) {
-        if (adapter == null) throw new IllegalArgumentException("InMemoryStatementStore cannot be null");
-        this.adapter = adapter;
+        this.adapter = Objects.requireNonNull(adapter, "adapter");
     }
 
     /**
@@ -32,12 +31,12 @@ final class MemoryQueryOperations implements QueryOperations {
      *
      * @param pattern the statement pattern to match (must not be null)
      * @return a stream of matching statements (must be closed)
-     * @throws IllegalArgumentException if pattern is null
+     * @throws NullPointerException if pattern is null
      * @throws StorageException         if the query fails
      */
     @Override
-    public Stream<Statement> query(StatementPattern pattern) throws StorageException {
-        if (pattern == null) throw new IllegalArgumentException("Pattern cannot be null");
+    public Stream<Statement> find(StatementPattern pattern) throws StorageException {
+        Objects.requireNonNull(pattern, "pattern");
         try {
             return adapter.find(
                     pattern.getSubject(),
@@ -59,7 +58,7 @@ final class MemoryQueryOperations implements QueryOperations {
      */
     @Override
     public long count(StatementPattern pattern) throws StorageException {
-        try (Stream<Statement> stream = query(pattern)) {
+        try (Stream<Statement> stream = find(pattern)) {
             return stream.count();
         }
     }
@@ -72,24 +71,9 @@ final class MemoryQueryOperations implements QueryOperations {
      * @throws StorageException if the query fails
      */
     @Override
-    public boolean exists(StatementPattern pattern) throws StorageException {
-        try (Stream<Statement> stream = query(pattern)) {
+    public boolean contains(StatementPattern pattern) throws StorageException {
+        try (Stream<Statement> stream = find(pattern)) {
             return stream.findAny().isPresent();
         }
-    }
-
-    /**
-     * Filters statements and returns them as a new Model.
-     *
-     * @param pattern the statement pattern to match
-     * @return never returns (always throws)
-     * @throws UnsupportedOperationException always
-     */
-    @Override
-    public Model filter(StatementPattern pattern) throws StorageException {
-        throw new UnsupportedOperationException(
-                "filter() not implemented for MemoryStorageManager. " +
-                        "Use query() to get a stream of matching statements."
-        );
     }
 }

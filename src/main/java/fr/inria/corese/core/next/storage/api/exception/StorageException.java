@@ -2,6 +2,8 @@ package fr.inria.corese.core.next.storage.api.exception;
 
 import fr.inria.corese.core.next.common.exception.CoreseException;
 
+import java.util.Objects;
+
 /**
  * Specific exception for StorageManager operations.
  */
@@ -17,7 +19,7 @@ public class StorageException extends CoreseException {
      */
     public StorageException(ErrorCode code, String message) {
         super(message);
-        this.code = code;
+        this.code = Objects.requireNonNull(code, "code");
     }
 
     /**
@@ -29,7 +31,7 @@ public class StorageException extends CoreseException {
      */
     public StorageException(ErrorCode code, String message, Throwable cause) {
         super(message, cause);
-        this.code = code;
+        this.code = Objects.requireNonNull(code, "code");
     }
 
     /**

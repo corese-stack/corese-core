@@ -51,7 +51,7 @@ class CoreseRepositoryConnectionTest {
         repository = new CoreseRepository(storage);
 
         // Insert one triple: alice knows bob
-        storage.getMutationOperations().insertStatement(
+        storage.mutations().add(
                 vf.createStatement(iri(ALICE), iri(KNOWS), iri(BOB)));
     }
 
