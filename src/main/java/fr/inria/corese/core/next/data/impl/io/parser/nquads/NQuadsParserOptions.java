@@ -1,11 +1,12 @@
 package fr.inria.corese.core.next.data.impl.io.parser.nquads;
 
 import fr.inria.corese.core.next.data.api.support.io.AbstractIOOptions;
+import fr.inria.corese.core.next.data.api.io.option.RDFParsingOptions;
 
 /**
  * Options used to configure a NQuads parser
  */
-public class NQuadsParserOptions extends AbstractIOOptions {
+public class NQuadsParserOptions extends AbstractIOOptions implements RDFParsingOptions {
 
 
     protected NQuadsParserOptions() {

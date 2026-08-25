@@ -3,6 +3,8 @@ package fr.inria.corese.core.next.data.impl.io.serializer;
 import fr.inria.corese.core.next.data.api.model.Model;
 import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
+import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializerOptions;
+import fr.inria.corese.core.next.data.api.exception.SerializationException;
 import fr.inria.corese.core.next.data.impl.io.jsonld.JSONLDOptions;
 import fr.inria.corese.core.next.data.impl.io.serializer.rdfc10.RDFC10Serializer;
 import fr.inria.corese.core.next.data.impl.io.serializer.rdfc10.RDFC10SerializerOptions;
@@ -273,7 +275,7 @@ class DefaultRDFSerializerFactoryTest {
     }
 
     @Test
-    @DisplayName("Should accept cross-use of config objects")
+    @DisplayName("Should reject cross-use of format-specific config objects")
     void configCrossUse() {
         JSONLDOptions jsonldOptions = new JSONLDOptions.Builder().build();
         NQuadsSerializerOptions nQuadsSerializerOptions = new NQuadsSerializerOptions.Builder().build();
@@ -282,29 +284,31 @@ class DefaultRDFSerializerFactoryTest {
         TriGSerializerOptions triGSerializerOptions = new TriGSerializerOptions.Builder().build();
         TurtleSerializerOptions turtleSerializerOptions = new TurtleSerializerOptions.Builder().build();
 
-        assertDoesNotThrow(() -> {
-            // JSONLDOptions -- NQuads
-            factory.createSerializer(RDFFormat.JSONLD, mockModel, nQuadsSerializerOptions);
-        });
-        assertDoesNotThrow(() -> {
-            // NQuads -- NTriples
-            factory.createSerializer(RDFFormat.NQUADS, mockModel, nTriplesSerializerOptions);
-        });
-        assertDoesNotThrow(() -> {
-            // NTriples -- RDFXML
-            factory.createSerializer(RDFFormat.NTRIPLES, mockModel, rdfxmlSerializerOptions);
-        });
-        assertDoesNotThrow(() -> {
-            // RDFXML -- TriG
-            factory.createSerializer(RDFFormat.RDFXML, mockModel, triGSerializerOptions);
-        });
-        assertDoesNotThrow(() -> {
-            // TriG -- Turtle
-            factory.createSerializer(RDFFormat.TRIG, mockModel, turtleSerializerOptions);
-        });
-        assertDoesNotThrow(() -> {
-            // Turtle -- JSONLD
-            factory.createSerializer(RDFFormat.TURTLE, mockModel, jsonldOptions);
-        });
+        assertThrows(SerializationException.class,
+                () -> factory.createSerializer(RDFFormat.JSONLD, mockModel, nQuadsSerializerOptions));
+        assertThrows(SerializationException.class,
+                () -> factory.createSerializer(RDFFormat.NQUADS, mockModel, nTriplesSerializerOptions));
+        assertThrows(SerializationException.class,
+                () -> factory.createSerializer(RDFFormat.NTRIPLES, mockModel, rdfxmlSerializerOptions));
+        assertThrows(SerializationException.class,
+                () -> factory.createSerializer(RDFFormat.RDFXML, mockModel, triGSerializerOptions));
+        assertThrows(SerializationException.class,
+                () -> factory.createSerializer(RDFFormat.TRIG, mockModel, turtleSerializerOptions));
+        assertThrows(SerializationException.class,
+                () -> factory.createSerializer(RDFFormat.TURTLE, mockModel, jsonldOptions));
+    }
+
+    @Test
+    void sharedPublicOptionsAreAdaptedToSupportedFormats() {
+        RDFSerializerOptions options = RDFSerializerOptions.builder().prettyPrint(false).build();
+
+        assertDoesNotThrow(() -> factory.createSerializer(RDFFormat.TURTLE, mockModel, options));
+        assertDoesNotThrow(() -> factory.createSerializer(RDFFormat.TRIG, mockModel, options));
+        assertDoesNotThrow(() -> factory.createSerializer(RDFFormat.NTRIPLES, mockModel, options));
+        assertDoesNotThrow(() -> factory.createSerializer(RDFFormat.NQUADS, mockModel, options));
+        assertDoesNotThrow(() -> factory.createSerializer(RDFFormat.RDFXML, mockModel, options));
+        assertDoesNotThrow(() -> factory.createSerializer(RDFFormat.JSONLD, mockModel, options));
+        assertThrows(SerializationException.class,
+                () -> factory.createSerializer(RDFFormat.RDFC_1_0, mockModel, options));
     }
 }

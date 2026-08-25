@@ -1,11 +1,13 @@
 package fr.inria.corese.core.next.query.api.io.serializer;
 
-import fr.inria.corese.core.next.data.api.io.option.IOOptions;
 import fr.inria.corese.core.next.query.api.io.ResultFormat;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 
 /**
  * Creates serializers for SPARQL tuple and boolean results.
+ *
+ * <p>Serializers consume tuple results but do not close them. The caller owns
+ * both the result and the destination writer.</p>
  */
 public interface ResultSerializerFactory {
 
@@ -30,13 +32,14 @@ public interface ResultSerializerFactory {
      * Creates a serializer for the given {@link TupleQueryResult} results in the given {@link ResultFormat format}
      * @param format The {@link ResultFormat} to use for serialization.
      * @param results The {@link TupleQueryResult} results to be serialized
-     * @param options Options to configure the serialization
+     * @param options SPARQL result options; implementations reject unrelated
+     *                {@link ResultIOOptions} instead of silently ignoring them
      * @return a new instance of {@link ResultSerializer} configured with the given options.
      */
     ResultSerializer createTupleSerializer(
             ResultFormat format,
             TupleQueryResult results,
-            IOOptions options);
+            ResultIOOptions options);
 
     /**
      * Creates a serializer for the given boolean result in the given {@link ResultFormat format}
@@ -49,5 +52,5 @@ public interface ResultSerializerFactory {
     BooleanResultSerializer createBooleanSerializer(
             ResultFormat format,
             boolean result,
-            IOOptions options);
+            ResultIOOptions options);
 }

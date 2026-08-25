@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.data.impl.io.serializer.trig;
 
 import fr.inria.corese.core.next.data.impl.io.serializer.option.AbstractTFamilyOptions;
+import fr.inria.corese.core.next.data.api.io.option.IOOptions;
 import fr.inria.corese.core.next.data.impl.io.serializer.option.BlankNodeStyle;
 
 /**
@@ -38,6 +39,14 @@ public class TriGSerializerOptions extends AbstractTFamilyOptions {
 
 
          }
+
+        /** Creates TriG options from the shared public RDF options. */
+        public Builder(IOOptions otherOptions) {
+            super(otherOptions);
+            includeContext(true);
+            blankNodeStyle(BlankNodeStyle.NAMED);
+            useCollections(false);
+        }
 
         /**
          * Builds and returns a new {@link TriGSerializerOptions} instance with the current builder settings.

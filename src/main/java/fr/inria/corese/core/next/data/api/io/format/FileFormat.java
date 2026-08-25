@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.data.api.io.format;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -19,8 +20,8 @@ public class FileFormat {
      * @param name       The human-readable name of the format.
      * @param extensions The list of file extensions.
      * @param mimeTypes  The list of MIME types.
-     * @throws NullPointerException if name, extensions or mimeTypes is null or
-     *                              empty.
+     * @throws NullPointerException if name, extensions or mimeTypes is null
+     * @throws IllegalArgumentException if extensions or mimeTypes is empty
      */
     public FileFormat(String name, List<String> extensions, List<String> mimeTypes) {
         this.name = Objects.requireNonNull(name, "Format name cannot be null");
@@ -98,7 +99,7 @@ public class FileFormat {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name.toLowerCase(), extensions, mimeTypes);
+        return Objects.hash(name.toLowerCase(Locale.ROOT), extensions, mimeTypes);
     }
 
 }

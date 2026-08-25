@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.data.impl.io.serializer.option;
 
 import fr.inria.corese.core.next.data.api.io.option.IOOptions;
 import fr.inria.corese.core.next.data.api.io.option.BaseIRIOptions;
+import fr.inria.corese.core.next.data.api.io.option.RDFSerializationOptions;
 import fr.inria.corese.core.next.data.api.io.serializer.option.BlankNodeIdGenerationOptions;
 import fr.inria.corese.core.next.data.api.io.serializer.option.DatatypePolicyOptions;
 import fr.inria.corese.core.next.data.api.io.serializer.option.LineEndingOptions;
@@ -19,7 +20,7 @@ import java.util.Objects;
  * nested {@link AbstractBuilder}. Subclasses are expected to extend this
  * configuration and its builder to add format-specific options.</p>
  */
-public abstract class AbstractSerializerOptions implements IOOptions, BaseIRIOptions, LineEndingOptions, BlankNodeIdGenerationOptions, DatatypePolicyOptions {
+public abstract class AbstractSerializerOptions implements RDFSerializationOptions, BaseIRIOptions, LineEndingOptions, BlankNodeIdGenerationOptions, DatatypePolicyOptions {
 
     /**
      * The policy for how literal datatypes are printed.

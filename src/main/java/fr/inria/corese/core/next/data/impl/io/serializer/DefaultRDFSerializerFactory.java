@@ -1,9 +1,13 @@
 package fr.inria.corese.core.next.data.impl.io.serializer;
 
 import fr.inria.corese.core.next.data.api.model.Model;
+import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.api.io.option.BaseIRIOptions;
+import fr.inria.corese.core.next.data.api.io.option.RDFSerializationOptions;
+import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializerOptions;
 import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
 import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializerFactory;
 import fr.inria.corese.core.next.data.api.exception.SerializationException;
@@ -11,12 +15,19 @@ import fr.inria.corese.core.next.data.impl.io.serializer.rdfc10.RDFC10Canonicali
 import fr.inria.corese.core.next.data.impl.io.serializer.rdfc10.RDFC10Serializer;
 import fr.inria.corese.core.next.data.impl.io.serializer.rdfc10.RDFC10SerializerOptions;
 import fr.inria.corese.core.next.data.impl.io.serializer.jsonld.JSONLDSerializer;
+import fr.inria.corese.core.next.data.impl.io.jsonld.JSONLDOptions;
 import fr.inria.corese.core.next.data.impl.io.serializer.nquads.NQuadsSerializer;
+import fr.inria.corese.core.next.data.impl.io.serializer.nquads.NQuadsSerializerOptions;
 import fr.inria.corese.core.next.data.impl.io.serializer.ntriples.NTriplesSerializer;
+import fr.inria.corese.core.next.data.impl.io.serializer.ntriples.NTriplesSerializerOptions;
 import fr.inria.corese.core.next.data.impl.io.serializer.rdfxml.RDFXMLSerializer;
+import fr.inria.corese.core.next.data.impl.io.serializer.rdfxml.RDFXMLSerializerOptions;
 import fr.inria.corese.core.next.data.impl.io.serializer.trig.TriGSerializer;
+import fr.inria.corese.core.next.data.impl.io.serializer.trig.TriGSerializerOptions;
 import fr.inria.corese.core.next.data.impl.io.serializer.turtle.TurtleSerializer;
+import fr.inria.corese.core.next.data.impl.io.serializer.turtle.TurtleSerializerOptions;
 import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
+import fr.inria.corese.core.next.data.impl.model.LinkedHashModel;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,12 +43,8 @@ import java.util.function.Function;
  * to map each format to its corresponding serializer constructor,
  * providing a flexible and extensible way to manage serializer instances.
  *
- * <p>
- * It adapts the generic {@link IOOptions} provided to the specific
- * configuration type expected by each serializer in the hierarchy, with a
- * fallback
- * to default configurations if an incompatible type is provided.
- * </p>
+ * <p>Shared public options are adapted to each format's safe defaults.
+ * Incompatible format-specific options are rejected rather than ignored.</p>
  */
 public class DefaultRDFSerializerFactory implements RDFSerializerFactory {
 
@@ -48,11 +55,7 @@ public class DefaultRDFSerializerFactory implements RDFSerializerFactory {
     /**
      * Constructs a {@code RDFSerializerFactory} and populates its registry
      * with constructors for all known {@link RDFFormat} implementations.
-     * Each constructor attempts to cast the generic {@link IOOptions} to
-     * the
-     * specific configuration type required by the serializer. If the cast is not
-     * possible,
-     * it falls back to the format's default configuration.
+     * Shared options are normalized before these constructors are invoked.
      */
     public DefaultRDFSerializerFactory() {
         this.coreseValueFactory = new CoreseValueFactory();
@@ -125,7 +128,10 @@ public class DefaultRDFSerializerFactory implements RDFSerializerFactory {
      *                                  this factory or if the configuration type is invalid.
      */
     @Override
-    public RDFSerializer createSerializer(RDFFormat format, Model model, IOOptions config) {
+    public RDFSerializer createSerializer(
+            RDFFormat format,
+            Model model,
+            RDFSerializationOptions config) {
 
         Objects.requireNonNull(format, "RDFFormat cannot be null");
         Objects.requireNonNull(model, "Model cannot be null");
@@ -140,7 +146,7 @@ public class DefaultRDFSerializerFactory implements RDFSerializerFactory {
             );
         }
 
-        return constructor.apply(model, config);
+        return constructor.apply(model, normalizeOptions(format, config));
     }
 
     /**
@@ -172,5 +178,81 @@ public class DefaultRDFSerializerFactory implements RDFSerializerFactory {
         }
 
         return constructor.apply(model);
+    }
+
+    @Override
+    public RDFSerializer createSerializer(RDFFormat format, Iterable<Statement> statements) {
+        Objects.requireNonNull(format, "RDFFormat cannot be null");
+        Objects.requireNonNull(statements, "Statements cannot be null");
+        if (RDFFormat.NTRIPLES.equals(format)) {
+            return new NTriplesSerializer(statements);
+        }
+        if (RDFFormat.NQUADS.equals(format)) {
+            return new NQuadsSerializer(statements);
+        }
+        return createSerializer(format, new LinkedHashModel(coreseValueFactory, statements));
+    }
+
+    @Override
+    public RDFSerializer createSerializer(
+            RDFFormat format,
+            Iterable<Statement> statements,
+            RDFSerializationOptions config) {
+        Objects.requireNonNull(format, "RDFFormat cannot be null");
+        Objects.requireNonNull(statements, "Statements cannot be null");
+        Objects.requireNonNull(config, "SerializationConfig cannot be null");
+        RDFSerializationOptions normalized = normalizeOptions(format, config);
+        if (RDFFormat.NTRIPLES.equals(format)) {
+            return new NTriplesSerializer(statements, normalized);
+        }
+        if (RDFFormat.NQUADS.equals(format)) {
+            return new NQuadsSerializer(statements, normalized);
+        }
+        return createSerializer(format, new LinkedHashModel(coreseValueFactory, statements), normalized);
+    }
+
+    private static RDFSerializationOptions normalizeOptions(
+            RDFFormat format,
+            RDFSerializationOptions options) {
+        if (options instanceof RDFSerializerOptions) {
+            if (RDFFormat.TURTLE.equals(format)) {
+                return new TurtleSerializerOptions.Builder(options).build();
+            }
+            if (RDFFormat.TRIG.equals(format)) {
+                return new TriGSerializerOptions.Builder(options).build();
+            }
+            if (RDFFormat.RDFXML.equals(format)) {
+                return new RDFXMLSerializerOptions.Builder(options).build();
+            }
+            if (RDFFormat.NTRIPLES.equals(format) || RDFFormat.NQUADS.equals(format)) {
+                return options;
+            }
+            if (RDFFormat.JSONLD.equals(format)) {
+                JSONLDOptions.Builder builder = new JSONLDOptions.Builder();
+                String baseIRI = ((BaseIRIOptions) options).getBaseIRI();
+                return baseIRI == null ? builder.build() : builder.base(baseIRI).build();
+            }
+            throw invalidOptions(format, options);
+        }
+
+        boolean compatible =
+                (RDFFormat.TURTLE.equals(format) && options instanceof TurtleSerializerOptions)
+                || (RDFFormat.TRIG.equals(format) && options instanceof TriGSerializerOptions)
+                || (RDFFormat.NTRIPLES.equals(format) && options instanceof NTriplesSerializerOptions)
+                || (RDFFormat.NQUADS.equals(format) && options instanceof NQuadsSerializerOptions)
+                || (RDFFormat.RDFXML.equals(format) && options instanceof RDFXMLSerializerOptions)
+                || (RDFFormat.JSONLD.equals(format) && options instanceof JSONLDOptions)
+                || (RDFFormat.RDFC_1_0.equals(format) && options instanceof RDFC10SerializerOptions);
+        if (!compatible) {
+            throw invalidOptions(format, options);
+        }
+        return options;
+    }
+
+    private static SerializationException invalidOptions(RDFFormat format, IOOptions options) {
+        return new SerializationException(
+                "Options of type " + options.getClass().getSimpleName()
+                        + " are not valid for " + format.getName(),
+                format);
     }
 }

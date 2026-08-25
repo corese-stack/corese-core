@@ -79,27 +79,27 @@ class XmlTupleResultSerializerTest extends AbstractResultSerializerTest implemen
                     "</head>" +
                     "<results>" +
                         "<result>" +
-                            "<binding name=\"name\">" +
-                                "<literal>Johnny Lee Outlaw</literal>" +
-                            "</binding>" +
                             "<binding name=\"email\">" +
                                 "<uri>mailto:jlow@example.com</uri>" +
                             "</binding>" +
+                            "<binding name=\"name\">" +
+                                "<literal>Johnny Lee Outlaw</literal>" +
+                            "</binding>" +
                         "</result>" +
                         "<result>" +
-                            "<binding name=\"name\">" +
-                                "<literal>Peter Goodguy</literal>" +
-                            "</binding>" +
                             "<binding name=\"email\">" +
                                 "<uri>mailto:peter@example.org</uri>" +
                             "</binding>" +
+                            "<binding name=\"name\">" +
+                                "<literal>Peter Goodguy</literal>" +
+                            "</binding>" +
                         "</result>" +
                         "<result>" +
-                            "<binding name=\"name\">" +
-                                "<literal>Carol Patoune</literal>" +
-                            "</binding>" +
                             "<binding name=\"email\">" +
                                 "<uri>mailto:carol@example.org</uri>" +
+                            "</binding>" +
+                            "<binding name=\"name\">" +
+                                "<literal>Carol Patoune</literal>" +
                             "</binding>" +
                         "</result>" +
                     "</results>" +
@@ -260,7 +260,7 @@ class XmlTupleResultSerializerTest extends AbstractResultSerializerTest implemen
     }
 
     private String getLinksTestResultsString() {
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +
                 "<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">" +
                     "<head>" +
                         "<variable name=\"a\"/>" +

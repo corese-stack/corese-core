@@ -3,10 +3,11 @@ package fr.inria.corese.core.next.data.api.io.parser;
 import fr.inria.corese.core.next.data.api.model.Model;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
-import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.api.io.option.RDFParsingOptions;
 
 /**
- * A factory for creating RDF parsers.
+ * A factory for creating RDF parsers. Configured creation rejects options that
+ * do not belong to RDF parsing or to the selected format.
  */
 public interface RDFParserFactory {
 
@@ -28,6 +29,10 @@ public interface RDFParserFactory {
      * @param config  The configuration to use for parsing.
      * @return A new instance of an RDF parser for the specified format and model.
      */
-    RDFParser createRDFParser(RDFFormat format, Model model, ValueFactory factory, IOOptions config);
+    RDFParser createRDFParser(
+            RDFFormat format,
+            Model model,
+            ValueFactory factory,
+            RDFParsingOptions config);
 
 }

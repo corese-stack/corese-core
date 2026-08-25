@@ -1,14 +1,19 @@
 package fr.inria.corese.core.next.data.api.io.parser;
 
 import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
-import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.api.io.option.RDFParsingOptions;
 import fr.inria.corese.core.next.data.api.exception.ParsingException;
 
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
- * An interface for parsing RDF data from an InputStream or Reader and adding statements to a model.
+ * Parses RDF data from an {@link InputStream} or {@link Reader} into a model.
+ * Caller-owned input sources are never closed by the parser.
  *
  * @see RDFParserFactory
  * @see RDFFormat
@@ -20,8 +25,8 @@ public interface RDFParser {
      */
     RDFFormat getRDFFormat();
 
-    void setConfig(IOOptions config);
-    IOOptions getConfig();
+    void setConfig(RDFParsingOptions config);
+    RDFParsingOptions getConfig();
 
     /**
      * Parses RDF data from the specified InputStream or Reader and adds it to the model.
@@ -56,4 +61,22 @@ public interface RDFParser {
      * @throws ParsingException if an error occurs during parsing
      */
     void parse(Reader reader, String baseURI) throws ParsingException;
+
+    /** Reads UTF-8 RDF from a file and closes the file opened by this method. */
+    default void parse(Path path) throws ParsingException {
+        try (Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
+            parse(reader);
+        } catch (IOException e) {
+            throw new ParsingException("Could not read RDF from " + path, e);
+        }
+    }
+
+    /** Reads UTF-8 RDF from a file using an explicit base IRI. */
+    default void parse(Path path, String baseURI) throws ParsingException {
+        try (Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
+            parse(reader, baseURI);
+        } catch (IOException e) {
+            throw new ParsingException("Could not read RDF from " + path, e);
+        }
+    }
 }

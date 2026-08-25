@@ -41,6 +41,10 @@ public class NQuadsSerializer extends AbstractLineBasedSerializer {
         super(model, NQuadsSerializerOptions.defaultConfig());
     }
 
+    public NQuadsSerializer(Iterable<Statement> statements) {
+        super(statements, NQuadsSerializerOptions.defaultConfig());
+    }
+
     /**
      * Constructs a new {@code NQuadsSerializer} instance with the specified model and custom configuration.
      *
@@ -51,6 +55,15 @@ public class NQuadsSerializer extends AbstractLineBasedSerializer {
      */
     public NQuadsSerializer(Model model, IOOptions config) {
         this(model);
+        applyOptions(config);
+    }
+
+    public NQuadsSerializer(Iterable<Statement> statements, IOOptions config) {
+        this(statements);
+        applyOptions(config);
+    }
+
+    private void applyOptions(IOOptions config) {
         Objects.requireNonNull(config, "NQuadsConfig cannot be null");
         if (config instanceof AbstractNFamilyOptions nFamilyOptions) {
             this.config = nFamilyOptions;

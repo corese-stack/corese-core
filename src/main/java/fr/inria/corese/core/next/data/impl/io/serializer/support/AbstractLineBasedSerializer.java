@@ -36,6 +36,7 @@ public abstract class AbstractLineBasedSerializer implements RDFSerializer {
     private static final Logger logger = LoggerFactory.getLogger(AbstractLineBasedSerializer.class);
 
     protected final Model model;
+    protected final Iterable<Statement> statements;
     protected AbstractSerializerOptions config;
 
     /**
@@ -47,6 +48,13 @@ public abstract class AbstractLineBasedSerializer implements RDFSerializer {
      */
     protected AbstractLineBasedSerializer(Model model, AbstractSerializerOptions config) {
         this.model = Objects.requireNonNull(model, "Model cannot be null");
+        this.statements = model;
+        this.config = Objects.requireNonNull(config, "Configuration cannot be null");
+    }
+
+    protected AbstractLineBasedSerializer(Iterable<Statement> statements, AbstractSerializerOptions config) {
+        this.model = null;
+        this.statements = Objects.requireNonNull(statements, "Statements cannot be null");
         this.config = Objects.requireNonNull(config, "Configuration cannot be null");
     }
 
@@ -59,15 +67,17 @@ public abstract class AbstractLineBasedSerializer implements RDFSerializer {
      */
     @Override
     public void write(Writer writer) throws SerializationException {
-        try (BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
+        Objects.requireNonNull(writer, "writer");
+        BufferedWriter bufferedWriter = new BufferedWriter(writer);
+        try {
             Set<Resource> processedNodes = preprocessModel();
 
-            for (Statement stmt : model) {
+            for (Statement stmt : statements) {
                 if (shouldProcess(stmt, processedNodes)) {
                     writeStatement(bufferedWriter, stmt);
                 }
             }
-
+            bufferedWriter.flush();
         } catch (IOException e) {
             throw new SerializationException(getFormatName() + " serialization failed", getFormatName(), e);
         } catch (IllegalArgumentException e) {

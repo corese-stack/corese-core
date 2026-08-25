@@ -40,6 +40,10 @@ public class NTriplesSerializer extends AbstractLineBasedSerializer {
         super(model, NTriplesSerializerOptions.defaultConfig());
     }
 
+    public NTriplesSerializer(Iterable<Statement> statements) {
+        super(statements, NTriplesSerializerOptions.defaultConfig());
+    }
+
     /**
      * Constructs a new {@code NTriplesSerializer} instance with the specified model and custom configuration.
      *
@@ -50,6 +54,15 @@ public class NTriplesSerializer extends AbstractLineBasedSerializer {
      */
     public NTriplesSerializer(Model model, IOOptions config) {
         this(model);
+        applyOptions(config);
+    }
+
+    public NTriplesSerializer(Iterable<Statement> statements, IOOptions config) {
+        this(statements);
+        applyOptions(config);
+    }
+
+    private void applyOptions(IOOptions config) {
         Objects.requireNonNull(config, "NTriplesConfig cannot be null");
         if (config instanceof AbstractNFamilyOptions nFamilyOptions) {
             this.config = nFamilyOptions;

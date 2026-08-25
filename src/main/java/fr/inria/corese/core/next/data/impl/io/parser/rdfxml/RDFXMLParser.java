@@ -6,7 +6,7 @@ import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 import fr.inria.corese.core.next.data.api.support.io.parser.AbstractRDFParser;
-import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.api.io.option.RDFParsingOptions;
 import fr.inria.corese.core.next.data.api.vocabulary.RDF;
 import fr.inria.corese.core.next.data.api.exception.ParsingException;
 import org.xml.sax.Attributes;
@@ -76,7 +76,7 @@ public class RDFXMLParser extends AbstractRDFParser {
      * @param factory The factory used to create RDF values.
      * @param config The IO configuration options.
      */
-    public RDFXMLParser(Model model, ValueFactory factory, IOOptions config) {
+    public RDFXMLParser(Model model, ValueFactory factory, RDFParsingOptions config) {
         super(model, factory, config);
         this.ctx = new RDFXMLContext(getModel(), getValueFactory());
         this.emitter = new RDFXMLStatementEmitter(model, factory);

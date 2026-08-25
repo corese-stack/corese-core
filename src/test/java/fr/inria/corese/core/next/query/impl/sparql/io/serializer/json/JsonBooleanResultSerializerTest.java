@@ -25,12 +25,12 @@ class JsonBooleanResultSerializerTest extends AbstractBooleanResultSerializerTes
 
     @Override
     protected String getTrueResultString() {
-        return "{\"boolean\":true}";
+        return "{\"head\":{},\"boolean\":true}";
     }
 
     @Override
     protected String getFalseResultString() {
-        return "{\"boolean\":false}";
+        return "{\"head\":{},\"boolean\":false}";
     }
 
     private String getLinksTestResultsString() {

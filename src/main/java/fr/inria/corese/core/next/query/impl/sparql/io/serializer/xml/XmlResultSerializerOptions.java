@@ -2,27 +2,36 @@ package fr.inria.corese.core.next.query.impl.sparql.io.serializer.xml;
 
 import fr.inria.corese.core.next.data.api.support.io.AbstractIOOptions;
 import fr.inria.corese.core.next.query.api.io.serializer.LinksOptions;
+import fr.inria.corese.core.next.query.api.io.serializer.XmlOutputOptions;
 
 import javax.xml.transform.OutputKeys;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class XmlResultSerializerOptions  extends AbstractIOOptions implements LinksOptions {
-    private final XmlResultSerializerOptions.Builder builder;
+public class XmlResultSerializerOptions extends AbstractIOOptions implements LinksOptions, XmlOutputOptions {
+    private final Map<String, String> xmlSettings;
+    private final Collection<String> links;
 
     protected XmlResultSerializerOptions(XmlResultSerializerOptions.Builder builder) {
-        this.builder = builder;
+        this.xmlSettings = Map.copyOf(builder.xmlSettings);
+        this.links = List.copyOf(builder.links);
     }
 
     public final Map<String, String> getXmlSettings() {
-        return this.builder.xmlSettings;
+        return xmlSettings;
+    }
+
+    @Override
+    public Map<String, String> xmlOutputProperties() {
+        return xmlSettings;
     }
 
     @Override
     public Collection<String> links() {
-        return this.builder.links;
+        return links;
     }
 
     public static class Builder extends AbstractIOOptions.Builder<XmlResultSerializerOptions> {

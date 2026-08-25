@@ -1,49 +1,52 @@
 package fr.inria.corese.core.next.query.impl.sparql.io.serializer.json;
 
+import fr.inria.corese.core.next.data.api.exception.SerializationException;
 import fr.inria.corese.core.next.data.api.io.format.FileFormat;
 import fr.inria.corese.core.next.data.api.io.option.IOOptions;
-import fr.inria.corese.core.next.data.api.exception.SerializationException;
 import fr.inria.corese.core.next.query.api.io.ResultFormat;
 import fr.inria.corese.core.next.query.api.io.serializer.BooleanResultSerializer;
 import fr.inria.corese.core.next.query.api.io.serializer.LinksOptions;
 import jakarta.json.Json;
-import jakarta.json.JsonObjectBuilder;
-import jakarta.json.JsonWriter;
+import jakarta.json.JsonException;
+import jakarta.json.stream.JsonGenerator;
 
 import java.io.Writer;
+import java.util.Objects;
 
-/**
- * Serializer class for boolean results (ASK results) for JSON
- */
+/** Streaming serializer for SPARQL boolean results in JSON. */
 public class JsonBooleanResultSerializer implements BooleanResultSerializer {
 
     private final boolean result;
-    private final IOOptions config;
+    private final IOOptions options;
 
     public JsonBooleanResultSerializer(boolean result) {
         this(result, new JsonResultSerializerOptions.Builder().build());
     }
 
     public JsonBooleanResultSerializer(boolean result, IOOptions options) {
-        this.config = options;
+        this.options = Objects.requireNonNull(options, "options");
         this.result = result;
     }
 
     @Override
     public void write(Writer writer) throws SerializationException {
-        JsonObjectBuilder resultBuilder = Json.createObjectBuilder();
-
-        if(this.config instanceof LinksOptions linksOptions && ! linksOptions.links().isEmpty() ) {
-            JsonObjectBuilder headerBuilder = Json.createObjectBuilder();
-            headerBuilder.add(JsonResultConstants.LINK, Json.createArrayBuilder(linksOptions.links()));
-            resultBuilder.add(JsonResultConstants.HEAD, headerBuilder.build());
+        Objects.requireNonNull(writer, "writer");
+        try {
+            JsonGenerator json = Json.createGenerator(writer);
+            json.writeStartObject();
+            json.writeStartObject(JsonResultConstants.HEAD);
+            if (options instanceof LinksOptions linksOptions && !linksOptions.links().isEmpty()) {
+                json.writeStartArray(JsonResultConstants.LINK);
+                linksOptions.links().forEach(json::write);
+                json.writeEnd();
+            }
+            json.writeEnd();
+            json.write(JsonResultConstants.BOOLEAN, result);
+            json.writeEnd();
+            json.flush();
+        } catch (JsonException | IllegalStateException e) {
+            throw new SerializationException("Could not serialize SPARQL boolean result", getFormat(), e);
         }
-
-        resultBuilder.add(JsonResultConstants.BOOLEAN, this.result);
-
-        JsonWriter jsonWriter = Json.createWriter(writer);
-        jsonWriter.writeObject( resultBuilder.build());
-        jsonWriter.close();
     }
 
     @Override

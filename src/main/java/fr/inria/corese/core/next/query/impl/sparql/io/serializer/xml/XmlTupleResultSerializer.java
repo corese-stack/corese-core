@@ -1,37 +1,26 @@
 package fr.inria.corese.core.next.query.impl.sparql.io.serializer.xml;
 
-import fr.inria.corese.core.next.data.api.term.BNode;
-import fr.inria.corese.core.next.data.api.term.IRI;
-import fr.inria.corese.core.next.data.api.term.Literal;
-import fr.inria.corese.core.next.data.api.term.Value;
+import fr.inria.corese.core.next.data.api.exception.SerializationException;
 import fr.inria.corese.core.next.data.api.io.format.FileFormat;
 import fr.inria.corese.core.next.data.api.io.option.IOOptions;
 import fr.inria.corese.core.next.data.api.literal.RDFDatatype;
 import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
-import fr.inria.corese.core.next.data.api.exception.SerializationException;
+import fr.inria.corese.core.next.data.api.term.BNode;
+import fr.inria.corese.core.next.data.api.term.IRI;
+import fr.inria.corese.core.next.data.api.term.Literal;
+import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.query.api.io.ResultFormat;
 import fr.inria.corese.core.next.query.api.io.serializer.LinksOptions;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
-import fr.inria.corese.core.next.query.api.result.Binding;
 import fr.inria.corese.core.next.query.api.result.BindingSet;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.Writer;
+import java.util.Objects;
 
-/**
- * Serializer for SPARQL results in XML as described in <a href="https://www.w3.org/TR/2013/REC-rdf-sparql-XMLres-20130321/">the W3C recommendation<a/>
- */
+/** Streaming serializer for the SPARQL 1.1 Query Results XML Format. */
 public class XmlTupleResultSerializer implements ResultSerializer {
 
-    private final DocumentBuilderFactory xmlDocumentBuilder = DocumentBuilderFactory.newDefaultInstance();
     private final TupleQueryResult results;
     private final IOOptions options;
 
@@ -40,110 +29,89 @@ public class XmlTupleResultSerializer implements ResultSerializer {
     }
 
     public XmlTupleResultSerializer(TupleQueryResult results, IOOptions options) {
-        this.results = results;
-        this.options = options;
-        xmlDocumentBuilder.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "no");
+        this.results = Objects.requireNonNull(results, "results");
+        this.options = Objects.requireNonNull(options, "options");
     }
 
     @Override
     public void write(Writer writer) throws SerializationException {
-        try {
-            Document resultDocument = this.xmlDocumentBuilder.newDocumentBuilder().newDocument();
-            Element root = resultDocument.createElementNS(XmlResultConstants.SPARQL_RESULT_NS, XmlResultConstants.SPARQL_QNAME);
-            Element head = resultDocument.createElement(XmlResultConstants.HEAD_QNAME);
-            Element resultsElement = resultDocument.createElement(XmlResultConstants.RESULTS_QNAME);
+        XmlResultWriter xml = new XmlResultWriter(writer, options);
+        xml.startDocument();
+        writeHead(xml);
+        writeResults(xml);
+        xml.endDocument();
+    }
 
-            // Head
-            this.results.getBindingNames().forEach(bindingName -> {
-                Element variableElement = resultDocument.createElement(XmlResultConstants.VARIABLE_QNAME);
-                variableElement.setAttribute(XmlResultConstants.NAME_ATTR, bindingName);
-                head.appendChild(variableElement);
-            });
-            if(this.options instanceof LinksOptions linksOptions && ! linksOptions.links().isEmpty()) {
-                linksOptions.links().forEach(link -> {
-                    Element linkElement = resultDocument.createElement(XmlResultConstants.LINK_QNAME);
-                    linkElement.setAttribute(XmlResultConstants.HREF_ATTR, link);
-                    head.appendChild(linkElement);
-                });
-            }
-            root.appendChild(head);
-
-            // Results
-            this.results.forEach(bindingSet -> resultsElement.appendChild(bindingSetToXML(bindingSet, resultDocument)));
-
-            root.appendChild(resultsElement);
-            resultDocument.appendChild(root);
-
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            if(this.options instanceof XmlResultSerializerOptions xmlSerializerOptions) {
-                xmlSerializerOptions.getXmlSettings().forEach((key, value) -> {
-                    transformer.setOutputProperty(key, value);
-                    if(key.equals(OutputKeys.STANDALONE)) { // Fix for Standalone property being ignored
-                        resultDocument.setXmlStandalone(value.equals("yes"));
-                    }
-                });
-            }
-            DOMSource source = new DOMSource(resultDocument);
-            StreamResult result = new StreamResult(writer);
-            transformer.transform(source, result);
-
-        } catch (ParserConfigurationException e) {
-            throw new SerializationException("Error during creation of the XML SPARQL result document.", this.getFormat(), e);
-        } catch (TransformerConfigurationException e) {
-            throw new SerializationException("Error during creation of the XML SPARQL result transformer.", this.getFormat(), e);
-        } catch (TransformerException e) {
-            throw new SerializationException("Error during writing of the XML SPARQL result document.", this.getFormat(), e);
+    private void writeHead(XmlResultWriter xml) {
+        xml.start(XmlResultConstants.HEAD_QNAME);
+        for (String bindingName : results.getBindingNames()) {
+            xml.empty(XmlResultConstants.VARIABLE_QNAME);
+            xml.attribute(XmlResultConstants.NAME_ATTR, bindingName);
         }
+        if (options instanceof LinksOptions linksOptions) {
+            for (String link : linksOptions.links()) {
+                xml.empty(XmlResultConstants.LINK_QNAME);
+                xml.attribute(XmlResultConstants.HREF_ATTR, link);
+            }
+        }
+        xml.end();
+    }
+
+    private void writeResults(XmlResultWriter xml) {
+        if (!results.hasNext()) {
+            xml.empty(XmlResultConstants.RESULTS_QNAME);
+            return;
+        }
+        xml.start(XmlResultConstants.RESULTS_QNAME);
+        do {
+            writeBindingSet(xml, results.next());
+        } while (results.hasNext());
+        xml.end();
+    }
+
+    private void writeBindingSet(XmlResultWriter xml, BindingSet bindings) {
+        boolean empty = results.getBindingNames().stream().noneMatch(bindings::hasBinding);
+        if (empty) {
+            xml.empty(XmlResultConstants.RESULT_QNAME);
+            return;
+        }
+        xml.start(XmlResultConstants.RESULT_QNAME);
+        for (String bindingName : results.getBindingNames()) {
+            if (!bindings.hasBinding(bindingName)) {
+                continue;
+            }
+            xml.start(XmlResultConstants.BINDING_QNAME);
+            xml.attribute(XmlResultConstants.NAME_ATTR, bindingName);
+            writeValue(xml, bindings.getValue(bindingName));
+            xml.end();
+        }
+        xml.end();
+    }
+
+    private void writeValue(XmlResultWriter xml, Value value) {
+        switch (value) {
+            case IRI iri -> xml.textElement(XmlResultConstants.URI_QNAME, iri.stringValue());
+            case BNode bNode -> xml.textElement(XmlResultConstants.BNODE_QNAME, bNode.getID());
+            case Literal literal -> writeLiteral(xml, literal);
+            default -> throw new SerializationException(
+                    "Unable to serialize value " + value.stringValue(), getFormat());
+        }
+    }
+
+    private static void writeLiteral(XmlResultWriter xml, Literal literal) {
+        xml.start(XmlResultConstants.LITERAL_QNAME);
+        if (literal.getLanguage().isPresent()) {
+            xml.languageAttribute(literal.getLanguage().orElseThrow());
+        } else if (literal.getDatatype() != null
+                && !literal.getDatatype().equals(XSDDatatype.STRING.getIRI())
+                && !literal.getDatatype().equals(RDFDatatype.LANGSTRING.getIRI())) {
+            xml.attribute(XmlResultConstants.DATATYPE_ATTR, literal.getDatatype().stringValue());
+        }
+        xml.textElementContent(literal.stringValue());
     }
 
     @Override
     public FileFormat getFormat() {
         return ResultFormat.XML;
-    }
-
-    private Element bindingSetToXML(BindingSet bindings, Document document) {
-        Element bindingSetElement = document.createElement(XmlResultConstants.RESULT_QNAME);
-
-        bindings.forEach(binding -> bindingSetElement.appendChild(bindingToXML(binding, document)));
-
-        return bindingSetElement;
-    }
-
-    private Element bindingToXML(Binding binding, Document document) {
-        Element bindingElement = document.createElement(XmlResultConstants.BINDING_QNAME);
-        bindingElement.setAttribute(XmlResultConstants.NAME_ATTR, binding.name());
-        bindingElement.appendChild(valueToXML(binding.value(), document));
-        return bindingElement;
-    }
-
-    private Element valueToXML(Value value, Document document) {
-        Element valueElement;
-        switch (value) {
-            case IRI iriValue -> {
-                valueElement = document.createElement(XmlResultConstants.URI_QNAME);
-                valueElement.setTextContent(iriValue.stringValue());
-            }
-            case BNode bnodeValue -> {
-                valueElement = document.createElement(XmlResultConstants.BNODE_QNAME);
-                valueElement.setTextContent(bnodeValue.getID());
-            }
-            case Literal literalValue -> {
-                valueElement = document.createElement(XmlResultConstants.LITERAL_QNAME);
-                if (literalValue.getLanguage().isEmpty()
-                        && literalValue.getDatatype() != null
-                        && literalValue.getDatatype() != XSDDatatype.STRING.getIRI()
-                        && literalValue.getDatatype() != RDFDatatype.LANGSTRING.getIRI()) {
-                    valueElement.setAttribute(XmlResultConstants.DATATYPE_ATTR, literalValue.getDatatype().stringValue());
-                }
-                if (literalValue.getLanguage().isPresent()) {
-                    valueElement.setAttribute(XmlResultConstants.LANG_ATTR, literalValue.getLanguage().get());
-                }
-                valueElement.setTextContent(literalValue.stringValue());
-            }
-            default ->
-                    throw new SerializationException("Unable to serialize Value " + value.stringValue() + " unknown type", this.getFormat());
-        }
-        return valueElement;
     }
 }

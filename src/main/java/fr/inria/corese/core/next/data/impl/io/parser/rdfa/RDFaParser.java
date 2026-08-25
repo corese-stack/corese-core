@@ -5,7 +5,7 @@ import fr.inria.corese.core.next.data.api.model.*;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 import fr.inria.corese.core.next.data.api.support.io.parser.AbstractRDFParser;
-import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.api.io.option.RDFParsingOptions;
 import fr.inria.corese.core.next.data.api.io.option.BaseIRIOptions;
 import fr.inria.corese.core.next.data.api.support.term.IRIUtils;
 import fr.inria.corese.core.next.data.api.vocabulary.RDF;
@@ -63,7 +63,7 @@ public class RDFaParser extends AbstractRDFParser {
         this(model, factory, new RDFaParserOptions.Builder().build());
     }
 
-    public RDFaParser(Model model, ValueFactory factory, IOOptions config) {
+    public RDFaParser(Model model, ValueFactory factory, RDFParsingOptions config) {
         super(model, factory, config);
         // Initializing the iri mappings with the default prefixes as defined by https://www.w3.org/TR/rdfa-core/#xmlrdfaconformance
         for (RDFaInitialPrefixes prefixObject : RDFaInitialPrefixes.values()) {
@@ -80,7 +80,7 @@ public class RDFaParser extends AbstractRDFParser {
     }
 
     @Override
-    public void setConfig(IOOptions options) {
+    public void setConfig(RDFParsingOptions options) {
         super.setConfig(options);
         if (options instanceof BaseIRIOptions baseIRIOptions) {
             this.baseIri = baseIRIOptions.getBaseIRI();

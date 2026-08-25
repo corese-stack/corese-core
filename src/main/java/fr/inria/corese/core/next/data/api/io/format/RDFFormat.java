@@ -118,7 +118,10 @@ public class RDFFormat extends FileFormat {
      * @return An Optional containing the matching RdfFormat if found.
      */
     public static Optional<RDFFormat> byName(String name) {
-        String n = name.toLowerCase(Locale.ROOT);
+        if (name == null) {
+            return Optional.empty();
+        }
+        String n = name.trim();
         return all().stream()
                 .filter(format -> format.getName().equalsIgnoreCase(n))
                 .findFirst();
@@ -131,10 +134,17 @@ public class RDFFormat extends FileFormat {
      * @return An Optional containing the matching RdfFormat if found.
      */
     public static Optional<RDFFormat> byExtension(String extension) {
-        String ext = extension.toLowerCase(Locale.ROOT);
+        if (extension == null) {
+            return Optional.empty();
+        }
+        String ext = extension.trim().toLowerCase(Locale.ROOT);
+        if (ext.startsWith(".")) {
+            ext = ext.substring(1);
+        }
+        String candidate = ext;
         return all().stream()
                 .filter(format -> format.getExtensions().stream()
-                        .anyMatch(e -> e.equalsIgnoreCase(ext)))
+                        .anyMatch(e -> e.equalsIgnoreCase(candidate)))
                 .findFirst();
     }
 
@@ -145,7 +155,10 @@ public class RDFFormat extends FileFormat {
      * @return An Optional containing the matching RdfFormat if found.
      */
     public static Optional<RDFFormat> byMimeType(String mimeType) {
-        String mime = mimeType.toLowerCase(Locale.ROOT);
+        if (mimeType == null) {
+            return Optional.empty();
+        }
+        String mime = mimeType.split(";", 2)[0].trim().toLowerCase(Locale.ROOT);
         return all().stream()
                 .filter(format -> format.getMimeTypes().stream()
                         .anyMatch(m -> m.equalsIgnoreCase(mime)))
@@ -187,7 +200,7 @@ public class RDFFormat extends FileFormat {
     @Override
     public int hashCode() {
         return Objects.hash(
-                getName().toLowerCase(),
+                getName().toLowerCase(Locale.ROOT),
                 getExtensions(),
                 getMimeTypes(),
                 supportsNamespaces,

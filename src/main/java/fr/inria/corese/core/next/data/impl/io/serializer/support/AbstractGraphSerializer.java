@@ -81,7 +81,9 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      */
     @Override
     public void write(Writer writer) throws SerializationException {
-        try (Writer bufferedWriter = new BufferedWriter(writer)) {
+        Objects.requireNonNull(writer, "writer");
+        Writer bufferedWriter = new BufferedWriter(writer);
+        try {
             writeHeader(bufferedWriter);
 
             Set<Resource> precomputedInlineBlankNodes = precomputeInlineBlankNodesAndLists();

@@ -3,17 +3,19 @@ package fr.inria.corese.core.next.query.impl.sparql.io.serializer.support;
 import fr.inria.corese.core.next.data.api.support.io.AbstractIOOptions;
 import fr.inria.corese.core.next.data.api.io.serializer.option.LineEndingOptions;
 import fr.inria.corese.core.next.data.api.support.io.IOConstants;
+import fr.inria.corese.core.next.query.api.io.serializer.ResultIOOptions;
 
-public abstract class CharacterSeparatedValuesSerializerOptions extends AbstractIOOptions implements LineEndingOptions {
+public abstract class CharacterSeparatedValuesSerializerOptions extends AbstractIOOptions
+        implements LineEndingOptions, ResultIOOptions {
 
-    private final AbstractBuilder<?> builder;
+    private final String lineEnding;
 
     protected CharacterSeparatedValuesSerializerOptions(AbstractBuilder<?> builder) {
-        this.builder = builder;
+        this.lineEnding = builder.lineEnding;
     }
 
     public String getLineEnding() {
-        return this.builder.lineEnding;
+        return lineEnding;
     }
 
     public abstract static class AbstractBuilder<S extends CharacterSeparatedValuesSerializerOptions.AbstractBuilder<S>> {

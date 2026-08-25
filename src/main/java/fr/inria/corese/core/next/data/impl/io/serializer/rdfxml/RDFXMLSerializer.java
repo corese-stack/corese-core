@@ -90,11 +90,14 @@ public class RDFXMLSerializer implements RDFSerializer {
      */
     @Override
     public void write(Writer writer) throws SerializationException {
-        try (Writer bufferedWriter = new BufferedWriter(writer)) {
+        Objects.requireNonNull(writer, "writer");
+        Writer bufferedWriter = new BufferedWriter(writer);
+        try {
             this.cachedStatements = model.stream().toList();
 
             writeXmlDeclaration(bufferedWriter);
             writeRdfRootElement(bufferedWriter);
+            bufferedWriter.flush();
         } catch (IOException e) {
             throw new SerializationException("Failed to write RDF/XML output", "RDF/XML", e);
         } catch (IllegalArgumentException e) {

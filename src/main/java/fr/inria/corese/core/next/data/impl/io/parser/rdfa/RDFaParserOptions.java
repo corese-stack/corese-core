@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.data.impl.io.parser.rdfa;
 
 import fr.inria.corese.core.next.data.api.support.io.AbstractIOOptions;
 import fr.inria.corese.core.next.data.api.io.option.BaseIRIOptions;
+import fr.inria.corese.core.next.data.api.io.option.RDFParsingOptions;
 import fr.inria.corese.core.next.data.api.support.io.IOConstants;
 
 import javax.xml.parsers.SAXParserFactory;
@@ -12,7 +13,7 @@ import java.util.Map;
 /**
  * Configuration class for the parsing of RDFa HTML documents
  */
-public class RDFaParserOptions extends AbstractIOOptions implements BaseIRIOptions {
+public class RDFaParserOptions extends AbstractIOOptions implements BaseIRIOptions, RDFParsingOptions {
 
     private final RDFaParserOptions.Builder builder;
     private final String baseIRI;

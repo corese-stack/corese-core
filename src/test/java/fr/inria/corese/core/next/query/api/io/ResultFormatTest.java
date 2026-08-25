@@ -11,6 +11,15 @@ import static org.junit.jupiter.api.Assertions.*;
 class ResultFormatTest {
 
     @Test
+    void findsFormatsByNameExtensionAndMimeType() {
+        assertEquals(ResultFormat.JSON, ResultFormat.byName("json").orElseThrow());
+        assertEquals(ResultFormat.JSON, ResultFormat.byExtension(".SRJ").orElseThrow());
+        assertEquals(ResultFormat.JSON,
+                ResultFormat.byMimeType("application/sparql-results+json; charset=UTF-8").orElseThrow());
+        assertTrue(ResultFormat.byName(null).isEmpty());
+    }
+
+    @Test
     @DisplayName("Should contain standard result formats")
     void testStandardFormats() {
         assertNotNull(ResultFormat.CSV);

@@ -9,6 +9,8 @@ import com.apicatalog.jsonld.JsonLdVersion;
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.support.io.AbstractIOOptions;
 import fr.inria.corese.core.next.data.api.io.option.BaseIRIOptions;
+import fr.inria.corese.core.next.data.api.io.option.RDFParsingOptions;
+import fr.inria.corese.core.next.data.api.io.option.RDFSerializationOptions;
 import fr.inria.corese.core.next.data.impl.io.parser.support.ParserConstants;
 
 /**
@@ -19,7 +21,7 @@ import fr.inria.corese.core.next.data.impl.io.parser.support.ParserConstants;
  *      "https://javadoc.io/doc/com.apicatalog/titanium-json-ld/latest/com/apicatalog/jsonld/JsonLdOptions.html">JsonLdOptions</a>
  */
 public class JSONLDOptions extends AbstractIOOptions
-        implements BaseIRIOptions {
+        implements BaseIRIOptions, RDFParsingOptions, RDFSerializationOptions {
 
     private final Builder builder;
 

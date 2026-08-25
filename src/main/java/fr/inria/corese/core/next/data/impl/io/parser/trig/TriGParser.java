@@ -4,7 +4,7 @@ import fr.inria.corese.core.next.data.api.model.Model;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 import fr.inria.corese.core.next.data.api.support.io.parser.AbstractRDFParser;
-import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.api.io.option.RDFParsingOptions;
 import fr.inria.corese.core.next.data.api.exception.ParsingException;
 import fr.inria.corese.core.next.generated.antlr.TriGLexer;
 import org.antlr.v4.runtime.BaseErrorListener;
@@ -49,7 +49,7 @@ public class TriGParser extends AbstractRDFParser {
      * @param factory The value factory for creating RDF resources.
      * @param config  Configuration options for parsing.
      */
-    public TriGParser(Model model, ValueFactory factory, IOOptions config) {
+    public TriGParser(Model model, ValueFactory factory, RDFParsingOptions config) {
         super(model, factory, config);
     }
 
@@ -93,7 +93,7 @@ public class TriGParser extends AbstractRDFParser {
             if (trigErrorListener.hasErrors()) {
                 throw new ParsingException("Syntax error in TriG document: " + trigErrorListener.getErrorMessage());
             }
-            IOOptions optionsWithBaseURI = new TriGParserOptions.Builder()
+            RDFParsingOptions optionsWithBaseURI = new TriGParserOptions.Builder()
                     .baseIRI(baseURI)
                     .build();
             TriGListener listener = new TriGListener(getModel(), getValueFactory(), optionsWithBaseURI);

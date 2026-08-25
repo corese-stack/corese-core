@@ -4,7 +4,7 @@ import fr.inria.corese.core.next.data.api.model.Model;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 import fr.inria.corese.core.next.data.api.support.io.parser.AbstractRDFParser;
-import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.api.io.option.RDFParsingOptions;
 import fr.inria.corese.core.next.data.api.exception.ParsingException;
 import fr.inria.corese.core.next.generated.antlr.NQuadsLexer;
 import org.antlr.v4.runtime.*;
@@ -41,7 +41,7 @@ public class NQuadsParser extends AbstractRDFParser {
      * @param factory The ValueFactory for creating RDF resources.
      * @param config  The configuration options for parsing.
      */
-    public NQuadsParser(Model model, ValueFactory factory, IOOptions config) {
+    public NQuadsParser(Model model, ValueFactory factory, RDFParsingOptions config) {
         super(model, factory, config);
     }
 

@@ -4,7 +4,7 @@ import fr.inria.corese.core.next.data.api.model.Model;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 import fr.inria.corese.core.next.data.api.support.io.parser.AbstractRDFParser;
-import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.api.io.option.RDFParsingOptions;
 import fr.inria.corese.core.next.data.api.exception.ParsingException;
 import fr.inria.corese.core.next.generated.antlr.TurtleLexer;
 import org.antlr.v4.runtime.BaseErrorListener;
@@ -50,7 +50,7 @@ public class TurtleParser extends AbstractRDFParser {
      * @param factory the value factory used to create RDF values
      * @param config  configuration object for the parser
      */
-    public TurtleParser(Model model, ValueFactory factory, IOOptions config) {
+    public TurtleParser(Model model, ValueFactory factory, RDFParsingOptions config) {
         super(model, factory, config);
     }
 
@@ -90,7 +90,7 @@ public class TurtleParser extends AbstractRDFParser {
             ParseTreeWalker walker = new ParseTreeWalker();
             ParseTree tree = parseTree(turtleParser, turtleErrorListener);
 
-            IOOptions optionsWithBaseURI = new TurtleParserOptions.Builder()
+            RDFParsingOptions optionsWithBaseURI = new TurtleParserOptions.Builder()
                     .baseIRI(baseURI)
                     .build();
             TurtleListener listener = new TurtleListener(getModel(), getValueFactory(), optionsWithBaseURI);

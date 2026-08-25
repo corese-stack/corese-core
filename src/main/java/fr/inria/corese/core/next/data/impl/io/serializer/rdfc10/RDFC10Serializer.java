@@ -55,13 +55,15 @@ public class RDFC10Serializer extends AbstractLineBasedSerializer {
      */
     @Override
     public void write(Writer writer) {
-        try (BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
+        Objects.requireNonNull(writer, "writer");
+        BufferedWriter bufferedWriter = new BufferedWriter(writer);
+        try {
             List<Statement> canonicalStatements = canonicalizer.canonicalize(model);
 
             for (Statement stmt : canonicalStatements) {
                 writeCanonicalStatement(bufferedWriter, stmt);
             }
-
+            bufferedWriter.flush();
         } catch (IOException e) {
             throw new SerializationException(getFormatName() + " serialization failed", getFormatName(), e);
         } catch (IllegalArgumentException e) {

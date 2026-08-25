@@ -3,8 +3,8 @@ package fr.inria.corese.core.next.data.impl.io.parser;
 import fr.inria.corese.core.next.data.api.model.Model;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
-import fr.inria.corese.core.next.data.api.io.option.IOOptions;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
+import fr.inria.corese.core.next.data.api.io.parser.RDFParserOptions;
 import fr.inria.corese.core.next.data.impl.io.parser.jsonld.JSONLDParser;
 import fr.inria.corese.core.next.data.impl.io.parser.nquads.NQuadsParser;
 import fr.inria.corese.core.next.data.impl.io.parser.ntriples.NTriplesParser;
@@ -35,8 +35,7 @@ class DefaultRDFParserFactoryTest {
     @Mock
     private ValueFactory mockValueFactory;
 
-    @Mock
-    private IOOptions mockParserOptions;
+    private final RDFParserOptions parserOptions = RDFParserOptions.builder().build();
 
 
     @BeforeEach
@@ -47,7 +46,7 @@ class DefaultRDFParserFactoryTest {
     @Test
     @DisplayName("createRDFParser (with config) should return JSONLDParser for JSONLD format")
     void testCreateRDFParserWithConfig_JSONLD() {
-        RDFParser parser = parserFactory.createRDFParser(RDFFormat.JSONLD, mockModel, mockValueFactory, mockParserOptions);
+        RDFParser parser = parserFactory.createRDFParser(RDFFormat.JSONLD, mockModel, mockValueFactory, parserOptions);
         assertNotNull(parser);
         assertInstanceOf(JSONLDParser.class, parser);
     }
@@ -55,7 +54,7 @@ class DefaultRDFParserFactoryTest {
     @Test
     @DisplayName("createRDFParser (with config) should return ANTLRTurtleParser for TURTLE format")
     void testCreateRDFParserWithConfig_TURTLE() {
-        RDFParser parser = parserFactory.createRDFParser(RDFFormat.TURTLE, mockModel, mockValueFactory, mockParserOptions);
+        RDFParser parser = parserFactory.createRDFParser(RDFFormat.TURTLE, mockModel, mockValueFactory, parserOptions);
         assertNotNull(parser);
         assertInstanceOf(TurtleParser.class, parser);
     }
@@ -63,7 +62,7 @@ class DefaultRDFParserFactoryTest {
     @Test
     @DisplayName("createRDFParser (with config) should return ANTLRNTriplesParser for N-TRIPLES format")
     void testCreateRDFParserWithConfig_NTRIPLES() {
-        RDFParser parser = parserFactory.createRDFParser(RDFFormat.NTRIPLES, mockModel, mockValueFactory, mockParserOptions);
+        RDFParser parser = parserFactory.createRDFParser(RDFFormat.NTRIPLES, mockModel, mockValueFactory, parserOptions);
         assertNotNull(parser);
         assertInstanceOf(NTriplesParser.class, parser);
     }
@@ -71,7 +70,7 @@ class DefaultRDFParserFactoryTest {
     @Test
     @DisplayName("createRDFParser (with config) should return ANTLRNQuadsParser for N-QUADS format")
     void testCreateRDFParserWithConfig_NQUADS() {
-        RDFParser parser = parserFactory.createRDFParser(RDFFormat.NQUADS, mockModel, mockValueFactory, mockParserOptions);
+        RDFParser parser = parserFactory.createRDFParser(RDFFormat.NQUADS, mockModel, mockValueFactory, parserOptions);
         assertNotNull(parser);
         assertInstanceOf(NQuadsParser.class, parser);
     }

@@ -27,6 +27,7 @@ class XmlBooleanResultSerializerTest extends AbstractBooleanResultSerializerTest
     protected String getTrueResultString() {
         return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +
         "<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">" +
+            "<head/>" +
             "<boolean>true</boolean>" +
         "</sparql>";
     }
@@ -35,12 +36,13 @@ class XmlBooleanResultSerializerTest extends AbstractBooleanResultSerializerTest
     protected String getFalseResultString() {
         return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +
         "<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">" +
+            "<head/>" +
             "<boolean>false</boolean>" +
         "</sparql>";
     }
 
     private String getLinksTestResultsString() {
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +
                 "<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">" +
                     "<head>" +
                         "<link href=\"http://google.com\"/>" +

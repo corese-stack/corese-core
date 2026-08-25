@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.data.impl.io.serializer.rdfxml;
 
+import fr.inria.corese.core.next.data.api.io.option.IOOptions;
 import fr.inria.corese.core.next.data.api.io.serializer.option.PrettyPrintOptions;
 import fr.inria.corese.core.next.data.api.io.serializer.option.UsesPrefixOptions;
 import fr.inria.corese.core.next.data.impl.namespace.PrefixHandler;
@@ -220,6 +221,30 @@ public class RDFXMLSerializerOptions extends AbstractSerializerOptions implement
             trailingDot(false); // No trailing dot in RDF/XML
             stableBlankNodeIds(true); // Good for reproducible RDF/XML outputs
             escapeUnicode(false); // Usually direct UTF-8 for RDF/XML, not unicode escapes
+        }
+
+        /** Creates RDF/XML options from the shared public RDF options. */
+        public Builder(IOOptions otherOptions) {
+            super(otherOptions);
+            literalDatatypePolicy(LiteralDatatypePolicy.ALWAYS_TYPED);
+            trailingDot(false);
+            escapeUnicode(false);
+            if (otherOptions instanceof UsesPrefixOptions prefixOptions) {
+                usePrefixes(prefixOptions.usePrefixes());
+                autoDeclarePrefixes(prefixOptions.autoDeclarePrefixes());
+                prefixOrdering(prefixOptions.getPrefixOrdering());
+                PrefixHandler copied = new PrefixHandler(false);
+                copied.copyFrom(prefixOptions.getPrefixMapping());
+                prefixHandler(copied);
+            }
+            if (otherOptions instanceof PrettyPrintOptions prettyOptions) {
+                prettyPrint(prettyOptions.prettyPrint());
+                indent(prettyOptions.getIndent());
+                maxLineLength(prettyOptions.getMaxLineLength());
+                sortSubjects(prettyOptions.sortSubjects());
+                sortPredicates(prettyOptions.sortPredicates());
+                prefixOrdering(prettyOptions.getPrefixOrdering());
+            }
         }
 
         /**

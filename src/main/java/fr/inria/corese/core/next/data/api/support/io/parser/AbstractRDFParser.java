@@ -8,10 +8,9 @@ import java.util.Objects;
 
 import fr.inria.corese.core.next.data.api.model.Model;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
-import fr.inria.corese.core.next.data.api.support.io.AbstractIOOptions;
 import fr.inria.corese.core.next.data.api.exception.ParsingException;
 import fr.inria.corese.core.next.data.api.io.option.BaseIRIOptions;
-import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.api.io.option.RDFParsingOptions;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
 
 /**
@@ -21,14 +20,14 @@ public abstract class AbstractRDFParser implements RDFParser {
 
     private final Model model;
     private final ValueFactory valueFactory;
-    private IOOptions config;
+    private RDFParsingOptions config;
 
     /**
      * Gets the configuration options for the parser.
      *
      * @return the configuration options
      */
-    public IOOptions getConfig() {
+    public RDFParsingOptions getConfig() {
         return config;
     }
 
@@ -37,19 +36,19 @@ public abstract class AbstractRDFParser implements RDFParser {
      *
      * @param config the configuration options to be set
      */
-    public void setConfig(IOOptions config) {
+    public void setConfig(RDFParsingOptions config) {
         this.config = config;
     }
 
     /**
      * Constructor for AbstractRDFParser that initializes the model and value
-     * factory. Ths created object will use an empty AbstractIOOptions object as configuration
+     * factory. The created object uses empty RDF parsing options.
      *
      * @param model   the model to be populated by the parser
      * @param factory the value factory used to create RDF values
      */
     protected AbstractRDFParser(Model model, ValueFactory factory) {
-        this(model, factory, new AbstractIOOptions() {
+        this(model, factory, new RDFParsingOptions() {
         });
     }
 
@@ -61,7 +60,7 @@ public abstract class AbstractRDFParser implements RDFParser {
      * @param factory the value factory used to create RDF values
      * @param config  optional configuration options for the parser
      */
-    protected AbstractRDFParser(Model model, ValueFactory factory, IOOptions config) {
+    protected AbstractRDFParser(Model model, ValueFactory factory, RDFParsingOptions config) {
         Objects.requireNonNull(model);
         Objects.requireNonNull(factory);
         Objects.requireNonNull(config);

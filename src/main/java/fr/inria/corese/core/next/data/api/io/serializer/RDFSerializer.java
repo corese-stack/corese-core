@@ -4,7 +4,11 @@ import fr.inria.corese.core.next.data.api.model.Model;
 import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 
 /**
- * Interface for Serializer of {@link Model} instances to a specified {@link RDFFormat}.
+ * Serializer of RDF statements to a specified {@link RDFFormat}.
+ *
+ * <p>The source is consumed once. The serializer does not close the destination
+ * writer. A serializer created from a one-shot statement source may not be
+ * reused.</p>
  */
 public interface RDFSerializer extends Serializer {
 
