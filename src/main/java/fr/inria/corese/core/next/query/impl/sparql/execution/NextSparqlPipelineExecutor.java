@@ -16,7 +16,6 @@ import fr.inria.corese.core.next.query.api.result.GraphQueryResult;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 import fr.inria.corese.core.next.query.impl.sparql.parser.SparqlParser;
 import fr.inria.corese.core.next.query.impl.result.CoreseGraphQueryResult;
-import fr.inria.corese.core.next.query.impl.result.CoreseTupleQueryResult;
 import fr.inria.corese.core.next.query.impl.sparql.ast.AskQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ConstructQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.DescribeQueryAst;
