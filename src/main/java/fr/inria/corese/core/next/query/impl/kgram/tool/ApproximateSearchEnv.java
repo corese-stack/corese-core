@@ -91,7 +91,7 @@ public class ApproximateSearchEnv {
     static class Value {
 
         private final Node node;
-        private double similarity = -1;
+        private final double similarity = -1;
         private final String algorithms;
 
         public Value(Node node, String algorithms) {

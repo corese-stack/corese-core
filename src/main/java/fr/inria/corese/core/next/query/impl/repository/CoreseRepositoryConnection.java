@@ -318,28 +318,30 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
 
     @Override
     public void commit() throws RepositoryException {
-        Transaction active = requireActiveTransaction();
-        try {
-            active.commit();
-        } catch (StorageException | IllegalStateException e) {
-            throw new RepositoryException("Could not commit transaction", e);
-        } finally {
-            if (!active.isActive()) {
-                transaction = null;
+        try (Transaction active = requireActiveTransaction()) {
+            try {
+                active.commit();
+            } catch (StorageException | IllegalStateException e) {
+                throw new RepositoryException("Could not commit transaction", e);
+            } finally {
+                if (!active.isActive()) {
+                    transaction = null;
+                }
             }
         }
     }
 
     @Override
     public void rollback() throws RepositoryException {
-        Transaction active = requireActiveTransaction();
-        try {
-            active.rollback();
-        } catch (StorageException | IllegalStateException e) {
-            throw new RepositoryException("Could not roll back transaction", e);
-        } finally {
-            if (!active.isActive()) {
-                transaction = null;
+        try (Transaction active = requireActiveTransaction()) {
+            try {
+                active.rollback();
+            } catch (StorageException | IllegalStateException e) {
+                throw new RepositoryException("Could not roll back transaction", e);
+            } finally {
+                if (!active.isActive()) {
+                    transaction = null;
+                }
             }
         }
     }

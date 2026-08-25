@@ -10,7 +10,7 @@ public enum DefaultDatatype implements CoreDatatype {
     /** Default fallback when no specific CoreDatatype is matched. */
     NONE();
 
-    private DefaultDatatype() {
+    DefaultDatatype() {
     }
 
     @Override

@@ -21,7 +21,6 @@ import static org.mockito.Mockito.when;
 class CoreseRepositoryConnectionTransactionTest {
 
     private CoreseRepositoryConnection connection;
-    private TransactionManager transactionManager;
     private Transaction transaction;
     private AtomicBoolean active;
 
@@ -29,7 +28,7 @@ class CoreseRepositoryConnectionTransactionTest {
     void setUp() {
         Repository repository = mock(Repository.class);
         StorageManager storage = mock(StorageManager.class);
-        transactionManager = mock(TransactionManager.class);
+        TransactionManager transactionManager = mock(TransactionManager.class);
         transaction = mock(Transaction.class);
         active = new AtomicBoolean();
 

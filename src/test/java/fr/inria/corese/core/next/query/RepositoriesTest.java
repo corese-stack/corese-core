@@ -83,12 +83,13 @@ class RepositoriesTest {
 
     @Test
     void rejectsStorageThatCannotBeAdopted() {
-        StorageManager storage = mock(StorageManager.class);
-        StorageLifecycle lifecycle = mock(StorageLifecycle.class);
-        when(storage.lifecycle()).thenReturn(lifecycle);
-        when(lifecycle.getState()).thenReturn(LifecycleState.SHUTDOWN);
+        try (StorageManager storage = mock(StorageManager.class)) {
+            StorageLifecycle lifecycle = mock(StorageLifecycle.class);
+            when(storage.lifecycle()).thenReturn(lifecycle);
+            when(lifecycle.getState()).thenReturn(LifecycleState.SHUTDOWN);
 
-        assertThrows(RepositoryException.class, () -> Repositories.create(storage));
+            assertThrows(RepositoryException.class, () -> Repositories.create(storage));
+        }
     }
 
     @Test

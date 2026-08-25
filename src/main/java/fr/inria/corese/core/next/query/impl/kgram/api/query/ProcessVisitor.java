@@ -8,7 +8,6 @@ import fr.inria.corese.core.next.query.impl.kgram.core.*;
 import fr.inria.corese.core.next.query.impl.kgram.path.Path;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
-import java.util.List;
 
 /**
  * @author Olivier Corby, Wimmics INRIA I3S, 2018

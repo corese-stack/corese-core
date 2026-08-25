@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class ExpNodeCollector {
 
-    private List<Node> nodeList;
+    private final List<Node> nodeList;
     private final List<Node> selectNodeList;
     private final List<Node> existNodeList;
 

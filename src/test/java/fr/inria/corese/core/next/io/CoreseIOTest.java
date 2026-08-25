@@ -120,9 +120,10 @@ class CoreseIOTest {
                 .lineEnding("\r\n")
                 .build();
         assertTrue(CoreseIO.writeToString(tupleResult(), ResultFormat.CSV, csv).endsWith("\r\n"));
-        TestTupleResult result = tupleResult();
-        assertThrows(IllegalArgumentException.class,
-                () -> CoreseIO.writeToString(result, ResultFormat.CSV, links));
+        try (TestTupleResult result = tupleResult()) {
+            assertThrows(IllegalArgumentException.class,
+                    () -> CoreseIO.writeToString(result, ResultFormat.CSV, links));
+        }
 
         Model model = CoreseIO.read(
                 new StringReader("<http://example/s> <http://example/p> \"é\" ."),
@@ -156,7 +157,7 @@ class CoreseIOTest {
     }
 
     @Test
-    void evaluatesAndExportsRepositoryQueriesInOneCall() throws Exception {
+    void evaluatesAndExportsRepositoryQueriesInOneCall() {
         try (Repository repository = Repositories.create()) {
             repository.update("INSERT DATA { <http://example/s> <http://example/p> <http://example/o> }");
 
@@ -241,6 +242,7 @@ class CoreseIOTest {
         }
 
         @Override
+        @SuppressWarnings("NullableProblems")
         public Iterator<Binding> iterator() {
             return values.entrySet().stream()
                     .<Binding>map(entry -> new TestBinding(entry.getKey(), entry.getValue()))
