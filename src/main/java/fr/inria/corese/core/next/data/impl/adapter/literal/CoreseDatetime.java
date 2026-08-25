@@ -16,6 +16,7 @@ import fr.inria.corese.core.next.data.api.exception.InvalidDatatypeException;
 import fr.inria.corese.core.next.data.api.exception.IncorrectOperationException;
 import fr.inria.corese.core.next.data.impl.adapter.node.CoreseIRI;
 import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.CoreseDateTime;
 
 /**
  * CoreseDatetime class that represents a date and time literal in the Corese
@@ -25,7 +26,7 @@ import fr.inria.corese.core.sparql.api.IDatatype;
  */
 @SuppressWarnings("java:S2160")
 public class CoreseDatetime extends AbstractTemporalPointLiteral implements CoreseDatatypeAdapter {
-    private final transient fr.inria.corese.core.sparql.datatype.CoreseDateTime coreseObject;
+    private final transient CoreseDateTime coreseObject;
 
     /**
      * Constructor for CoreseDatetime.
@@ -34,7 +35,7 @@ public class CoreseDatetime extends AbstractTemporalPointLiteral implements Core
      */
     public CoreseDatetime(IDatatype coreseObject) {
         super(new CoreseIRI(coreseObject.getDatatypeURI()));
-        if (coreseObject instanceof fr.inria.corese.core.sparql.datatype.CoreseDateTime dateTimeObj) {
+        if (coreseObject instanceof CoreseDateTime dateTimeObj) {
             this.coreseObject = dateTimeObj;
         } else {
             throw new IncorrectOperationException("Cannot create CoreseDatetime from a non-date Corese object.");
@@ -47,7 +48,7 @@ public class CoreseDatetime extends AbstractTemporalPointLiteral implements Core
      * @param calendar the XMLGregorianCalendar object
      */
     public CoreseDatetime(XMLGregorianCalendar calendar) {
-        this(new fr.inria.corese.core.sparql.datatype.CoreseDateTime(calendar.toXMLFormat()));
+        this(new CoreseDateTime(calendar.toXMLFormat()));
     }
 
     /**
@@ -56,7 +57,7 @@ public class CoreseDatetime extends AbstractTemporalPointLiteral implements Core
      * @param dateXMLDateFormat the date in XML date format
      */
     public CoreseDatetime(String dateXMLDateFormat) {
-        this(new fr.inria.corese.core.sparql.datatype.CoreseDateTime(dateXMLDateFormat));
+        this(new CoreseDateTime(dateXMLDateFormat));
     }
 
     /**
@@ -66,7 +67,7 @@ public class CoreseDatetime extends AbstractTemporalPointLiteral implements Core
      * @param datatype the datatype of the literal
      */
     public CoreseDatetime(String value, IRI datatype) {
-        this(new fr.inria.corese.core.sparql.datatype.CoreseDateTime(value));
+        this(new CoreseDateTime(value));
         this.datatype = datatype;
     }
 

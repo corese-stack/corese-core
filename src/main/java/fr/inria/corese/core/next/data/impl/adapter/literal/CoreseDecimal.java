@@ -13,8 +13,12 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
- * Super class for all numeric literal containing floating points in the XD datatype hierarchy
- * @ImplNotes Against the XSD hierarchy, the legacy Corese super class for floating point numbers is CoreseDouble, the legacy CoreseDecimal inherits from CoreseDouble. This class is a wrapper for CoreseDouble, and is used to represent the XSD decimal datatype.
+ * Adapter for decimal literals in the XSD datatype hierarchy.
+ *
+ * <p><strong>Implementation note:</strong> Unlike the XSD hierarchy, the legacy
+ * Corese decimal implementation inherits from {@link CoreseDouble}. This
+ * adapter preserves the decimal datatype while wrapping that legacy
+ * representation.</p>
  */
 public class CoreseDecimal extends AbstractCoreseNumber {
 

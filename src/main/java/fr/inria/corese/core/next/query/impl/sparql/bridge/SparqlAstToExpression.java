@@ -2,11 +2,13 @@ package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
 import fr.inria.corese.core.next.data.api.support.io.IOConstants;
 import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
+import fr.inria.corese.core.next.query.impl.kgram.api.core.ExprType;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Filter;
 import fr.inria.corese.core.next.common.text.RdfText;
 import fr.inria.corese.core.sparql.datatype.RDF;
+import fr.inria.corese.core.sparql.triple.cst.Keyword;
 import fr.inria.corese.core.sparql.triple.parser.*;
 
 import java.util.ArrayList;
@@ -129,7 +131,7 @@ public final class SparqlAstToExpression {
 
     private static String normalizeDatatypeIri(String dt) {
         String d =  RdfText.stripAngleBrackets(dt);
-        return fr.inria.corese.core.sparql.triple.parser.NSManager.nsm().toNamespace(d);
+        return NSManager.nsm().toNamespace(d);
     }
 
     private static Constant iriToConstant(String rawIri) {
@@ -261,7 +263,7 @@ public final class SparqlAstToExpression {
      */
     private static Term notTerm(Expression expression) {
         Term not = Term.create("!", expression);
-        not.setOper(fr.inria.corese.core.next.query.impl.kgram.api.core.ExprType.NOT);
+        not.setOper(ExprType.NOT);
         return not;
     }
 
@@ -342,7 +344,7 @@ public final class SparqlAstToExpression {
     }
 
     private static final class KeywordHolder {
-        static final String SEAND = fr.inria.corese.core.sparql.triple.cst.Keyword.SEAND;
-        static final String SEOR = fr.inria.corese.core.sparql.triple.cst.Keyword.SEOR;
+        static final String SEAND = Keyword.SEAND;
+        static final String SEOR = Keyword.SEOR;
     }
 }

@@ -40,7 +40,7 @@ public class CoreseBNode extends AbstractBNode implements CoreseNodeAdapter {
      *                                     {@link fr.inria.corese.core.sparql.datatype.CoreseBlankNode}.
      */
     public CoreseBNode(IDatatype coreseObject) {
-        if (coreseObject instanceof fr.inria.corese.core.sparql.datatype.CoreseBlankNode blankNode) {
+        if (coreseObject instanceof CoreseBlankNode blankNode) {
             this.coreseObject = blankNode;
             this.id = this.coreseObject.getID();
         } else {
@@ -57,7 +57,7 @@ public class CoreseBNode extends AbstractBNode implements CoreseNodeAdapter {
      * @param id The unique identifier for the blank node.
      */
     public CoreseBNode(String id) {
-        this(new fr.inria.corese.core.sparql.datatype.CoreseBlankNode(id));
+        this(new CoreseBlankNode(id));
         this.id = id;
     }
 
