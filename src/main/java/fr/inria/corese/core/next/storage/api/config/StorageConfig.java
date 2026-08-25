@@ -1,13 +1,18 @@
 package fr.inria.corese.core.next.storage.api.config;
 
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
  * Configuration for StorageManager instances.
  */
 public final class StorageConfig {
+
+    private static final String TYPE_PROPERTY = "type";
+    private static final String MEMORY_TYPE = "memory";
 
     /**
      * Custom configuration properties (immutable).
@@ -20,7 +25,7 @@ public final class StorageConfig {
      * @param builder the builder containing configuration values
      */
     private StorageConfig(Builder builder) {
-        this.properties = Map.copyOf(builder.properties);
+        this.properties = Collections.unmodifiableMap(new LinkedHashMap<>(builder.properties));
     }
 
     /**
@@ -30,7 +35,7 @@ public final class StorageConfig {
      * @return an {@link Optional} containing the property value, or empty if not found
      */
     public Optional<Object> getProperty(String key) {
-        return Optional.ofNullable(properties.get(key));
+        return Optional.ofNullable(properties.get(Objects.requireNonNull(key, "key")));
     }
 
     /**
@@ -41,10 +46,10 @@ public final class StorageConfig {
      * @param type the expected class of the property value
      * @return an {@link Optional} containing the typed value, or empty if not found or wrong type
      */
-    @SuppressWarnings("unchecked")
     public <T> Optional<T> getProperty(String key, Class<T> type) {
-        Object value = properties.get(key);
-        return type.isInstance(value) ? Optional.of((T) value) : Optional.empty();
+        Objects.requireNonNull(type, "type");
+        Object value = properties.get(Objects.requireNonNull(key, "key"));
+        return type.isInstance(value) ? Optional.of(type.cast(value)) : Optional.empty();
     }
 
     /**
@@ -65,7 +70,7 @@ public final class StorageConfig {
      * @return the storage type, or empty if not set
      */
     public Optional<String> getType() {
-        return getProperty("type", String.class);
+        return getProperty(TYPE_PROPERTY, String.class);
     }
 
     /**
@@ -77,12 +82,27 @@ public final class StorageConfig {
         return new Builder();
     }
 
+    /** Returns the standard configuration for the in-memory storage backend. */
+    public static StorageConfig memory() {
+        return builder().type(MEMORY_TYPE).build();
+    }
+
     @Override
     public String toString() {
-        return "StorageConfig{" +
-                "type=" + getType().orElse("not set") +
-                ", properties=" + properties +
-                '}';
+        return "StorageConfig{type=" + getType().orElse("not set")
+                + ", propertyKeys=" + properties.keySet() + '}';
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        return this == object
+                || object instanceof StorageConfig other
+                && properties.equals(other.properties);
+    }
+
+    @Override
+    public int hashCode() {
+        return properties.hashCode();
     }
 
     /**
@@ -90,12 +110,25 @@ public final class StorageConfig {
      */
     public static final class Builder {
 
-        private final Map<String, Object> properties = new HashMap<>();
+        private final Map<String, Object> properties = new LinkedHashMap<>();
 
         /**
          * Private constructor — use {@link StorageConfig#builder()}.
          */
         private Builder() {
+        }
+
+        /**
+         * Selects a storage plugin by type.
+         *
+         * @param type storage plugin name
+         * @return this builder
+         */
+        public Builder type(String type) {
+            if (type == null || type.isBlank()) {
+                throw new IllegalArgumentException("Storage type cannot be null or blank");
+            }
+            return property(TYPE_PROPERTY, type.trim());
         }
 
         /**
@@ -113,6 +146,12 @@ public final class StorageConfig {
             }
             if (value == null) {
                 throw new IllegalArgumentException("Property value cannot be null");
+            }
+            if (TYPE_PROPERTY.equals(key)) {
+                if (!(value instanceof String type) || type.isBlank()) {
+                    throw new IllegalArgumentException("Storage type must be a non-blank string");
+                }
+                value = type.trim();
             }
             properties.put(key, value);
             return this;

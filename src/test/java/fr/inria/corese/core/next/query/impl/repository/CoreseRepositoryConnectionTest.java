@@ -20,6 +20,7 @@ import fr.inria.corese.core.next.query.api.result.BindingSet;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 import fr.inria.corese.core.next.query.impl.dataset.CoreseDataset;
 import fr.inria.corese.core.next.storage.impl.memory.MemoryStorageManager;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -50,11 +51,15 @@ class CoreseRepositoryConnectionTest {
         vf = new CoreseValueFactory();
         MemoryStorageManager storage = MemoryStorageManager.builder().build();
         repository = new CoreseRepository(storage);
-        repository.init();
 
         // Insert one triple: alice knows bob
         storage.getMutationOperations().insertStatement(
                 vf.createStatement(iri(ALICE), iri(KNOWS), iri(BOB)));
+    }
+
+    @AfterEach
+    void tearDown() {
+        repository.close();
     }
 
     // -------------------------------------------------------------------------

@@ -3,6 +3,7 @@ package fr.inria.corese.core.next.query.impl.repository;
 import fr.inria.corese.core.next.query.api.exception.RepositoryException;
 import fr.inria.corese.core.next.query.api.repository.RepositoryConnection;
 import fr.inria.corese.core.next.storage.impl.memory.MemoryStorageManager;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -20,44 +21,60 @@ class CoreseRepositoryTest {
         repository = new CoreseRepository(storage);
     }
 
+    @AfterEach
+    void tearDown() {
+        repository.close();
+    }
+
     @Nested
     @DisplayName("Lifecycle")
     class Lifecycle {
 
         @Test
-        @DisplayName("Not initialized before init()")
-        void notInitializedBeforeInit() {
-            assertFalse(repository.isInitialized());
+        @DisplayName("Open immediately after construction")
+        void openAfterConstruction() {
+            assertTrue(repository.isOpen());
         }
 
         @Test
-        @DisplayName("Initialized after init()")
-        void initializedAfterInit() throws RepositoryException {
-            repository.init();
-            assertTrue(repository.isInitialized());
+        @DisplayName("Closed after close()")
+        void closedAfterClose() {
+            repository.close();
+            assertFalse(repository.isOpen());
         }
 
         @Test
-        @DisplayName("init() twice throws RepositoryException")
-        void initTwiceThrows() throws RepositoryException {
-            repository.init();
-            assertThrows(RepositoryException.class, repository::init);
+        @DisplayName("close() is idempotent")
+        void closeIsIdempotent() {
+            repository.close();
+            assertDoesNotThrow(repository::close);
         }
 
         @Test
-        @DisplayName("getConnection() before init() throws RepositoryException")
-        void getConnectionBeforeInitThrows() {
+        @DisplayName("getConnection() after close() throws RepositoryException")
+        void getConnectionAfterCloseThrows() {
+            repository.close();
             assertThrows(RepositoryException.class, repository::getConnection);
         }
 
         @Test
-        @DisplayName("getConnection() after init() returns open connection")
-        void getConnectionAfterInit() throws RepositoryException {
-            repository.init();
+        @DisplayName("getConnection() returns open connection")
+        void getConnectionReturnsOpenConnection() {
             try (RepositoryConnection conn = repository.getConnection()) {
                 assertTrue(conn.isOpen());
                 assertSame(repository, conn.getRepository());
             }
+        }
+
+        @Test
+        @DisplayName("Closing repository invalidates existing connections")
+        void closeInvalidatesConnections() {
+            RepositoryConnection connection = repository.getConnection();
+            repository.close();
+
+            assertFalse(connection.isOpen());
+            assertThrows(RepositoryException.class, () -> connection.setDataset(null));
+            connection.close();
         }
 
         @Test
@@ -74,7 +91,6 @@ class CoreseRepositoryTest {
         @Test
         @DisplayName("select() 1-liner executes SELECT query and returns materialized safe result")
         void selectOneLinerTest() throws RepositoryException {
-            repository.init();
             repository.update("INSERT DATA { <http://ex.org/s> <http://ex.org/p> <http://ex.org/o> }");
 
             var result = repository.select("SELECT * WHERE { ?s ?p ?o }");
@@ -89,7 +105,6 @@ class CoreseRepositoryTest {
         @Test
         @DisplayName("ask() 1-liner executes ASK query")
         void askOneLinerTest() throws RepositoryException {
-            repository.init();
             repository.update("INSERT DATA { <http://ex.org/s> <http://ex.org/p> <http://ex.org/o> }");
 
             assertTrue(repository.ask("ASK WHERE { <http://ex.org/s> ?p ?o }"));
@@ -99,7 +114,6 @@ class CoreseRepositoryTest {
         @Test
         @DisplayName("construct() 1-liner executes CONSTRUCT query and returns materialized safe result")
         void constructOneLinerTest() throws RepositoryException {
-            repository.init();
             repository.update("INSERT DATA { <http://ex.org/s> <http://ex.org/p> <http://ex.org/o> }");
 
             var result = repository.construct("CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o }");

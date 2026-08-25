@@ -61,7 +61,7 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
 
     @Override
     public boolean isOpen() {
-        return open;
+        return open && repository.isOpen();
     }
 
     @Override
@@ -131,34 +131,38 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
 
     @Override
     public void setDataset(Dataset dataset) {
+        checkOpen();
         this.connectionDataset = dataset;
     }
 
     @Override
     public Dataset getDataset() {
+        checkOpen();
         return connectionDataset;
     }
 
     @Override
     public void begin() throws RepositoryException {
-        checkOpen();
-        throw new RepositoryException("Transactions are not yet supported.");
+        checkTransactionsSupported();
     }
 
     @Override
     public void commit() throws RepositoryException {
-        checkOpen();
-        throw new RepositoryException("Transactions are not yet supported.");
+        checkTransactionsSupported();
     }
 
     @Override
     public void rollback() throws RepositoryException {
+        checkTransactionsSupported();
+    }
+
+    private void checkTransactionsSupported() throws RepositoryException {
         checkOpen();
         throw new RepositoryException("Transactions are not yet supported.");
     }
 
     private void checkOpen() {
-        if (!open) {
+        if (!isOpen()) {
             throw new RepositoryException("This connection is closed.");
         }
     }

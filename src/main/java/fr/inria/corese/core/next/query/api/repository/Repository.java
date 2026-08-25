@@ -8,6 +8,7 @@ import fr.inria.corese.core.next.query.api.exception.RepositoryException;
 import fr.inria.corese.core.next.query.api.result.BindingSet;
 import fr.inria.corese.core.next.query.api.result.GraphQueryResult;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
+import fr.inria.corese.core.next.query.Repositories;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,41 +16,34 @@ import java.util.List;
 /**
  * A Corese repository that contains RDF data that can be queried and updated.
  *
+ * <p>Repositories are created open through {@link Repositories}. Common query
+ * methods manage their own connections and return materialized, connection-safe
+ * results. Use {@link #getConnection()} for prepared operations and progressive
+ * result consumption.</p>
+ *
  * @see RepositoryConnection
+ * @see Repositories
  */
 public interface Repository extends AutoCloseable {
 
     /**
-     * Initializes the repository, making it ready for use.
+     * Returns whether this repository is open and can create connections.
+     * Repositories returned by the public factory are open immediately.
      *
-     * @throws RepositoryException if initialization fails (e.g., I/O errors, corrupt data)
-     *                             or if the repository is already initialized
+     * @return {@code true} until {@link #close()} is called
      */
-    void init() throws RepositoryException;
+    boolean isOpen();
 
     /**
-     * Checks whether the repository has been successfully initialized.
+     * Closes this repository and the storage backend it owns.
      *
-     * @return {@code true} if initialized and ready for use, {@code false} otherwise
-     */
-    boolean isInitialized();
-
-    /**
-     * Shuts down the repository and releases all resources.
+     * <p>Closing a repository is idempotent. Existing connections become closed
+     * and no new connection can be created.</p>
      *
-     * @throws RepositoryException if shutdown fails (e.g., unable to flush data)
-     */
-    void shutDown() throws RepositoryException;
-
-    /**
-     * Closes the repository by calling {@link #shutDown()}.
-     *
-     * @throws RepositoryException if shutdown fails
+     * @throws RepositoryException if the underlying storage cannot be closed
      */
     @Override
-    default void close() throws RepositoryException {
-        shutDown();
-    }
+    void close() throws RepositoryException;
 
     /**
      * Checks whether the repository supports write operations.
@@ -62,7 +56,7 @@ public interface Repository extends AutoCloseable {
      * Opens a new connection to this repository.
      *
      * @return a new {@link RepositoryConnection}
-     * @throws RepositoryException if the repository is not initialized or closed
+     * @throws RepositoryException if the repository is closed
      */
     RepositoryConnection getConnection() throws RepositoryException;
 

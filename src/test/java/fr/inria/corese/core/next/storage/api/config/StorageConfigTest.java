@@ -18,10 +18,12 @@ class StorageConfigTest {
     @DisplayName("Should build config with all properties set")
     void testBuilderWithAllProperties() {
         StorageConfig config = StorageConfig.builder()
+                .type("memory")
                 .property("timeout", 5000)
                 .property("maxConnections", 100)
                 .build();
 
+        assertEquals(Optional.of("memory"), config.getType());
         assertEquals(Optional.of(5000), config.getProperty("timeout", Integer.class));
         assertEquals(Optional.of(100), config.getProperty("maxConnections", Integer.class));
     }
@@ -51,6 +53,12 @@ class StorageConfigTest {
 
         assertThrows(IllegalArgumentException.class,
                 () -> builder.property("key", null));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> builder.type(" "));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> builder.property("type", 42));
     }
 
     @Test
@@ -118,13 +126,31 @@ class StorageConfigTest {
     @DisplayName("Should include the configuration type in toString() output")
     void testToString() {
         StorageConfig config = StorageConfig.builder()
-                .property("type", "memory")
-                .property("test", "value")
+                .type("memory")
+                .property("password", "secret")
                 .build();
 
         String str = config.toString();
         assertTrue(str.contains("StorageConfig"));
         assertTrue(str.contains("memory"));
+        assertFalse(str.contains("secret"));
+    }
+
+    @Test
+    @DisplayName("Should expose a standard memory configuration")
+    void memoryConfiguration() {
+        StorageConfig config = StorageConfig.memory();
+
+        assertEquals(Optional.of("memory"), config.getType());
+    }
+
+    @Test
+    @DisplayName("Should reject null lookup arguments")
+    void lookupValidation() {
+        StorageConfig config = StorageConfig.memory();
+
+        assertThrows(NullPointerException.class, () -> config.getProperty(null));
+        assertThrows(NullPointerException.class, () -> config.getProperty("type", null));
     }
 
 
@@ -138,5 +164,7 @@ class StorageConfigTest {
         StorageConfig config2 = builder.build();
 
         assertNotSame(config1, config2);
+        assertEquals(config1, config2);
+        assertEquals(config1.hashCode(), config2.hashCode());
     }
 }

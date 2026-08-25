@@ -1,9 +1,11 @@
 /**
  * Public SPARQL query API for Corese.
  *
- * <p>Entry point: obtain a {@link fr.inria.corese.core.next.query.api.repository.RepositoryConnection}
- * from a {@link fr.inria.corese.core.next.query.api.repository.Repository}, then prepare
- * one of the four query types:</p>
+ * <p>Create a ready-to-use repository through
+ * {@link fr.inria.corese.core.next.query.Repositories}. The repository convenience
+ * methods cover common queries; obtain a
+ * {@link fr.inria.corese.core.next.query.api.repository.RepositoryConnection}
+ * when prepared operations or progressive results are needed.</p>
  *
  * <ul>
  *   <li>{@link fr.inria.corese.core.next.query.api.TupleQuery} — SPARQL SELECT</li>

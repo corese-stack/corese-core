@@ -15,6 +15,9 @@ import fr.inria.corese.core.next.query.api.*;
  * manage datasets (FROM / FROM NAMED), and optionally participate in transactions.
  * </p>
  *
+ * <p>Connections are invalidated when either the connection or their repository
+ * is closed. Closing a connection is idempotent and never closes its repository.</p>
+ *
  *
  * @see Repository
  * @see TupleQuery
@@ -143,7 +146,8 @@ public interface RepositoryConnection extends AutoCloseable {
     void rollback() throws RepositoryException;
 
     /**
-     * Closes this connection and releases any resources it holds.
+     * Closes this connection and releases any resources it holds. Repeated calls
+     * have no effect.
      *
      * @throws RepositoryException if closing the connection fails
      */

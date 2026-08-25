@@ -12,8 +12,8 @@ import fr.inria.corese.core.next.query.api.result.Binding;
 import fr.inria.corese.core.next.query.api.result.BindingSet;
 import fr.inria.corese.core.next.query.api.result.GraphQueryResult;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
-import fr.inria.corese.core.next.query.impl.repository.CoreseRepository;
-import fr.inria.corese.core.next.storage.impl.memory.MemoryStorageManager;
+import fr.inria.corese.core.next.query.Repositories;
+import fr.inria.corese.core.next.query.api.repository.Repository;
 import org.junit.jupiter.api.Test;
 
 import java.io.StringReader;
@@ -126,8 +126,7 @@ class CoreseIOTest {
 
     @Test
     void evaluatesAndExportsRepositoryQueriesInOneCall() throws Exception {
-        try (CoreseRepository repository = new CoreseRepository(MemoryStorageManager.builder().build())) {
-            repository.init();
+        try (Repository repository = Repositories.create()) {
             repository.update("INSERT DATA { <http://example/s> <http://example/p> <http://example/o> }");
 
             StringWriter select = new StringWriter();

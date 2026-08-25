@@ -1,7 +1,8 @@
 /**
  * SPARQL query and update services.
  *
- * <p>{@code api} contains the supported public contracts; {@code impl} contains the Corese
- * implementation and internal execution machinery.</p>
+ * <p>{@link fr.inria.corese.core.next.query.Repositories} is the public creation
+ * entry point. {@code api} contains the supported contracts; {@code impl}
+ * contains the Corese implementation and internal execution machinery.</p>
  */
 package fr.inria.corese.core.next.query;

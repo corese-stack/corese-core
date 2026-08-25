@@ -7,9 +7,11 @@ import fr.inria.corese.core.next.query.api.repository.Repository;
 import fr.inria.corese.core.next.query.api.repository.RepositoryConnection;
 import fr.inria.corese.core.next.storage.api.StorageManager;
 import fr.inria.corese.core.next.storage.api.lifecycle.LifecycleState;
+import fr.inria.corese.core.next.storage.api.lifecycle.StorageLifecycle;
 import fr.inria.corese.core.next.storage.api.config.StorageConfig;
 import fr.inria.corese.core.next.storage.api.exception.StorageException;
 
+import java.util.Objects;
 
 /**
  * Corese implementation of {@link Repository}.
@@ -19,66 +21,75 @@ import fr.inria.corese.core.next.storage.api.exception.StorageException;
  * {@link #getConnection()} and interact only with the public query API —
  * the parser, AST, bridge, and KGRAM remain invisible.</p>
  *
- * <h2>Usage</h2>
- * <pre>{@code
- * StorageManager storage = MemoryStorageManager.builder().build();
- * Repository repo = new CoreseRepository(storage);
- * repo.init();
- *
- * try (RepositoryConnection conn = repo.getConnection()) {
- *     TupleQuery q = conn.prepareTupleQuery(QueryLanguage.SPARQL, "SELECT * WHERE { ?s ?p ?o }");
- *     try (TupleQueryResult result = q.evaluate()) {
- *         result.stream().forEach(bs -> System.out.println(bs));
- *     }
- * }
- * repo.shutDown();
- * }</pre>
+ * <p>This implementation class is instantiated by the public repository
+ * factory. The repository takes ownership of its storage manager and is ready
+ * for use when construction returns.</p>
  */
 public final class CoreseRepository implements Repository {
 
     private final StorageManager storage;
+    private final StorageLifecycle lifecycle;
     private final ValueFactory valueFactory;
+    private volatile boolean open;
 
     public CoreseRepository(StorageManager storage) {
-        this.storage = storage;
-        this.valueFactory = new CoreseValueFactory();
+        this(storage, StorageConfig.builder().build());
     }
 
-    @Override
-    public void init() throws RepositoryException {
-        if (isInitialized()) {
-            throw new RepositoryException("Repository is already initialized.");
+    public CoreseRepository(StorageManager storage, StorageConfig config) {
+        this.storage = Objects.requireNonNull(storage, "storage");
+        this.lifecycle = Objects.requireNonNull(storage.getLifecycle(), "storage lifecycle");
+        this.valueFactory = new CoreseValueFactory();
+        initialize(Objects.requireNonNull(config, "config"));
+        this.open = true;
+    }
+
+    private void initialize(StorageConfig config) {
+        LifecycleState state = lifecycle.getState();
+        if (state == LifecycleState.RUNNING) {
+            return;
+        }
+        if (state != LifecycleState.NOT_INITIALIZED) {
+            throw new RepositoryException(
+                    "Cannot create a repository from storage in state " + state + '.');
         }
         try {
-            storage.getLifecycle().initialize(StorageConfig.builder().build());
-        } catch (StorageException e) {
+            lifecycle.initialize(config);
+        } catch (StorageException | IllegalStateException e) {
             throw new RepositoryException("Failed to initialize repository: " + e.getMessage(), e);
         }
     }
 
     @Override
-    public boolean isInitialized() {
-        return storage.getLifecycle().getState() == LifecycleState.RUNNING;
+    public boolean isOpen() {
+        return open && lifecycle.getState() == LifecycleState.RUNNING;
     }
 
     @Override
-    public void shutDown() throws RepositoryException {
+    public synchronized void close() throws RepositoryException {
+        if (!open) {
+            return;
+        }
+        open = false;
+        if (lifecycle.getState() != LifecycleState.RUNNING) {
+            return;
+        }
         try {
-            storage.getLifecycle().shutdown();
-        } catch (StorageException e) {
+            lifecycle.shutdown();
+        } catch (StorageException | IllegalStateException e) {
             throw new RepositoryException("Failed to shut down repository: " + e.getMessage(), e);
         }
     }
 
     @Override
     public boolean isWritable() {
-        return isInitialized();
+        return isOpen();
     }
 
     @Override
     public RepositoryConnection getConnection() throws RepositoryException {
-        if (!isInitialized()) {
-            throw new RepositoryException("Repository is not initialized. Call init() first.");
+        if (!isOpen()) {
+            throw new RepositoryException("This repository is closed.");
         }
         return new CoreseRepositoryConnection(this, storage);
     }
