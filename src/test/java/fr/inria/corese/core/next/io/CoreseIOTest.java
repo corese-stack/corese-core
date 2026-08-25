@@ -16,9 +16,13 @@ import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 import fr.inria.corese.core.next.query.Repositories;
 import fr.inria.corese.core.next.query.api.repository.Repository;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -31,6 +35,32 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CoreseIOTest {
+
+    @Test
+    void usesTheDocumentUriAsTheBaseWhenReadingAPath(@TempDir Path directory) throws Exception {
+        Path source = directory.resolve("document.ttl");
+        Files.writeString(source, "<subject> <predicate> <object> .");
+
+        Model model = CoreseIO.read(source, RDFFormat.TURTLE);
+
+        assertTrue(model.subjects().stream()
+                .anyMatch(subject -> Path.of(URI.create(subject.stringValue()))
+                        .equals(directory.resolve("subject"))));
+    }
+
+    @Test
+    void preservesAnExplicitBaseWhenReadingAPath(@TempDir Path directory) throws Exception {
+        Path source = directory.resolve("document.ttl");
+        Files.writeString(source, "<subject> <predicate> <object> .");
+
+        Model model = CoreseIO.read(
+                source,
+                RDFFormat.TURTLE,
+                RDFParserOptions.builder().baseIRI("http://example/").build());
+
+        assertTrue(model.subjects().stream()
+                .anyMatch(subject -> subject.stringValue().equals("http://example/subject")));
+    }
 
     @Test
     void readsAndWritesRdfWithoutImplementationImports() {

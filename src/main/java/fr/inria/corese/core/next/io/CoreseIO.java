@@ -4,6 +4,7 @@ import fr.inria.corese.core.next.data.Models;
 import fr.inria.corese.core.next.data.Values;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
+import fr.inria.corese.core.next.data.api.io.option.BaseIRIOptions;
 import fr.inria.corese.core.next.data.api.io.option.RDFParsingOptions;
 import fr.inria.corese.core.next.data.api.io.option.RDFSerializationOptions;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
@@ -96,17 +97,28 @@ public final class CoreseIO {
         return read(source, format, target, VALUE_FACTORY, options);
     }
 
-    /** Reads UTF-8 RDF from a file into a new in-memory model. */
+    /**
+     * Reads UTF-8 RDF from a file into a new in-memory model, using the file
+     * URI as the base IRI.
+     */
     public static Model read(Path source, RDFFormat format) {
         Model target = Models.create();
         RDF_PARSERS.createRDFParser(format, target, VALUE_FACTORY).parse(source);
         return target;
     }
 
-    /** Reads configured UTF-8 RDF from a file into a new in-memory model. */
+    /**
+     * Reads configured UTF-8 RDF from a file into a new in-memory model. An
+     * explicit {@link BaseIRIOptions} value takes precedence over the file URI.
+     */
     public static Model read(Path source, RDFFormat format, RDFParsingOptions options) {
         Model target = Models.create();
-        RDF_PARSERS.createRDFParser(format, target, VALUE_FACTORY, options).parse(source);
+        RDFParser parser = RDF_PARSERS.createRDFParser(format, target, VALUE_FACTORY, options);
+        if (options instanceof BaseIRIOptions baseOptions && baseOptions.getBaseIRI() != null) {
+            parser.parse(source, baseOptions.getBaseIRI());
+        } else {
+            parser.parse(source);
+        }
         return target;
     }
 

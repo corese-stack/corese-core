@@ -62,10 +62,13 @@ public interface RDFParser {
      */
     void parse(Reader reader, String baseURI) throws ParsingException;
 
-    /** Reads UTF-8 RDF from a file and closes the file opened by this method. */
+    /**
+     * Reads UTF-8 RDF from a file, using the file URI as the base IRI, and
+     * closes the file opened by this method.
+     */
     default void parse(Path path) throws ParsingException {
         try (Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
-            parse(reader);
+            parse(reader, path.toAbsolutePath().normalize().toUri().toString());
         } catch (IOException e) {
             throw new ParsingException("Could not read RDF from " + path, e);
         }
