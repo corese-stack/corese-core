@@ -2,6 +2,7 @@ package fr.inria.corese.core.sparql.triple.parser;
 
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.sparql.triple.parser.AccessRight.AccessRights;
 import fr.inria.corese.core.sparql.triple.parser.AccessRight.AccessModes;
 
 import java.util.HashMap;
@@ -31,7 +32,7 @@ public class AccessRightDefinition {
         setSingleton(new AccessRightDefinition());
     }
     
-    public class AccessMap extends HashMap<String, AccessRight.AccessRights> {
+    public class AccessMap extends HashMap<String, AccessRights> {
 
 
         /**
@@ -40,11 +41,11 @@ public class AccessRightDefinition {
          * otherwise return null
          * @return
          */
-        AccessRight.AccessRights getAccess(Node node) {
+        AccessRights getAccess(Node node) {
             if (isEmpty()) {
                 return null;
             }
-            AccessRight.AccessRights b = get(node.getLabel());
+            AccessRights b = get(node.getLabel());
             if (b != null) {
                 return b;
             }
@@ -111,22 +112,22 @@ public class AccessRightDefinition {
      * res is the URI|namespace access right granted for edge
      * @return
      */
-    AccessRight.AccessRights getAccess(Edge edge, AccessRight.AccessRights def) {
-        AccessRight.AccessRights res = getAccess(edge);
+    AccessRights getAccess(Edge edge, AccessRights def) {
+        AccessRights res = getAccess(edge);
         if (res == null) {
             return def;
         }
         return res;
     }
     
-    AccessRight.AccessRights getAccess(Edge edge) {
+    AccessRights getAccess(Edge edge) {
        return getAccessDirect(edge);
     }
     
     /**
      * URI of default may overload namespace of current (if current has no URI)
      */
-    AccessRight.AccessRights getAccessDirect(Edge edge) {
+    AccessRights getAccessDirect(Edge edge) {
         if (size() == 0) {
             return null;
         }
@@ -134,23 +135,23 @@ public class AccessRightDefinition {
     }  
 
 
-    AccessRight.AccessRights get(AccessRight.AccessRights current, AccessRight.AccessRights defaut) {
+    AccessRights get(AccessRights current, AccessRights defaut) {
         return (current == null) ? defaut : current;
     }
 
 
-    AccessRight.AccessRights getAccessOrDefault(Edge edge) {
-        AccessRight.AccessRights res = getAccessBasic(edge);
+    AccessRights getAccessOrDefault(Edge edge) {
+        AccessRights res = getAccessBasic(edge);
         if (res == null) {
             return getSingleton().getAccessBasic(edge);
         }
         return res;
     }
 
-    AccessRight.AccessRights getAccessBasic(Edge edge) {
+    AccessRights getAccessBasic(Edge edge) {
         if (size() > 0) {
-            AccessRight.AccessRights node   = combine(getSubject(edge),   getObject(edge));
-            AccessRight.AccessRights access = combine(getPredicate(edge), getGraph(edge));
+            AccessRights node   = combine(getSubject(edge),   getObject(edge));
+            AccessRights access = combine(getPredicate(edge), getGraph(edge));
             return combine(node, access);
         }
         return null;
@@ -161,14 +162,14 @@ public class AccessRightDefinition {
     }
 
     
-    AccessRight.AccessRights combine(AccessRight.AccessRights b1, AccessRight.AccessRights b2) {
+    AccessRights combine(AccessRights b1, AccessRights b2) {
         if (getMode() == AccessModes.BI_MODE) {
             return combineBinary(b1, b2);
         }
         return moreRestricted(b1, b2);
     }
 
-    AccessRight.AccessRights combineBinary(AccessRight.AccessRights b1, AccessRight.AccessRights b2) {
+    AccessRights combineBinary(AccessRights b1, AccessRights b2) {
         if (b1 == null) {
             return b2;
         }
@@ -179,7 +180,7 @@ public class AccessRightDefinition {
     }
 
 
-    AccessRight.AccessRights moreRestricted(AccessRight.AccessRights b1, AccessRight.AccessRights b2) {
+    AccessRights moreRestricted(AccessRights b1, AccessRights b2) {
         if (b1 == null) {
             return b2;
         }
@@ -192,22 +193,22 @@ public class AccessRightDefinition {
 
   
     // return null when there is no uri access right
-    AccessRight.AccessRights getPredicate(Edge edge) {
+    AccessRights getPredicate(Edge edge) {
         return getPredicate().getAccess(edge.getProperty());
     }
 
-    AccessRight.AccessRights getGraph(Edge edge) {
+    AccessRights getGraph(Edge edge) {
          if (edge.getGraph() == null) {
             return null;
         }
         return getGraph().getAccess(edge.getGraph());
     }
 
-    AccessRight.AccessRights getSubject(Edge edge) {
+    AccessRights getSubject(Edge edge) {
         return getNode().getAccess(edge.getNode(0));
     }
 
-    AccessRight.AccessRights getObject(Edge edge) {
+    AccessRights getObject(Edge edge) {
         return getNode().getAccess(edge.getNode(1));
     }
     
