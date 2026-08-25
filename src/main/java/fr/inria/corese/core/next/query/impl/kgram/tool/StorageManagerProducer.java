@@ -4,19 +4,27 @@ import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
+import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
 import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
+import fr.inria.corese.core.next.query.impl.kgram.api.core.BindingContext;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Edge;
+import fr.inria.corese.core.next.query.impl.kgram.api.core.Expr;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Regex;
 import fr.inria.corese.core.next.query.impl.kgram.api.query.Environment;
+import fr.inria.corese.core.next.query.impl.kgram.api.query.ProcessVisitor;
+import fr.inria.corese.core.next.query.impl.kgram.core.Eval;
 import fr.inria.corese.core.next.query.impl.kgram.core.Exp;
 import fr.inria.corese.core.next.query.impl.kgram.core.Mapping;
 import fr.inria.corese.core.next.query.impl.kgram.core.Mappings;
 import fr.inria.corese.core.next.query.impl.kgram.core.Query;
+import fr.inria.corese.core.next.query.impl.kgram.event.KgramEventDispatcher;
+import fr.inria.corese.core.next.query.impl.kgram.path.Path;
 import fr.inria.corese.core.next.storage.api.StorageManager;
 import fr.inria.corese.core.next.storage.api.model.StatementPattern;
 import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +73,7 @@ public final class StorageManagerProducer extends ProducerDefault {
             return List.of();
         }
 
-        try (Stream<fr.inria.corese.core.next.data.api.model.Statement> statements =
+        try (Stream<Statement> statements =
                      storage.queries().find(queryPattern.statementPattern())) {
             return statements
                     .map(StorageManagerEdge::new)
@@ -258,38 +266,49 @@ public final class StorageManagerProducer extends ProducerDefault {
      * Language - Evaluation of Graph</a>
      */
     private ContextSelection contextSelection(Node graphNode, List<Node> from, Environment environment) {
-        List<Node> activeGraphs = from;
+        List<Node> activeGraphs = selectActiveGraphs(graphNode, from, environment);
+        if (graphNode != null) {
+            return selectExplicitGraphContext(graphNode, activeGraphs, environment);
+        }
+        return selectDatasetContexts(activeGraphs, environment);
+    }
+
+    private List<Node> selectActiveGraphs(Node graphNode, List<Node> from, Environment environment) {
         if (isExplicitDataset(environment)) {
-            activeGraphs = graphNode == null
+            return graphNode == null
                     ? environment.getQuery().getFrom()
                     : environment.getQuery().getNamed();
         }
-        if (graphNode != null) {
-            // GRAPH <g>: evaluate in the requested named graph, provided it belongs
-            // to the active named dataset restriction.
-            Node resolvedGraphNode = resolve(graphNode, environment);
-            if (resolvedGraphNode == null) {
-                return isExplicitDataset(environment) && (activeGraphs == null || activeGraphs.isEmpty())
-                        ? ContextSelection.emptyResult()
-                        : ContextSelection.allContexts();
-            }
-            Value value = StorageManagerKgramValues.rdfValue(resolvedGraphNode, valueFactory);
-            if (!(value instanceof Resource resource)) {
-                return ContextSelection.emptyResult();
-            }
-            if (!matchesFrom(resolvedGraphNode, activeGraphs, environment)) {
-                return ContextSelection.emptyResult();
-            }
-            return ContextSelection.of(List.of(resource));
-        }
+        return from;
+    }
 
+    private ContextSelection selectExplicitGraphContext(
+            Node graphNode,
+            List<Node> activeGraphs,
+            Environment environment) {
+        Node resolvedGraphNode = resolve(graphNode, environment);
+        if (resolvedGraphNode == null) {
+            return isExplicitDataset(environment) && (activeGraphs == null || activeGraphs.isEmpty())
+                    ? ContextSelection.emptyResult()
+                    : ContextSelection.allContexts();
+        }
+        Value value = StorageManagerKgramValues.rdfValue(resolvedGraphNode, valueFactory);
+        if (!(value instanceof Resource resource)) {
+            return ContextSelection.emptyResult();
+        }
+        if (!matchesFrom(resolvedGraphNode, activeGraphs, environment)) {
+            return ContextSelection.emptyResult();
+        }
+        return ContextSelection.of(List.of(resource));
+    }
+
+    private ContextSelection selectDatasetContexts(List<Node> activeGraphs, Environment environment) {
         if (activeGraphs == null || activeGraphs.isEmpty()) {
             return isExplicitDataset(environment)
                     ? ContextSelection.emptyResult()
                     : ContextSelection.allContexts();
         }
 
-        // No explicit GRAPH: use the dataset restriction as storage contexts.
         List<Resource> contexts = new ArrayList<>();
         for (Node node : activeGraphs) {
             Node resolvedNode = resolve(node, environment);
@@ -520,12 +539,12 @@ public final class StorageManagerProducer extends ProducerDefault {
         }
 
         @Override
-        public fr.inria.corese.core.next.query.impl.kgram.api.core.BindingContext getBind() {
+        public BindingContext getBind() {
             return delegate == null ? null : delegate.getBind();
         }
 
         @Override
-        public void setBind(fr.inria.corese.core.next.query.impl.kgram.api.core.BindingContext bindingContext) {
+        public void setBind(BindingContext bindingContext) {
             if (delegate != null) {
                 delegate.setBind(bindingContext);
             }
@@ -542,7 +561,7 @@ public final class StorageManagerProducer extends ProducerDefault {
         }
 
         @Override
-        public Node getNode(fr.inria.corese.core.next.query.impl.kgram.api.core.Expr varExpr) {
+        public Node getNode(Expr varExpr) {
             return delegate == null ? null : delegate.getNode(varExpr);
         }
 
@@ -572,7 +591,7 @@ public final class StorageManagerProducer extends ProducerDefault {
         }
 
         @Override
-        public fr.inria.corese.core.next.query.impl.kgram.path.Path getPath(Node queryNode) {
+        public Path getPath(Node queryNode) {
             return delegate == null ? null : delegate.getPath(queryNode);
         }
 
@@ -582,7 +601,7 @@ public final class StorageManagerProducer extends ProducerDefault {
         }
 
         @Override
-        public fr.inria.corese.core.next.query.impl.kgram.event.KgramEventDispatcher getEventManager() {
+        public KgramEventDispatcher getEventManager() {
             return delegate == null ? null : delegate.getEventManager();
         }
 
@@ -653,12 +672,12 @@ public final class StorageManagerProducer extends ProducerDefault {
         }
 
         @Override
-        public Node get(fr.inria.corese.core.next.query.impl.kgram.api.core.Expr varExpr) {
+        public Node get(Expr varExpr) {
             return delegate == null ? null : delegate.get(varExpr);
         }
 
         @Override
-        public fr.inria.corese.core.sparql.triple.parser.ASTExtension getExtension() {
+        public ASTExtension getExtension() {
             return delegate == null ? null : delegate.getExtension();
         }
 
@@ -668,19 +687,19 @@ public final class StorageManagerProducer extends ProducerDefault {
         }
 
         @Override
-        public fr.inria.corese.core.next.query.impl.kgram.core.Eval getEval() {
+        public Eval getEval() {
             return delegate == null ? null : delegate.getEval();
         }
 
         @Override
-        public void setEval(fr.inria.corese.core.next.query.impl.kgram.core.Eval eval) {
+        public void setEval(Eval eval) {
             if (delegate != null) {
                 delegate.setEval(eval);
             }
         }
 
         @Override
-        public fr.inria.corese.core.next.query.impl.kgram.api.query.ProcessVisitor getVisitor() {
+        public ProcessVisitor getVisitor() {
             return delegate == null ? null : delegate.getVisitor();
         }
 
