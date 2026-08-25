@@ -2,6 +2,8 @@ package fr.inria.corese.core.sparql.triple.parser;
 
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.sparql.triple.parser.AccessRight.AccessModes;
+
 import java.util.HashMap;
 
 /**
@@ -154,13 +156,13 @@ public class AccessRightDefinition {
         return null;
     }
     
-    int getMode() {
+    AccessModes getMode() {
         return AccessRight.getMode();
     }
 
     
     AccessRight.AccessRights combine(AccessRight.AccessRights b1, AccessRight.AccessRights b2) {
-        if (getMode() == AccessRight.BI_MODE) {
+        if (getMode() == AccessModes.BI_MODE) {
             return combineBinary(b1, b2);
         }
         return moreRestricted(b1, b2);

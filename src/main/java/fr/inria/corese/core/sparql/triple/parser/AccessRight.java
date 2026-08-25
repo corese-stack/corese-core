@@ -2,6 +2,7 @@ package fr.inria.corese.core.sparql.triple.parser;
 
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.triple.parser.AccessRight.AccessRights;
 
 /**
  * 
@@ -39,10 +40,7 @@ public class AccessRight {
         }
 
     }
-
-    public static final int GT_MODE  = 0;
-    public static final int EQ_MODE  = 1;
-    public static final int BI_MODE  = 2;
+    public enum AccessModes { GT_MODE, EQ_MODE, BI_MODE }
 
     public static final byte ZERO = 0b0000000;
     // available for access right:
@@ -59,7 +57,7 @@ public class AccessRight {
 
     public static final byte[] BINARY = {ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN};
 
-    public static final int DEFAULT_MODE = GT_MODE;
+    public static final AccessModes DEFAULT_MODE = AccessModes.GT_MODE;
     
     public static final String GT_ACCESS_MODE    = NSManager.EXT+"gt";
     public static final String EQ_ACCESS_MODE    = NSManager.EXT+"eq";
@@ -87,7 +85,7 @@ public class AccessRight {
     private AccessRights[] whereList = new AccessRights[0];
     private AccessRights where    = DEFAULT;
         
-    private static int mode = DEFAULT_MODE;
+    private static AccessModes mode = DEFAULT_MODE;
     
     private AccessRightDefinition insertRightDefinition;
     private AccessRightDefinition deleteRightDefinition;
@@ -338,24 +336,24 @@ public class AccessRight {
     }
     
    
-    public static int getMode() {
+    public static AccessModes getMode() {
         return mode;
     }
     
-    public static void setMode(int m) {
+    public static void setMode(AccessModes m) {
         mode = m;
     }
     
     public static void gtMode() {
-        setMode(GT_MODE);
+        setMode(AccessModes.GT_MODE);
     }
     
     public static void eqMode() {
-        setMode(EQ_MODE);
+        setMode(AccessModes.EQ_MODE);
     }
     
      public static void biMode() {
-        setMode(BI_MODE);
+        setMode(AccessModes.BI_MODE);
     }
     
 
