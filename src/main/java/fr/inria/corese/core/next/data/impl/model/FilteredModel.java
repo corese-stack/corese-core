@@ -1,6 +1,5 @@
 package fr.inria.corese.core.next.data.impl.model;
 
-import java.io.Serial;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Objects;
@@ -22,10 +21,6 @@ public abstract class FilteredModel extends AbstractModel {
 
     // The wrapped RDF model to filter.
     private final Model model;
-
-    // Serialization identifier.
-    @Serial
-    private static final long serialVersionUID = 1L;
 
     // RDF filter pattern: subject, predicate, object, and contexts.
     protected Resource subjectFilter;

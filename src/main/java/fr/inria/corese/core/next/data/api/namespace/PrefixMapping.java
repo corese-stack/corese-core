@@ -92,14 +92,14 @@ public interface PrefixMapping {
      * @param prefix    the prefix
      * @param namespace the namespace IRI
      * @throws IllegalArgumentException if prefix or namespace is invalid/null
-     * @throws IllegalArgumentException if prefix doesn't match XML NCName rules
-     *                                  (except empty string which is always valid)
+     * @throws IllegalArgumentException if prefix contains a colon
      */
     void setPrefix(String prefix, String namespace);
 
     /**
      * Sets a namespace using a Namespace object.
-     * Equivalent to setPrefix(namespace.getPrefix(), namespace.getName()).
+     * Equivalent to
+     * {@code setPrefix(namespace.getPrefix(), namespace.getNamespace())}.
      *
      * @param namespace the Namespace object to register
      * @throws IllegalArgumentException if namespace is null or invalid
@@ -116,7 +116,7 @@ public interface PrefixMapping {
 
     /**
      * Removes all prefix mappings.
-     * This does not affect the default namespace.
+     * This also unsets the default namespace.
      */
     void clear();
 
@@ -156,14 +156,6 @@ public interface PrefixMapping {
     String compressIRI(String iri);
 
     /**
-     * Checks if a prefix is valid according to XML NCName rules.
-     *
-     * @param prefix the prefix to validate
-     * @return true if the prefix is valid, false otherwise
-     */
-    boolean isValidPrefix(String prefix);
-
-    /**
      * Copies all prefix mappings from another handler.
      * Existing mappings in this handler are overwritten if prefixes match.
      *
@@ -187,12 +179,10 @@ public interface PrefixMapping {
     boolean isEmpty();
 
     /**
-     * Creates a deep copy of this handler.
-     * The returned handler is independent and can be modified without
+     * Creates an independent copy of this mapping. The returned mapping can be modified without
      * affecting the original.
      *
      * @return a new PrefixMapping instance with same mappings
      */
-    @SuppressWarnings("java:S2975")
-    PrefixMapping clone();
+    PrefixMapping copy();
 }

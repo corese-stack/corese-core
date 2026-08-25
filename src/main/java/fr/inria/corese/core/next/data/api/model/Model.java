@@ -1,6 +1,5 @@
 package fr.inria.corese.core.next.data.api.model;
 
-import java.io.Serializable;
 import java.util.Optional;
 import java.util.Set;
 
@@ -8,18 +7,19 @@ import fr.inria.corese.core.next.data.api.namespace.Namespace;
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.term.Value;
-import fr.inria.corese.core.next.data.api.exception.IncorrectOperationException;
 
 /**
- * Represents an RDF model, a set of statements.
- * This is the central interface for handling RDF data.
- * Statements can have zero or several resources as contexts to represent
- * named graphs within the model.
- * A model also handles a set of namespaces. There can be different prefixes for
- * the same namespace, although it is ill-advised, and how it affects serialization
- * is implementation-dependent. There cannot be two namespaces with the same prefix.
+ * A mutable, set-based collection of RDF statements.
+ *
+ * <p>Each statement belongs either to the default graph (a {@code null}
+ * context) or to one named graph. Operations accepting several contexts apply
+ * independently to each selected graph. Prefix declarations are metadata used
+ * by parsers and serializers; they are not RDF statements.</p>
+ *
+ * <p>Models are not required to support Java object serialization. Use an RDF
+ * serializer when data must be persisted or exchanged.</p>
  */
-public interface Model extends Set<Statement>, Serializable {
+public interface Model extends Set<Statement> {
 
     /**
      * Returns the namespaces defined in this model.
@@ -39,9 +39,8 @@ public interface Model extends Set<Statement>, Serializable {
     }
 
     /**
-     * @return a "read-only" view of this model. "query" operations are possible,
-     *         such as {@code filter()} on {@code contains()} but modifications will
-     *         throw {@link IncorrectOperationException}.
+     * @return a live, read-only view of this model; query operations remain
+     *         available and mutation attempts fail
      */
     Model unmodifiable();
 
@@ -50,7 +49,7 @@ public interface Model extends Set<Statement>, Serializable {
      * @param prefix a prefix for the namespace. It should be unique in the model.
      * @param name   the IRI of the namespace. It should be a valid IRI.
      * @return the new Namespace created with the given prefix and name.
-     * @throws IncorrectOperationException if the Model is unmodifiable.
+     * @throws UnsupportedOperationException if the model is unmodifiable
      */
     Namespace setNamespace(String prefix, String name);
 
@@ -58,7 +57,7 @@ public interface Model extends Set<Statement>, Serializable {
      * Set the namespace of this model. The prefix should be unique in the model.
      *
      * @param namespace the namespace object to be added.
-     * @throws IncorrectOperationException if the Model is unmodifiable.
+     * @throws UnsupportedOperationException if the model is unmodifiable
      */
     void setNamespace(Namespace namespace);
 
@@ -66,7 +65,7 @@ public interface Model extends Set<Statement>, Serializable {
      * @param prefix the prefix of the namespace to be removed.
      * @return the removed namespace, or an empty Optional if no namespace with the
      *         given prefix was found.
-     * @throws IncorrectOperationException if the Model is unmodifiable.
+     * @throws UnsupportedOperationException if the model is unmodifiable
      */
     Optional<Namespace> removeNamespace(String prefix);
 
@@ -80,8 +79,9 @@ public interface Model extends Set<Statement>, Serializable {
      *                 match any predicate.
      * @param obj      a Value, object of the statement. Can be {@code null} to
      *                 match any object.
-     * @param contexts any Resource, context of the statement. Optional parameter.
-     *                 Can be {@code null} to match any context.
+     * @param contexts contexts to match; no contexts or a {@code null} array means
+     *                 every graph, while an explicit {@code null} element selects
+     *                 the default graph
      * @return true if a statement with the associated context is in the model,
      *         false otherwise.
      */
@@ -97,7 +97,7 @@ public interface Model extends Set<Statement>, Serializable {
      * @param contexts optional contexts in which to add the statement;
      *                 may be {@code null} or empty to add to the default graph
      * @return {@code true} if the model was modified, {@code false} otherwise
-     * @throws IncorrectOperationException if the model is unmodifiable
+     * @throws UnsupportedOperationException if the model is unmodifiable
      * @throws IllegalArgumentException    if {@code subj}, {@code pred}, or
      *                                     {@code obj} is {@code null}
      */
@@ -107,10 +107,11 @@ public interface Model extends Set<Statement>, Serializable {
      * Remove statements from the model according to their context. If no context is
      * given, all statements are removed, regardless of context.
      *
-     * @param context a Resource, context of the statement. Optional parameter. Can
-     *                be {@code null} to match any context.
+     * @param context contexts to clear; no contexts or a {@code null} array means
+     *                every graph, while an explicit {@code null} element selects
+     *                the default graph
      * @return true if any statement was removed, false if none were present.
-     * @throws IncorrectOperationException if the Model is unmodifiable.
+     * @throws UnsupportedOperationException if the model is unmodifiable
      */
     boolean clear(Resource... context);
 
@@ -121,16 +122,16 @@ public interface Model extends Set<Statement>, Serializable {
      * @param subj     a Resource, subject of the statement. Can be {@code null}.
      * @param pred     an IRI, predicate of the statement. Can be {@code null}.
      * @param obj      a Value, object of the statement. Can be {@code null}.
-     * @param contexts any Resource, context of the statement. Optional parameter.
-     *                 Can be {@code null} to match any context.
+     * @param contexts contexts to match; no contexts or a {@code null} array means
+     *                 every graph, while an explicit {@code null} element selects
+     *                 the default graph
      * @return true if any statement was removed, false if none were present.
-     * @throws IncorrectOperationException if the Model is unmodifiable.
+     * @throws UnsupportedOperationException if the model is unmodifiable
      */
     boolean remove(Resource subj, IRI pred, Value obj, Resource... contexts);
 
     /**
-     * The returned iterator must throw {@link IncorrectOperationException} if the
-     * model is unmodifiable and a modification is attempted.
+     * The returned iterable is read-only when this model is unmodifiable.
      *
      * @param subj     a Resource, subject of the statement. Can be {@code null} to
      *                 match any subject.
@@ -138,8 +139,9 @@ public interface Model extends Set<Statement>, Serializable {
      *                 match any predicate.
      * @param obj      a Value, object of the statement. Can be {@code null} to
      *                 match any object.
-     * @param contexts any Resource, context of the statement. Optional parameter.
-     *                 Can be {@code null} to match any context.
+     * @param contexts contexts to match; no contexts or a {@code null} array means
+     *                 every graph, while an explicit {@code null} element selects
+     *                 the default graph
      * @return an iterator on a selection of statements.
      */
     Iterable<Statement> getStatements(Resource subj, IRI pred, Value obj,
@@ -156,29 +158,43 @@ public interface Model extends Set<Statement>, Serializable {
      *                 match any predicate.
      * @param obj      a Value, object of the statement. Can be {@code null} to
      *                 match any object.
-     * @param contexts any Resource, context of the statement. Optional parameter.
-     *                 Can be {@code null} to match any context.
+     * @param contexts contexts to match; no contexts or a {@code null} array means
+     *                 every graph, while an explicit {@code null} element selects
+     *                 the default graph
      * @return a new Model containing all statements matching the given pattern.
      */
     Model filter(Resource subj, IRI pred, Value obj, Resource... contexts);
 
     /**
-     * @return the set of resources used as subjects in the statements of the model.
+     * Returns a live set view of resources used as subjects. Removing a term
+     * removes every statement using it; adding a term is unsupported.
+     *
+     * @return the subjects in this model
      */
     Set<Resource> subjects();
 
     /**
-     * @return the set of IRIs used as predicates in the statements of the model.
+     * Returns a live set view of IRIs used as predicates. Removing a term
+     * removes every statement using it; adding a term is unsupported.
+     *
+     * @return the predicates in this model
      */
     Set<IRI> predicates();
 
     /**
-     * @return the set of values used as objects in the statements of the model.
+     * Returns a live set view of values used as objects. Removing a term removes
+     * every statement using it; adding a term is unsupported.
+     *
+     * @return the objects in this model
      */
     Set<Value> objects();
 
     /**
-     * @return the set of resources used as contexts in the statements of the model.
+     * Returns a live set view of contexts. Removing a context clears every
+     * statement in that graph; adding a context is unsupported.
+     *
+     * @return contexts used by the model, including {@code null} when the
+     *         default graph contains statements
      */
     Set<Resource> contexts();
 }

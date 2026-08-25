@@ -86,30 +86,8 @@ class CoreseValueFactoryTest extends ValueFactoryTest {
     }
 
     @Test
-    void testCreateLiteralWithCoreDatatype() {
-        // Test createLiteral with CoreDatatype (XSD.STRING)
-        Literal literal = valueFactory.createLiteral(stringTestValue, XSDDatatype.STRING);
-
-        assertNotNull(literal);
-        assertTrue(literal instanceof CoreseTyped);
-        assertEquals(stringTestValue, literal.getLabel());
-        assertEquals(XSDDatatype.STRING, literal.getCoreDatatype());
-    }
-
-    @Test
-    void testCreateLiteralWithDatatypeIRIAndCoreDatatype() {
-        // Test createLiteral with IRI datatype and CoreDatatype (XSD.STRING)
-        Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI, XSDDatatype.STRING);
-
-        assertNotNull(literal);
-        assertTrue(literal instanceof CoreseTyped);
-        assertEquals(stringTestValue, literal.getLabel());
-        assertEquals(XSDDatatype.STRING, literal.getCoreDatatype());
-    }
-
-    @Test
     void testCreateStatementWithoutContext() {
-        Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI, XSDDatatype.STRING);
+        Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI);
         CoreseStatement statement = (CoreseStatement) valueFactory.createStatement(subject, predicate, literal);
         assertNotNull(statement);
         assertEquals(subject, statement.getSubject());
@@ -120,7 +98,7 @@ class CoreseValueFactoryTest extends ValueFactoryTest {
 
     @Test
     void testCreateStatementWithContext() {
-        Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI, XSDDatatype.STRING);
+        Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI);
 
         CoreseStatement statement = (CoreseStatement) valueFactory.createStatement(subject, predicate, literal, context);
 

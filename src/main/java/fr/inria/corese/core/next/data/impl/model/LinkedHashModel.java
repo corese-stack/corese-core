@@ -9,7 +9,6 @@ import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.term.Value;
 
-import java.io.Serial;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Objects;
@@ -21,11 +20,8 @@ import java.util.Set;
  * Its runtime value factory is intentionally retained as part of the live model
  * state even when a factory implementation is not Java-serializable.
  */
-@SuppressWarnings({"java:S2160", "java:S1948"})
+@SuppressWarnings("java:S2160")
 public final class LinkedHashModel extends AbstractModel {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
 
     private final ValueFactory valueFactory;
     private final Set<Statement> statements = new LinkedHashSet<>();

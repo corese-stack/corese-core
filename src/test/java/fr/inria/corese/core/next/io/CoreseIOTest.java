@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.io;
 
+import fr.inria.corese.core.next.data.Values;
 import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParserOptions;
 import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializerOptions;
@@ -102,10 +103,10 @@ class CoreseIOTest {
 
     @Test
     void exportsGraphQueryResultsDirectlyWithoutClosingThem() {
-        Statement statement = CoreseIO.valueFactory().createStatement(
-                CoreseIO.valueFactory().createIRI("http://example/s"),
-                CoreseIO.valueFactory().createIRI("http://example/p"),
-                CoreseIO.valueFactory().createIRI("http://example/o"));
+        Statement statement = Values.factory().createStatement(
+                Values.factory().createIRI("http://example/s"),
+                Values.factory().createIRI("http://example/p"),
+                Values.factory().createIRI("http://example/o"));
         TestGraphResult result = new TestGraphResult(List.of(statement));
 
         String output = CoreseIO.writeToString(result, RDFFormat.NTRIPLES);
@@ -149,7 +150,7 @@ class CoreseIOTest {
 
     private static TestTupleResult tupleResult() {
         Map<String, Value> values = new LinkedHashMap<>();
-        values.put("value", CoreseIO.valueFactory().createLiteral("hello"));
+        values.put("value", Values.factory().createLiteral("hello"));
         return new TestTupleResult(List.of("value"), List.of(new TestBindingSet(values)));
     }
 

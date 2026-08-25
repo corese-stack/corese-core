@@ -23,7 +23,6 @@ import fr.inria.corese.core.next.data.api.term.SimpleTriple;
 import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.support.term.literal.AbstractLiteral;
-import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
 import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 import fr.inria.corese.core.next.data.api.literal.CoreDatatypes;
 import fr.inria.corese.core.next.data.impl.adapter.node.CoreseBNode;
@@ -152,75 +151,6 @@ public class CoreseValueFactory implements ValueFactory {
 
         // unknown datatype
         return new CoreseTyped(label, datatype);
-    }
-
-    /**
-     * Creates a literal with the given label and datatype.
-     * @param label Lexical value
-     * @param coreDatatype he core datatype of the literal that will also serves as it datatype IRI
-     * @return a new CoreseDatatypeAdapter object with the given label and core datatype.
-     */
-    @Override
-    public Literal createLiteral(String label, CoreDatatype coreDatatype) {
-        Objects.requireNonNull(label, LABEL_PARAMETER);
-        Objects.requireNonNull(coreDatatype, "coreDatatype");
-
-        if (coreDatatype.getIRI() != null) {
-            return createLiteral(label, coreDatatype.getIRI());
-        }
-
-        // Temporal types
-        return new CoreseTyped(label, coreDatatype.getIRI(), coreDatatype);
-    }
-
-    /**
-     * Creates a literal with the given label, datatype and core datatype.
-     * @param label Lexical value
-     * @param datatype Datatype IRI
-     * @param coreDatatype The core datatype of the literal that will also serves as it datatype IRI
-     * @return a new CoreseDatatypeAdapter object with the given label, datatype and core datatype. The core datatype will be used even if there is a mismatch with the datatype IRI.
-     */
-    @Override
-    public Literal createLiteral(String label, IRI datatype, CoreDatatype coreDatatype) {
-        Objects.requireNonNull(label, LABEL_PARAMETER);
-        Objects.requireNonNull(datatype, "datatype");
-        Objects.requireNonNull(coreDatatype, "coreDatatype");
-
-        try {
-            // Temporal types
-            if (XSDDatatype.DATE.equals(coreDatatype)) {
-                return new CoreseDate(label, datatype, coreDatatype);
-            } else if (XSDDatatype.DATETIME.equals(coreDatatype)) {
-                return new CoreseDatetime(label, datatype, coreDatatype);
-            } else if (XSDDatatype.TIME.equals(coreDatatype)) {
-                return new CoreseTime(label, datatype, coreDatatype);
-            } else if (XSDDatatype.DURATION.equals(coreDatatype)) {
-                return new CoreseDuration(label, datatype, coreDatatype);
-            }
-
-            // Numeric types
-            else if (AbstractLiteral.isIntegerCoreDatatype(coreDatatype)) {
-                return new CoreseInteger(label, datatype, coreDatatype);
-            } else if (AbstractLiteral.isDecimalCoreDatatype(coreDatatype)) {
-                return new CoreseDecimal(label, datatype, coreDatatype);
-            }
-
-            // Boolean types
-            else if (XSDDatatype.BOOLEAN.equals(coreDatatype)) {
-                if (!XSDDatatype.BOOLEAN.getIRI().equals(datatype)) {
-                    return new CoreseTyped(label, datatype, coreDatatype);
-                }
-                return new CoreseBoolean(label);
-            }
-        } catch (RuntimeException invalidLexicalForm) {
-            return new CoreseIllTypedLiteral(label, datatype, coreDatatype);
-        }
-
-        // String literals
-        if (XSDDatatype.STRING.equals(coreDatatype)) {
-            return new CoreseTyped(label, datatype, coreDatatype);
-        }
-        return new CoreseTyped(label, datatype, coreDatatype);
     }
 
     /**

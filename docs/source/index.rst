@@ -103,6 +103,7 @@ Home Page
 
    Installation <install>
    User Guide <user_guide>
+   RDF data API <next_data>
    RDF and SPARQL result I/O <next_io>
    Repository API <next_repository>
    Java API <java_api/library_root>

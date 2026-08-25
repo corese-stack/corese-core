@@ -1,6 +1,5 @@
 package fr.inria.corese.core.next.data.api.support.model;
 
-import java.io.Serial;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Optional;
@@ -19,9 +18,6 @@ import fr.inria.corese.core.next.data.api.term.Value;
  */
 @SuppressWarnings("java:S2160")
 public class ReadOnlyModel extends AbstractModel {
-
-	@Serial
-	private static final long serialVersionUID = 8934829374192038471L;
 
 	// The underlying model to delegate read operations to
 	private final Model delegate;

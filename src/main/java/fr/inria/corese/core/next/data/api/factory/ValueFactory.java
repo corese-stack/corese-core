@@ -1,6 +1,5 @@
 package fr.inria.corese.core.next.data.api.factory;
 
-import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
 import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.data.api.term.BNode;
 import fr.inria.corese.core.next.data.api.term.IRI;
@@ -62,29 +61,12 @@ public interface ValueFactory {
 
 	/**
 	 * Create a typed literal from its lexical value and datatype IRI.
-	 * If the datatype is a CoreDatatype, the coreDatatype parameter should be set to the corresponding value.
+	 * Known Corese datatypes are inferred from the datatype IRI.
 	 * @param label Lexical value
 	 * @param datatype Datatype IRI
 	 * @return Literal
 	 */
 	Literal createLiteral(String label, IRI datatype);
-
-	/**
-	 * Create a typed literal from its lexical value and core datatype IRI. The datatype of the literal is set to be the datatype IRI corresponding to the core datatype.
-	 * @param label Lexical value
-	 * @param datatype Core datatype
-	 * @return Literal
-	 */
-	Literal createLiteral(String label, CoreDatatype datatype);
-
-	/**
-	 * Create a typed literal from its lexical value, datatype IRI and core datatype IRI.
-	 * @param label Lexical value
-	 * @param datatype Datatype IRI
-	 * @param coreDatatype Core datatype
-	 * @return Literal
-	 */
-	Literal createLiteral(String label, IRI datatype, CoreDatatype coreDatatype);
 
 	/**
 	 * Create a literal typed by xsd:boolean.

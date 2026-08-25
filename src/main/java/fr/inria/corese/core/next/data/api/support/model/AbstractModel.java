@@ -71,7 +71,8 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
 
             @Override
             public boolean add(Resource subject) {
-                return AbstractModel.this.add(subject, null, null);
+                throw new UnsupportedOperationException(
+                        "A subject alone cannot define an RDF statement.");
             }
 
             @Override
@@ -108,7 +109,8 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
 
             @Override
             public boolean add(IRI predicate) {
-                return AbstractModel.this.add(null, predicate, null);
+                throw new UnsupportedOperationException(
+                        "A predicate alone cannot define an RDF statement.");
             }
 
             @Override
@@ -145,7 +147,8 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
 
             @Override
             public boolean add(Value value) {
-                return AbstractModel.this.add(null, null, value);
+                throw new UnsupportedOperationException(
+                        "An object alone cannot define an RDF statement.");
             }
 
             @Override
@@ -182,7 +185,8 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
 
             @Override
             public boolean add(Resource context) {
-                return AbstractModel.this.add(null, null, null, context);
+                throw new UnsupportedOperationException(
+                        "A context alone cannot define an RDF statement.");
             }
 
             @Override
@@ -339,7 +343,7 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
             try {
                 while (iterator.hasNext()) {
                     Object currentObject = iterator.next();
-                    if (! (currentObject instanceof Statement) && ! this.contains(currentObject)) {
+                    if (!super.contains(currentObject)) {
                         return false;
                     }
                 }
@@ -460,6 +464,7 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
 
     @Override
     public boolean add(Statement statement) {
+        Objects.requireNonNull(statement, "statement");
         return add(
                 statement.getSubject(),
                 statement.getPredicate(),

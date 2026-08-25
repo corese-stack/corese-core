@@ -4,6 +4,10 @@
 RDF graphs or SPARQL query results. The short methods cover common use cases;
 typed option objects and the factory accessors cover advanced use cases.
 
+Use `Values.factory()` and `Models.create()` to construct RDF values and models
+outside an I/O operation. `CoreseIO` is intentionally limited to parsing and
+serialization concerns.
+
 ## Read and write RDF
 
 ```java

@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.io;
 
+import fr.inria.corese.core.next.data.Models;
+import fr.inria.corese.core.next.data.Values;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 import fr.inria.corese.core.next.data.api.io.option.RDFParsingOptions;
@@ -10,10 +12,8 @@ import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
 import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializerFactory;
 import fr.inria.corese.core.next.data.api.model.Model;
 import fr.inria.corese.core.next.data.api.model.Statement;
-import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
 import fr.inria.corese.core.next.data.impl.io.parser.DefaultRDFParserFactory;
 import fr.inria.corese.core.next.data.impl.io.serializer.DefaultRDFSerializerFactory;
-import fr.inria.corese.core.next.data.impl.model.LinkedHashModel;
 import fr.inria.corese.core.next.query.api.io.ResultFormat;
 import fr.inria.corese.core.next.query.api.io.serializer.BooleanResultSerializer;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
@@ -49,22 +49,12 @@ import java.util.Objects;
  */
 public final class CoreseIO {
 
-    private static final ValueFactory VALUE_FACTORY = new CoreseValueFactory();
+    private static final ValueFactory VALUE_FACTORY = Values.factory();
     private static final RDFParserFactory RDF_PARSERS = new DefaultRDFParserFactory();
     private static final RDFSerializerFactory RDF_SERIALIZERS = new DefaultRDFSerializerFactory();
     private static final ResultSerializerFactory RESULT_SERIALIZERS = new DefaultResultSerializerFactory();
 
     private CoreseIO() {
-    }
-
-    /** Creates an insertion-ordered in-memory RDF model. */
-    public static Model model() {
-        return new LinkedHashModel(VALUE_FACTORY);
-    }
-
-    /** Returns the default Corese value factory used by this facade. */
-    public static ValueFactory valueFactory() {
-        return VALUE_FACTORY;
     }
 
     /** Returns the advanced RDF parser factory. */
@@ -84,38 +74,38 @@ public final class CoreseIO {
 
     /** Reads RDF into a new in-memory model. */
     public static Model read(Reader source, RDFFormat format) {
-        Model target = model();
+        Model target = Models.create();
         return read(source, format, target, VALUE_FACTORY);
     }
 
     /** Reads configured RDF into a new in-memory model. */
     public static Model read(Reader source, RDFFormat format, RDFParsingOptions options) {
-        Model target = model();
+        Model target = Models.create();
         return read(source, format, target, VALUE_FACTORY, options);
     }
 
     /** Reads RDF into a new in-memory model. */
     public static Model read(InputStream source, RDFFormat format) {
-        Model target = model();
+        Model target = Models.create();
         return read(source, format, target, VALUE_FACTORY);
     }
 
     /** Reads configured RDF into a new in-memory model. */
     public static Model read(InputStream source, RDFFormat format, RDFParsingOptions options) {
-        Model target = model();
+        Model target = Models.create();
         return read(source, format, target, VALUE_FACTORY, options);
     }
 
     /** Reads UTF-8 RDF from a file into a new in-memory model. */
     public static Model read(Path source, RDFFormat format) {
-        Model target = model();
+        Model target = Models.create();
         RDF_PARSERS.createRDFParser(format, target, VALUE_FACTORY).parse(source);
         return target;
     }
 
     /** Reads configured UTF-8 RDF from a file into a new in-memory model. */
     public static Model read(Path source, RDFFormat format, RDFParsingOptions options) {
-        Model target = model();
+        Model target = Models.create();
         RDF_PARSERS.createRDFParser(format, target, VALUE_FACTORY, options).parse(source);
         return target;
     }

@@ -4,7 +4,6 @@ import fr.inria.corese.core.next.data.api.term.*;
 import fr.inria.corese.core.next.data.api.model.*;
 import fr.inria.corese.core.next.data.api.namespace.*;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
-import fr.inria.corese.core.next.data.api.exception.IncorrectOperationException;
 import fr.inria.corese.core.next.storage.api.StorageManager;
 import fr.inria.corese.core.next.storage.api.lifecycle.StorageLifecycle;
 import fr.inria.corese.core.next.storage.api.operations.MetadataOperations;
@@ -516,7 +515,8 @@ class StorageModelTest {
             IRI predicate = mock(IRI.class);
             Value object = mock(Value.class);
 
-            assertThrows(IncorrectOperationException.class, () -> unmodifiable.add(subject, predicate, object));
+            assertThrows(UnsupportedOperationException.class,
+                    () -> unmodifiable.add(subject, predicate, object));
         }
 
         @Test
@@ -527,7 +527,8 @@ class StorageModelTest {
             IRI predicate = mock(IRI.class);
             Value object = mock(Value.class);
 
-            assertThrows(IncorrectOperationException.class, () -> unmodifiable.remove(subject, predicate, object));
+            assertThrows(UnsupportedOperationException.class,
+                    () -> unmodifiable.remove(subject, predicate, object));
         }
 
         @Test
@@ -535,7 +536,7 @@ class StorageModelTest {
         void shouldThrowWhenClearingUnmodifiableModel() {
             Model unmodifiable = model.unmodifiable();
 
-            assertThrows(IncorrectOperationException.class, unmodifiable::clear);
+            assertThrows(UnsupportedOperationException.class, unmodifiable::clear);
         }
 
         @Test
@@ -544,7 +545,8 @@ class StorageModelTest {
             Model unmodifiable = model.unmodifiable();
             Namespace ns = mock(Namespace.class);
 
-            assertThrows(IncorrectOperationException.class, () -> unmodifiable.setNamespace(ns));
+            assertThrows(UnsupportedOperationException.class,
+                    () -> unmodifiable.setNamespace(ns));
         }
 
         @Test

@@ -21,17 +21,17 @@ import java.util.stream.Collectors;
 /**
  * Unified prefix handler for managing namespace prefix mappings across all RDF formats.
  */
-public class PrefixHandler implements PrefixMapping, Cloneable {
+public class PrefixHandler implements PrefixMapping {
 
     /**
      * Map of prefix to namespace URI.
      */
-    private ConcurrentHashMap<String, String> prefixToNamespace;
+    private final ConcurrentHashMap<String, String> prefixToNamespace;
 
     /**
      * Map of namespace URI to prefix (for reverse lookup).
      */
-    private ConcurrentHashMap<String, String> namespaceToPrefix;
+    private final ConcurrentHashMap<String, String> namespaceToPrefix;
 
     /**
      * The default namespace
@@ -84,7 +84,7 @@ public class PrefixHandler implements PrefixMapping, Cloneable {
 
     /**
      * Sets or updates a prefix mapping.
-     * Validates that the prefix matches XML NCName rules.
+     * Accepts an empty default prefix and rejects prefixes containing a colon.
      *
      * @param prefix    the prefix
      * @param namespace the namespace URI
@@ -94,8 +94,7 @@ public class PrefixHandler implements PrefixMapping, Cloneable {
     public void setPrefix(String prefix, String namespace) {
         if (!isValidPrefix(prefix)) {
             throw new IllegalArgumentException(
-                    "Invalid prefix format: '" + prefix +
-                            "' (must be empty or valid according to Turtle/TriG specification)");
+                    "Invalid prefix format: '" + prefix + "' (must not contain ':')");
         }
         if (namespace == null) {
             throw new IllegalArgumentException("Namespace cannot be null");
@@ -262,9 +261,10 @@ public class PrefixHandler implements PrefixMapping, Cloneable {
      */
     @Override
     public Set<Namespace> getNamespaceObjects() {
-        return namespaceToPrefix.entrySet().stream()
+        Set<Namespace> result = namespaceToPrefix.entrySet().stream()
                 .map(e -> new SimpleNamespace(e.getValue(), e.getKey()))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
+        return Collections.unmodifiableSet(result);
     }
 
     /**
@@ -353,14 +353,13 @@ public class PrefixHandler implements PrefixMapping, Cloneable {
     }
 
     /**
-     * Checks if a prefix is valid according
-     * Empty string "" is considered valid (for Turtle default prefix)
+     * Checks the syntax accepted by this mapping. The empty string represents the
+     * default prefix.
      *
      * @param prefix the prefix to validate
      * @return true if the prefix is valid, false otherwise
      */
-    @Override
-    public boolean isValidPrefix(String prefix) {
+    private static boolean isValidPrefix(String prefix) {
         if (prefix == null) {
             return false;
         }
@@ -392,23 +391,15 @@ public class PrefixHandler implements PrefixMapping, Cloneable {
     }
 
     /**
-     * Creates a deep copy of this handler.
+     * Creates an independent copy of this handler.
      * The returned handler is independent and can be modified without
      * affecting the original.
      *
      * @return a new PrefixHandler instance with same mappings
      */
-    @SuppressWarnings("java:S2975")
     @Override
-    public PrefixHandler clone() {
-        try {
-            PrefixHandler cloned = (PrefixHandler) super.clone();
-            cloned.prefixToNamespace = new ConcurrentHashMap<>(this.prefixToNamespace);
-            cloned.namespaceToPrefix = new ConcurrentHashMap<>(this.namespaceToPrefix);
-            return cloned;
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError(e);
-        }
+    public PrefixHandler copy() {
+        return new PrefixHandler(this);
     }
 
     @Override

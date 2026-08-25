@@ -1,7 +1,6 @@
 package fr.inria.corese.core.next.storage.impl.model;
 
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
-import fr.inria.corese.core.next.data.api.exception.IncorrectOperationException;
 import fr.inria.corese.core.next.data.api.model.Model;
 import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.data.api.namespace.Namespace;
@@ -28,11 +27,9 @@ import java.util.Set;
 /**
  * Implementation of the {@link Model} interface backed by a {@link StorageManager}.
  *
- * <p>This model is a live view over runtime services. The inherited Java
- * serialization marker does not imply that its storage manager or value factory
- * can be serialized independently.</p>
+ * <p>This model is a live view over runtime storage services.</p>
  */
-@SuppressWarnings({"java:S2160", "java:S1948"})
+@SuppressWarnings("java:S2160")
 public final class StorageModel extends AbstractModel {
 
     private final StorageManager storage;
@@ -345,11 +342,11 @@ public final class StorageModel extends AbstractModel {
     /**
      * Checks if this model is modifiable and throws an exception if not.
      *
-     * @throws IncorrectOperationException if the model is unmodifiable
+     * @throws UnsupportedOperationException if the model is unmodifiable
      */
     private void checkModifiable() {
         if (unmodifiable) {
-            throw new IncorrectOperationException("Model is unmodifiable");
+            throw new UnsupportedOperationException("Model is unmodifiable");
         }
     }
 
