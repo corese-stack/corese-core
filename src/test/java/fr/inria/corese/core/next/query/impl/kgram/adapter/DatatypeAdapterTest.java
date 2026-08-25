@@ -1,6 +1,5 @@
 package fr.inria.corese.core.next.query.impl.kgram.adapter;
 
-import fr.inria.corese.core.next.query.impl.kgram.adapter.DatatypeAdapter;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.DatatypeValue;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;

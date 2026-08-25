@@ -2,9 +2,6 @@ package fr.inria.corese.core.next.query.impl.kgram.core;
 
 import fr.inria.corese.core.next.query.impl.kgram.api.core.BindingContext;
 import fr.inria.corese.core.next.query.impl.kgram.api.query.*;
-import fr.inria.corese.core.next.query.impl.kgram.core.Eval;
-import fr.inria.corese.core.next.query.impl.kgram.core.Mappings;
-import fr.inria.corese.core.next.query.impl.kgram.core.Memory;
 import fr.inria.corese.core.next.query.impl.kgram.event.KgramEventDispatcher;
 import fr.inria.corese.core.next.query.impl.kgram.event.ResultListener;
 import org.junit.jupiter.api.BeforeEach;

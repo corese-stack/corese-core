@@ -1,6 +1,5 @@
 package fr.inria.corese.core.next.query.impl.kgram.adapter;
 
-import fr.inria.corese.core.next.query.impl.kgram.adapter.BindingAdapter;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.impl.kgram.core.Mappings;
 import fr.inria.corese.core.next.query.impl.kgram.core.Exp;

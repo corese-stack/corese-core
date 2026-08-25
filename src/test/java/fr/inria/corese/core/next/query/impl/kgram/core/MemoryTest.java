@@ -6,7 +6,6 @@ import fr.inria.corese.core.next.query.impl.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.impl.kgram.api.query.Evaluator;
 import fr.inria.corese.core.next.query.impl.kgram.api.query.Matcher;
 import fr.inria.corese.core.next.query.impl.kgram.api.query.ProcessVisitor;
-import fr.inria.corese.core.next.query.impl.kgram.core.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
