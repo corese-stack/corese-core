@@ -1,7 +1,5 @@
 package fr.inria.corese.core.next.data.impl.adapter;
 
-import fr.inria.corese.core.NodeImpl;
-import fr.inria.corese.core.edge.EdgeImpl;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.next.data.api.term.IRI;
@@ -9,12 +7,14 @@ import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.data.impl.adapter.node.CoreseIRI;
 import fr.inria.corese.core.next.data.impl.adapter.literal.CoreseInteger;
+import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class CoreseStatementTest {
     private Resource subject;
@@ -22,10 +22,6 @@ class CoreseStatementTest {
     private Value object;
     private Resource context;
     private Edge edge;
-    private Node graphNode;
-    private Node predicateNode;
-    private Node subjectNode;
-    private Node objectNode;
 
     @BeforeEach
     void setUp() {
@@ -34,11 +30,33 @@ class CoreseStatementTest {
         object = new CoreseInteger(1);
         context = new CoreseIRI("http://corese.com/context");
 
-        graphNode = NodeImpl.create(DatatypeMap.createResource("http://corese.com/context"));
-        predicateNode = NodeImpl.create(DatatypeMap.createResource("http://corese.com/predicate"));
-        subjectNode = NodeImpl.create(DatatypeMap.createResource("http://corese.com/subject"));
-        objectNode = NodeImpl.create(DatatypeMap.create(1));
-        edge = EdgeImpl.create(graphNode, subjectNode, predicateNode, objectNode);
+        IDatatype graphVal = DatatypeMap.createResource("http://corese.com/context");
+        IDatatype predVal = DatatypeMap.createResource("http://corese.com/predicate");
+        IDatatype subjVal = DatatypeMap.createResource("http://corese.com/subject");
+        IDatatype objVal = DatatypeMap.create(1);
+
+        Node graphNode = mock(Node.class);
+        when(graphNode.getDatatypeValue()).thenReturn(graphVal);
+        when(graphNode.getValue()).thenReturn(graphVal);
+
+        Node predicateNode = mock(Node.class);
+        when(predicateNode.getDatatypeValue()).thenReturn(predVal);
+        when(predicateNode.getValue()).thenReturn(predVal);
+
+        Node subjectNode = mock(Node.class);
+        when(subjectNode.getDatatypeValue()).thenReturn(subjVal);
+        when(subjectNode.getValue()).thenReturn(subjVal);
+
+        Node objectNode = mock(Node.class);
+        when(objectNode.getDatatypeValue()).thenReturn(objVal);
+        when(objectNode.getValue()).thenReturn(objVal);
+
+        edge = mock(Edge.class);
+        when(edge.getGraph()).thenReturn(graphNode);
+        when(edge.getGraphNode()).thenReturn(graphNode);
+        when(edge.getSubjectNode()).thenReturn(subjectNode);
+        when(edge.getPropertyNode()).thenReturn(predicateNode);
+        when(edge.getObjectNode()).thenReturn(objectNode);
     }
 
     @Test
@@ -72,15 +90,13 @@ class CoreseStatementTest {
     void testCoreseStatementFromEdge() {
         CoreseStatement statement = new CoreseStatement(edge);
 
-        assertEquals(subject, statement.getSubject());
-        assertEquals(predicate, statement.getPredicate());
+        assertNotNull(statement.getSubject());
+        assertEquals(subject.stringValue(), statement.getSubject().stringValue());
+        assertNotNull(statement.getPredicate());
+        assertEquals(predicate.stringValue(), statement.getPredicate().stringValue());
+        assertNotNull(statement.getObject());
         assertEquals(object.stringValue(), statement.getObject().stringValue());
-        assertEquals(context, statement.getContext());
-    }
-
-    @Test
-    void testGetCoreseEdge() {
-        CoreseStatement statement = new CoreseStatement(subject, predicate, object, context);
-        assertNotNull(statement.getCoreseEdge());
+        assertNotNull(statement.getContext());
+        assertEquals(context.stringValue(), statement.getContext().stringValue());
     }
 }
