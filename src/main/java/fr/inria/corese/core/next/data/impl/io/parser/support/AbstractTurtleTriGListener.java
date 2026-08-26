@@ -138,6 +138,11 @@ public abstract class AbstractTurtleTriGListener {
                 } else if (isAbsoluteIRI(raw)) {
                     return raw;
                 } else {
+                    if (prefix.isEmpty()) {
+                        throw new ParsingException(
+                                "Undeclared prefix: '' (empty prefix). " +
+                                        "Use '@prefix : <namespace> .' to declare it.");
+                    }
                     throw new ParsingException("Undeclared prefix: " + prefix);
                 }
             }
