@@ -79,7 +79,9 @@ public class ASTQuery
     static int nbt = 0; // to generate an unique id for a triple if needed
     static int nbbnode = 0; // createBlankNode()
 
-    public enum ResultForm { QT_SELECT, QT_ASK, QT_CONSTRUCT, QT_DESCRIBE, QT_DELETE, QT_UPDATE, QT_TEMPLATE }
+    public enum ResultForm {
+        SELECT, ASK, CONSTRUCT, DESCRIBE, DELETE, UPDATE, TEMPLATE
+    }
 
     public final static int L_PATH = 2;
     public final static int L_LIST = 1;
@@ -155,7 +157,7 @@ public class ASTQuery
     int nbtriple = 0; // rdf*
     int nbd = 0; // to generate an unique id for a variable if needed
     int nbfun = 0, nbvar = 0;
-    ResultForm resultForm = ResultForm.QT_SELECT;
+    ResultForm resultForm = ResultForm.SELECT;
     private int priority = 100;
     int countVar = 0;
     // if more, reject 2 times worse projection than best one
@@ -2009,7 +2011,7 @@ public class ASTQuery
 
 
     public void setDescribe(Atom at) {
-        setResultForm(ResultForm.QT_DESCRIBE);
+        setResultForm(ResultForm.DESCRIBE);
         for (Atom aa : adescribe) {
             if (aa.getLabel().equals(at.getLabel())) {
                 return;
@@ -2238,20 +2240,20 @@ public class ASTQuery
     }
     
     public void setConstruct(Exp constructExp) {
-        this.setResultForm(ResultForm.QT_CONSTRUCT);
+        this.setResultForm(ResultForm.CONSTRUCT);
         this.constructExp = constructExp;
     }
     
     public void setDelete(boolean b) {
         if (b) {
-            setResultForm(ResultForm.QT_DELETE);
+            setResultForm(ResultForm.DELETE);
             isDelete = b;
         }
     }
 
     public void setInsert(boolean b) {
         if (b) {
-            setResultForm(ResultForm.QT_CONSTRUCT);
+            setResultForm(ResultForm.CONSTRUCT);
             setAdd(true);
         }
     }
@@ -2623,7 +2625,7 @@ public class ASTQuery
 
     public void setAsk(boolean b) {
         if (b) {
-            setResultForm(ResultForm.QT_ASK);
+            setResultForm(ResultForm.ASK);
         }
     }
 
@@ -2636,26 +2638,26 @@ public class ASTQuery
     }
 
     public boolean isDescribe() {
-        return (getResultForm() == ResultForm.QT_DESCRIBE);
+        return (getResultForm() == ResultForm.DESCRIBE);
     }
 
     public boolean isAsk() {
-        return (getResultForm() == ResultForm.QT_ASK);
+        return (getResultForm() == ResultForm.ASK);
     }
 
     @Override
     public boolean isConstruct() {
-        return (getResultForm() == ResultForm.QT_CONSTRUCT);
+        return (getResultForm() == ResultForm.CONSTRUCT);
     }
 
     @Override
     public boolean isSelect() {
-        return (getResultForm() == ResultForm.QT_SELECT);
+        return (getResultForm() == ResultForm.SELECT);
     }
 
     @Override
     public boolean isUpdate() {
-        return (getResultForm() == ResultForm.QT_UPDATE);
+        return (getResultForm() == ResultForm.UPDATE);
     }
 
     @Override
@@ -2721,7 +2723,7 @@ public class ASTQuery
     }
 
     public void set(ASTUpdate u) {
-        setResultForm(ResultForm.QT_UPDATE);
+        setResultForm(ResultForm.UPDATE);
         astu = u;
         u.set(this);
     }

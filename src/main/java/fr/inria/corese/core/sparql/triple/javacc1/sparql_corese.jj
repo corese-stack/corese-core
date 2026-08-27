@@ -367,7 +367,7 @@ void  UpdateQuery(Metadata la) : {  }
 {
 
 	{
-  		astq.setResultForm(ASTQuery.ResultForm.QT_UPDATE);
+  		astq.setResultForm(ASTQuery.ResultForm.UPDATE);
   		astq.set(astu);
   		astu.defProlog();
   	}	
@@ -797,7 +797,7 @@ Exp SelectQuery(Metadata la) : { Exp stack; }
   stack = WhereClause()
   SolutionModifier()  
   {
-    astq.setResultForm(ASTQuery.ResultForm.QT_SELECT);
+    astq.setResultForm(ASTQuery.ResultForm.SELECT);
     return stack; 
   }
 }
@@ -864,7 +864,7 @@ Exp DescribeQuery(Metadata la) : { Exp stack; Variable v; String s; Atom at;}
   ( LOOKAHEAD(2) stack = WhereClause() )?
   SolutionModifier()  
   { 
-    astq.setResultForm(ASTQuery.ResultForm.QT_DESCRIBE);
+    astq.setResultForm(ASTQuery.ResultForm.DESCRIBE);
     astq.setAnnotation(la);	
     return stack; 
   }
@@ -878,7 +878,7 @@ Exp AskQuery(Metadata la) : { Exp stack; Values values;}
   (values = Values()  {astq.setValues(values); } ) ?
   
   {
-  	astq.setResultForm(ASTQuery.ResultForm.QT_ASK);
+  	astq.setResultForm(ASTQuery.ResultForm.ASK);
         astq.setAnnotation(la);	
   	return stack;
   }
@@ -891,7 +891,7 @@ Exp DeleteQuery() : { Exp stack; }
 	stack = WhereClause()
 	{ 
 		astq.setDelete(true);
-		astq.setResultForm(ASTQuery.ResultForm.QT_DELETE);
+		astq.setResultForm(ASTQuery.ResultForm.DELETE);
 		return stack; 
 	}
 }
