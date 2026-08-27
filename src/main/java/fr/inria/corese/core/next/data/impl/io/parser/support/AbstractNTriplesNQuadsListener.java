@@ -161,6 +161,10 @@ public abstract class AbstractNTriplesNQuadsListener {
                 result.append('"');
                 yield i + 1;
             }
+            case '\'' -> {
+                result.append('\'');
+                yield i + 1;
+            }
             case '\\' -> {
                 result.append('\\');
                 yield i + 1;

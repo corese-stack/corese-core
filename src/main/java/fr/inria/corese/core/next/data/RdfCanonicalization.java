@@ -22,8 +22,7 @@ public final class RdfCanonicalization {
      * @return canonical, lexicographically ordered statements
      */
     public static List<Statement> canonicalize(Model model) {
-        RDFC10SerializerOptions options = RDFC10SerializerOptions.defaultConfig();
-        return canonicalize(model, options.getPermutationLimit());
+        return canonicalize(model, RDFC10SerializerOptions.defaultConfig());
     }
 
     /**
@@ -34,10 +33,36 @@ public final class RdfCanonicalization {
      * @return canonical, lexicographically ordered statements
      */
     public static List<Statement> canonicalize(Model model, int maxCalls) {
+        return canonicalize(model, RDFC10SerializerOptions.builder().permutationLimit(maxCalls).build());
+    }
+
+    /**
+     * Canonicalizes a model with a specified hash algorithm.
+     *
+     * @param model model to canonicalize
+     * @param hashAlgorithm hash algorithm to use (SHA-256 or SHA-384)
+     * @return canonical, lexicographically ordered statements
+     */
+    public static List<Statement> canonicalize(Model model, RDFC10SerializerOptions.HashAlgorithm hashAlgorithm) {
+        return canonicalize(model, RDFC10SerializerOptions.builder().hashAlgorithm(hashAlgorithm).build());
+    }
+
+    /**
+     * Canonicalizes a model with custom RDFC 1.0 options.
+     *
+     * @param model model to canonicalize
+     * @param options custom RDFC 1.0 options
+     * @return canonical, lexicographically ordered statements
+     */
+    public static List<Statement> canonicalize(Model model, RDFC10SerializerOptions options) {
         Objects.requireNonNull(model, "model");
-        RDFC10SerializerOptions options = RDFC10SerializerOptions.defaultConfig();
-        return new RDFC10Canonicalizer(options.getHashAlgorithm(), maxCalls, Values.factory())
-                .canonicalize(model);
+        Objects.requireNonNull(options, "options");
+        return new RDFC10Canonicalizer(
+                options.getHashAlgorithm(),
+                options.getPermutationLimit(),
+                options.getDepthFactor(),
+                Values.factory()
+        ).canonicalize(model);
     }
 
     /**

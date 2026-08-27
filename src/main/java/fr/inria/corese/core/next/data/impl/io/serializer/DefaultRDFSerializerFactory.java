@@ -88,6 +88,7 @@ public class DefaultRDFSerializerFactory implements RDFSerializerFactory {
                 RDFC10Canonicalizer rdfc10Canonicalizer = new RDFC10Canonicalizer(
                         specificConfig.getHashAlgorithm(),
                         specificConfig.getPermutationLimit(),
+                        specificConfig.getDepthFactor(),
                         coreseValueFactory
                 );
                 return new RDFC10Serializer(model, specificConfig, rdfc10Canonicalizer);
@@ -104,6 +105,7 @@ public class DefaultRDFSerializerFactory implements RDFSerializerFactory {
             RDFC10Canonicalizer rdfc10Canonicalizer = new RDFC10Canonicalizer(
                     defaultConfig.getHashAlgorithm(),
                     defaultConfig.getPermutationLimit(),
+                    defaultConfig.getDepthFactor(),
                     coreseValueFactory
             );
             return new RDFC10Serializer(model, defaultConfig, rdfc10Canonicalizer);

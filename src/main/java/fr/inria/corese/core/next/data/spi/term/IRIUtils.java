@@ -53,7 +53,7 @@ public final class IRIUtils {
             "(?<query>\\?[\\S\\-\\\"\\'_\\:\\?\\=]+)?)" +
             "(?<fragment>[\\S\\-_]+)?" +
             "$");
-    private static final Pattern STANDARD_IRI_PATTERN = Pattern.compile("^(([^:/?#\\s]+):)(\\/\\/([^/?#\\s]*))?([^?#\\s]*)(\\?([^#\\s]*))?(#(.*))?");
+    private static final Pattern STANDARD_IRI_PATTERN = Pattern.compile("^(([^:/?# \\t\\r\\n]+):)(\\/\\/([^/?# \\t\\r\\n]*))?([^?# \\t\\r\\n]*)(\\?([^# \\t\\r\\n]*))?(#(.*))?");
     private static final int MAX_IRI_LENGTH = 2048;
     private static final long REGEX_TIMEOUT_MS = 100;
 
@@ -250,7 +250,8 @@ public final class IRIUtils {
             URI uri = new URI(uriString);
             return uri.getScheme() != null && !uri.getScheme().isEmpty();
         } catch (URISyntaxException e) {
-            return false;
+            int colonIndex = uriString.indexOf(':');
+            return colonIndex > 0 && !uriString.contains(" ") && !uriString.contains("\t") && !uriString.contains("\n") && !uriString.contains("\r");
         }
     }
 

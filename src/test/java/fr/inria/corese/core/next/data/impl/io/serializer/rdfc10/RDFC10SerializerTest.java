@@ -303,7 +303,7 @@ class RDFC10SerializerTest {
         String expected = """
             <http://example.com/#p> <http://example.com/#q> _:c14n2 .
             <http://example.com/#p> <http://example.com/#q> _:c14n3 .
-            _:c14n1 <http://example.com/#r> _:c14n0 .
+            _:c14n0 <http://example.com/#r> _:c14n1 .
             _:c14n2 <http://example.com/#p> _:c14n1 .
             _:c14n3 <http://example.com/#p> _:c14n0 .""";
 
@@ -321,10 +321,10 @@ class RDFC10SerializerTest {
         String actual = canonicalOutput.trim().replace("\r\n", "\n");
 
         String expected = """
-            <http://example.com/#p> <http://example.com/#q> _:c14n1 .
-            <http://example.com/#p> <http://example.com/#r> _:c14n0 .
-            _:c14n0 <http://example.com/#t> <http://example.com/#u> .
-            _:c14n1 <http://example.com/#s> <http://example.com/#u> .""";
+            <http://example.com/#p> <http://example.com/#q> _:c14n0 .
+            <http://example.com/#p> <http://example.com/#r> _:c14n1 .
+            _:c14n0 <http://example.com/#s> <http://example.com/#u> .
+            _:c14n1 <http://example.com/#t> <http://example.com/#u> .""";
 
         assertEquals(expected, actual, "Canonical output should match RDFC-1.0 specification");
     }

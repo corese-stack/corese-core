@@ -2,6 +2,8 @@ package fr.inria.corese.core.next.data.impl.io.serializer.rdfc10;
 
 import fr.inria.corese.core.next.data.impl.io.serializer.option.AbstractSerializerOptions;
 
+import java.util.Objects;
+
 /**
  * Configuration for Canonical RDF serialization format (RDFC-1.0).
  * This class extends {@link AbstractSerializerOptions} and provides specific defaults
@@ -75,9 +77,9 @@ public class RDFC10SerializerOptions extends AbstractSerializerOptions {
      * specific to the Canonical RDF format.
      */
     public static class Builder extends AbstractSerializerOptions.AbstractBuilder<Builder> {
-        private final HashAlgorithm hashAlgorithm = HashAlgorithm.SHA_256;
-        private final int depthFactor = 5;
-        private final int permutationLimit = 50000;
+        private HashAlgorithm hashAlgorithm = HashAlgorithm.SHA_256;
+        private int depthFactor = 5;
+        private int permutationLimit = 50000;
 
         /**
          * Default constructor for the Builder.
@@ -88,9 +90,62 @@ public class RDFC10SerializerOptions extends AbstractSerializerOptions {
         }
 
         /**
+         * Copy constructor for creating options inheriting settings from another instance.
+         *
+         * @param otherOption other options instance
+         */
+        public Builder(fr.inria.corese.core.next.data.api.io.option.IOOptions otherOption) {
+            super(otherOption);
+            if (otherOption instanceof RDFC10SerializerOptions rdfcOptions) {
+                this.hashAlgorithm = rdfcOptions.getHashAlgorithm();
+                this.depthFactor = rdfcOptions.getDepthFactor();
+                this.permutationLimit = rdfcOptions.getPermutationLimit();
+            }
+        }
+
+        /**
+         * Sets the hashing algorithm to use (SHA-256 or SHA-384).
+         *
+         * @param hashAlgorithm the hashing algorithm
+         * @return this builder
+         */
+        public Builder hashAlgorithm(HashAlgorithm hashAlgorithm) {
+            this.hashAlgorithm = Objects.requireNonNull(hashAlgorithm, "Hash algorithm cannot be null");
+            return this;
+        }
+
+        /**
+         * Sets the depth factor for graph isomorphism exploration.
+         *
+         * @param depthFactor the depth factor (must be > 0)
+         * @return this builder
+         */
+        public Builder depthFactor(int depthFactor) {
+            if (depthFactor <= 0) {
+                throw new IllegalArgumentException("Depth factor must be greater than 0");
+            }
+            this.depthFactor = depthFactor;
+            return this;
+        }
+
+        /**
+         * Sets the maximum number of permutations allowed.
+         *
+         * @param permutationLimit the permutation limit (must be > 0)
+         * @return this builder
+         */
+        public Builder permutationLimit(int permutationLimit) {
+            if (permutationLimit <= 0) {
+                throw new IllegalArgumentException("Permutation limit must be greater than 0");
+            }
+            this.permutationLimit = permutationLimit;
+            return this;
+        }
+
+        /**
          * Builds a new {@link RDFC10SerializerOptions} instance with the configured values.
          *
-         * @return A new instance of {@code CanonicalOption}.
+         * @return A new instance of {@code RDFC10SerializerOptions}.
          */
         @Override
         public RDFC10SerializerOptions build() {
