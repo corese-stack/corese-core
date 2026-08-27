@@ -12,6 +12,12 @@ import java.util.Objects;
 /** Public entry point for RDF Dataset Canonicalization 1.0 operations. */
 public final class RdfCanonicalization {
 
+    /** Hash algorithms defined by RDF Dataset Canonicalization 1.0. */
+    public enum HashAlgorithm {
+        SHA_256,
+        SHA_384
+    }
+
     private RdfCanonicalization() {
     }
 
@@ -43,8 +49,13 @@ public final class RdfCanonicalization {
      * @param hashAlgorithm hash algorithm to use (SHA-256 or SHA-384)
      * @return canonical, lexicographically ordered statements
      */
-    public static List<Statement> canonicalize(Model model, RDFC10SerializerOptions.HashAlgorithm hashAlgorithm) {
-        return canonicalize(model, RDFC10SerializerOptions.builder().hashAlgorithm(hashAlgorithm).build());
+    public static List<Statement> canonicalize(Model model, HashAlgorithm hashAlgorithm) {
+        Objects.requireNonNull(hashAlgorithm, "hashAlgorithm");
+        RDFC10SerializerOptions.HashAlgorithm internalAlgorithm = switch (hashAlgorithm) {
+            case SHA_256 -> RDFC10SerializerOptions.HashAlgorithm.SHA_256;
+            case SHA_384 -> RDFC10SerializerOptions.HashAlgorithm.SHA_384;
+        };
+        return canonicalize(model, RDFC10SerializerOptions.builder().hashAlgorithm(internalAlgorithm).build());
     }
 
     /**
@@ -54,7 +65,7 @@ public final class RdfCanonicalization {
      * @param options custom RDFC 1.0 options
      * @return canonical, lexicographically ordered statements
      */
-    public static List<Statement> canonicalize(Model model, RDFC10SerializerOptions options) {
+    private static List<Statement> canonicalize(Model model, RDFC10SerializerOptions options) {
         Objects.requireNonNull(model, "model");
         Objects.requireNonNull(options, "options");
         return new RDFC10Canonicalizer(

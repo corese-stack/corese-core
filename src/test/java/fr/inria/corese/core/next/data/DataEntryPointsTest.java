@@ -122,6 +122,8 @@ class DataEntryPointsTest {
         assertEquals("<urn:subject> <urn:predicate> <urn:object> .",
                 RdfCanonicalization.toNQuad(statement));
         assertEquals(List.of(statement), RdfCanonicalization.canonicalize(Models.create(List.of(statement))));
+        assertEquals(List.of(statement), RdfCanonicalization.canonicalize(
+                Models.create(List.of(statement)), RdfCanonicalization.HashAlgorithm.SHA_384));
     }
 
     @Test
