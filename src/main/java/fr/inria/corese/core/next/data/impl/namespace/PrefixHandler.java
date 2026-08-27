@@ -101,14 +101,8 @@ public class PrefixHandler implements PrefixMapping {
         }
 
         String oldNamespace = prefixToNamespace.get(prefix);
-        if (oldNamespace != null && ! oldNamespace.equals(namespace)) {
+        if (oldNamespace != null && !oldNamespace.equals(namespace)) {
             namespaceToPrefix.remove(oldNamespace);
-            prefixToNamespace.remove(prefix);
-        }
-        String oldPrefix = namespaceToPrefix.get(namespace);
-        if(oldPrefix != null && ! oldPrefix.equals(prefix)) {
-            namespaceToPrefix.remove(namespace);
-            prefixToNamespace.remove(oldPrefix);
         }
 
         prefixToNamespace.put(prefix, namespace);

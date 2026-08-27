@@ -289,7 +289,7 @@ fragment PN_PREFIX
     ;
 
 fragment PN_LOCAL
-    : (PN_CHARS_U | [0-9] | PLX) ((PN_CHARS | '.' | ':' | PLX)* (PN_CHARS | ':' | PLX))?
+    : (PN_CHARS_U | ':' | [0-9] | PLX) ((PN_CHARS | '.' | ':' | PLX)* (PN_CHARS | ':' | PLX))?
     ;
 
 fragment PLX
