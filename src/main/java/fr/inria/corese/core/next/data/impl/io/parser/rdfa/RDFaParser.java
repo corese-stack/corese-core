@@ -9,6 +9,7 @@ import fr.inria.corese.core.next.data.api.io.option.RDFParsingOptions;
 import fr.inria.corese.core.next.data.api.io.option.BaseIRIOptions;
 import fr.inria.corese.core.next.data.spi.term.IRIUtils;
 import fr.inria.corese.core.next.data.api.vocabulary.RDF;
+import fr.inria.corese.core.next.data.api.vocabulary.XSD;
 import fr.inria.corese.core.next.data.api.exception.ParsingException;
 import fr.inria.corese.core.next.data.impl.io.parser.rdfa.model.*;
 import fr.inria.corese.core.next.data.spi.io.IOConstants;
@@ -20,6 +21,9 @@ import org.xml.sax.helpers.DefaultHandler;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import javax.xml.datatype.DatatypeConstants;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -43,9 +47,13 @@ public class RDFaParser extends AbstractRDFParser {
 
     private static final String BASE_TAG = "base";
     private static final String XMLNS_PREFIX = "xmlns";
+    private static final String XHTML_VOCABULARY = "http://www.w3.org/1999/xhtml/vocab#";
+    private static final String LICENSE_TERM = "license";
+    private static final DatatypeFactory XML_DATATYPE_FACTORY = createDatatypeFactory();
 
     private String baseIri = IOConstants.getDefaultBaseURI();
     private String documentBaseIri;
+    private boolean xmlBaseAllowed = true;
 
     private final SAXParser saxParser;
     private final SAXParserFactory saxParserFactory;
@@ -118,6 +126,7 @@ public class RDFaParser extends AbstractRDFParser {
         try {
             this.baseIri = baseURI;
             this.documentBaseIri = baseURI;
+            this.xmlBaseAllowed = true;
             SAXParserFactory factory = SAXParserFactory.newInstance();
             factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
             factory.setValidating(false);
@@ -209,7 +218,12 @@ public class RDFaParser extends AbstractRDFParser {
         } else {
             // This is the start of the document
             RDFaEvaluationContext startingContext = getNewContext(getValueFactory().createIRI(this.baseIri));
-            initializeEvaluationContextMappings(startingContext);
+            if (qName.equalsIgnoreCase("html")) {
+                initializeXhtmlTermMappings(startingContext);
+                // xml:base is not part of XHTML 1.x. XHTML5 documents do not
+                // use the XHTML+RDFa version marker.
+                this.xmlBaseAllowed = attrs.getValue("version") == null;
+            }
             startingContext.setParentSubjectResource(startingContext.getBaseIri());
             startingContext.setParentObjectResource(null);
             startingContext.setLanguage(null);
@@ -226,7 +240,7 @@ public class RDFaParser extends AbstractRDFParser {
 
         // XML-specific xml:base attribute or a base element.
         String xmlBase = this.currentProcessingContext().getElementAttributes().get("xml:base");
-        if (xmlBase != null && !xmlBase.isEmpty()) {
+        if (this.xmlBaseAllowed && xmlBase != null && !xmlBase.isEmpty()) {
             String currentBase = currentProcessingContext().getEvaluationContext().getBaseIri().stringValue();
             String resolvedBase = java.net.URI.create(currentBase).resolve(xmlBase).toString();
             currentProcessingContext().getEvaluationContext().setBaseIri(getValueFactory().createIRI(resolvedBase));
@@ -565,6 +579,7 @@ public class RDFaParser extends AbstractRDFParser {
             String propertyValue = getAttributeStringValue(RDFaAttributes.PROPERTY);
             if (propertyValue != null && !propertyValue.trim().isEmpty()) {
                 List<Resource> propertyIRIList = getAttributeValueResourceList(RDFaAttributes.PROPERTY);
+                String htmlDatetimeValue = getHtmlDatetimeValue(qName);
             Resource datatypeRes = (isAttributePresent(RDFaAttributes.DATATYPE) && !getAttributeStringValue(RDFaAttributes.DATATYPE).trim().isEmpty())
                     ? getAttributeValueResource(RDFaAttributes.DATATYPE)
                     : null;
@@ -574,6 +589,8 @@ public class RDFaParser extends AbstractRDFParser {
                 if (isAttributePresent(RDFaAttributes.CONTENT)) {
                     String contentString = getAttributeStringValue(RDFaAttributes.CONTENT);
                     this.currentProcessingContext().setCurrentPropertyValue(getValueFactory().createLiteral(contentString, datatypeIRI));
+                } else if (htmlDatetimeValue != null) {
+                    this.currentProcessingContext().setCurrentPropertyValue(getValueFactory().createLiteral(htmlDatetimeValue, datatypeIRI));
                 } else {
                     String contentString = this.currentProcessingContext().getCharacters();
                     this.currentProcessingContext().setCurrentPropertyValue(getValueFactory().createLiteral(contentString, datatypeIRI));
@@ -609,6 +626,8 @@ public class RDFaParser extends AbstractRDFParser {
                 } else {
                     this.currentProcessingContext().setCurrentPropertyValue(getValueFactory().createLiteral(contentString));
                 }
+            } else if (htmlDatetimeValue != null) {
+                this.currentProcessingContext().setCurrentPropertyValue(createHtmlDatetimeLiteral(htmlDatetimeValue));
                 //  otherwise, if the @rel, @rev, and @content attributes are not present, as a resource obtained from one of the following:
                 //    by using the resource from @resource, if present, obtained according to the section on CURIE and IRI Processing;
                 //    otherwise, by using the IRI from @href, if present, obtained according to the section on CURIE and IRI Processing;
@@ -898,6 +917,63 @@ public class RDFaParser extends AbstractRDFParser {
         return !this.processingContexts.isEmpty() && this.processingContexts.getLast().getElementName().equalsIgnoreCase("html");
     }
 
+    private String getHtmlDatetimeValue(String qName) {
+        if (!isHtmlDocument() || !qName.equalsIgnoreCase("time") || isAttributePresent(RDFaAttributes.CONTENT)) {
+            return null;
+        }
+        String datetime = this.currentProcessingContext().getElementAttributes().get("datetime");
+        return datetime != null ? datetime : this.currentProcessingContext().getCharacters();
+    }
+
+    private Literal createHtmlDatetimeLiteral(String value) {
+        IRI datatype = inferHtmlDatetimeDatatype(value);
+        if (datatype != null) {
+            return getValueFactory().createLiteral(value, datatype);
+        }
+        String language = this.currentProcessingContext().getCurrentLanguage();
+        return language != null && !language.isEmpty()
+                ? getValueFactory().createLiteral(value, language)
+                : getValueFactory().createLiteral(value);
+    }
+
+    private IRI inferHtmlDatetimeDatatype(String value) {
+        try {
+            XMLGregorianCalendar calendar = XML_DATATYPE_FACTORY.newXMLGregorianCalendar(value);
+            javax.xml.namespace.QName schemaType = calendar.getXMLSchemaType();
+            if (DatatypeConstants.DATETIME.equals(schemaType)) {
+                return XSD.xsdDateTime.getIRI();
+            }
+            if (DatatypeConstants.DATE.equals(schemaType)) {
+                return XSD.xsdDate.getIRI();
+            }
+            if (DatatypeConstants.TIME.equals(schemaType)) {
+                return XSD.xsdTime.getIRI();
+            }
+            if (DatatypeConstants.GYEARMONTH.equals(schemaType)) {
+                return XSD.xsdYearMonth.getIRI();
+            }
+            if (DatatypeConstants.GYEAR.equals(schemaType)) {
+                return XSD.xsdYear.getIRI();
+            }
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            // An unmatched lexical form is a plain literal in HTML+RDFa.
+        }
+        try {
+            XML_DATATYPE_FACTORY.newDuration(value);
+            return value.startsWith("P") || value.startsWith("-P") ? XSD.xsdDuration.getIRI() : null;
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
+    private static DatatypeFactory createDatatypeFactory() {
+        try {
+            return DatatypeFactory.newInstance();
+        } catch (javax.xml.datatype.DatatypeConfigurationException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+    }
+
     /**
      * Resolves attributes that require TERMorCURIEorAbsURI (@property, @rel, @rev, @typeof, @datatype)
      */
@@ -957,7 +1033,7 @@ public class RDFaParser extends AbstractRDFParser {
         if (resultString.contains(":")) {
             String prefixString = resultString.substring(0, resultString.indexOf(":"));
             if (IRIUtils.isStandardIRI(resultString) && isValidIRIScheme(prefixString)) {
-                return Optional.of(this.getValueFactory().createIRI(resultString));
+                return Optional.of(this.getValueFactory().createIRI(java.net.URI.create(resultString).normalize().toString()));
             }
         }
 
@@ -1098,23 +1174,29 @@ public class RDFaParser extends AbstractRDFParser {
     }
 
     private void initializeEvaluationContextMappings(RDFaEvaluationContext context) {
-        // Standard XHTML vocabulary terms
-        String[] xhvTerms = {
-            "alternate", "appendix", "cite", "bookmark", "contents", "chapter", "copyright",
-            "first", "glossary", "help", "icon", "index", "last", "license", "meta", "next",
-            "prev", "previous", "role", "section", "start", "stylesheet", "subsection", "top", "up", "p3pv1"
-        };
-        for (String term : xhvTerms) {
-            context.addTermMapping(term, getValueFactory().createIRI("http://www.w3.org/1999/xhtml/vocab#" + term));
-        }
+        // RDFa Core initial context terms. Host-specific terms are added only
+        // after the root element identifies an XHTML document.
         context.addTermMapping("describedby", getValueFactory().createIRI("http://www.w3.org/2007/05/powder-s#describedby"));
+        context.addTermMapping(LICENSE_TERM, getValueFactory().createIRI(XHTML_VOCABULARY + LICENSE_TERM));
+        context.addTermMapping("role", getValueFactory().createIRI(XHTML_VOCABULARY + "role"));
 
         // Initial context predefined prefixes
         for (RDFaInitialPrefixes prefixObject : RDFaInitialPrefixes.values()) {
             context.addIriMapping(prefixObject.getPrefix(), getValueFactory().createIRI(prefixObject.getNamespace()));
         }
         // Default empty prefix
-        context.addIriMapping("", getValueFactory().createIRI("http://www.w3.org/1999/xhtml/vocab#"));
+        context.addIriMapping("", getValueFactory().createIRI(XHTML_VOCABULARY));
+    }
+
+    private void initializeXhtmlTermMappings(RDFaEvaluationContext context) {
+        String[] xhvTerms = {
+            "alternate", "appendix", "cite", "bookmark", "contents", "chapter", "copyright",
+            "first", "glossary", "help", "icon", "index", "last", LICENSE_TERM, "meta", "next",
+            "prev", "previous", "role", "section", "start", "stylesheet", "subsection", "top", "up", "p3pv1"
+        };
+        for (String term : xhvTerms) {
+            context.addTermMapping(term, getValueFactory().createIRI(XHTML_VOCABULARY + term));
+        }
     }
 
     private Map<String, IRI> getIriMappings() {

@@ -7,6 +7,7 @@ import org.xml.sax.Attributes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,7 +59,13 @@ public class RDFaProcessingContext {
         this.newSubject = null;
         this.currentObjectResource = null;
         this.typedResource = null;
-        this.incompleteStatements = context.getIncompleteStatements();
+        // The RDFa processing sequence defines this as an element-local value.
+        // Descendants receive it through their evaluation context, but siblings
+        // must never share it after this element closes.
+        this.incompleteStatements = new HashSet<>();
+        // The RDFa algorithm explicitly defines this as a reference to the
+        // evaluation context's list mapping. Step 8 replaces it when a new
+        // subject establishes a new list owner.
         this.listMappings = context.getListMappings();
         this.currentLanguage = context.getLanguage();
         this.defaultVocabulary = context.getDefaultVocabulary();

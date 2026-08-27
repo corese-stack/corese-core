@@ -22,6 +22,7 @@ import java.io.StringWriter;
 import java.util.Iterator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -264,6 +265,103 @@ class RDFaParserTest extends ParserTestBase {
         assertTrue(model.contains(subject, predicate, object));
         assertEquals(RDF.XMLLiteral.getIRI(), object.getDatatype());
         assertEquals("<span property=\"foaf:firstName\" xmlns=\"http://www.w3.org/1999/xhtml\" xmlns:foaf=\"http://xmlns.com/foaf/0.1/\" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">Mark</span>", object.getLabel());
+    }
+
+    @Test
+    void incompleteRelationsDoNotLeakToFollowingSiblings() {
+        String xhtml = """
+                <html prefix="foaf: http://xmlns.com/foaf/0.1/">
+                  <body>
+                    <div about="http://example.org/alice" rel="foaf:knows">
+                      <span about="http://example.org/bob" property="foaf:name">Bob</span>
+                    </div>
+                    <div about="http://example.org/carol" property="foaf:name">Carol</div>
+                  </body>
+                </html>
+                """;
+
+        Model model = createTestModel();
+        RDFParser parser = parserFactory.createRDFParser(RDFFormat.RDFA, model, valueFactory);
+        parser.parse(new ByteArrayInputStream(xhtml.getBytes()), "http://example.org/document");
+
+        IRI alice = valueFactory.createIRI("http://example.org/alice");
+        IRI bob = valueFactory.createIRI("http://example.org/bob");
+        IRI carol = valueFactory.createIRI("http://example.org/carol");
+        IRI knows = valueFactory.createIRI("http://xmlns.com/foaf/0.1/knows");
+        IRI name = valueFactory.createIRI("http://xmlns.com/foaf/0.1/name");
+
+        assertEquals(3, model.size());
+        assertTrue(model.contains(alice, knows, bob));
+        assertTrue(model.contains(bob, name, valueFactory.createLiteral("Bob")));
+        assertTrue(model.contains(carol, name, valueFactory.createLiteral("Carol")));
+    }
+
+    @Test
+    void xmlHostUsesOnlyRdfaCoreTerms() {
+        String xml = """
+                <root>
+                  <a rel="alternate" href="http://example.org/alternate"/>
+                  <a rel="license" href="http://example.org/license"/>
+                </root>
+                """;
+
+        Model model = createTestModel();
+        RDFParser parser = parserFactory.createRDFParser(RDFFormat.RDFA, model, valueFactory);
+        parser.parse(new ByteArrayInputStream(xml.getBytes()), "http://example.org/document");
+
+        IRI subject = valueFactory.createIRI("http://example.org/document");
+        IRI alternate = valueFactory.createIRI("http://www.w3.org/1999/xhtml/vocab#alternate");
+        IRI license = valueFactory.createIRI("http://www.w3.org/1999/xhtml/vocab#license");
+
+        assertEquals(1, model.size());
+        assertFalse(model.contains(subject, alternate, null));
+        assertTrue(model.contains(subject, license, valueFactory.createIRI("http://example.org/license")));
+    }
+
+    @Test
+    void htmlTimeUsesDatetimeValueAndInferredDatatype() {
+        String xhtml = """
+                <html prefix="ex: http://example.org/">
+                  <body about="http://example.org/event">
+                    <time property="ex:date" datetime="2012-03-18Z">18 March 2012</time>
+                    <time property="ex:label" lang="en" datetime="D-Day">ignored</time>
+                  </body>
+                </html>
+                """;
+
+        Model model = createTestModel();
+        RDFParser parser = parserFactory.createRDFParser(RDFFormat.RDFA, model, valueFactory);
+        parser.parse(new ByteArrayInputStream(xhtml.getBytes()), "http://example.org/document");
+
+        IRI subject = valueFactory.createIRI("http://example.org/event");
+        assertEquals(2, model.size());
+        assertTrue(model.contains(subject, valueFactory.createIRI("http://example.org/date"),
+                valueFactory.createLiteral("2012-03-18Z", XSD.xsdDate.getIRI())));
+        assertTrue(model.contains(subject, valueFactory.createIRI("http://example.org/label"),
+                valueFactory.createLiteral("D-Day", "en")));
+    }
+
+    @Test
+    void xhtmlOneIgnoresXmlBaseAndNormalizesAbsoluteIris() {
+        String xhtml = """
+                <html version="XHTML+RDFa 1.1" prefix="ex: http://example.org/">
+                  <body xml:base="http://example.org/invalid/">
+                    <span about="" property="ex:title">Title</span>
+                    <a about="" rel="ex:target" href="http://example.org/foo/.."/>
+                  </body>
+                </html>
+                """;
+
+        Model model = createTestModel();
+        RDFParser parser = parserFactory.createRDFParser(RDFFormat.RDFA, model, valueFactory);
+        parser.parse(new ByteArrayInputStream(xhtml.getBytes()), "http://example.org/document");
+
+        IRI subject = valueFactory.createIRI("http://example.org/document");
+        assertEquals(2, model.size());
+        assertTrue(model.contains(subject, valueFactory.createIRI("http://example.org/title"),
+                valueFactory.createLiteral("Title")));
+        assertTrue(model.contains(subject, valueFactory.createIRI("http://example.org/target"),
+                valueFactory.createIRI("http://example.org/")));
     }
 
     @Test
