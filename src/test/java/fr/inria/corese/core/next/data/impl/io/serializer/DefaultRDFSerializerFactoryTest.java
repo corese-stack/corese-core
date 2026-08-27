@@ -5,7 +5,7 @@ import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
 import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializerOptions;
 import fr.inria.corese.core.next.data.api.exception.SerializationException;
-import fr.inria.corese.core.next.data.impl.io.jsonld.JSONLDOptions;
+import fr.inria.corese.core.next.data.api.io.JSONLDOptions;
 import fr.inria.corese.core.next.data.impl.io.serializer.rdfc10.RDFC10Serializer;
 import fr.inria.corese.core.next.data.impl.io.serializer.rdfc10.RDFC10SerializerOptions;
 import fr.inria.corese.core.next.data.impl.io.serializer.jsonld.JSONLDSerializer;

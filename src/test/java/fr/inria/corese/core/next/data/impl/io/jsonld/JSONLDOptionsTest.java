@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.data.impl.io.jsonld;
 
 import com.apicatalog.jsonld.JsonLdVersion;
+import fr.inria.corese.core.next.data.api.io.JSONLDOptions;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;

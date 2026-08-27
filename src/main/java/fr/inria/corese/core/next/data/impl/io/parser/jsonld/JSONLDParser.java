@@ -19,7 +19,7 @@ import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 import fr.inria.corese.core.next.data.impl.namespace.PrefixHandler;
 import fr.inria.corese.core.next.data.spi.term.IRIUtils;
 import fr.inria.corese.core.next.data.api.exception.ParsingException;
-import fr.inria.corese.core.next.data.impl.io.jsonld.JSONLDOptions;
+import fr.inria.corese.core.next.data.api.io.JSONLDOptions;
 import fr.inria.corese.core.next.data.impl.io.parser.DefaultRDFParserFactory;
 
 import java.io.InputStream;

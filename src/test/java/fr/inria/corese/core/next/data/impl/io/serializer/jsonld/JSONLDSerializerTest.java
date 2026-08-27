@@ -6,7 +6,7 @@ import fr.inria.corese.core.next.data.api.model.*;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
 import fr.inria.corese.core.next.storage.impl.model.StorageModel;
-import fr.inria.corese.core.next.data.impl.io.jsonld.JSONLDOptions;
+import fr.inria.corese.core.next.data.api.io.JSONLDOptions;
 import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
 import fr.inria.corese.core.next.storage.Storages;
 import fr.inria.corese.core.next.storage.api.config.StorageConfig;

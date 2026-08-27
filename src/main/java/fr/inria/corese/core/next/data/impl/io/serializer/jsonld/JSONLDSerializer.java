@@ -9,7 +9,7 @@ import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
 import fr.inria.corese.core.next.data.api.io.option.IOOptions;
 import fr.inria.corese.core.next.data.api.exception.SerializationException;
-import fr.inria.corese.core.next.data.impl.io.jsonld.JSONLDOptions;
+import fr.inria.corese.core.next.data.api.io.JSONLDOptions;
 
 import java.io.IOException;
 import java.io.Writer;

@@ -21,7 +21,7 @@ import fr.inria.corese.core.next.data.impl.io.parser.turtle.TurtleParser;
 import fr.inria.corese.core.next.data.impl.io.parser.turtle.TurtleParserOptions;
 import fr.inria.corese.core.next.data.impl.io.parser.trig.TriGParser;
 import fr.inria.corese.core.next.data.impl.io.parser.trig.TriGParserOptions;
-import fr.inria.corese.core.next.data.impl.io.jsonld.JSONLDOptions;
+import fr.inria.corese.core.next.data.api.io.JSONLDOptions;
 
 import java.util.Objects;
 

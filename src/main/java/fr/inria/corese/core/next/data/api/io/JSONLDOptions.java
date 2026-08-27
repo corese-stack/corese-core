@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.data.impl.io.jsonld;
+package fr.inria.corese.core.next.data.api.io;
 
 import java.net.URI;
 import java.time.Duration;
@@ -11,7 +11,7 @@ import fr.inria.corese.core.next.data.spi.io.AbstractIOOptions;
 import fr.inria.corese.core.next.data.api.io.option.BaseIRIOptions;
 import fr.inria.corese.core.next.data.api.io.option.RDFParsingOptions;
 import fr.inria.corese.core.next.data.api.io.option.RDFSerializationOptions;
-import fr.inria.corese.core.next.data.impl.io.parser.support.ParserConstants;
+import fr.inria.corese.core.next.data.spi.io.IOConstants;
 
 /**
  * Wrapper around the JsonLdOptions class for the Titanium JSONLD parser and
@@ -137,7 +137,7 @@ public class JSONLDOptions extends AbstractIOOptions
     @Override
     public String getBaseIRI() {
         if(this.builder.options.getBase() == null) {
-            return ParserConstants.getDefaultBaseURI();
+            return IOConstants.getDefaultBaseURI();
         }
         return this.builder.options.getBase().toString();
     }
