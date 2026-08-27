@@ -114,4 +114,17 @@ class TurtleParserTest extends ParserTestBase {
         assertEquals(refModel.size(), model.size());
     }
 
+    @Test
+    void testUndeclaredEmptyPrefixThrowsParsingException() {
+        String turtle = ":subject :predicate :object .";
+        Model model = createTestModel();
+        RDFParser parser = new TurtleParser(model, factory);
+
+        fr.inria.corese.core.next.data.api.exception.ParsingException ex = org.junit.jupiter.api.Assertions.assertThrows(
+                fr.inria.corese.core.next.data.api.exception.ParsingException.class,
+                () -> parser.parse(new StringReader(turtle))
+        );
+        assertTrue(ex.getMessage().contains("Undeclared prefix: '' (empty prefix)"));
+    }
+
 }

@@ -251,7 +251,7 @@ public class RDFaParser extends AbstractRDFParser {
 
                 IRI prefixNamespace;
                 if (IRIUtils.isStandardIRI(attributeValue)) {
-                    prefixNamespace = getValueFactory().createIRI(attributeValue, "");
+                    prefixNamespace = getValueFactory().createIRI(attributeValue);
                 } else {
                     String baseIriString = currentProcessingContext().getEvaluationContext().getBaseIri().stringValue();
                     prefixNamespace = getValueFactory().createIRI(baseIriString + attributeValue);
