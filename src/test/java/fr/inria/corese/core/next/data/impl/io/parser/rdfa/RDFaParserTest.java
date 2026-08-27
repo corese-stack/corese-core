@@ -511,6 +511,32 @@ class RDFaParserTest extends ParserTestBase {
         assertTrue(testModel.contains(subject, RDF.type.getIRI(), object));
     }
 
+    @Test
+    void parseXmlnsWithRelativeUri() {
+        String xhtml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
+                <html xmlns="http://www.w3.org/1999/xhtml"
+                      xmlns:ex="vocab#"
+                      version="XHTML+RDFa 1.1">
+                  <body>
+                    <p about="#me" typeof="ex:Person" property="ex:name">Alice</p>
+                  </body>
+                </html>""";
+
+        Model model = createTestModel();
+        RDFParser parser = parserFactory.createRDFParser(RDFFormat.RDFA, model, valueFactory);
+        parser.parse(new ByteArrayInputStream(xhtml.getBytes()), "http://example.org/test/");
+
+        IRI subject = valueFactory.createIRI("http://example.org/test/#me");
+        IRI type = RDF.type.getIRI();
+        IRI personClass = valueFactory.createIRI("http://example.org/test/vocab#Person");
+        IRI namePred = valueFactory.createIRI("http://example.org/test/vocab#name");
+
+        assertTrue(model.contains(subject, type, personClass));
+        assertTrue(model.contains(subject, namePred, valueFactory.createLiteral("Alice")));
+    }
+
     private static void logModelContent(Model model) {
         StringWriter outWriter = new StringWriter();
         RDFSerializer serializer = (new DefaultRDFSerializerFactory()).createSerializer(RDFFormat.TURTLE, model);

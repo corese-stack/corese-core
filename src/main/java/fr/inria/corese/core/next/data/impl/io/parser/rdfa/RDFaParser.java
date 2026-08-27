@@ -46,8 +46,8 @@ public class RDFaParser extends AbstractRDFParser {
 
     private String baseIri = IOConstants.getDefaultBaseURI();
 
-    private SAXParser saxParser;
-    private SAXParserFactory saxParserFactory;
+    private final SAXParser saxParser;
+    private final SAXParserFactory saxParserFactory;
 
     /**
      * An index of IRI prefixes
@@ -249,7 +249,13 @@ public class RDFaParser extends AbstractRDFParser {
                     throw new ParsingException("Prefix '" + prefixName + "' contains underscore character which is not allowed in xmlns declaration");
                 }
 
-                IRI prefixNamespace = getValueFactory().createIRI(attributeValue, "");
+                IRI prefixNamespace;
+                if (IRIUtils.isStandardIRI(attributeValue)) {
+                    prefixNamespace = getValueFactory().createIRI(attributeValue);
+                } else {
+                    String baseIriString = currentProcessingContext().getEvaluationContext().getBaseIri().stringValue();
+                    prefixNamespace = getValueFactory().createIRI(baseIriString + attributeValue);
+                }
                 this.addIriMapping(prefixName, prefixNamespace);
             }
         });

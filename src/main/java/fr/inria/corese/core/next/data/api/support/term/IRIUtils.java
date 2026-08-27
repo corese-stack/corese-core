@@ -121,8 +121,8 @@ public final class IRIUtils {
             if (matcher == null || !matcher.matches()) {
                 return iri;
             } else if (matcher.matches()) {
-                if (matcher.group("fragment") != null) { // If the IRI has a fragment
-                    return matcher.group("fragment");
+                if (matcher.group("anchor") != null) {
+                    return matcher.group("fragment") != null ? matcher.group("fragment") : "";
                 } else if (matcher.group(FINAL_PATH_GROUP) != null) { // If the IRI has no fragment but does not end with a slash
                     return matcher.group(FINAL_PATH_GROUP);
                 } else { // If the URI ends with a slash
