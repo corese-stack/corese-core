@@ -29,10 +29,21 @@ public class RDFaProcessingContext {
     private String defaultVocabulary = null;
     private Map<String, String> elementAttributes = new HashMap<>();
 
+    /** Namespace declarations explicitly in scope for XML literal serialization. */
+    private Map<String, String> namespaceDeclarations = new HashMap<>();
+
     /**
      * Buffer for accumulating character data between start and end tags.
      */
     private StringBuilder characters = new StringBuilder();
+
+    /**
+     * Serialized XML descendants used when this element establishes an
+     * {@code rdf:XMLLiteral} property value.
+     */
+    private StringBuilder xmlLiteralContent = new StringBuilder();
+
+    private boolean xmlLiteralProperty;
 
     private boolean isRootElement = true;
 
@@ -52,6 +63,18 @@ public class RDFaProcessingContext {
         this.currentLanguage = context.getLanguage();
         this.defaultVocabulary = context.getDefaultVocabulary();
         this.evaluationContext = context;
+    }
+
+    public Map<String, String> getNamespaceDeclarations() {
+        return namespaceDeclarations;
+    }
+
+    public void setNamespaceDeclarations(Map<String, String> namespaceDeclarations) {
+        this.namespaceDeclarations = new HashMap<>(namespaceDeclarations);
+    }
+
+    public void addNamespaceDeclaration(String prefix, String namespace) {
+        this.namespaceDeclarations.put(prefix, namespace);
     }
 
     /**
@@ -268,6 +291,22 @@ public class RDFaProcessingContext {
      */
     public void addCharacters(char[] ch, int start, int length) {
         this.characters.append(ch, start, length);
+    }
+
+    public boolean isXmlLiteralProperty() {
+        return xmlLiteralProperty;
+    }
+
+    public void setXmlLiteralProperty(boolean xmlLiteralProperty) {
+        this.xmlLiteralProperty = xmlLiteralProperty;
+    }
+
+    public String getXmlLiteralContent() {
+        return xmlLiteralContent.toString();
+    }
+
+    public void appendXmlLiteralContent(String content) {
+        this.xmlLiteralContent.append(content);
     }
 
     /**

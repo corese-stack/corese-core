@@ -22,6 +22,7 @@ import java.io.StringWriter;
 import java.util.Iterator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class RDFaParserTest extends ParserTestBase {
@@ -186,6 +187,83 @@ class RDFaParserTest extends ParserTestBase {
             assertEquals(statementRef.getContext(), statementTest.getContext());
         }
         assertTrue(testModel.contains(subject, predicate, object));
+    }
+
+    @Test
+    void baseElementIsAppliedInXmlHost() {
+        String xml = """
+                <root>
+                  <head><base href="http://example.org/"/></head>
+                  <body>
+                    <p about="#me" property="http://example.org/name">Ivan Herman</p>
+                  </body>
+                </root>
+                """;
+
+        Model model = createTestModel();
+        RDFParser parser = parserFactory.createRDFParser(RDFFormat.RDFA, model, valueFactory);
+        parser.parse(new ByteArrayInputStream(xml.getBytes()), "http://example.test/document.xml");
+
+        IRI subject = valueFactory.createIRI("http://example.org/#me");
+        IRI predicate = valueFactory.createIRI("http://example.org/name");
+        Literal object = valueFactory.createLiteral("Ivan Herman");
+
+        assertEquals(1, model.size());
+        assertTrue(model.contains(subject, predicate, object));
+    }
+
+    @Test
+    void baseElementDoesNotChangeXmlDocumentSubject() {
+        String xml = """
+                <root>
+                  <head><base href="http://example.org/"/></head>
+                  <body>
+                    <p property="http://example.org/name">Ivan Herman</p>
+                  </body>
+                </root>
+                """;
+
+        Model model = createTestModel();
+        RDFParser parser = parserFactory.createRDFParser(RDFFormat.RDFA, model, valueFactory);
+        parser.parse(new ByteArrayInputStream(xml.getBytes()), "http://example.test/document.xml");
+
+        IRI subject = valueFactory.createIRI("http://example.test/document.xml");
+        IRI predicate = valueFactory.createIRI("http://example.org/name");
+        Literal object = valueFactory.createLiteral("Ivan Herman");
+
+        assertEquals(1, model.size());
+        assertTrue(model.contains(subject, predicate, object));
+    }
+
+    @Test
+    void serializesXmlLiteralDescendantsWithNamespaces() {
+        String xhtml = """
+                <html xmlns="http://www.w3.org/1999/xhtml"
+                      prefix="foaf: http://xmlns.com/foaf/0.1/ rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                  <body about="http://example.org/mark">
+                    <h2 property="foaf:name" datatype="rdf:XMLLiteral"><span property="foaf:firstName">Mark</span></h2>
+                  </body>
+                </html>
+                """;
+
+        Model model = createTestModel();
+        RDFParser parser = parserFactory.createRDFParser(RDFFormat.RDFA, model, valueFactory);
+        parser.parse(new ByteArrayInputStream(xhtml.getBytes()), "http://example.org/document");
+
+        IRI subject = valueFactory.createIRI("http://example.org/mark");
+        IRI predicate = valueFactory.createIRI("http://xmlns.com/foaf/0.1/name");
+        Literal object = null;
+        for (Statement statement : model) {
+            if (statement.getSubject().equals(subject) && statement.getPredicate().equals(predicate)) {
+                object = (Literal) statement.getObject();
+                break;
+            }
+        }
+
+        assertNotNull(object);
+        assertTrue(model.contains(subject, predicate, object));
+        assertEquals(RDF.XMLLiteral.getIRI(), object.getDatatype());
+        assertEquals("<span property=\"foaf:firstName\" xmlns=\"http://www.w3.org/1999/xhtml\" xmlns:foaf=\"http://xmlns.com/foaf/0.1/\" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">Mark</span>", object.getLabel());
     }
 
     @Test

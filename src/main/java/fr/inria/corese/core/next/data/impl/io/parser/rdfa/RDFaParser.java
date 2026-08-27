@@ -147,7 +147,14 @@ public class RDFaParser extends AbstractRDFParser {
     private void handleCharacters(char[] ch, int start, int length) {
         for (RDFaProcessingContext value : this.processingContexts) {
             value.addCharacters(ch, start, length);
+            if (value.isXmlLiteralProperty()) {
+                value.appendXmlLiteralContent(escapeXmlText(new String(ch, start, length)));
+            }
         }
+    }
+
+    private String escapeXmlText(String value) {
+        return value.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 
     private void clearAllCharactersBuffers() {
@@ -168,6 +175,7 @@ public class RDFaParser extends AbstractRDFParser {
         RDFaProcessingContext processingContext;
         if (!this.processingContexts.isEmpty()) { // Not a root element
             processingContext = new RDFaProcessingContext(currentProcessingContext().getEvaluationContext());
+            processingContext.setNamespaceDeclarations(currentProcessingContext().getNamespaceDeclarations());
             processingContext.setRootElement(false);
             // 13. Next, all elements that are children of the current element are processed using the rules described here, using a new evaluation context, initialized as follows:
             // If the skip element flag is 'true' then the new evaluation context is a copy of the current context that was passed in to this level of processing, with the language and list of IRI mappings values replaced with the local values;
@@ -216,13 +224,13 @@ public class RDFaParser extends AbstractRDFParser {
             throw new ParsingException("Start process element "+ qName +" is not paired with the right context" + this.currentProcessingContext());
         }
 
-        // XML-specific xml:base attribute or HTML-specific base element
+        // XML-specific xml:base attribute or a base element.
         String xmlBase = this.currentProcessingContext().getElementAttributes().get("xml:base");
         if (xmlBase != null && !xmlBase.isEmpty()) {
             String currentBase = currentProcessingContext().getEvaluationContext().getBaseIri().stringValue();
             String resolvedBase = java.net.URI.create(currentBase).resolve(xmlBase).toString();
             currentProcessingContext().getEvaluationContext().setBaseIri(getValueFactory().createIRI(resolvedBase));
-        } else if (isHtmlDocument() && qName.equalsIgnoreCase(BASE_TAG) && isAttributePresent(RDFaAttributes.HREF)) {
+        } else if (qName.equalsIgnoreCase(BASE_TAG) && isAttributePresent(RDFaAttributes.HREF)) {
             Resource resourceBase = getAttributeValueResource(RDFaAttributes.HREF);
             if (resourceBase != null && resourceBase.isIRI()) {
                 String baseStr = resourceBase.stringValue();
@@ -234,19 +242,27 @@ public class RDFaParser extends AbstractRDFParser {
                 this.baseIri = newBase.stringValue();
                 for (RDFaProcessingContext ctx : this.processingContexts) {
                     ctx.getEvaluationContext().setBaseIri(newBase);
-                    if (ctx.getNewSubject() != null && ctx.getNewSubject().isIRI()
-                            && (this.documentBaseIri == null || ctx.getNewSubject().stringValue().equals(this.documentBaseIri))) {
-                        ctx.setNewSubject(newBase);
-                    }
-                    if (ctx.getEvaluationContext().getParentSubjectResource() != null
-                            && ctx.getEvaluationContext().getParentSubjectResource().isIRI()
-                            && (this.documentBaseIri == null || ctx.getEvaluationContext().getParentSubjectResource().stringValue().equals(this.documentBaseIri))) {
-                        ctx.getEvaluationContext().setParentSubjectResource(newBase);
-                    }
-                    if (ctx.getEvaluationContext().getParentObjectResource() != null
-                            && ctx.getEvaluationContext().getParentObjectResource().isIRI()
-                            && (this.documentBaseIri == null || ctx.getEvaluationContext().getParentObjectResource().stringValue().equals(this.documentBaseIri))) {
-                        ctx.getEvaluationContext().setParentObjectResource(newBase);
+                }
+
+                // In HTML, the base element also updates the implicit document
+                // resource tracked by the active processing contexts. For XML
+                // hosts it only affects the resolution of relative IRIs.
+                if (isHtmlDocument()) {
+                    for (RDFaProcessingContext ctx : this.processingContexts) {
+                        if (ctx.getNewSubject() != null && ctx.getNewSubject().isIRI()
+                                && (this.documentBaseIri == null || ctx.getNewSubject().stringValue().equals(this.documentBaseIri))) {
+                            ctx.setNewSubject(newBase);
+                        }
+                        if (ctx.getEvaluationContext().getParentSubjectResource() != null
+                                && ctx.getEvaluationContext().getParentSubjectResource().isIRI()
+                                && (this.documentBaseIri == null || ctx.getEvaluationContext().getParentSubjectResource().stringValue().equals(this.documentBaseIri))) {
+                            ctx.getEvaluationContext().setParentSubjectResource(newBase);
+                        }
+                        if (ctx.getEvaluationContext().getParentObjectResource() != null
+                                && ctx.getEvaluationContext().getParentObjectResource().isIRI()
+                                && (this.documentBaseIri == null || ctx.getEvaluationContext().getParentObjectResource().stringValue().equals(this.documentBaseIri))) {
+                            ctx.getEvaluationContext().setParentObjectResource(newBase);
+                        }
                     }
                 }
             }
@@ -272,6 +288,9 @@ public class RDFaParser extends AbstractRDFParser {
 
         // 3. The current element is examined for IRI mappings and these are added to the local list of IRI mappings. Note that an IRI mapping will simply overwrite any current mapping in the list that has the same name;
         this.currentProcessingContext().getElementAttributes().forEach((String attribute, String attributeValue) -> {
+            if (attribute.equals(XMLNS_PREFIX)) {
+                this.currentProcessingContext().addNamespaceDeclaration("", attributeValue);
+            }
             if (attribute.startsWith(XMLNS_PREFIX + ":")) {
                 String prefixName = attribute.replace(XMLNS_PREFIX + ":", "");
 
@@ -288,12 +307,16 @@ public class RDFaParser extends AbstractRDFParser {
                     prefixNamespace = getValueFactory().createIRI(resolvedIRI);
                 }
                 this.addIriMapping(prefixName, prefixNamespace);
+                this.currentProcessingContext().addNamespaceDeclaration(prefixName, prefixNamespace.stringValue());
             }
         });
         if (isAttributePresent(RDFaAttributes.PREFIX)
                 && !getAttributeStringValue(RDFaAttributes.PREFIX).isEmpty()) {
             String prefixDeclaration = getAttributeStringValue(RDFaAttributes.PREFIX);
-            this.addIriMappings(getPrefixesFromDeclaration(prefixDeclaration));
+            Map<String, IRI> prefixMappings = getPrefixesFromDeclaration(prefixDeclaration);
+            this.addIriMappings(prefixMappings);
+            prefixMappings.forEach((prefix, namespace) -> this.currentProcessingContext()
+                    .addNamespaceDeclaration(prefix, namespace.stringValue()));
         }
 
         // 4. The current element is also parsed for any language information, and if present, current language is set accordingly;
@@ -546,7 +569,7 @@ public class RDFaParser extends AbstractRDFParser {
                     ? getAttributeValueResource(RDFaAttributes.DATATYPE)
                     : null;
 
-            if (datatypeRes != null && datatypeRes.isIRI() && datatypeRes != RDF.XMLLiteral.getIRI()) {
+            if (datatypeRes != null && datatypeRes.isIRI() && !datatypeRes.equals(RDF.XMLLiteral.getIRI())) {
                 IRI datatypeIRI = (IRI) datatypeRes;
                 if (isAttributePresent(RDFaAttributes.CONTENT)) {
                     String contentString = getAttributeStringValue(RDFaAttributes.CONTENT);
@@ -556,6 +579,9 @@ public class RDFaParser extends AbstractRDFParser {
                     this.currentProcessingContext().setCurrentPropertyValue(getValueFactory().createLiteral(contentString, datatypeIRI));
                     this.clearAllCharactersBuffers();
                 }
+            } else if (datatypeRes != null && datatypeRes.equals(RDF.XMLLiteral.getIRI())) {
+                this.currentProcessingContext().setCurrentPropertyValue(
+                        getValueFactory().createLiteral(this.currentProcessingContext().getXmlLiteralContent(), RDF.XMLLiteral.getIRI()));
             } else if (isAttributePresent(RDFaAttributes.DATATYPE)
                     && (getAttributeStringValue(RDFaAttributes.DATATYPE).trim().isEmpty() || datatypeRes == null)) {
                 String contentString;
@@ -681,6 +707,46 @@ public class RDFaParser extends AbstractRDFParser {
      * Internal SAX handler that delegates to the parser's methods
      */
     private class XMLSaxHandler extends DefaultHandler {
+        private String serializeStartElement(String qName, Attributes attrs, Map<String, String> namespaceDeclarations) {
+            StringBuilder serialized = new StringBuilder("<").append(qName);
+            for (int index = 0; index < attrs.getLength(); index++) {
+                serialized.append(' ')
+                        .append(attrs.getQName(index))
+                        .append("=\"")
+                        .append(escapeXmlAttribute(attrs.getValue(index)))
+                        .append('"');
+            }
+            namespaceDeclarations.entrySet().stream()
+                    .sorted(Map.Entry.comparingByKey())
+                    .forEach(declaration -> serialized.append(' ')
+                            .append(declaration.getKey().isEmpty() ? XMLNS_PREFIX : XMLNS_PREFIX + ':' + declaration.getKey())
+                            .append("=\"")
+                            .append(escapeXmlAttribute(declaration.getValue()))
+                            .append('"'));
+            return serialized.append('>').toString();
+        }
+
+        private String escapeXmlAttribute(String value) {
+            return escapeXmlText(value).replace("\"", "&quot;").replace("\t", "&#x9;").replace("\n", "&#xA;").replace("\r", "&#xD;");
+        }
+
+        private void appendXmlLiteralStartElement(String qName, Attributes attrs) {
+            for (RDFaProcessingContext context : RDFaParser.this.processingContexts) {
+                if (context.isXmlLiteralProperty()) {
+                    context.appendXmlLiteralContent(serializeStartElement(qName, attrs, context.getNamespaceDeclarations()));
+                }
+            }
+        }
+
+        private void appendXmlLiteralEndElement(String qName) {
+            String serializedElement = "</" + qName + ">";
+            for (RDFaProcessingContext context : RDFaParser.this.processingContexts) {
+                if (context != RDFaParser.this.currentProcessingContext() && context.isXmlLiteralProperty()) {
+                    context.appendXmlLiteralContent(serializedElement);
+                }
+            }
+        }
+
         @Override
         public void characters(char[] ch, int start, int length) {
             RDFaParser.this.handleCharacters(ch, start, length);
@@ -693,11 +759,16 @@ public class RDFaParser extends AbstractRDFParser {
 
         @Override
         public void startElement(String uri, String localName, String qName, Attributes attrs) {
+            appendXmlLiteralStartElement(qName, attrs);
             startProcessElement(qName, attrs);
+            RDFaParser.this.currentProcessingContext().setXmlLiteralProperty(
+                    isAttributePresent(RDFaAttributes.DATATYPE)
+                    && RDF.XMLLiteral.getIRI().equals(getAttributeValueResource(RDFaAttributes.DATATYPE)));
         }
 
         @Override
         public void endElement(String uri, String localName, String qName) {
+            appendXmlLiteralEndElement(qName);
             endProcessElement(qName);
         }
 
