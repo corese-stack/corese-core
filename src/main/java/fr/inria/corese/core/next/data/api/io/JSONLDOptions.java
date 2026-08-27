@@ -127,6 +127,20 @@ public class JSONLDOptions extends AbstractIOOptions
     }
 
     /**
+     * @return true if produce generalized RDF is enabled.
+     */
+    public boolean isProduceGeneralizedRdf() {
+        return this.builder.options.isProduceGeneralizedRdf();
+    }
+
+    /**
+     * @return the RDF direction policy, or null if not set.
+     */
+    public JsonLdOptions.RdfDirection getRdfDirection() {
+        return this.builder.options.getRdfDirection();
+    }
+
+    /**
      *
      * @return the inner JsonLdOptions object.
      */
@@ -274,6 +288,50 @@ public class JSONLDOptions extends AbstractIOOptions
          */
         public Builder processingMode(JsonLdVersion processingMode) {
             this.options.setProcessingMode(processingMode);
+            return this;
+        }
+
+        /**
+         * @param produceGeneralizedRdf if true, triples with blank node predicates are not dropped.
+         * @return this builder
+         */
+        public Builder produceGeneralizedRdf(boolean produceGeneralizedRdf) {
+            this.options.setProduceGeneralizedRdf(produceGeneralizedRdf);
+            return this;
+        }
+
+        /**
+         * @param rdfDirection how to handle rdfDirection: "i18n-datatype" or "compound-literal".
+         * @return this builder
+         */
+        public Builder rdfDirection(String rdfDirection) {
+            if (rdfDirection != null) {
+                if ("i18n-datatype".equalsIgnoreCase(rdfDirection)) {
+                    this.options.setRdfDirection(JsonLdOptions.RdfDirection.I18N_DATATYPE);
+                } else if ("compound-literal".equalsIgnoreCase(rdfDirection)) {
+                    this.options.setRdfDirection(JsonLdOptions.RdfDirection.COMPOUND_LITERAL);
+                }
+            }
+            return this;
+        }
+
+        /**
+         * @param rdfDirection the RdfDirection enum value.
+         * @return this builder
+         */
+        public Builder rdfDirection(JsonLdOptions.RdfDirection rdfDirection) {
+            this.options.setRdfDirection(rdfDirection);
+            return this;
+        }
+
+        /**
+         * @param expandContext the expand context document URI.
+         * @return this builder
+         */
+        public Builder expandContext(URI expandContext) {
+            if (expandContext != null) {
+                this.options.setExpandContext(expandContext);
+            }
             return this;
         }
     }
