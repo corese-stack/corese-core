@@ -10,8 +10,6 @@ import fr.inria.corese.core.sparql.api.IDatatype;
 public class AccessRight {
     
     private static boolean active = false;
-    // @deprecated
-    private static boolean inheritDefault = false;
 
     public enum AccessRights {
         // NONE means no access right
@@ -39,10 +37,7 @@ public class AccessRight {
         }
 
     }
-
-    public static final int GT_MODE  = 0;
-    public static final int EQ_MODE  = 1;
-    public static final int BI_MODE  = 2;
+    public enum AccessMode { GT, EQ, BINARY }
 
     public static final byte ZERO = 0b0000000;
     // available for access right:
@@ -59,7 +54,7 @@ public class AccessRight {
 
     public static final byte[] BINARY = {ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN};
 
-    public static final int DEFAULT_MODE = GT_MODE;
+    public static final AccessMode DEFAULT_MODE = AccessMode.GT;
     
     public static final String GT_ACCESS_MODE    = NSManager.EXT+"gt";
     public static final String EQ_ACCESS_MODE    = NSManager.EXT+"eq";
@@ -87,12 +82,10 @@ public class AccessRight {
     private AccessRights[] whereList = new AccessRights[0];
     private AccessRights where    = DEFAULT;
         
-    private static int mode = DEFAULT_MODE;
+    private static AccessMode mode = DEFAULT_MODE;
     
     private AccessRightDefinition insertRightDefinition;
     private AccessRightDefinition deleteRightDefinition;
-    
-    private boolean debug = false;
     
     
     
@@ -157,14 +150,11 @@ public class AccessRight {
     }
     
     public static boolean accept(AccessRights query, AccessRights target) {
-        switch (mode) {
-            case EQ_MODE:
-                return acceptEQ(query, target);
-            case BI_MODE:
-                return acceptBI(query, target);    
-            default:
-                return acceptGT(query, target);
-        }
+        return switch (mode) {
+            case EQ -> acceptEQ(query, target);
+            case BINARY -> acceptBI(query, target);
+            default -> acceptGT(query, target);
+        };
     }
     
     
@@ -338,24 +328,24 @@ public class AccessRight {
     }
     
    
-    public static int getMode() {
+    public static AccessMode getMode() {
         return mode;
     }
     
-    public static void setMode(int m) {
+    public static void setMode(AccessMode m) {
         mode = m;
     }
     
     public static void gtMode() {
-        setMode(GT_MODE);
+        setMode(AccessMode.GT);
     }
     
     public static void eqMode() {
-        setMode(EQ_MODE);
+        setMode(AccessMode.EQ);
     }
     
-     public static void biMode() {
-        setMode(BI_MODE);
+    public static void biMode() {
+        setMode(AccessMode.BINARY);
     }
     
 
