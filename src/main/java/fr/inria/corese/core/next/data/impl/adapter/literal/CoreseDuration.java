@@ -4,7 +4,7 @@ import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
 import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
-import fr.inria.corese.core.next.data.api.support.term.literal.AbstractDuration;
+import fr.inria.corese.core.next.data.spi.term.literal.AbstractDuration;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.CoreseUndefLiteral;
 

@@ -28,7 +28,7 @@ wrappedGraph
     ;
 
 triplesBlock
-    : triples ('.'? triplesBlock?)?
+    : triples ('.' triplesBlock?)?
     ;
 
 labelOrSubject

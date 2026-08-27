@@ -32,11 +32,11 @@ import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
-import fr.inria.corese.core.next.data.api.support.term.IRIUtils;
+import fr.inria.corese.core.next.data.spi.term.IRIUtils;
 import fr.inria.corese.core.next.data.api.vocabulary.RDF;
 import fr.inria.corese.core.next.data.api.vocabulary.XSD;
 import fr.inria.corese.core.next.data.api.exception.SerializationException;
-import fr.inria.corese.core.next.data.api.support.io.IOConstants;
+import fr.inria.corese.core.next.data.spi.io.IOConstants;
 import fr.inria.corese.core.next.data.impl.io.parser.support.ParserConstants;
 
 /**

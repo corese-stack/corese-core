@@ -96,6 +96,10 @@ java {
     targetCompatibility = JavaVersion.VERSION_21
 }
 
+jacoco {
+    toolVersion = "0.8.15"
+}
+
 /////////////////////////
 // Dependency settings //
 /////////////////////////

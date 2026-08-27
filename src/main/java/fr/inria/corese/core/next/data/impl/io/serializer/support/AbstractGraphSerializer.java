@@ -9,7 +9,7 @@ import fr.inria.corese.core.next.data.api.io.serializer.option.*;
 import fr.inria.corese.core.next.data.api.io.serializer.option.LiteralDatatypePolicy;
 import fr.inria.corese.core.next.data.api.io.serializer.option.PrefixOrdering;
 import fr.inria.corese.core.next.data.impl.namespace.PrefixHandler;
-import fr.inria.corese.core.next.data.api.support.term.IRIUtils;
+import fr.inria.corese.core.next.data.spi.term.IRIUtils;
 import fr.inria.corese.core.next.data.api.vocabulary.RDF;
 import fr.inria.corese.core.next.data.api.vocabulary.XSD;
 import fr.inria.corese.core.next.data.api.exception.SerializationException;

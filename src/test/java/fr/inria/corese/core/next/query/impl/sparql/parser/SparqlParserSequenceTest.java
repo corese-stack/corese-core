@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.parser;
 
-import fr.inria.corese.core.next.data.api.support.io.IOConstants;
+import fr.inria.corese.core.next.data.spi.io.IOConstants;
 import fr.inria.corese.core.next.query.impl.sparql.ast.BgpAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;

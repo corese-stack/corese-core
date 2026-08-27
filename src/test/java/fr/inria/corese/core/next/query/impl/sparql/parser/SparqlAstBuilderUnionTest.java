@@ -30,19 +30,19 @@ class SparqlAstBuilderUnionTest {
      * Each branch is empty (no BGP inside).
      */
     private GroupGraphPatternAst buildTwoEmptyBranchUnion() {
-        builder.enterGroup();          // outer WHERE {
-        builder.enterUnion();      // GroupOrUnionGraphPattern
+        builder.enterGroup();
+        builder.enterUnion();
 
-        builder.enterGroup(); // left branch {
-        builder.exitGroup();  // }
+        builder.enterGroup();
+        builder.exitGroup();
         builder.collectUnionBranch();
 
-        builder.enterGroup(); // right branch {
-        builder.exitGroup();  // }
+        builder.enterGroup();
+        builder.exitGroup();
         builder.collectUnionBranch();
 
         builder.exitUnion();
-        builder.exitGroup();           // }
+        builder.exitGroup();
         builder.exitSelectQuery();
         return Objects.requireNonNull((SelectQueryAst)builder.getResult()).whereClause();
     }
@@ -52,7 +52,7 @@ class SparqlAstBuilderUnionTest {
      */
     private void addTriple(String object) {
         builder.enterBgp();
-        builder.addTriple(builder.var("s"), builder.iri("a"), builder.iri(object));
+        builder.addTriple(builder.variable("s"), builder.iri("a"), builder.iri(object));
         builder.exitBgp();
     }
 
@@ -94,7 +94,6 @@ class SparqlAstBuilderUnionTest {
         @Test
         @DisplayName("Each branch holds its own BGP with correct triples")
         void branchesContainCorrectBgps() {
-            // { ?s a foaf:Person } UNION { ?s a ex:Animal }
             builder.enterGroup();
             builder.enterUnion();
 
@@ -301,23 +300,22 @@ class SparqlAstBuilderUnionTest {
         @Test
         @DisplayName("Outer group contains a BGP followed by a UnionAst")
         void outerGroupContainsBgpThenUnion() {
-            // SELECT * WHERE { ?s a ex:Root . { ?s a ex:A } UNION { ?s a ex:B } }
-            builder.enterGroup();                       // WHERE {
-            addTriple("ex:Root");         //   ?s a ex:Root .
+            builder.enterGroup();
+            addTriple("ex:Root");
 
-            builder.enterUnion();                   //   GroupOrUnion
-            builder.enterGroup();               //   {
-            addTriple("ex:A");    //     ?s a ex:A
-            builder.exitGroup();                //   }
+            builder.enterUnion();
+            builder.enterGroup();
+            addTriple("ex:A");
+            builder.exitGroup();
             builder.collectUnionBranch();
 
-            builder.enterGroup();               //   UNION {
-            addTriple("ex:B");    //     ?s a ex:B
-            builder.exitGroup();                //   }
+            builder.enterGroup();
+            addTriple("ex:B");
+            builder.exitGroup();
             builder.collectUnionBranch();
             builder.exitUnion();
 
-            builder.exitGroup();                        // }
+            builder.exitGroup();
 
             builder.exitSelectQuery();
             SelectQueryAst result = (SelectQueryAst) builder.getResult();

@@ -5,7 +5,7 @@ import fr.inria.corese.core.next.data.api.model.Model;
 import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
-import fr.inria.corese.core.next.data.api.support.io.parser.AbstractRDFParser;
+import fr.inria.corese.core.next.data.spi.io.parser.AbstractRDFParser;
 import fr.inria.corese.core.next.data.api.io.option.RDFParsingOptions;
 import fr.inria.corese.core.next.data.api.vocabulary.RDF;
 import fr.inria.corese.core.next.data.api.exception.ParsingException;

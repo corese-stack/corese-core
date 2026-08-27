@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.next.data.api.term.IRI;
-import fr.inria.corese.core.next.data.api.support.term.literal.AbstractStringLiteral;
+import fr.inria.corese.core.next.data.spi.term.literal.AbstractStringLiteral;
 import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
 import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 import fr.inria.corese.core.next.data.api.literal.CoreDatatypes;

@@ -13,13 +13,13 @@ import fr.inria.corese.core.next.data.api.model.Model;
 import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
-import fr.inria.corese.core.next.data.api.support.io.parser.AbstractRDFParser;
+import fr.inria.corese.core.next.data.spi.io.parser.AbstractRDFParser;
 import fr.inria.corese.core.next.data.api.io.option.RDFParsingOptions;
 import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 import fr.inria.corese.core.next.data.impl.namespace.PrefixHandler;
-import fr.inria.corese.core.next.data.api.support.term.IRIUtils;
+import fr.inria.corese.core.next.data.spi.term.IRIUtils;
 import fr.inria.corese.core.next.data.api.exception.ParsingException;
-import fr.inria.corese.core.next.data.impl.io.jsonld.JSONLDOptions;
+import fr.inria.corese.core.next.data.api.io.JSONLDOptions;
 import fr.inria.corese.core.next.data.impl.io.parser.DefaultRDFParserFactory;
 
 import java.io.InputStream;

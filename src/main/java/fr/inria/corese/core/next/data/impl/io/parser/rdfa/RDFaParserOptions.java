@@ -1,9 +1,9 @@
 package fr.inria.corese.core.next.data.impl.io.parser.rdfa;
 
-import fr.inria.corese.core.next.data.api.support.io.AbstractIOOptions;
+import fr.inria.corese.core.next.data.spi.io.AbstractIOOptions;
 import fr.inria.corese.core.next.data.api.io.option.BaseIRIOptions;
 import fr.inria.corese.core.next.data.api.io.option.RDFParsingOptions;
-import fr.inria.corese.core.next.data.api.support.io.IOConstants;
+import fr.inria.corese.core.next.data.spi.io.IOConstants;
 
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.validation.Schema;

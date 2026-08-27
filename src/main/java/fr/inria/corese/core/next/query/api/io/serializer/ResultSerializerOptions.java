@@ -1,7 +1,6 @@
 package fr.inria.corese.core.next.query.api.io.serializer;
 
 import fr.inria.corese.core.next.data.api.io.serializer.option.LineEndingOptions;
-import fr.inria.corese.core.next.data.api.support.io.IOConstants;
 import fr.inria.corese.core.next.query.api.io.serializer.option.LinksOptions;
 import fr.inria.corese.core.next.query.api.io.serializer.option.XmlSerializationOptions;
 
@@ -57,7 +56,7 @@ public final class ResultSerializerOptions
 
     public static final class Builder {
         private final List<String> links = new ArrayList<>();
-        private String lineEnding = IOConstants.DEFAULT_LINE_ENDING;
+        private String lineEnding = "\n";
         private final Map<String, String> xmlOutputProperties = new LinkedHashMap<>();
 
         private Builder() {

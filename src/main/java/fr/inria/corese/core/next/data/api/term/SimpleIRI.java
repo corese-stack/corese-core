@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.data.api.term;
 
-import fr.inria.corese.core.next.data.api.support.term.AbstractIRI;
+import fr.inria.corese.core.next.data.spi.term.AbstractIRI;
 import fr.inria.corese.core.next.data.api.exception.IncorrectFormatException;
 
 import java.io.Serial;

@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.data.impl.io.parser.support;
 
-import fr.inria.corese.core.next.data.api.support.io.IOConstants;
+import fr.inria.corese.core.next.data.spi.io.IOConstants;
 
 /**
  * A utility class containing constants for characters and keywords

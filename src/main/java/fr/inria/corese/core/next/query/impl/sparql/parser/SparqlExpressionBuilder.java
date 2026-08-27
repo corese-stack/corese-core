@@ -9,7 +9,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
@@ -36,58 +35,71 @@ public final class SparqlExpressionBuilder {
      * Creates the right AST node for a built-in SPARQL operator or function.
      */
     public ConstraintAst createConstraint(ASTConstants.Constraint constraint, List<TermAst> args) {
-        switch (constraint) {
-            case ASTConstants.OPERATOR.NOT -> { return new BooleanNotAst(args); }
-            case ASTConstants.OPERATOR.PLUS -> { return new UnaryPlusAst(args); }
-            case ASTConstants.OPERATOR.MINUS -> { return new UnaryMinusAst(args); }
-            case ASTConstants.FUNCTION_CALL.BOUND -> { return new BoundAst(args); }
-            case ASTConstants.FUNCTION_CALL.IS_IRI -> { return new IsIriAst(args); }
-            case ASTConstants.FUNCTION_CALL.IS_BLANK -> { return new IsBlankAst(args); }
-            case ASTConstants.FUNCTION_CALL.IS_LITERAL -> { return new IsLiteralAst(args); }
-            case ASTConstants.FUNCTION_CALL.STR -> { return new StrAst(args); }
-            case ASTConstants.FUNCTION_CALL.UCASE -> { return new UcaseAst(args); }
-            case ASTConstants.FUNCTION_CALL.LCASE -> { return new LcaseAst(args); }
-            case ASTConstants.FUNCTION_CALL.LANG -> { return new LangAst(args); }
-            case ASTConstants.FUNCTION_CALL.STRDT -> { return new StrDtAst(args); }
-            case ASTConstants.FUNCTION_CALL.STRLANG -> { return new StrLangAst(args); }
-            case ASTConstants.FUNCTION_CALL.DATATYPE -> { return new DatatypeAst(args); }
-            case ASTConstants.FUNCTION_CALL.IRI -> { return new IriFunctionAst(args); }
-            case ASTConstants.FUNCTION_CALL.BNODE -> { return new BnodeAst(args); }
-            case ASTConstants.OPERATOR.OR -> { return new OrAst(args); }
-            case ASTConstants.OPERATOR.AND -> { return new AndAst(args); }
-            case ASTConstants.OPERATOR.EQ -> { return new EqualsAst(args); }
-            case ASTConstants.OPERATOR.NE -> { return new DifferentAst(args); }
-            case ASTConstants.OPERATOR.LT -> { return new LowerThanAst(args); }
-            case ASTConstants.OPERATOR.LE -> { return new LowerOrEqualThanAst(args); }
-            case ASTConstants.OPERATOR.GT -> { return new GreaterThanAst(args); }
-            case ASTConstants.OPERATOR.GE -> { return new GreaterOrEqualThanAst(args); }
-            case ASTConstants.OPERATOR.MUL -> { return new MultiplyAst(args); }
-            case ASTConstants.OPERATOR.DIV -> { return new DivideAst(args); }
-            case ASTConstants.OPERATOR.ADD -> { return new AddAst(args); }
-            case ASTConstants.OPERATOR.SUB -> { return new SubtractAst(args); }
-            case ASTConstants.FUNCTION_CALL.SAMETERM -> { return new SameTermAst(args); }
-            case ASTConstants.FUNCTION_CALL.LANGMATCHES -> { return new LangMatchesAst(args); }
-            case ASTConstants.FUNCTION_CALL.CONTAINS -> { return new ContainsAst(args); }
-            case ASTConstants.FUNCTION_CALL.STRSTARTS -> { return new StrStartsAst(args); }
-            case ASTConstants.FUNCTION_CALL.STRENDS -> { return new StrEndsAst(args); }
-            case ASTConstants.FUNCTION_CALL.SUBSTR -> { return new SubstrAst(args); }
-            case ASTConstants.FUNCTION_CALL.CONCAT -> { return new ConcatAst(args); }
-            case ASTConstants.FUNCTION_CALL.STRBEFORE -> { return new StrBeforeAst(args); }
-            case ASTConstants.FUNCTION_CALL.STRAFTER -> { return new StrAfterAst(args); }
-            case ASTConstants.FUNCTION_CALL.REPLACE -> { return new ReplaceAst(args); }
-            case ASTConstants.FUNCTION_CALL.REGEX -> {
+        if (constraint instanceof ASTConstants.OPERATOR op) {
+            return createOperatorConstraint(op, args);
+        }
+        if (constraint instanceof ASTConstants.FUNCTION_CALL fn) {
+            return createFunctionCallConstraint(fn, args);
+        }
+        throw new QueryEvaluationException(
+                "Unexpected constraint (" + constraint + ") with arguments: " + args);
+    }
+
+    private ConstraintAst createOperatorConstraint(ASTConstants.OPERATOR op, List<TermAst> args) {
+        return switch (op) {
+            case NOT -> new BooleanNotAst(args);
+            case PLUS -> new UnaryPlusAst(args);
+            case MINUS -> new UnaryMinusAst(args);
+            case OR -> new OrAst(args);
+            case AND -> new AndAst(args);
+            case EQ -> new EqualsAst(args);
+            case NE -> new DifferentAst(args);
+            case LT -> new LowerThanAst(args);
+            case LE -> new LowerOrEqualThanAst(args);
+            case GT -> new GreaterThanAst(args);
+            case GE -> new GreaterOrEqualThanAst(args);
+            case MUL -> new MultiplyAst(args);
+            case DIV -> new DivideAst(args);
+            case ADD -> new AddAst(args);
+            case SUB -> new SubtractAst(args);
+        };
+    }
+
+    private ConstraintAst createFunctionCallConstraint(ASTConstants.FUNCTION_CALL fn, List<TermAst> args) {
+        return switch (fn) {
+            case BOUND -> new BoundAst(args);
+            case IS_IRI -> new IsIriAst(args);
+            case IS_BLANK -> new IsBlankAst(args);
+            case IS_LITERAL -> new IsLiteralAst(args);
+            case STR -> new StrAst(args);
+            case UCASE -> new UcaseAst(args);
+            case LCASE -> new LcaseAst(args);
+            case LANG -> new LangAst(args);
+            case STRDT -> new StrDtAst(args);
+            case STRLANG -> new StrLangAst(args);
+            case DATATYPE -> new DatatypeAst(args);
+            case IRI -> new IriFunctionAst(args);
+            case BNODE -> new BnodeAst(args);
+            case SAMETERM -> new SameTermAst(args);
+            case LANGMATCHES -> new LangMatchesAst(args);
+            case CONTAINS -> new ContainsAst(args);
+            case STRSTARTS -> new StrStartsAst(args);
+            case STRENDS -> new StrEndsAst(args);
+            case SUBSTR -> new SubstrAst(args);
+            case CONCAT -> new ConcatAst(args);
+            case STRBEFORE -> new StrBeforeAst(args);
+            case STRAFTER -> new StrAfterAst(args);
+            case REPLACE -> new ReplaceAst(args);
+            case REGEX -> {
                 if (args.size() == 2) {
-                    return new BinaryRegexAst(args);
+                    yield new BinaryRegexAst(args);
                 } else if (args.size() == 3) {
-                    return new TrinaryRegexAst(args);
+                    yield new TrinaryRegexAst(args);
                 } else {
                     throw new QueryEvaluationException("Unexpected number of arguments (3) for REGEX keyword");
                 }
             }
-            default ->
-                    throw new QueryEvaluationException(
-                            "Unexpected number of arguments (" + args.size() + ") for " + constraint);
-        }
+        };
     }
 
     public ConstraintAst createFunCall(IriAst functionName, List<TermAst> args) {
@@ -207,86 +219,90 @@ public final class SparqlExpressionBuilder {
     }
 
     public TermAst termFromAdditive(SparqlParser.AdditiveExpressionContext ctx) {
-        if (ctx.multiplicativeExpression() != null && !ctx.multiplicativeExpression().isEmpty()) {
-            if (ctx.multiplicativeExpression().size() > 1
-                    || !ctx.numericLiteralNegative().isEmpty()
-                    || !ctx.numericLiteralPositive().isEmpty()) {
-                TermAst leftHand = termFromMultiplicative(ctx.multiplicativeExpression().getFirst());
-                ASTConstants.OPERATOR op = ASTConstants.OPERATOR.ADD;
-                for (int i = 1; i < ctx.getChildCount(); i++) {
-                    ParseTree child = ctx.getChild(i);
-                    if (child instanceof TerminalNode) {
-                        if (Objects.equals(child.getText(), "+")) {
-                            op = ASTConstants.OPERATOR.ADD;
-                        } else if (Objects.equals(child.getText(), "-")) {
-                            op = ASTConstants.OPERATOR.SUB;
-                        } else {
-                            throw new QueryEvaluationException(
-                                    "Unexpected operator in additive termFromExpression " + child.getText());
-                        }
-                    } else {
-                        TermAst rightHand = switch (child) {
-                            case SparqlParser.MultiplicativeExpressionContext c ->
-                                    termFromMultiplicative(c);
-                            case SparqlParser.NumericLiteralPositiveContext c ->
-                                    (ExprAst) terms.termFromNumericLiteralPositive(c);
-                            case SparqlParser.NumericLiteralNegativeContext c ->
-                                    (ExprAst) terms.termFromNumericLiteralNegative(c);
-                            case null, default ->
-                                    throw new QueryEvaluationException(
-                                            "Unexpected left hand termFromExpression in additive termFromExpression "
-                                                    + ctx.getText()
-                                                    + " "
-                                                    + (child != null ? child.getText() : "null")
-                                    );
-                        };
-                        leftHand = createConstraint(op, List.of(leftHand, rightHand));
-                    }
-                }
-                return leftHand;
-            } else {
-                return termFromMultiplicative(ctx.multiplicativeExpression().getFirst());
-            }
-        } else {
+        if (ctx.multiplicativeExpression() == null || ctx.multiplicativeExpression().isEmpty()) {
             throw new QueryEvaluationException("No multiplicative termFromExpression found");
         }
+        if (ctx.multiplicativeExpression().size() == 1
+                && ctx.numericLiteralNegative().isEmpty()
+                && ctx.numericLiteralPositive().isEmpty()) {
+            return termFromMultiplicative(ctx.multiplicativeExpression().getFirst());
+        }
+
+        TermAst leftHand = termFromMultiplicative(ctx.multiplicativeExpression().getFirst());
+        ASTConstants.OPERATOR op = ASTConstants.OPERATOR.ADD;
+        for (int i = 1; i < ctx.getChildCount(); i++) {
+            ParseTree child = ctx.getChild(i);
+            if (child instanceof TerminalNode) {
+                op = parseAdditiveOperator(child);
+            } else {
+                TermAst rightHand = extractAdditiveOperand(child, ctx.getText());
+                leftHand = createConstraint(op, List.of(leftHand, rightHand));
+            }
+        }
+        return leftHand;
+    }
+
+    private static ASTConstants.OPERATOR parseAdditiveOperator(ParseTree child) {
+        if ("+".equals(child.getText())) {
+            return ASTConstants.OPERATOR.ADD;
+        }
+        if ("-".equals(child.getText())) {
+            return ASTConstants.OPERATOR.SUB;
+        }
+        throw new QueryEvaluationException(
+                "Unexpected operator in additive termFromExpression " + child.getText());
+    }
+
+    private TermAst extractAdditiveOperand(ParseTree child, String contextText) {
+        return switch (child) {
+            case SparqlParser.MultiplicativeExpressionContext c ->
+                    termFromMultiplicative(c);
+            case SparqlParser.NumericLiteralPositiveContext c ->
+                    terms.termFromNumericLiteralPositive(c);
+            case SparqlParser.NumericLiteralNegativeContext c ->
+                    terms.termFromNumericLiteralNegative(c);
+            case null, default ->
+                    throw new QueryEvaluationException(
+                            "Unexpected left hand termFromExpression in additive termFromExpression "
+                                    + contextText
+                                    + " "
+                                    + (child != null ? child.getText() : "null")
+                    );
+        };
     }
 
     public TermAst termFromMultiplicative(SparqlParser.MultiplicativeExpressionContext ctx) {
-        if (ctx.unaryExpression() != null && !ctx.unaryExpression().isEmpty()) {
-            if (ctx.unaryExpression().size() > 1) {
-                TermAst head = termFromUnary(ctx.unaryExpression().getFirst());
-                TermAst rightHand = null;
-                ASTConstants.OPERATOR op = null;
-                for (int i = 1; i < ctx.getChildCount(); i += 2) {
-                    ParseTree operatorContext = ctx.getChild(i);
-                    ParseTree rightHandContext = ctx.getChild(i + 1);
-
-                    if (rightHandContext instanceof SparqlParser.UnaryExpressionContext uec) {
-                        rightHand = termFromUnary(uec);
-                    }
-
-                    if (operatorContext instanceof TerminalNode terminalNode) {
-                        if (Objects.equals(terminalNode.getText(), "*")) {
-                            op = ASTConstants.OPERATOR.MUL;
-                        } else if (Objects.equals(terminalNode.getText(), "/")) {
-                            op = ASTConstants.OPERATOR.DIV;
-                        }
-                    }
-                    if (op != null && rightHand != null) {
-                        head = createConstraint(op, List.of(head, rightHand));
-                    } else {
-                        throw new QuerySyntaxException(
-                                "Unexpected operator or right hand content in " + ctx.getText());
-                    }
-                }
-                return head;
-            } else {
-                return termFromUnary(ctx.unaryExpression().getFirst());
-            }
-        } else {
+        if (ctx.unaryExpression() == null || ctx.unaryExpression().isEmpty()) {
             throw new QueryEvaluationException("No unary termFromExpression found");
         }
+        if (ctx.unaryExpression().size() == 1) {
+            return termFromUnary(ctx.unaryExpression().getFirst());
+        }
+
+        TermAst head = termFromUnary(ctx.unaryExpression().getFirst());
+        for (int i = 1; i < ctx.getChildCount(); i += 2) {
+            ASTConstants.OPERATOR op = parseMultiplicativeOperator(ctx.getChild(i));
+            ParseTree rightHandContext = ctx.getChild(i + 1);
+            if (op == null || !(rightHandContext instanceof SparqlParser.UnaryExpressionContext uec)) {
+                throw new QuerySyntaxException(
+                        "Unexpected operator or right hand content in " + ctx.getText());
+            }
+            TermAst rightHand = termFromUnary(uec);
+            head = createConstraint(op, List.of(head, rightHand));
+        }
+        return head;
+    }
+
+    private static ASTConstants.OPERATOR parseMultiplicativeOperator(ParseTree tree) {
+        if (tree instanceof TerminalNode terminalNode) {
+            if ("*".equals(terminalNode.getText())) {
+                return ASTConstants.OPERATOR.MUL;
+            }
+            if ("/".equals(terminalNode.getText())) {
+                return ASTConstants.OPERATOR.DIV;
+            }
+        }
+        return null;
     }
 
     public TermAst termFromUnary(SparqlParser.UnaryExpressionContext ctx) {
@@ -337,6 +353,40 @@ public final class SparqlExpressionBuilder {
      *                                  EXISTS/NOT EXISTS pattern was not captured
      */
     public TermAst termFromBuiltInCall(SparqlParser.BuiltInCallContext ctx) {
+        TermAst patternOrAgg = termFromPatternOrAggregateBuiltInCall(ctx);
+        if (patternOrAgg != null) {
+            return patternOrAgg;
+        }
+        TermAst condOrCtor = termFromConditionOrConstructorBuiltInCall(ctx);
+        if (condOrCtor != null) {
+            return condOrCtor;
+        }
+        TermAst zeroArg = termFromZeroArgBuiltInCall(ctx);
+        if (zeroArg != null) {
+            return zeroArg;
+        }
+        if (ctx.expression() != null) {
+            List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
+            TermAst dtOrNum = termFromDateTimeOrNumericBuiltInCall(ctx, args);
+            if (dtOrNum != null) {
+                return dtOrNum;
+            }
+            TermAst strCall = termFromStringBuiltInCall(ctx, args);
+            if (strCall != null) {
+                return strCall;
+            }
+            TermAst typeOrHash = termFromTypeOrHashBuiltInCall(ctx, args);
+            if (typeOrHash != null) {
+                return typeOrHash;
+            }
+            throw new QueryEvaluationException(
+                    "Unexpected function for a  BuiltInCall for token " + ctx.getText());
+        }
+        throw new QueryEvaluationException(
+                "Unable to resolve BuiltInCall for token " + ctx.getText());
+    }
+
+    private TermAst termFromPatternOrAggregateBuiltInCall(SparqlParser.BuiltInCallContext ctx) {
         if (ctx.aggregate() != null) {
             return termFromAggregate(ctx.aggregate());
         }
@@ -358,126 +408,110 @@ public final class SparqlExpressionBuilder {
         }
         if (ctx.regexExpression() != null) {
             return termFromRegex(ctx.regexExpression());
-        } else if (ctx.strReplaceExpression() != null) {
+        }
+        if (ctx.strReplaceExpression() != null) {
             return termFromReplace(ctx.strReplaceExpression());
-        } else if (ctx.BOUND() != null) {
+        }
+        return null;
+    }
+
+    private TermAst termFromConditionOrConstructorBuiltInCall(SparqlParser.BuiltInCallContext ctx) {
+        if (ctx.BOUND() != null) {
             return createConstraint(ASTConstants.FUNCTION_CALL.BOUND,
-                    List.of(terms.var(ctx.var_().getText())));
-        } else if (ctx.BNODE() != null) {
+                    List.of(terms.variable(ctx.var_().getText())));
+        }
+        if (ctx.BNODE() != null) {
             List<TermAst> args = ctx.expression() == null
                     ? List.of()
                     : ctx.expression().stream().map(this::termFromExpression).toList();
             return createConstraint(ASTConstants.FUNCTION_CALL.BNODE, args);
-        } else if (ctx.IF() != null) {
+        }
+        if (ctx.IF() != null) {
             List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
             return new IfAst(args.get(0), args.get(1), args.get(2));
-        } else if (ctx.RAND() != null) {
-            return new RandAst();
-        } else if (ctx.UUID() != null) {
-            return new UuidAst();
-        } else if (ctx.STRUUID() != null) {
-            return new StrUuidAst();
-        } else if (ctx.CONCAT() != null) {
+        }
+        if (ctx.CONCAT() != null) {
             List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
             return createConstraint(ASTConstants.FUNCTION_CALL.CONCAT, args);
-        } else if (ctx.COALESCE() != null) {
+        }
+        if (ctx.COALESCE() != null) {
             List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
             return new CoalesceAst(args);
-        } else if (ctx.subStringExpression() != null) {
+        }
+        if (ctx.subStringExpression() != null) {
             List<TermAst> args = ctx.subStringExpression().expression().stream()
                     .map(this::termFromExpression).toList();
             return createConstraint(ASTConstants.FUNCTION_CALL.SUBSTR, args);
-        } else if (ctx.NOW() != null) {
-            return new NowAst();
-        } else if (ctx.expression() != null) {
-            List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
-            if (ctx.STR() != null) {
-                return createConstraint(ASTConstants.FUNCTION_CALL.STR, args);
-            } else if (ctx.UCASE() != null) {
-                return createConstraint(ASTConstants.FUNCTION_CALL.UCASE, args);
-            } else if (ctx.LCASE() != null) {
-                return createConstraint(ASTConstants.FUNCTION_CALL.LCASE, args);
-            } else if (ctx.ENCODE_FOR_URI() != null) {
-                return new EncodeForUriAst(args);
-            } else if (ctx.LANG() != null) {
-                return createConstraint(ASTConstants.FUNCTION_CALL.LANG, args);
-            } else if (ctx.LANGMATCHES() != null) {
-                return new LangMatchesAst(args);
-            } else if (ctx.CONTAINS() != null) {
-                return createConstraint(ASTConstants.FUNCTION_CALL.CONTAINS, args);
-            } else if (ctx.STRSTARTS() != null) {
-                return createConstraint(ASTConstants.FUNCTION_CALL.STRSTARTS, args);
-            } else if (ctx.STRENDS() != null) {
-                return createConstraint(ASTConstants.FUNCTION_CALL.STRENDS, args);
-            } else if (ctx.STRDT() != null) {
-                return createConstraint(ASTConstants.FUNCTION_CALL.STRDT, args);
-            } else if (ctx.STRLANG() != null) {
-                return createConstraint(ASTConstants.FUNCTION_CALL.STRLANG, args);
-            } else if (ctx.STRBEFORE() != null) {
-                return createConstraint(ASTConstants.FUNCTION_CALL.STRBEFORE, args);
-            } else if (ctx.STRAFTER() != null) {
-                return createConstraint(ASTConstants.FUNCTION_CALL.STRAFTER, args);
-            } else if (ctx.YEAR() != null) {
-                return new YearAst(args);
-            } else if (ctx.MONTH() != null) {
-                return new MonthAst(args);
-            } else if (ctx.DAY() != null) {
-                return new DayAst(args);
-            } else if (ctx.HOURS() != null) {
-                return new HoursAst(args);
-            } else if (ctx.MINUTES() != null) {
-                return new MinutesAst(args);
-            } else if (ctx.SECONDS() != null) {
-                return new SecondsAst(args);
-            } else if (ctx.TIMEZONE() != null) {
-                return new TimezoneAst(args);
-            } else if (ctx.TZ() != null) {
-                return new TzAst(args);
-            } else if (ctx.DATATYPE() != null) {
-                return createConstraint(ASTConstants.FUNCTION_CALL.DATATYPE, args);
-            } else if (ctx.IRI() != null || ctx.URI() != null) {
-                return createConstraint(ASTConstants.FUNCTION_CALL.IRI, args);
-            } else if (ctx.SAME_TERM() != null) {
-                return createConstraint(ASTConstants.FUNCTION_CALL.SAMETERM, args);
-            } else if (ctx.IS_URI() != null || ctx.IS_IRI() != null) {
-                return createConstraint(ASTConstants.FUNCTION_CALL.IS_IRI, args);
-            } else if (ctx.IS_BLANK() != null) {
-                return createConstraint(ASTConstants.FUNCTION_CALL.IS_BLANK, args);
-            } else if (ctx.IS_LITERAL() != null) {
-                return createConstraint(ASTConstants.FUNCTION_CALL.IS_LITERAL, args);
-            } else if (ctx.MD5() != null) {
-                return new Md5Ast(args);
-            } else if (ctx.SHA1() != null) {
-                return new Sha1Ast(args);
-            } else if (ctx.SHA256() != null) {
-                return new Sha256Ast(args);
-            } else if (ctx.SHA384() != null) {
-                return new Sha384Ast(args);
-            } else if (ctx.SHA512() != null) {
-                return new Sha512Ast(args);
-            } else if (ctx.ABS() != null) {
-                return new AbsAst(args);
-            } else if (ctx.CEIL() != null) {
-                return new CeilAst(args);
-            } else if (ctx.FLOOR() != null) {
-                return new FloorAst(args);
-            } else if (ctx.ROUND() != null) {
-                return new RoundAst(args);
-            } else if (ctx.BOUND() != null) {
-                return createConstraint(ASTConstants.FUNCTION_CALL.BOUND,
-                        List.of(terms.var(ctx.var_().getText())));
-            } else if (ctx.regexExpression() != null) {
-                return termFromRegex(ctx.regexExpression());
-            } else if (ctx.STRLEN() != null) {
-                return new StrLenAst(args.getFirst());
-            } else {
-                throw new QueryEvaluationException(
-                        "Unexpected function for a  BuiltInCall for token " + ctx.getText());
-            }
-        } else {
-            throw new QueryEvaluationException(
-                    "Unable to resolve BuiltInCall for token " + ctx.getText());
         }
+        return null;
+    }
+
+    private static TermAst termFromZeroArgBuiltInCall(SparqlParser.BuiltInCallContext ctx) {
+        if (ctx.RAND() != null) {
+            return new RandAst();
+        }
+        if (ctx.UUID() != null) {
+            return new UuidAst();
+        }
+        if (ctx.STRUUID() != null) {
+            return new StrUuidAst();
+        }
+        if (ctx.NOW() != null) {
+            return new NowAst();
+        }
+        return null;
+    }
+
+    private static TermAst termFromDateTimeOrNumericBuiltInCall(
+            SparqlParser.BuiltInCallContext ctx, List<TermAst> args) {
+        if (ctx.YEAR() != null) return new YearAst(args);
+        if (ctx.MONTH() != null) return new MonthAst(args);
+        if (ctx.DAY() != null) return new DayAst(args);
+        if (ctx.HOURS() != null) return new HoursAst(args);
+        if (ctx.MINUTES() != null) return new MinutesAst(args);
+        if (ctx.SECONDS() != null) return new SecondsAst(args);
+        if (ctx.TIMEZONE() != null) return new TimezoneAst(args);
+        if (ctx.TZ() != null) return new TzAst(args);
+        if (ctx.ABS() != null) return new AbsAst(args);
+        if (ctx.CEIL() != null) return new CeilAst(args);
+        if (ctx.FLOOR() != null) return new FloorAst(args);
+        if (ctx.ROUND() != null) return new RoundAst(args);
+        if (ctx.STRLEN() != null) return new StrLenAst(args.getFirst());
+        return null;
+    }
+
+    private TermAst termFromStringBuiltInCall(
+            SparqlParser.BuiltInCallContext ctx, List<TermAst> args) {
+        if (ctx.STR() != null) return createConstraint(ASTConstants.FUNCTION_CALL.STR, args);
+        if (ctx.UCASE() != null) return createConstraint(ASTConstants.FUNCTION_CALL.UCASE, args);
+        if (ctx.LCASE() != null) return createConstraint(ASTConstants.FUNCTION_CALL.LCASE, args);
+        if (ctx.ENCODE_FOR_URI() != null) return new EncodeForUriAst(args);
+        if (ctx.LANG() != null) return createConstraint(ASTConstants.FUNCTION_CALL.LANG, args);
+        if (ctx.LANGMATCHES() != null) return new LangMatchesAst(args);
+        if (ctx.CONTAINS() != null) return createConstraint(ASTConstants.FUNCTION_CALL.CONTAINS, args);
+        if (ctx.STRSTARTS() != null) return createConstraint(ASTConstants.FUNCTION_CALL.STRSTARTS, args);
+        if (ctx.STRENDS() != null) return createConstraint(ASTConstants.FUNCTION_CALL.STRENDS, args);
+        if (ctx.STRDT() != null) return createConstraint(ASTConstants.FUNCTION_CALL.STRDT, args);
+        if (ctx.STRLANG() != null) return createConstraint(ASTConstants.FUNCTION_CALL.STRLANG, args);
+        if (ctx.STRBEFORE() != null) return createConstraint(ASTConstants.FUNCTION_CALL.STRBEFORE, args);
+        if (ctx.STRAFTER() != null) return createConstraint(ASTConstants.FUNCTION_CALL.STRAFTER, args);
+        return null;
+    }
+
+    private TermAst termFromTypeOrHashBuiltInCall(
+            SparqlParser.BuiltInCallContext ctx, List<TermAst> args) {
+        if (ctx.DATATYPE() != null) return createConstraint(ASTConstants.FUNCTION_CALL.DATATYPE, args);
+        if (ctx.IRI() != null || ctx.URI() != null) return createConstraint(ASTConstants.FUNCTION_CALL.IRI, args);
+        if (ctx.SAME_TERM() != null) return createConstraint(ASTConstants.FUNCTION_CALL.SAMETERM, args);
+        if (ctx.IS_URI() != null || ctx.IS_IRI() != null) return createConstraint(ASTConstants.FUNCTION_CALL.IS_IRI, args);
+        if (ctx.IS_BLANK() != null) return createConstraint(ASTConstants.FUNCTION_CALL.IS_BLANK, args);
+        if (ctx.IS_LITERAL() != null) return createConstraint(ASTConstants.FUNCTION_CALL.IS_LITERAL, args);
+        if (ctx.MD5() != null) return new Md5Ast(args);
+        if (ctx.SHA1() != null) return new Sha1Ast(args);
+        if (ctx.SHA256() != null) return new Sha256Ast(args);
+        if (ctx.SHA384() != null) return new Sha384Ast(args);
+        if (ctx.SHA512() != null) return new Sha512Ast(args);
+        return null;
     }
 
     public TermAst termFromConstraint(SparqlParser.ConstraintContext ctx) {
@@ -579,20 +613,25 @@ public final class SparqlExpressionBuilder {
     public TermAst termFromPrimary(SparqlParser.PrimaryExpressionContext ctx) {
         if (ctx.brackettedExpression() != null) {
             return termFromBrackettedExpression(ctx.brackettedExpression());
-        } else if (ctx.builtInCall() != null) {
-            return termFromBuiltInCall(ctx.builtInCall());
-        } else if (ctx.iriRefOrFunction() != null) {
-            return termFromIriRefOrFunction(ctx.iriRefOrFunction());
-        } else if (ctx.rdfLiteral() != null) {
-            return terms.termFromRdfLiteral(ctx.rdfLiteral());
-        } else if (ctx.numericLiteral() != null) {
-            return terms.termFromNumericLiteral(ctx.numericLiteral());
-        } else if (ctx.booleanLiteral() != null) {
-            return terms.termFromBooleanLiteral(ctx.booleanLiteral());
-        } else if (ctx.var_() != null) {
-            return terms.termFromVar(ctx.var_());
-        } else {
-            throw new QueryEvaluationException("Unexpected content of bracketed termFromExpression");
         }
+        if (ctx.builtInCall() != null) {
+            return termFromBuiltInCall(ctx.builtInCall());
+        }
+        if (ctx.iriRefOrFunction() != null) {
+            return termFromIriRefOrFunction(ctx.iriRefOrFunction());
+        }
+        if (ctx.rdfLiteral() != null) {
+            return terms.termFromRdfLiteral(ctx.rdfLiteral());
+        }
+        if (ctx.numericLiteral() != null) {
+            return terms.termFromNumericLiteral(ctx.numericLiteral());
+        }
+        if (ctx.booleanLiteral() != null) {
+            return terms.termFromBooleanLiteral(ctx.booleanLiteral());
+        }
+        if (ctx.var_() != null) {
+            return terms.termFromVar(ctx.var_());
+        }
+        throw new QueryEvaluationException("Unexpected content of bracketed termFromExpression");
     }
 }

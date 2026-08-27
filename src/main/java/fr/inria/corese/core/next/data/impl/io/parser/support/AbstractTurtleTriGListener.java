@@ -5,13 +5,13 @@ import fr.inria.corese.core.next.data.api.model.*;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 import fr.inria.corese.core.next.data.impl.namespace.PrefixHandler;
-import fr.inria.corese.core.next.data.api.support.term.IRIUtils;
+import fr.inria.corese.core.next.data.spi.term.IRIUtils;
 import fr.inria.corese.core.next.data.api.vocabulary.RDF;
 import fr.inria.corese.core.next.data.api.exception.ParsingException;
 import fr.inria.corese.core.next.common.text.RdfText;
 
-import static fr.inria.corese.core.next.data.api.support.term.IRIUtils.isAbsoluteIRI;
-import static fr.inria.corese.core.next.data.api.support.term.IRIUtils.normalizeURI;
+import static fr.inria.corese.core.next.data.spi.term.IRIUtils.isAbsoluteIRI;
+import static fr.inria.corese.core.next.data.spi.term.IRIUtils.normalizeURI;
 
 /**
  * Base class for RDF parsers (Turtle, TriG) providing common functionality.

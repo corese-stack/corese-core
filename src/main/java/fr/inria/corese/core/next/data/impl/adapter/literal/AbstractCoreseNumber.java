@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.data.impl.adapter.literal;
 
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.next.data.api.term.IRI;
-import fr.inria.corese.core.next.data.api.support.term.literal.AbstractNumber;
+import fr.inria.corese.core.next.data.spi.term.literal.AbstractNumber;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
 import java.math.BigDecimal;

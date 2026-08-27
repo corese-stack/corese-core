@@ -6,6 +6,8 @@ import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.data.api.namespace.PrefixMapping;
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Resource;
+import fr.inria.corese.core.next.storage.Storages;
+import fr.inria.corese.core.next.storage.StorageModels;
 import org.junit.jupiter.api.Test;
 
 import java.io.Serializable;
@@ -98,6 +100,28 @@ class DataEntryPointsTest {
     @Test
     void modelContractDoesNotPromiseJavaObjectSerialization() {
         assertFalse(Models.create() instanceof Serializable);
+    }
+
+    @Test
+    void createsAModelBackedByCallerOwnedStorage() {
+        try (var storage = Storages.create()) {
+            Model model = StorageModels.create(storage);
+            model.add(subject, predicate, object);
+
+            assertTrue(model.contains(subject, predicate, object));
+            assertTrue(storage.queries().contains(
+                    fr.inria.corese.core.next.storage.api.model.StatementPattern.of(
+                            subject, predicate, object)));
+        }
+    }
+
+    @Test
+    void canonicalizationIsAvailableWithoutImplementationImports() {
+        Statement statement = values.createStatement(subject, predicate, object);
+
+        assertEquals("<urn:subject> <urn:predicate> <urn:object> .",
+                RdfCanonicalization.toNQuad(statement));
+        assertEquals(List.of(statement), RdfCanonicalization.canonicalize(Models.create(List.of(statement))));
     }
 
     @Test

@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.parser;
 
 import fr.inria.corese.core.next.data.api.vocabulary.RDF;
-import fr.inria.corese.core.next.data.api.support.io.IOConstants;
+import fr.inria.corese.core.next.data.spi.io.IOConstants;
 import fr.inria.corese.core.next.generated.antlr.SparqlParser;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
@@ -523,8 +523,8 @@ public abstract class SparqlAstBuilder {
     /**
      * Variable token text can be "?s" or "$s" depending on grammar.
      */
-    public TermAst var(String tokenText) {
-        return terms.var(tokenText);
+    public TermAst variable(String tokenText) {
+        return terms.variable(tokenText);
     }
 
     /**

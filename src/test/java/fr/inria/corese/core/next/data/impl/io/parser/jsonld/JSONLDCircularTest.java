@@ -7,7 +7,7 @@ import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
 import fr.inria.corese.core.next.storage.impl.model.StorageModel;
-import fr.inria.corese.core.next.data.impl.io.jsonld.JSONLDOptions;
+import fr.inria.corese.core.next.data.api.io.JSONLDOptions;
 import fr.inria.corese.core.next.data.impl.io.parser.DefaultRDFParserFactory;
 import fr.inria.corese.core.next.data.impl.io.serializer.DefaultRDFSerializerFactory;
 import fr.inria.corese.core.next.data.impl.io.parser.support.ParserTestBase;

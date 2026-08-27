@@ -15,7 +15,7 @@ import fr.inria.corese.core.next.data.impl.io.serializer.rdfc10.RDFC10Canonicali
 import fr.inria.corese.core.next.data.impl.io.serializer.rdfc10.RDFC10Serializer;
 import fr.inria.corese.core.next.data.impl.io.serializer.rdfc10.RDFC10SerializerOptions;
 import fr.inria.corese.core.next.data.impl.io.serializer.jsonld.JSONLDSerializer;
-import fr.inria.corese.core.next.data.impl.io.jsonld.JSONLDOptions;
+import fr.inria.corese.core.next.data.api.io.JSONLDOptions;
 import fr.inria.corese.core.next.data.impl.io.serializer.nquads.NQuadsSerializer;
 import fr.inria.corese.core.next.data.impl.io.serializer.nquads.NQuadsSerializerOptions;
 import fr.inria.corese.core.next.data.impl.io.serializer.ntriples.NTriplesSerializer;

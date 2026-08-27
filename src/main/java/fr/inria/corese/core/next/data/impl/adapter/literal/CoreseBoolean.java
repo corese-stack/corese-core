@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.data.impl.adapter.literal;
 
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.next.data.api.support.term.literal.AbstractLiteral;
+import fr.inria.corese.core.next.data.spi.term.literal.AbstractLiteral;
 import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
 import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 import fr.inria.corese.core.next.data.api.exception.IncorrectOperationException;

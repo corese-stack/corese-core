@@ -25,6 +25,7 @@ public class CanonicalizationState {
      * Constructs a new CanonicalizationState instance.
      */
     public CanonicalizationState() {
+        // State containers are initialized at declaration to keep instances ready for use.
     }
 
     // Quad to Blank Node Management
@@ -91,9 +92,9 @@ public class CanonicalizationState {
      *         value is associated.
      */
     public String getHashForBlankNode(String blankNodeId) {
-        for (String hash : hashToBlankNode.keySet()) {
-            if (hashToBlankNode.get(hash).contains(blankNodeId)) {
-                return hash;
+        for (Map.Entry<String, List<String>> entry : hashToBlankNode.entrySet()) {
+            if (entry.getValue().contains(blankNodeId)) {
+                return entry.getKey();
             }
         }
         return null;

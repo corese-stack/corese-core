@@ -12,7 +12,7 @@ import fr.inria.corese.core.next.data.api.namespace.Namespace;
 import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.data.api.term.Value;
-import fr.inria.corese.core.next.data.api.support.model.AbstractModel;
+import fr.inria.corese.core.next.data.spi.model.AbstractModel;
 
 @SuppressWarnings("java:S2160")
 public abstract class FilteredModel extends AbstractModel {

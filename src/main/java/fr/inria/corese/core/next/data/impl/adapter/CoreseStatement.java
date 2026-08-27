@@ -4,7 +4,7 @@ import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.term.Value;
-import fr.inria.corese.core.next.data.api.support.model.AbstractStatement;
+import fr.inria.corese.core.next.data.spi.model.AbstractStatement;
 
 /**
  * Represents a statement in Corese. A Corese statement consists of a subject,

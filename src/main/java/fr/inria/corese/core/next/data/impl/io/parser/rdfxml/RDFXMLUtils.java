@@ -7,7 +7,7 @@ import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 import fr.inria.corese.core.next.data.api.vocabulary.RDF;
 import fr.inria.corese.core.next.data.api.exception.IncorrectFormatException;
 import fr.inria.corese.core.next.data.api.exception.ParsingException;
-import fr.inria.corese.core.next.data.api.support.io.IOConstants;
+import fr.inria.corese.core.next.data.spi.io.IOConstants;
 import org.xml.sax.Attributes;
 
 import java.util.List;
