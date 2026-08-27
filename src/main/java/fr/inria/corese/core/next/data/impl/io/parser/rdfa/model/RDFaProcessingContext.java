@@ -5,8 +5,9 @@ import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.term.Value;
 import org.xml.sax.Attributes;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,7 +23,7 @@ public class RDFaProcessingContext {
     private Resource currentObjectResource = null;
     private Resource typedResource = null;
     private Set<RDFaIncompleteStatement> incompleteStatements = null;
-    private Map<IRI, Set<Value>> listMappings = new HashMap<>();
+    private Map<IRI, List<Value>> listMappings = new HashMap<>();
     private String currentLanguage = null;
     private Value currentPropertyValue = null;
     private String defaultVocabulary = null;
@@ -145,7 +146,7 @@ public class RDFaProcessingContext {
      *
      * @return A list mapping that associates IRIs with lists.
      */
-    public Map<IRI, Set<Value>> getListMappings() {
+    public Map<IRI, List<Value>> getListMappings() {
         return listMappings;
     }
 
@@ -153,7 +154,7 @@ public class RDFaProcessingContext {
      *
      * @param listMappings A list mapping that associates IRIs with lists.
      */
-    public void setListMappings(Map<IRI, Set<Value>> listMappings) {
+    public void setListMappings(Map<IRI, List<Value>> listMappings) {
         this.listMappings = listMappings;
     }
 
@@ -163,7 +164,7 @@ public class RDFaProcessingContext {
      * @param value The resource associated to this list
      */
     public void addListMapping(IRI key, Value value) {
-        this.listMappings.computeIfAbsent(key,k -> new HashSet<>());
+        this.listMappings.computeIfAbsent(key, k -> new ArrayList<>());
         this.listMappings.get(key).add(value);
     }
 
@@ -172,7 +173,7 @@ public class RDFaProcessingContext {
      * @param key The IRI of the list
      * @param objects The resources associated to this list
      */
-    public void addListMappings(IRI key, Set<Value> objects) {
+    public void addListMappings(IRI key, List<Value> objects) {
         this.listMappings.put(key, objects);
     }
 
@@ -181,7 +182,10 @@ public class RDFaProcessingContext {
      * @return The language. Note that there is no default language.
      */
     public String getCurrentLanguage() {
-        return currentLanguage;
+        if (currentLanguage != null) {
+            return currentLanguage.isEmpty() ? null : currentLanguage;
+        }
+        return evaluationContext != null ? evaluationContext.getLanguage() : null;
     }
 
     /**
@@ -213,7 +217,10 @@ public class RDFaProcessingContext {
      * @return The default vocabulary, a value to use as the prefix IRI when a term unknown to the RDFa Processor is used.
      */
     public String getDefaultVocabulary() {
-        return defaultVocabulary;
+        if (defaultVocabulary != null) {
+            return defaultVocabulary.isEmpty() ? null : defaultVocabulary;
+        }
+        return evaluationContext != null ? evaluationContext.getDefaultVocabulary() : null;
     }
 
     /**

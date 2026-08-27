@@ -1,5 +1,10 @@
 package fr.inria.corese.core.next.data.impl.io.parser.rdfa.model;
 
+/**
+ * Enumeration of standard RDFa 1.1 attributes used during parsing.
+ *
+ * @see <a href="https://www.w3.org/TR/rdfa-core/">RDFa Core 1.1 Specification</a>
+ */
 public enum RDFaAttributes {
     ABOUT("about"),
     BASE("base"),

@@ -38,7 +38,7 @@ public class RDFaEvaluationContext {
     /**
      * A list mapping that associates IRIs with lists.
      */
-    private Map<IRI, Set<Value>> listMappings = new HashMap<>();
+    private Map<IRI, List<Value>> listMappings = new HashMap<>();
     /**
      * The term mappings, a list of terms and their associated IRIs. This specification does not define an initial list. Host Languages MAY define an initial list.
      */
@@ -49,6 +49,11 @@ public class RDFaEvaluationContext {
      */
     private String defaultVocabulary = null;
 
+    /**
+     * The IRI prefix mappings scoped to this context.
+     */
+    private Map<String, IRI> iriMappings = new HashMap<>();
+
     public RDFaEvaluationContext(IRI baseIri) {
         this.baseIri = baseIri;
     }
@@ -58,10 +63,11 @@ public class RDFaEvaluationContext {
         this.defaultVocabulary = context.defaultVocabulary;
         this.incompleteStatements = new HashSet<>(context.incompleteStatements);
         this.language = context.language;
-        this.listMappings = new HashMap<>(context.listMappings);
+        this.listMappings = context.listMappings;
         this.parentObjectResource = context.parentObjectResource;
         this.parentSubjectResource = context.parentSubjectResource;
         this.termMappings = new HashMap<>(context.termMappings);
+        this.iriMappings = new HashMap<>(context.iriMappings);
     }
 
     public IRI getBaseIri() {
@@ -144,11 +150,37 @@ public class RDFaEvaluationContext {
         return this.termMappings;
     }
 
-    public Map<IRI, Set<Value>> getListMappings() {
+    public Map<String, IRI> getIriMappings() {
+        return iriMappings;
+    }
+
+    public void setIriMappings(Map<String, IRI> iriMappings) {
+        this.iriMappings = iriMappings != null ? new HashMap<>(iriMappings) : new HashMap<>();
+    }
+
+    public void addIriMapping(String prefix, IRI iri) {
+        this.iriMappings.put(prefix, iri);
+    }
+
+    public void addIriMappings(Map<String, IRI> mappings) {
+        if (mappings != null) {
+            this.iriMappings.putAll(mappings);
+        }
+    }
+
+    public boolean hasIriMapping(String prefix) {
+        return this.iriMappings.containsKey(prefix);
+    }
+
+    public IRI getIriMapping(String prefix) {
+        return this.iriMappings.get(prefix);
+    }
+
+    public Map<IRI, List<Value>> getListMappings() {
         return listMappings;
     }
 
-    public void setListMappings(Map<IRI, Set<Value>> listMappings) {
+    public void setListMappings(Map<IRI, List<Value>> listMappings) {
         this.listMappings = listMappings;
     }
 

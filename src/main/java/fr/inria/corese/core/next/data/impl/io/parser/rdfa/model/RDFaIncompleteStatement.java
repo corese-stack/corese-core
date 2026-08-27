@@ -21,6 +21,7 @@ public class RDFaIncompleteStatement {
     private IRI predicate = null;
     private Value object = null;
     private Direction direction = null;
+    private java.util.List<Value> targetList = null;
 
     private RDFaIncompleteStatement() {
         this.direction = Direction.FORWARD;
@@ -35,6 +36,21 @@ public class RDFaIncompleteStatement {
         this();
         this.predicate = predicate;
         this.direction = direction;
+    }
+
+    public RDFaIncompleteStatement(IRI predicate, Direction direction, java.util.List<Value> targetList) {
+        this();
+        this.predicate = predicate;
+        this.direction = direction;
+        this.targetList = targetList;
+    }
+
+    public java.util.List<Value> getTargetList() {
+        return this.targetList;
+    }
+
+    public void setTargetList(java.util.List<Value> targetList) {
+        this.targetList = targetList;
     }
 
     public boolean isForward() {

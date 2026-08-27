@@ -219,9 +219,8 @@ class RDFaParserTest extends ParserTestBase {
     @Test
     void basicIRItoIRITest() {
         String testDataString = """
-                <html>
+                <html xmlns:dbp="http://dbpedia.org/property/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
                   <head>
-                    <meta xmlns:dbp="http://dbpedia.org/property/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:xsd="http://www.w3.org/2001/XMLSchema#"></meta>
                   </head>
                   <body>
                     <div about="http://dbpedia.org/resource/Albert_Einstein">
@@ -258,9 +257,8 @@ class RDFaParserTest extends ParserTestBase {
     @Test
     void basicIRItoStringTest() {
         String testDataString = """
-                <html>
+                <html xmlns:dbp="http://dbpedia.org/property/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
                   <head>
-                  <meta xmlns:dbp="http://dbpedia.org/property/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:xsd="http://www.w3.org/2001/XMLSchema#"></meta>
                   </head>
                   <body>
                 <div about="http://dbpedia.org/resource/Albert_Einstein">
@@ -294,9 +292,8 @@ class RDFaParserTest extends ParserTestBase {
     @Test
     void basicIRItoTypedLiteralTest() {
         String testDataString = """
-                <html>
+                <html xmlns:dbp="http://dbpedia.org/property/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
                   <head>
-                  <meta xmlns:dbp="http://dbpedia.org/property/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:xsd="http://www.w3.org/2001/XMLSchema#"></meta>
                   </head>
                   <body>
                     <div about="http://dbpedia.org/resource/Albert_Einstein">
@@ -343,9 +340,8 @@ class RDFaParserTest extends ParserTestBase {
     @Test
     void basicChainTest() {
         String testDataString = """
-                <html>
+                <html xmlns:dbp="http://dbpedia.org/property/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
                   <head>
-                  <meta xmlns:dbp="http://dbpedia.org/property/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:xsd="http://www.w3.org/2001/XMLSchema#"></meta>
                   </head>
                   <body>
                 <div about="http://dbpedia.org/resource/Albert_Einstein">
