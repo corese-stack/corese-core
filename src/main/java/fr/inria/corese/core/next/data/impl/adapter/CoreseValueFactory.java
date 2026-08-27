@@ -22,7 +22,7 @@ import fr.inria.corese.core.next.data.api.term.Triple;
 import fr.inria.corese.core.next.data.api.term.SimpleTriple;
 import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
-import fr.inria.corese.core.next.data.api.support.term.literal.AbstractLiteral;
+import fr.inria.corese.core.next.data.spi.term.literal.AbstractLiteral;
 import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 import fr.inria.corese.core.next.data.api.literal.CoreDatatypes;
 import fr.inria.corese.core.next.data.impl.adapter.node.CoreseBNode;

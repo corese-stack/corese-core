@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.parser;
 
-import fr.inria.corese.core.next.data.api.support.io.IOConstants;
+import fr.inria.corese.core.next.data.spi.io.IOConstants;
 import fr.inria.corese.core.next.data.api.io.option.BaseIRIOptions;
 import fr.inria.corese.core.next.query.api.validation.QueryDiagnostic;
 import fr.inria.corese.core.next.query.impl.sparql.parser.options.ErrorHandlingOptions;

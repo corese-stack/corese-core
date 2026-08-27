@@ -18,7 +18,7 @@ public class BindAstListener extends AbstractSparqlAstListener {
     @Override
     public void exitBind(SparqlParser.BindContext ctx) {
         TermAst expression = builder().termFromExpression(ctx.expression());
-        VarAst variable = (VarAst) builder().var(ctx.var_().getText());
+        VarAst variable = (VarAst) builder().variable(ctx.var_().getText());
         builder().addBind(new BindAst(expression, variable));
     }
 }

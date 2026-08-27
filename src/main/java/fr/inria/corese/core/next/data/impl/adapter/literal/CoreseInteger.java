@@ -1,8 +1,8 @@
 package fr.inria.corese.core.next.data.impl.adapter.literal;
 
 import fr.inria.corese.core.next.data.api.term.IRI;
-import fr.inria.corese.core.next.data.api.support.term.literal.AbstractLiteral;
-import fr.inria.corese.core.next.data.api.support.term.literal.AbstractNumber;
+import fr.inria.corese.core.next.data.spi.term.literal.AbstractLiteral;
+import fr.inria.corese.core.next.data.spi.term.literal.AbstractNumber;
 import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
 import fr.inria.corese.core.next.data.api.literal.CoreDatatypes;

@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.parser;
 
 
-import fr.inria.corese.core.next.data.api.support.io.IOConstants;
+import fr.inria.corese.core.next.data.spi.io.IOConstants;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import org.junit.jupiter.api.Test;
@@ -212,8 +212,11 @@ class SparqlQueryAstBuilderTest {
         SparqlAstBuilder b = newBuilder();
 
         b.enterGroup();
+        VarAst s = new VarAst("s");
+        VarAst p = new VarAst("p");
+        VarAst o = new VarAst("o");
         assertThrows(IllegalStateException.class, () ->
-                b.addTriple(new VarAst("s"), new VarAst("p"), new VarAst("o"))
+                b.addTriple(s, p, o)
         );
     }
 

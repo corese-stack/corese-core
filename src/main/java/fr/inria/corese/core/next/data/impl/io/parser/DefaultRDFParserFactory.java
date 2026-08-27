@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.data.impl.io.parser;
 import fr.inria.corese.core.next.data.api.model.Model;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
-import fr.inria.corese.core.next.data.api.support.io.parser.AbstractRDFParserFactory;
+import fr.inria.corese.core.next.data.spi.io.parser.AbstractRDFParserFactory;
 import fr.inria.corese.core.next.data.api.io.option.RDFParsingOptions;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParserOptions;

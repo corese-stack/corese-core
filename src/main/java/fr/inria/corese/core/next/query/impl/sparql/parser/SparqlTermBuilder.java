@@ -59,7 +59,7 @@ public final class SparqlTermBuilder {
     /**
      * Variable token text can be "?s" or "$s" depending on grammar.
      */
-    public VarAst var(String tokenText) {
+    public VarAst variable(String tokenText) {
         if (tokenText == null || tokenText.isBlank()) {
             throw new IllegalArgumentException("Variable token text is null/blank");
         }
@@ -97,7 +97,7 @@ public final class SparqlTermBuilder {
     // --- ANTLR-context converters ---
 
     public TermAst termFromVar(SparqlParser.Var_Context ctx) {
-        return var(ctx.getText());
+        return variable(ctx.getText());
     }
 
     public TermAst termFromIriRef(SparqlParser.IriRefContext ctx) {

@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.data.api.namespace;
 import java.io.Serial;
 import java.util.Objects;
 
-import fr.inria.corese.core.next.data.api.support.namespace.AbstractNamespace;
+import fr.inria.corese.core.next.data.spi.namespace.AbstractNamespace;
 
 /**
  * Immutable default implementation of a {@link Namespace} binding.

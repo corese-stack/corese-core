@@ -8,7 +8,6 @@ import fr.inria.corese.core.next.data.api.io.serializer.option.LineEndingOptions
 import fr.inria.corese.core.next.data.api.io.serializer.option.LiteralDatatypePolicy;
 import fr.inria.corese.core.next.data.api.io.serializer.option.PrefixOrdering;
 import fr.inria.corese.core.next.data.api.io.serializer.option.PrettyPrintOptions;
-import fr.inria.corese.core.next.data.api.support.io.IOConstants;
 
 import java.util.Objects;
 
@@ -107,7 +106,7 @@ public final class RDFSerializerOptions implements
 
     public static final class Builder {
         private String baseIRI;
-        private String lineEnding = IOConstants.DEFAULT_LINE_ENDING;
+        private String lineEnding = "\n";
         private boolean stableBlankNodeIds;
         private LiteralDatatypePolicy literalDatatypePolicy = LiteralDatatypePolicy.MINIMAL;
         private boolean prettyPrint = true;

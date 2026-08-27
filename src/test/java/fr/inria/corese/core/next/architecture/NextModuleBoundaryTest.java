@@ -6,8 +6,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -17,6 +21,8 @@ class NextModuleBoundaryTest {
 
     private static final Path CORE_SOURCES = Path.of("src/main/java/fr/inria/corese/core");
     private static final Path NEXT_SOURCES = CORE_SOURCES.resolve("next");
+    private static final Pattern CORESE_TYPE_REFERENCE = Pattern.compile(
+            "\\bfr\\.inria\\.corese\\.core(?:\\.[A-Za-z_$][A-Za-z0-9_$]*)+");
 
     @Test
     void sharedCodeMustNotDependOnDomainModules() throws IOException {
@@ -43,18 +49,18 @@ class NextModuleBoundaryTest {
     }
 
     @Test
-    void publicApisMustNotDependOnImplementations() throws IOException {
-        for (Path apiDirectory : publicApiDirectories()) {
-            assertNoImports(
+    void publicContractsMustNotDependOnImplementations() throws IOException {
+        for (Path apiDirectory : publicContractDirectories()) {
+            assertNoReferences(
                     apiDirectory,
                     imported -> imported.contains(".next.") && imported.contains(".impl."));
         }
     }
 
     @Test
-    void publicApisMustNotDependOnTheLegacyPipeline() throws IOException {
-        for (Path apiDirectory : publicApiDirectories()) {
-            assertNoImports(
+    void publicContractsMustNotDependOnTheLegacyPipeline() throws IOException {
+        for (Path apiDirectory : publicContractDirectories()) {
+            assertNoReferences(
                     apiDirectory,
                     imported -> imported.startsWith("fr.inria.corese.core.")
                             && !imported.startsWith("fr.inria.corese.core.next."));
@@ -63,18 +69,31 @@ class NextModuleBoundaryTest {
 
     @Test
     void legacyCodeMustNotDependOnNextImplementations() throws IOException {
-        assertNoImports(
+        assertNoReferences(
                 CORE_SOURCES,
                 source -> !source.startsWith(NEXT_SOURCES),
                 imported -> imported.startsWith("fr.inria.corese.core.next.")
-                        && imported.contains(".impl."));
+                        && imported.contains(".impl.")
+                        // KGRAM migration hooks are deliberately outside the next boundary.
+                        && !imported.startsWith("fr.inria.corese.core.next.query.impl.kgram."));
     }
 
     @Test
-    void publicApiPackagesMustBeDocumented() throws IOException {
+    void publicApiAndSpiPackagesMustBeDocumented() throws IOException {
+        assertPackagesAreDocumented(publicContractDirectories(), "Undocumented public API or SPI packages:");
+    }
+
+    @Test
+    void nonKgramImplementationPackagesMustBeDocumented() throws IOException {
+        assertPackagesAreDocumented(
+                nonKgramImplementationDirectories(), "Undocumented non-KGRAM implementation packages:");
+    }
+
+    private static void assertPackagesAreDocumented(List<Path> packageRoots, String message)
+            throws IOException {
         List<String> violations = new ArrayList<>();
-        for (Path apiDirectory : publicApiDirectories()) {
-            try (Stream<Path> paths = Files.walk(apiDirectory)) {
+        for (Path packageRoot : packageRoots) {
+            try (Stream<Path> paths = Files.walk(packageRoot)) {
                 for (Path packageDirectory : paths.filter(Files::isDirectory).toList()) {
                     try (Stream<Path> sources = Files.list(packageDirectory)) {
                         boolean containsTypes = sources.anyMatch(source ->
@@ -88,15 +107,23 @@ class NextModuleBoundaryTest {
             }
         }
         if (!violations.isEmpty()) {
-            fail("Undocumented public API packages:\n" + String.join("\n", violations));
+            fail(message + "\n" + String.join("\n", violations));
         }
     }
 
-    private static List<Path> publicApiDirectories() {
+    private static List<Path> publicContractDirectories() {
         return List.of(
                 NEXT_SOURCES.resolve("data/api"),
+                NEXT_SOURCES.resolve("data/spi"),
                 NEXT_SOURCES.resolve("storage/api"),
                 NEXT_SOURCES.resolve("query/api"));
+    }
+
+    private static List<Path> nonKgramImplementationDirectories() {
+        return List.of(
+                NEXT_SOURCES.resolve("data/impl"),
+                NEXT_SOURCES.resolve("storage/impl"),
+                NEXT_SOURCES.resolve("query/impl/sparql"));
     }
 
     private static void assertNoImports(Path sourceDirectory, Predicate<String> forbidden)
@@ -124,6 +151,39 @@ class NextModuleBoundaryTest {
                         if (forbidden.test(imported)) {
                             violations.add(NEXT_SOURCES.relativize(source) + " -> " + imported);
                         }
+                    }
+                }
+            }
+        }
+        if (!violations.isEmpty()) {
+            fail("Forbidden next-module dependencies:\n" + String.join("\n", violations));
+        }
+    }
+
+    private static void assertNoReferences(
+            Path sourceDirectory,
+            Predicate<String> forbidden) throws IOException {
+        assertNoReferences(sourceDirectory, source -> true, forbidden);
+    }
+
+    private static void assertNoReferences(
+            Path sourceDirectory,
+            Predicate<Path> includedSource,
+            Predicate<String> forbidden) throws IOException {
+        List<String> violations = new ArrayList<>();
+        try (Stream<Path> paths = Files.walk(sourceDirectory)) {
+            for (Path source : paths
+                    .filter(path -> path.toString().endsWith(".java"))
+                    .filter(includedSource)
+                    .toList()) {
+                Set<String> references = new LinkedHashSet<>();
+                Matcher matcher = CORESE_TYPE_REFERENCE.matcher(Files.readString(source));
+                while (matcher.find()) {
+                    references.add(matcher.group());
+                }
+                for (String reference : references) {
+                    if (forbidden.test(reference)) {
+                        violations.add(NEXT_SOURCES.relativize(source) + " -> " + reference);
                     }
                 }
             }

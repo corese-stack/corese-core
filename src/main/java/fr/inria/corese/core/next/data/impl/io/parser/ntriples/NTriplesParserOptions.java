@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.data.impl.io.parser.ntriples;
 
-import fr.inria.corese.core.next.data.api.support.io.AbstractIOOptions;
+import fr.inria.corese.core.next.data.spi.io.AbstractIOOptions;
 import fr.inria.corese.core.next.data.api.io.option.RDFParsingOptions;
 
 /**

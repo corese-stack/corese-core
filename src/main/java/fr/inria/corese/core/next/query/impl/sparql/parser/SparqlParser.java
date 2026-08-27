@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 
-import fr.inria.corese.core.next.data.api.support.io.IOConstants;
+import fr.inria.corese.core.next.data.spi.io.IOConstants;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.api.exception.QueryValidationException;

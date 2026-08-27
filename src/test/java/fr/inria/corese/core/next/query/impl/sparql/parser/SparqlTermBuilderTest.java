@@ -27,47 +27,47 @@ class SparqlTermBuilderTest {
     }
 
     @Nested
-    @DisplayName("var()")
+    @DisplayName("variable()")
     class VarFactory {
 
         @Test
         @DisplayName("strips leading '?' prefix")
         void stripsQuestionMark() {
-            VarAst result = builder.var("?subject");
+            VarAst result = builder.variable("?subject");
             assertEquals("subject", result.name());
         }
 
         @Test
         @DisplayName("strips leading '$' prefix")
         void stripsDollarSign() {
-            VarAst result = builder.var("$x");
+            VarAst result = builder.variable("$x");
             assertEquals("x", result.name());
         }
 
         @Test
         @DisplayName("accepts name without prefix")
         void acceptsNameWithoutPrefix() {
-            VarAst result = builder.var("myVar");
+            VarAst result = builder.variable("myVar");
             assertEquals("myVar", result.name());
         }
 
         @Test
         @DisplayName("trims surrounding whitespace")
         void trimsWhitespace() {
-            VarAst result = builder.var("  ?s  ");
+            VarAst result = builder.variable("  ?s  ");
             assertEquals("s", result.name());
         }
 
         @Test
         @DisplayName("throws on null input")
         void throwsOnNull() {
-            assertThrows(IllegalArgumentException.class, () -> builder.var(null));
+            assertThrows(IllegalArgumentException.class, () -> builder.variable(null));
         }
 
         @Test
         @DisplayName("throws on blank input")
         void throwsOnBlank() {
-            assertThrows(IllegalArgumentException.class, () -> builder.var("   "));
+            assertThrows(IllegalArgumentException.class, () -> builder.variable("   "));
         }
     }
 

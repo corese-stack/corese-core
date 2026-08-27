@@ -39,7 +39,7 @@ class SparqlAstBuilderDescribeTest {
     private DescribeQueryAst buildWithWhere() {
         builder.enterGroup();
         builder.enterBgp();
-        builder.addTriple(builder.var("s"), builder.iri("a"), builder.iri("foaf:Person"));
+        builder.addTriple(builder.variable("s"), builder.iri("a"), builder.iri("foaf:Person"));
         builder.exitBgp();
         builder.exitGroup();
         return (DescribeQueryAst) builder.getResult();
@@ -104,7 +104,7 @@ class SparqlAstBuilderDescribeTest {
         @Test
         @DisplayName("Single variable resource is added to described list")
         void singleVariableResource() {
-            builder.addDescribeResource(builder.var("?s"));
+            builder.addDescribeResource(builder.variable("?s"));
             DescribeQueryAst result = buildWithEmptyWhere();
 
             assertFalse(result.isDescribeAll());
@@ -115,7 +115,7 @@ class SparqlAstBuilderDescribeTest {
         @Test
         @DisplayName("Variable name is stripped of ? prefix")
         void variableNameStripped() {
-            builder.addDescribeResource(builder.var("?s"));
+            builder.addDescribeResource(builder.variable("?s"));
             DescribeQueryAst result = buildWithEmptyWhere();
 
             VarAst describedVar = (VarAst) result.described().getFirst();
@@ -125,7 +125,7 @@ class SparqlAstBuilderDescribeTest {
         @Test
         @DisplayName("$ prefix is also stripped from variable name")
         void dollarPrefixStripped() {
-            builder.addDescribeResource(builder.var("$x"));
+            builder.addDescribeResource(builder.variable("$x"));
             DescribeQueryAst result = buildWithEmptyWhere();
 
             VarAst describedVar = (VarAst) result.described().getFirst();
@@ -140,7 +140,7 @@ class SparqlAstBuilderDescribeTest {
         @Test
         @DisplayName("Multiple resources are preserved in order")
         void multipleResourcesPreservedInOrder() {
-            builder.addDescribeResource(builder.var("?s"));
+            builder.addDescribeResource(builder.variable("?s"));
             builder.addDescribeResource(builder.iri("<http://example.org/alice>"));
             builder.addDescribeResource(builder.iri("<http://example.org/bob>"));
             DescribeQueryAst result = buildWithEmptyWhere();
@@ -154,7 +154,7 @@ class SparqlAstBuilderDescribeTest {
         @Test
         @DisplayName("isDescribeAll() is false when resources are present")
         void isDescribeAllFalseWhenResourcesPresent() {
-            builder.addDescribeResource(builder.var("?s"));
+            builder.addDescribeResource(builder.variable("?s"));
             DescribeQueryAst result = buildWithEmptyWhere();
             assertFalse(result.isDescribeAll());
         }
@@ -167,7 +167,7 @@ class SparqlAstBuilderDescribeTest {
         @Test
         @DisplayName("WHERE clause is present and contains expected BGP")
         void whereClauseContainsBgp() {
-            builder.addDescribeResource(builder.var("?s"));
+            builder.addDescribeResource(builder.variable("?s"));
             DescribeQueryAst result = buildWithWhere();
 
             assertFalse(result.whereClause().patterns().isEmpty());
@@ -177,7 +177,7 @@ class SparqlAstBuilderDescribeTest {
         @Test
         @DisplayName("BGP in WHERE clause contains the expected triple")
         void whereClauseBgpTriple() {
-            builder.addDescribeResource(builder.var("?s"));
+            builder.addDescribeResource(builder.variable("?s"));
             DescribeQueryAst result = buildWithWhere();
 
             BgpAst bgp = (BgpAst) result.whereClause().patterns().getFirst();
@@ -188,7 +188,7 @@ class SparqlAstBuilderDescribeTest {
         @Test
         @DisplayName("Resources and WHERE clause coexist correctly")
         void resourcesAndWhereClauseCoexist() {
-            builder.addDescribeResource(builder.var("?s"));
+            builder.addDescribeResource(builder.variable("?s"));
             DescribeQueryAst result = buildWithWhere();
 
             assertEquals(1, result.described().size());
