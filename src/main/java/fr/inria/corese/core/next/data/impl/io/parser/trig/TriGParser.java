@@ -33,7 +33,7 @@ import java.util.List;
 public class TriGParser extends AbstractRDFParser {
 
     /**
-     * Constructor for the ANTLRTrigParser.
+     * Constructs a TriGParser with default options.
      *
      * @param model   The RDF model to be populated.
      * @param factory The value factory for creating RDF resources.
@@ -43,7 +43,7 @@ public class TriGParser extends AbstractRDFParser {
     }
 
     /**
-     * Constructor for the ANTLRTrigParser with configuration options.
+     * Constructs a TriGParser with configuration options.
      *
      * @param model   The RDF model to be populated.
      * @param factory The value factory for creating RDF resources.

@@ -28,8 +28,7 @@ public class RDFC10Serializer extends AbstractLineBasedSerializer {
     private final RDFC10Canonicalizer canonicalizer;
 
     /**
-     * Constructs a new CanonicalSerializer.
-     * This constructor is now adapted to be used by the DefaultSerializerFactory.
+     * Constructs a new RDFC10Serializer.
      *
      * @param model         The model to be serialized.
      * @param config        The configuration options for the canonicalization process.

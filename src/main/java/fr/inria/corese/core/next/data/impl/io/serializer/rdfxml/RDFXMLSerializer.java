@@ -48,7 +48,7 @@ public class RDFXMLSerializer implements RDFSerializer {
     private List<Statement> cachedStatements;
 
     /**
-     * Constructs a new {@code XmlSerializer} instance with the specified model and default configuration.
+     * Constructs a new {@code RDFXMLSerializer} instance with the specified model and default configuration.
      * The default configuration is obtained from {@link RDFXMLSerializerOptions#defaultConfig()}.
      *
      * @param model the {@link Model} to serialize. Must not be null.
@@ -59,7 +59,7 @@ public class RDFXMLSerializer implements RDFSerializer {
     }
 
     /**
-     * Constructs a new {@code XmlSerializer} instance with the specified model and custom configuration.
+     * Constructs a new {@code RDFXMLSerializer} instance with the specified model and custom configuration.
      *
      * @param model  the {@link Model} to serialize. Must not be null.
      * @param config the {@link RDFXMLSerializerOptions} to use for serialization. Must not be null.
