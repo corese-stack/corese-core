@@ -78,13 +78,11 @@ public class ASTQuery
     static final String NL = "\n";
     static int nbt = 0; // to generate an unique id for a triple if needed
     static int nbbnode = 0; // createBlankNode()
-    public final static int QT_SELECT = 0;
-    public final static int QT_ASK = 1;
-    public final static int QT_CONSTRUCT = 2;
-    public final static int QT_DESCRIBE = 3;
-    public final static int QT_DELETE = 4;
-    public final static int QT_UPDATE = 5;
-    public final static int QT_TEMPLATE = 6;
+
+    public enum ResultForm {
+        SELECT, ASK, CONSTRUCT, DESCRIBE, DELETE, UPDATE, TEMPLATE
+    }
+
     public final static int L_PATH = 2;
     public final static int L_LIST = 1;
     public final static int L_DEFAULT = 0;
@@ -159,7 +157,7 @@ public class ASTQuery
     int nbtriple = 0; // rdf*
     int nbd = 0; // to generate an unique id for a variable if needed
     int nbfun = 0, nbvar = 0;
-    int resultForm = QT_SELECT;
+    ResultForm resultForm = ResultForm.SELECT;
     private int priority = 100;
     int countVar = 0;
     // if more, reject 2 times worse projection than best one
@@ -1926,11 +1924,11 @@ public class ASTQuery
         Offset = offset;
     }
 
-    public int getResultForm() {
+    public ResultForm getResultForm() {
         return resultForm;
     }
 
-    public void setResultForm(int resultForm) {
+    public void setResultForm(ResultForm resultForm) {
         this.resultForm = resultForm;
     }
 
@@ -2013,7 +2011,7 @@ public class ASTQuery
 
 
     public void setDescribe(Atom at) {
-        setResultForm(QT_DESCRIBE);
+        setResultForm(ResultForm.DESCRIBE);
         for (Atom aa : adescribe) {
             if (aa.getLabel().equals(at.getLabel())) {
                 return;
@@ -2242,20 +2240,20 @@ public class ASTQuery
     }
     
     public void setConstruct(Exp constructExp) {
-        this.setResultForm(QT_CONSTRUCT);
+        this.setResultForm(ResultForm.CONSTRUCT);
         this.constructExp = constructExp;
     }
     
     public void setDelete(boolean b) {
         if (b) {
-            setResultForm(QT_DELETE);
+            setResultForm(ResultForm.DELETE);
             isDelete = b;
         }
     }
 
     public void setInsert(boolean b) {
         if (b) {
-            setResultForm(ASTQuery.QT_CONSTRUCT);
+            setResultForm(ResultForm.CONSTRUCT);
             setAdd(true);
         }
     }
@@ -2627,7 +2625,7 @@ public class ASTQuery
 
     public void setAsk(boolean b) {
         if (b) {
-            setResultForm(QT_ASK);
+            setResultForm(ResultForm.ASK);
         }
     }
 
@@ -2640,26 +2638,26 @@ public class ASTQuery
     }
 
     public boolean isDescribe() {
-        return (getResultForm() == QT_DESCRIBE);
+        return (getResultForm() == ResultForm.DESCRIBE);
     }
 
     public boolean isAsk() {
-        return (getResultForm() == QT_ASK);
+        return (getResultForm() == ResultForm.ASK);
     }
 
     @Override
     public boolean isConstruct() {
-        return (getResultForm() == QT_CONSTRUCT);
+        return (getResultForm() == ResultForm.CONSTRUCT);
     }
 
     @Override
     public boolean isSelect() {
-        return (getResultForm() == QT_SELECT);
+        return (getResultForm() == ResultForm.SELECT);
     }
 
     @Override
     public boolean isUpdate() {
-        return (getResultForm() == QT_UPDATE);
+        return (getResultForm() == ResultForm.UPDATE);
     }
 
     @Override
@@ -2725,7 +2723,7 @@ public class ASTQuery
     }
 
     public void set(ASTUpdate u) {
-        setResultForm(ASTQuery.QT_UPDATE);
+        setResultForm(ResultForm.UPDATE);
         astu = u;
         u.set(this);
     }
