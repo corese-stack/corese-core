@@ -464,7 +464,7 @@ class RDFXMLParserTest extends ParserTestBase {
 
                 </rdf:RDF>
                 """.trim(),
-                1
+                5
             )
         );
     }
