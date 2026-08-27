@@ -57,7 +57,7 @@ class TurtleParserTest extends ParserTestBase {
                 """
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
                 <#0214>\s
-                    rdfs:comment \"""blabla"abc""\"" .""",
+                    rdfs:comment \"""blabla"abc\\\"\""" .""",
                 "blabla\"abc\""
             ),
             Arguments.of(
@@ -78,7 +78,7 @@ class TurtleParserTest extends ParserTestBase {
                 """
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
                 <#0214>\s
-                    rdfs:comment ""\""abc""\"" .""",
+                    rdfs:comment ""\""abc\\\"\""" .""",
                 "\"abc\""
             )
         );

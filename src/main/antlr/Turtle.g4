@@ -181,48 +181,24 @@ EXPONENT
     ;
 
 STRING_LITERAL_LONG_SINGLE_QUOTE
-    : '\'\'\'' (
-            ( '\'' | '\'\'' )?
-             SINGLE_QUOTE_LONG_LITERAL_CONTENT
-        )+ '\'\'\''
-    | '\'\'\'' (
-            SINGLE_QUOTE_LONG_LITERAL_CONTENT
-            ( '\'' | '\'\'' )?
-         )+ '\'\'\''
-    | '\'\'\'' (
-            ( '\'' | '\'\'' )
-            SINGLE_QUOTE_LONG_LITERAL_CONTENT+
-            ( '\'' | '\'\'' )
-         )+ '\'\'\''
-    | '\'\'\'\'\'\''
-    | '\'\'\'\'\'\'\''
-    | '\'\'\'\'\'\'\'\''
+    : '\'\'\'' (LONG_STRING_CHAR_SINGLE | ECHAR | UCHAR)* '\'\'\''
     ;
 
 STRING_LITERAL_LONG_QUOTE
-    : '"""' (
-            ( '"' | '""' )?
-             QUOTE_LONG_LITERAL_CONTENT
-        )+ '"""'
-    | '"""' (
-            QUOTE_LONG_LITERAL_CONTENT
-            ( '"' | '""' )?
-         )+ '"""'
-    | '"""' (
-            ( '"' | '""' )
-            QUOTE_LONG_LITERAL_CONTENT+
-            ( '"' | '""' )
-         )+ '"""'
-    | '""""""'
-    | '"""""""'
-    | '""""""""'
+    : '"""' (LONG_STRING_CHAR_DOUBLE | ECHAR | UCHAR)* '"""'
     ;
 
-QUOTE_LONG_LITERAL_CONTENT
-    : ( ~["\\] | ECHAR | UCHAR ) ;
+fragment LONG_STRING_CHAR_DOUBLE
+    : ~[\\"]
+    | '"' ~["]
+    | '"' '"' ~["]
+    ;
 
-SINGLE_QUOTE_LONG_LITERAL_CONTENT
-    : ( ~['\\] | ECHAR | UCHAR ) ;
+fragment LONG_STRING_CHAR_SINGLE
+    : ~[\\']
+    | '\'' ~[']
+    | '\'' '\'' ~[']
+    ;
 
 STRING_LITERAL_QUOTE
     : '"'  (~["\\\r\n] | ECHAR | UCHAR)* '"'
