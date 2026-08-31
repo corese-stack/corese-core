@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.kgram.tool;
 
+import fr.inria.corese.core.next.data.api.exception.IncorrectFormatException;
 import fr.inria.corese.core.next.data.api.term.BNode;
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Literal;
@@ -66,7 +67,12 @@ final class StorageManagerKgramValues {
      */
     static Value rdfValue(IDatatype datatype, ValueFactory valueFactory) {
         if (datatype.isURI()) {
-            return valueFactory.createIRI(datatype.getLabel());
+            try {
+                return valueFactory.createIRI(datatype.getLabel());
+            } catch (IncorrectFormatException e) {
+                throw new IllegalArgumentException(
+                        "KGRAM URI node has label '" + datatype.getLabel() + "' which is not a valid IRI", e);
+            }
         }
         if (datatype.isBlank()) {
             return valueFactory.createBNode(datatype.getLabel());

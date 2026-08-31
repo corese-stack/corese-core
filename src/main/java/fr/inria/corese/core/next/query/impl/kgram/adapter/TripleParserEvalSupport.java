@@ -19,16 +19,12 @@ public final class TripleParserEvalSupport {
 
     public static IDatatype evalWE(
             Expression expr, Computer eval, Binding binding, Environment env, Producer producer) {
-        if (!(env instanceof fr.inria.corese.core.kgram.api.query.Environment kgramEnv)) {
-            throw new QueryEvaluationException(
-                    "Environment must implement fr.inria.corese.core.kgram.api.query.Environment"
-                            + " (required by sparql.triple.parser.Expression#evalWE)");
-        }
-        if (!(producer instanceof fr.inria.corese.core.kgram.api.query.Producer kgramProducer)) {
-            throw new QueryEvaluationException(
-                    "Producer must implement fr.inria.corese.core.kgram.api.query.Producer"
-                            + " (required by sparql.triple.parser.Expression#evalWE)");
-        }
+        fr.inria.corese.core.kgram.api.query.Environment kgramEnv =
+                (env instanceof fr.inria.corese.core.kgram.api.query.Environment e)
+                        ? e : new LegacyEnvironmentBridge(env);
+        fr.inria.corese.core.kgram.api.query.Producer kgramProducer =
+                (producer instanceof fr.inria.corese.core.kgram.api.query.Producer p)
+                        ? p : LegacyProducerBridge.INSTANCE;
         try {
             return expr.evalWE(eval, binding, kgramEnv, kgramProducer);
         } catch (EngineException e) {

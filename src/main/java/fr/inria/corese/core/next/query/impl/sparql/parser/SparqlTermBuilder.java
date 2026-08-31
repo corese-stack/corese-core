@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 /**
  * Stateless term-building helpers extracted from {@link SparqlAstBuilder}.
@@ -29,19 +30,38 @@ import java.util.function.Function;
 public final class SparqlTermBuilder {
 
     private final Function<SparqlParser.BlankNodeContext, TermAst> blankNodeResolver;
+    private final UnaryOperator<String> iriExpander;
 
     /**
-     * Constructs a {@code SparqlTermBuilder} with a blank-node resolver callback.
+     * Constructs a {@code SparqlTermBuilder} with a blank-node resolver and an IRI expander.
      *
      * @param options           parser options (base IRI, etc.)
      * @param blankNodeResolver callback that handles {@code BlankNodeContext} and
      *                          updates the mutable blank-node label set held by
      *                          {@link SparqlAstBuilder}
+     * @param iriExpander       function that expands prefixed names (e.g. {@code ":p"}) to
+     *                          angle-bracketed absolute IRIs (e.g. {@code "<http://example.org/p>"})
+     *                          using the query's PREFIX declarations; returns the input unchanged
+     *                          when no matching prefix is found
+     */
+    public SparqlTermBuilder(SparqlParserOptions options,
+                             Function<SparqlParser.BlankNodeContext, TermAst> blankNodeResolver,
+                             UnaryOperator<String> iriExpander) {
+        Objects.requireNonNull(options, "options");
+        this.blankNodeResolver = blankNodeResolver;
+        this.iriExpander = Objects.requireNonNull(iriExpander, "iriExpander");
+    }
+
+    /**
+     * Constructs a {@code SparqlTermBuilder} with a blank-node resolver callback and no
+     * prefix expansion (IRI strings are passed through unchanged).
+     *
+     * @param options           parser options (base IRI, etc.)
+     * @param blankNodeResolver callback that handles {@code BlankNodeContext}
      */
     public SparqlTermBuilder(SparqlParserOptions options,
                              Function<SparqlParser.BlankNodeContext, TermAst> blankNodeResolver) {
-        Objects.requireNonNull(options, "options");
-        this.blankNodeResolver = blankNodeResolver;
+        this(options, blankNodeResolver, UnaryOperator.identity());
     }
 
     /**
@@ -79,7 +99,7 @@ public final class SparqlTermBuilder {
     public IriAst iri(String raw) {
         if (raw == null) throw new IllegalArgumentException("IRI raw is null");
         if (raw.equals("a")) return new IriAst("<" + RDF.type.getIRI().stringValue() + ">");
-        return new IriAst(raw);
+        return new IriAst(iriExpander.apply(raw));
     }
 
     /**
@@ -123,7 +143,7 @@ public final class SparqlTermBuilder {
             String t = ctx.LANGTAG().getText(); // ex: "@fr"
             lang = t.startsWith("@") ? t.substring(1) : t;
         } else if (ctx.DOUBLE_CARET() != null && ctx.iriRef() != null) {
-            datatype = ctx.iriRef().getText(); // ex: xsd:integer or <iri>
+            datatype = iriExpander.apply(ctx.iriRef().getText()); // ex: xsd:integer or <iri>
         }
         return literal(lexical, lang, datatype);
     }

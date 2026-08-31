@@ -3,6 +3,7 @@ package fr.inria.corese.core.next.query.impl.kgram.core;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.impl.kgram.api.query.ProcessVisitor;
 import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.Metadata;
 
 /**
@@ -30,7 +31,8 @@ public class ProcessVisitorDefault implements ProcessVisitor {
 
 
     void visit(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
-        if (eval.getQuery().getGlobalAST().hasMetadata(Metadata.Type.REPORT)) {
+        ASTQuery ast = eval.getQuery().getGlobalAST();
+        if (ast != null && ast.hasMetadata(Metadata.Type.REPORT)) {
             eval.getBind().visit(e, g, m1, m2);
         }
     }

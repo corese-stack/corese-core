@@ -1296,13 +1296,19 @@ public class Eval implements ExpType, Plugin {
 
 
     IDatatype eval(Filter f, Environment env, Producer p) {
-        DatatypeValue result = (DatatypeValue) f.getExp().evalWE(getEvaluator(), env.getBind(), env, p);
-        return DatatypeAdapter.unwrap(result);
+        IDatatype result = f.getExp().evalWE(getEvaluator(), env.getBind(), env, p);
+        if (result instanceof DatatypeValue dv) {
+            return DatatypeAdapter.unwrap(dv);
+        }
+        return result;
     }
 
     IDatatype eval(Expr e, Environment env, Producer p) {
-        DatatypeValue result = (DatatypeValue) e.evalWE(getEvaluator(), env.getBind(), env, p);
-        return DatatypeAdapter.unwrap(result);
+        IDatatype result = e.evalWE(getEvaluator(), env.getBind(), env, p);
+        if (result instanceof DatatypeValue dv) {
+            return DatatypeAdapter.unwrap(dv);
+        }
+        return result;
     }
 
     // values var { unnext(exp) }

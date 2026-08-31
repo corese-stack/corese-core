@@ -47,6 +47,11 @@ public class NodeImpl implements Node {
         return new NodeImpl(new Variable(name));
     }
 
+    /** Creates a constant node wrapping the given {@link IDatatype} value. */
+    public static NodeImpl forDatatype(IDatatype dt) {
+        return new NodeImpl(Constant.create(dt));
+    }
+
     @Override
     public IDatatype getValue() {
         return atom.getDatatypeValue();

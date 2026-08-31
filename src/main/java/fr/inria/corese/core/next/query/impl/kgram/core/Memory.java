@@ -6,6 +6,7 @@ import fr.inria.corese.core.next.query.impl.kgram.api.query.*;
 import fr.inria.corese.core.next.query.impl.kgram.event.KgramEventDispatcher;
 import fr.inria.corese.core.next.query.impl.kgram.path.Path;
 import fr.inria.corese.core.next.query.impl.kgram.tool.ApproximateSearchEnv;
+import fr.inria.corese.core.next.query.impl.kgram.tool.NodeImpl;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
@@ -72,6 +73,7 @@ public class Memory extends PointerObject implements Environment {
         eval = e;
         bnode = new HashMap<>();
         this.appxSearchEnv = new ApproximateSearchEnv();
+        this.bindingContext = new fr.inria.corese.core.next.query.impl.kgram.adapter.BindingAdapter(Binding.create());
     }
 
     @Override
@@ -539,7 +541,10 @@ public class Memory extends PointerObject implements Environment {
             if (nodes[n] == null) {
                 Filter f = e.getFilter();
                 if (f != null && !e.isAggregate()) {
-                    nodes[n] = (Node) kgram.eval(f, this, p);
+                    IDatatype dt = kgram.eval(f, this, p);
+                    if (dt != null) {
+                        nodes[n] = NodeImpl.forDatatype(dt);
+                    }
                 }
 
             }

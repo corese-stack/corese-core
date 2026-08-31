@@ -214,21 +214,35 @@ public final class StorageManagerProducer extends ProducerDefault {
         // Subject and predicate have stricter RDF roles than object: subject must
         // be a resource, predicate must be an IRI, while object accepts any RDF value.
         if (subjectNode != null) {
-            Value value = StorageManagerKgramValues.rdfValue(subjectNode, valueFactory);
+            Value value;
+            try {
+                value = StorageManagerKgramValues.rdfValue(subjectNode, valueFactory);
+            } catch (IllegalArgumentException e) {
+                return StorageQueryPattern.emptyResult();
+            }
             if (!(value instanceof Resource resource)) {
                 return StorageQueryPattern.emptyResult();
             }
             subject = resource;
         }
         if (predicateNode != null) {
-            Value value = StorageManagerKgramValues.rdfValue(predicateNode, valueFactory);
+            Value value;
+            try {
+                value = StorageManagerKgramValues.rdfValue(predicateNode, valueFactory);
+            } catch (IllegalArgumentException e) {
+                return StorageQueryPattern.emptyResult();
+            }
             if (!(value instanceof IRI iri)) {
                 return StorageQueryPattern.emptyResult();
             }
             predicate = iri;
         }
         if (objectNode != null) {
-            object = StorageManagerKgramValues.rdfValue(objectNode, valueFactory);
+            try {
+                object = StorageManagerKgramValues.rdfValue(objectNode, valueFactory);
+            } catch (IllegalArgumentException e) {
+                return StorageQueryPattern.emptyResult();
+            }
         }
 
         // Graph and dataset clauses become the statement contexts passed to storage.

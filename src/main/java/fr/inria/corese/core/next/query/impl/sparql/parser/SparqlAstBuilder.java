@@ -156,9 +156,39 @@ public abstract class SparqlAstBuilder {
     protected SparqlAstBuilder(SparqlParserOptions options) {
         this.options = options;
         this.baseUri = options.getBaseIRI();
-        this.terms = new SparqlTermBuilder(options, this::termFromBlankNode);
+        this.terms = new SparqlTermBuilder(options, this::termFromBlankNode, this::expandPrefixedName);
         this.paths = new SparqlPathBuilder(this.terms);
         this.expressions = new SparqlExpressionBuilder(this.terms, this::popCapturedExistsPattern);
+    }
+
+    /**
+     * Expands a prefixed name (e.g. {@code ":p"}, {@code "foaf:Person"}) to an
+     * angle-bracketed absolute IRI (e.g. {@code "<http://example.org/p>"}) using
+     * the prefix declarations collected so far during parsing.
+     *
+     * <p>If the raw value already starts with {@code '<'} it is returned unchanged.
+     * If no matching prefix is found, the raw value is returned unchanged so that
+     * downstream processing (e.g. the global {@code NSManager}) can still handle it.
+     *
+     * @param raw raw IRI text from the ANTLR grammar token
+     * @return angle-bracketed absolute IRI when a matching prefix is found, otherwise {@code raw}
+     */
+    private String expandPrefixedName(String raw) {
+        if (raw.startsWith("<")) {
+            return raw;
+        }
+        int colonIdx = raw.indexOf(':');
+        if (colonIdx < 0) {
+            return raw;
+        }
+        String prefix = raw.substring(0, colonIdx);
+        String local = raw.substring(colonIdx + 1);
+        for (PrefixDeclarationAst decl : prefixDeclarations) {
+            if (decl.prefix().equals(prefix)) {
+                return "<" + decl.namespace().raw() + local + ">";
+            }
+        }
+        return raw;
     }
 
     public void reserveBlankNodeLabels(Collection<String> labels) {
