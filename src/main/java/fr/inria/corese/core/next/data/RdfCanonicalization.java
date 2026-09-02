@@ -7,6 +7,7 @@ import fr.inria.corese.core.next.data.impl.io.serializer.rdfc10.RDFC10Serializer
 import fr.inria.corese.core.next.data.impl.io.serializer.rdfc10.StatementUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /** Public entry point for RDF Dataset Canonicalization 1.0 operations. */
@@ -19,6 +20,43 @@ public final class RdfCanonicalization {
     }
 
     private RdfCanonicalization() {
+    }
+
+    /**
+     * Computes the canonical blank node mapping for a model with standard RDFC 1.0 configuration.
+     *
+     * @param model model to map
+     * @return map from original blank node IDs to canonical identifiers
+     */
+    public static Map<String, String> canonicalMap(Model model) {
+        return canonicalMap(model, RDFC10SerializerOptions.defaultConfig());
+    }
+
+    /**
+     * Computes the canonical blank node mapping for a model with a specified hash algorithm.
+     *
+     * @param model model to map
+     * @param hashAlgorithm hash algorithm to use (SHA-256 or SHA-384)
+     * @return map from original blank node IDs to canonical identifiers
+     */
+    public static Map<String, String> canonicalMap(Model model, HashAlgorithm hashAlgorithm) {
+        Objects.requireNonNull(hashAlgorithm, "hashAlgorithm");
+        RDFC10SerializerOptions.HashAlgorithm internalAlgorithm = switch (hashAlgorithm) {
+            case SHA_256 -> RDFC10SerializerOptions.HashAlgorithm.SHA_256;
+            case SHA_384 -> RDFC10SerializerOptions.HashAlgorithm.SHA_384;
+        };
+        return canonicalMap(model, RDFC10SerializerOptions.builder().hashAlgorithm(internalAlgorithm).build());
+    }
+
+    private static Map<String, String> canonicalMap(Model model, RDFC10SerializerOptions options) {
+        Objects.requireNonNull(model, "model");
+        Objects.requireNonNull(options, "options");
+        return new RDFC10Canonicalizer(
+                options.getHashAlgorithm(),
+                options.getPermutationLimit(),
+                options.getDepthFactor(),
+                Values.factory()
+        ).canonicalMap(model);
     }
 
     /**

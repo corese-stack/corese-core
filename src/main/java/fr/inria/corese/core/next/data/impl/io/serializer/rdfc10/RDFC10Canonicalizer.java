@@ -71,6 +71,23 @@ public class RDFC10Canonicalizer {
     }
 
     /**
+     * Computes the canonical blank node replacement map for a {@link Model} according to W3C RDFC-1.0.
+     *
+     * @param model The model whose blank nodes will be mapped. Must not be null.
+     * @return An unmodifiable map from original blank node identifiers to their canonical identifiers (e.g. c14n0).
+     */
+    public Map<String, String> canonicalMap(Model model) {
+        Objects.requireNonNull(model, "Model cannot be null");
+        List<Statement> stmtList = model.stream().toList();
+        callsHashNDegreeQuads = 0;
+        Map<String, List<Statement>> blankNodeToQuads = createBNodeToQuadsMap(stmtList);
+        if (blankNodeToQuads.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return Collections.unmodifiableMap(createCanonicalMap(blankNodeToQuads));
+    }
+
+    /**
      * Canonicalizes an RDF {@link Model} according to the W3C RDFC-1.0 specification.
      *
      * @param model The model to canonicalize. Must not be null.
