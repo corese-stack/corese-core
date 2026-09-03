@@ -111,7 +111,7 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
         SelectFrame frame = selectStack.pop();
 
         if (frame.whereClause == null) {
-            throw new IllegalStateException("No WHERE clause for SELECT query");
+            throw new QuerySyntaxException("No WHERE clause for SELECT query");
         }
 
         // SELECT projection / ORDER BY scope: reported by SparqlQuerySemanticValidator (validate() collects all diagnostics).
@@ -345,7 +345,7 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
     public QueryAst getResult() {
         if (selectQueryResult != null) return selectQueryResult;
         if (whereClause == null && this.queryType != ASTConstants.QUERY_TYPE.DESCRIBE) {
-            throw new IllegalStateException("No WHERE clause: did you call exitGroup() for the top-level GroupGraphPattern?");
+            throw new QuerySyntaxException("No WHERE clause: the top-level GroupGraphPattern was not closed.");
         }
         DatasetClauseAst datasetClauseAst = new DatasetClauseAst(datasetDefaultGraphs, datasetNamedGraphs);
         QueryPrologueAst prologueAst = new QueryPrologueAst(List.copyOf(getPrefixDeclaration()), new IriAst(getBaseUri()));
