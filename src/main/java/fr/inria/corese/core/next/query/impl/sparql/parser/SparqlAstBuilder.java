@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.parser;
 
+import fr.inria.corese.core.next.common.text.RdfText;
+import fr.inria.corese.core.next.data.spi.term.IRIUtils;
 import fr.inria.corese.core.next.data.api.vocabulary.RDF;
 import fr.inria.corese.core.next.data.spi.io.IOConstants;
 import fr.inria.corese.core.next.generated.antlr.SparqlParser;
@@ -161,6 +163,8 @@ public abstract class SparqlAstBuilder {
         this.expressions = new SparqlExpressionBuilder(this.terms, this::popCapturedExistsPattern);
     }
 
+    private boolean baseDeclarationSeen = false;
+
     public void reserveBlankNodeLabels(Collection<String> labels) {
         blankNodeLabels.addAll(Objects.requireNonNull(labels, "labels"));
     }
@@ -168,20 +172,36 @@ public abstract class SparqlAstBuilder {
     // --- Construction entry points (called by listener) ---
 
     public void setBaseUri(String uri) {
-        if(this.baseUri != null && !this.baseUri.equals(options.getBaseIRI())) {
+        if (this.baseDeclarationSeen) {
             throw new QuerySyntaxException("Base URI already set, multiple BASE declarations are forbidden.");
         }
-        this.baseUri = uri;
+        this.baseDeclarationSeen = true;
+        this.baseUri = uri != null ? RdfText.stripAngleBrackets(uri) : null;
     }
 
     public void addPrefix(String prefix, String uri) {
-        PrefixDeclarationAst declarationAst = new PrefixDeclarationAst(prefix, new IriAst(uri));
+        String p = normalizePrefix(prefix);
+        String ns = uri != null ? RdfText.stripAngleBrackets(uri) : "";
+        if (this.baseUri != null && !IRIUtils.isAbsoluteIRI(ns)) {
+            ns = IRIUtils.resolveIRIAgainstBase(this.baseUri, ns);
+        }
+        PrefixDeclarationAst declarationAst = new PrefixDeclarationAst(p, new IriAst(ns));
         if(this.prefixDeclarations.stream().anyMatch(declaration ->
                 Objects.equals(declaration.prefix(), declarationAst.prefix())
         )) {
             throw new QuerySyntaxException("Prefix " + prefix + " has already been declared");
         }
         this.prefixDeclarations.add(declarationAst);
+    }
+
+    private static String normalizePrefix(String prefix) {
+        if (prefix == null) {
+            return "";
+        }
+        if (prefix.endsWith(":")) {
+            return prefix.substring(0, prefix.length() - 1);
+        }
+        return prefix;
     }
 
     public String getBaseUri() {
@@ -605,6 +625,9 @@ public abstract class SparqlAstBuilder {
     }
 
     public TermAst termFromBlankNode(SparqlParser.BlankNodeContext ctx) {
+        if (ctx.ANON() != null) {
+            return newAnonymousBlankNode();
+        }
         String label = ctx.getText();
         blankNodeLabels.add(label);
         return this.iri(label);

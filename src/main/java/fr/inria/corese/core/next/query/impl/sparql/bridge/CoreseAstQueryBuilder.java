@@ -60,13 +60,19 @@ public final class CoreseAstQueryBuilder {
         Objects.requireNonNull(askQueryAst, "askQueryAst");
         rejectUnsupportedAskClauses(askQueryAst);
 
-        Query query = createQuery(
-                askQueryAst.whereClause(),
-                askQueryAst.datasetClause(),
-                askQueryAst.solutionModifier());
-        applyOrderBy(query, askQueryAst.solutionModifier());
-        query.setAsk(true);
-        return query;
+        QueryPrologueAst prev = SparqlAstToExpression.getCurrentPrologue();
+        try {
+            SparqlAstToExpression.setCurrentPrologue(askQueryAst.prologue());
+            Query query = createQuery(
+                    askQueryAst.whereClause(),
+                    askQueryAst.datasetClause(),
+                    askQueryAst.solutionModifier());
+            applyOrderBy(query, askQueryAst.solutionModifier());
+            query.setAsk(true);
+            return query;
+        } finally {
+            SparqlAstToExpression.setCurrentPrologue(prev);
+        }
     }
 
     /**
@@ -82,14 +88,20 @@ public final class CoreseAstQueryBuilder {
         Objects.requireNonNull(selectQueryAst, "selectQueryAst");
         rejectUnsupportedSelectClauses(selectQueryAst);
 
-        Query query = createQuery(
-                selectQueryAst.whereClause(),
-                selectQueryAst.datasetClause(),
-                selectQueryAst.solutionModifier());
-        applyProjection(query, selectQueryAst.projection());
-        query.setDistinct(selectQueryAst.solutionModifier().distinct());
-        applyOrderBy(query, selectQueryAst.solutionModifier());
-        return query;
+        QueryPrologueAst prev = SparqlAstToExpression.getCurrentPrologue();
+        try {
+            SparqlAstToExpression.setCurrentPrologue(selectQueryAst.prologue());
+            Query query = createQuery(
+                    selectQueryAst.whereClause(),
+                    selectQueryAst.datasetClause(),
+                    selectQueryAst.solutionModifier());
+            applyProjection(query, selectQueryAst.projection());
+            query.setDistinct(selectQueryAst.solutionModifier().distinct());
+            applyOrderBy(query, selectQueryAst.solutionModifier());
+            return query;
+        } finally {
+            SparqlAstToExpression.setCurrentPrologue(prev);
+        }
     }
 
     /**
@@ -106,14 +118,20 @@ public final class CoreseAstQueryBuilder {
         Objects.requireNonNull(describeQueryAst, "describeQueryAst");
         rejectUnsupportedDescribeClauses(describeQueryAst);
 
-        Query query = createQuery(
-                describeQueryAst.whereClause(),
-                describeQueryAst.datasetClause(),
-                describeQueryAst.solutionModifier());
-        applyOrderBy(query, describeQueryAst.solutionModifier());
-        List<Node> describedNodes = describeNodes(query, describeQueryAst);
-        lowerDescribeToConstructQuery(query, describedNodes);
-        return query;
+        QueryPrologueAst prev = SparqlAstToExpression.getCurrentPrologue();
+        try {
+            SparqlAstToExpression.setCurrentPrologue(describeQueryAst.prologue());
+            Query query = createQuery(
+                    describeQueryAst.whereClause(),
+                    describeQueryAst.datasetClause(),
+                    describeQueryAst.solutionModifier());
+            applyOrderBy(query, describeQueryAst.solutionModifier());
+            List<Node> describedNodes = describeNodes(query, describeQueryAst);
+            lowerDescribeToConstructQuery(query, describedNodes);
+            return query;
+        } finally {
+            SparqlAstToExpression.setCurrentPrologue(prev);
+        }
     }
 
     /**
@@ -130,16 +148,22 @@ public final class CoreseAstQueryBuilder {
         Objects.requireNonNull(constructQueryAst, "constructQueryAst");
         rejectUnsupportedConstructClauses(constructQueryAst);
 
-        Query query = createQuery(
-                constructQueryAst.whereClause(),
-                constructQueryAst.datasetClause(),
-                constructQueryAst.solutionModifier());
-        applyOrderBy(query, constructQueryAst.solutionModifier());
-        Exp template = compileConstructTemplate(query, constructQueryAst.constructTemplate());
-        query.setConstruct(true);
-        query.setConstruct(template);
-        query.setConstructNodes(template.getNodes());
-        return query;
+        QueryPrologueAst prev = SparqlAstToExpression.getCurrentPrologue();
+        try {
+            SparqlAstToExpression.setCurrentPrologue(constructQueryAst.prologue());
+            Query query = createQuery(
+                    constructQueryAst.whereClause(),
+                    constructQueryAst.datasetClause(),
+                    constructQueryAst.solutionModifier());
+            applyOrderBy(query, constructQueryAst.solutionModifier());
+            Exp template = compileConstructTemplate(query, constructQueryAst.constructTemplate());
+            query.setConstruct(true);
+            query.setConstruct(template);
+            query.setConstructNodes(template.getNodes());
+            return query;
+        } finally {
+            SparqlAstToExpression.setCurrentPrologue(prev);
+        }
     }
 
     /**
@@ -188,6 +212,17 @@ public final class CoreseAstQueryBuilder {
                         + path.getClass().getSimpleName());
     }
 
+    /**
+     * Rejects unsupported clauses for {@code ASK} queries.
+     *
+     * <p>Planned roadmap items:
+     * <ul>
+     *   <li>Issue #388: inline {@code VALUES} requires a dedicated runtime mapping.</li>
+     *   <li>Issue #388: {@code GROUP BY} / {@code HAVING} requires aggregate-aware ASK semantics.</li>
+     *   <li>Issue #388: {@code REDUCED} support aligned with next-pipeline query-form policy.</li>
+     * </ul>
+     * </p>
+     */
     private static void rejectUnsupportedAskClauses(AskQueryAst askQueryAst) {
         if (!askQueryAst.valuesClause().mappings().isEmpty()) {
             throw new UnsupportedQueryFeatureException(
@@ -198,11 +233,20 @@ public final class CoreseAstQueryBuilder {
             throw new UnsupportedQueryFeatureException(
                     "GROUP BY, HAVING, DISTINCT and REDUCED are not supported yet by the next pipeline for ASK");
         }
-        // TODO(#388): inline VALUES needs a dedicated runtime mapping.
-        // TODO(#388): GROUP BY / HAVING would require aggregate-aware ASK semantics, not just field copying.
-        // TODO(#388): REDUCED support should be aligned with the final query-form policy for the next pipeline.
     }
 
+    /**
+     * Rejects unsupported clauses for {@code SELECT} queries.
+     *
+     * <p>Planned roadmap items:
+     * <ul>
+     *   <li>Issue #387: inline {@code VALUES} requires a dedicated runtime mapping.</li>
+     *   <li>Issue #387: {@code SELECT} expressions and aliases need a runtime story and reuse in later clauses.</li>
+     *   <li>Issue #387: {@code GROUP BY} / {@code HAVING} require aggregate semantics, not only AST field propagation.</li>
+     *   <li>Issue #387: {@code REDUCED} support aligned with next-pipeline query-form policy.</li>
+     * </ul>
+     * </p>
+     */
     private static void rejectUnsupportedSelectClauses(SelectQueryAst selectQueryAst) {
         if (!selectQueryAst.valuesClause().mappings().isEmpty()) {
             throw new UnsupportedQueryFeatureException(
@@ -223,12 +267,19 @@ public final class CoreseAstQueryBuilder {
         if (solutionModifier.hasHaving()) {
             throw new UnsupportedQueryFeatureException("HAVING is not supported yet by the next pipeline for SELECT");
         }
-        // TODO(#387): inline VALUES needs a dedicated runtime mapping.
-        // TODO(#387): SELECT expressions need a clear runtime story for aliases and reuse in later clauses.
-        // TODO(#387): GROUP BY / HAVING require aggregate semantics, not only AST field propagation.
-        // TODO(#387): REDUCED support should be aligned with the final next-pipeline query-form policy.
     }
 
+    /**
+     * Rejects unsupported clauses for {@code DESCRIBE} queries.
+     *
+     * <p>Planned roadmap items:
+     * <ul>
+     *   <li>Issue #390: inline {@code VALUES} requires a dedicated runtime mapping.</li>
+     *   <li>Issue #390: {@code GROUP BY} / {@code HAVING} requires aggregate-aware DESCRIBE semantics.</li>
+     *   <li>Issue #390: {@code REDUCED} support aligned with next-pipeline query-form policy.</li>
+     * </ul>
+     * </p>
+     */
     private static void rejectUnsupportedDescribeClauses(DescribeQueryAst describeQueryAst) {
         if (!describeQueryAst.valuesClause().mappings().isEmpty()) {
             throw new UnsupportedQueryFeatureException(
@@ -239,9 +290,6 @@ public final class CoreseAstQueryBuilder {
             throw new UnsupportedQueryFeatureException(
                     "GROUP BY, HAVING, DISTINCT and REDUCED are not supported yet by the next pipeline for DESCRIBE");
         }
-        // TODO(#390): inline VALUES needs a dedicated runtime mapping.
-        // TODO(#390): GROUP BY / HAVING would require aggregate-aware DESCRIBE semantics, not just field copying.
-        // TODO(#390): REDUCED support should be aligned with the final query-form policy for the next pipeline.
     }
 
     /**
@@ -458,6 +506,17 @@ public final class CoreseAstQueryBuilder {
         }
     }
 
+    /**
+     * Rejects unsupported clauses for {@code CONSTRUCT} queries.
+     *
+     * <p>Planned roadmap items:
+     * <ul>
+     *   <li>Issue #389: inline {@code VALUES} requires a dedicated runtime mapping.</li>
+     *   <li>Issue #389: {@code GROUP BY} / {@code HAVING} requires aggregate-aware CONSTRUCT semantics.</li>
+     *   <li>Issue #389: {@code DISTINCT} / {@code REDUCED} defensive guards.</li>
+     * </ul>
+     * </p>
+     */
     private static void rejectUnsupportedConstructClauses(ConstructQueryAst constructQueryAst) {
         if (!constructQueryAst.valuesClause().mappings().isEmpty()) {
             throw new UnsupportedQueryFeatureException(
@@ -468,9 +527,6 @@ public final class CoreseAstQueryBuilder {
             throw new UnsupportedQueryFeatureException(
                     "GROUP BY, HAVING, DISTINCT and REDUCED are not supported yet by the next pipeline for CONSTRUCT");
         }
-        // TODO(#389): inline VALUES needs a dedicated runtime mapping.
-        // TODO(#389): GROUP BY / HAVING would require aggregate-aware CONSTRUCT semantics, not just field copying.
-        // TODO(#389): DISTINCT / REDUCED are SELECT-only in the grammar; kept as a defensive guard.
     }
 
     /**

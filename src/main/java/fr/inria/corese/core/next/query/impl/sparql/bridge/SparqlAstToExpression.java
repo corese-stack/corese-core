@@ -8,6 +8,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Filter;
 import fr.inria.corese.core.next.common.text.RdfText;
 import fr.inria.corese.core.sparql.datatype.RDF;
+import fr.inria.corese.core.next.data.spi.term.IRIUtils;
 import fr.inria.corese.core.sparql.triple.cst.Keyword;
 import fr.inria.corese.core.sparql.triple.parser.*;
 
@@ -23,6 +24,20 @@ import java.util.Optional;
  *
  */
 public final class SparqlAstToExpression {
+
+    private static final ThreadLocal<QueryPrologueAst> CURRENT_PROLOGUE = new ThreadLocal<>();
+
+    public static QueryPrologueAst getCurrentPrologue() {
+        return CURRENT_PROLOGUE.get();
+    }
+
+    public static void setCurrentPrologue(QueryPrologueAst prologue) {
+        if (prologue == null) {
+            CURRENT_PROLOGUE.remove();
+        } else {
+            CURRENT_PROLOGUE.set(prologue);
+        }
+    }
 
     private SparqlAstToExpression() {
     }
@@ -129,17 +144,151 @@ public final class SparqlAstToExpression {
         return lexical;
     }
 
+    /**
+     * Normalizes a datatype IRI string from a literal AST term.
+     * <p>If enclosed in angle brackets (&lt;...&gt;), it is treated as an explicit IRI_REF and resolved against BASE.
+     * If it already contains a URI scheme delimiter (://), it is preserved as an absolute URI.
+     * Otherwise, it is treated as a prefixed name (e.g. {@code xsd:integer}) and expanded.</p>
+     */
     private static String normalizeDatatypeIri(String dt) {
-        String d = RdfText.stripAngleBrackets(dt);
-        return NSManager.nsm().toNamespace(d);
+        if (dt == null) {
+            return null;
+        }
+        if (dt.startsWith("<") && dt.endsWith(">")) {
+            String inner = RdfText.stripAngleBrackets(dt);
+            return resolveRelativeIri(inner, CURRENT_PROLOGUE.get());
+        }
+        if (dt.contains("://")) {
+            return dt;
+        }
+        return resolvePrefixedIri(dt, CURRENT_PROLOGUE.get());
     }
 
+    /**
+     * Converts a raw IRI/PName token string into a runtime {@link Constant}.
+     * <p>Blank nodes are instantiated as blank constants; IRIs and prefixed names are resolved via
+     * the query prologue and instantiated as resource constants.</p>
+     */
     private static Constant iriToConstant(String rawIri) {
-        String raw = RdfText.stripAngleBrackets(rawIri);
-        if (raw.startsWith(IOConstants.BLANK_NODE_PREFIX)) {
-            return Constant.createBlank(raw.substring(IOConstants.BLANK_NODE_PREFIX.length()));
+        if (rawIri == null) {
+            return null;
         }
-        return Constant.createResource(raw);
+        if (rawIri.startsWith(IOConstants.BLANK_NODE_PREFIX)) {
+            return Constant.createBlank(rawIri.substring(IOConstants.BLANK_NODE_PREFIX.length()));
+        }
+        String resolved = resolveIri(rawIri, CURRENT_PROLOGUE.get());
+        return Constant.createResource(resolved, resolved);
+    }
+
+    /**
+     * Resolves a raw SPARQL term against the query prologue.
+     * <ul>
+     *   <li>&lt;...&gt; explicit IRI references are resolved against {@code BASE} if relative.</li>
+     *   <li>Blank node labels (_:...) are preserved as is.</li>
+     *   <li>SPARQL keyword {@code a} resolves to {@code rdf:type}.</li>
+     *   <li>Prefixed names (prefix:local) are expanded using declared prefixes or Corese default namespaces.</li>
+     * </ul>
+     */
+    static String resolveIri(String raw, QueryPrologueAst prologue) {
+        if (raw == null) {
+            return null;
+        }
+        if (raw.startsWith("<") && raw.endsWith(">")) {
+            String inner = RdfText.stripAngleBrackets(raw);
+            return resolveRelativeIri(inner, prologue);
+        }
+        if (raw.startsWith(IOConstants.BLANK_NODE_PREFIX)) {
+            return raw;
+        }
+        if (raw.equals("a")) {
+            return RDF.RDF + "type";
+        }
+        return resolvePrefixedIri(raw, prologue);
+    }
+
+    /**
+     * Expands a prefixed name (e.g. {@code ex:item}, {@code :item}) using the query prologue declarations,
+     * falling back to default namespaces from {@link NSManager}.
+     */
+    private static String resolvePrefixedIri(String raw, QueryPrologueAst prologue) {
+        int colon = raw.indexOf(':');
+        if (colon >= 0) {
+            String prefix = raw.substring(0, colon);
+            String local = raw.substring(colon + 1);
+            String ns = findNamespace(prefix, prologue);
+            if (ns != null) {
+                return ns + unescapePName(local);
+            }
+        }
+        return raw;
+    }
+
+    /**
+     * Finds the namespace associated with a prefix in the query prologue, or in the global {@link NSManager}.
+     */
+    private static String findNamespace(String prefix, QueryPrologueAst prologue) {
+        if (prologue != null && prologue.prefixDeclarations() != null) {
+            for (PrefixDeclarationAst decl : prologue.prefixDeclarations()) {
+                String p = decl.prefix();
+                if (p != null && p.endsWith(":")) {
+                    p = p.substring(0, p.length() - 1);
+                }
+                if (Objects.equals(p, prefix)) {
+                    return RdfText.stripAngleBrackets(decl.namespace().raw());
+                }
+            }
+        }
+        return NSManager.nsm().getNamespace(prefix);
+    }
+
+    /**
+     * Resolves a relative IRI against the prologue {@code BASE} URI if present and absolute.
+     */
+    private static String resolveRelativeIri(String clean, QueryPrologueAst prologue) {
+        if (prologue != null && prologue.baseIri() != null) {
+            String base = RdfText.stripAngleBrackets(prologue.baseIri().raw());
+            if (IRIUtils.isAbsoluteIRI(base) && !IRIUtils.isAbsoluteIRI(clean)) {
+                return IRIUtils.resolveIRIAgainstBase(base, clean);
+            }
+        }
+        return clean;
+    }
+
+    /**
+     * Unescapes SPARQL PN_LOCAL_ESC sequences (e.g. \: -&gt; :, \. -&gt; .) and Unicode escapes (\\uXXXX).
+     */
+    private static String unescapePName(String local) {
+        if (local == null || !local.contains("\\")) {
+            return local;
+        }
+        StringBuilder sb = new StringBuilder();
+        int i = 0;
+        int len = local.length();
+        while (i < len) {
+            char c = local.charAt(i);
+            if (c == '\\' && i + 1 < len) {
+                i = appendEscaped(sb, local, i + 1);
+            } else {
+                sb.append(c);
+                i++;
+            }
+        }
+        return sb.toString();
+    }
+
+    private static int appendEscaped(StringBuilder sb, String str, int nextIdx) {
+        char next = str.charAt(nextIdx);
+        if (next == 'u' || next == 'U') {
+            int hexLen = (next == 'u') ? 4 : 8;
+            if (nextIdx + 1 + hexLen <= str.length()) {
+                String hex = str.substring(nextIdx + 1, nextIdx + 1 + hexLen);
+                int codePoint = Integer.parseInt(hex, 16);
+                sb.appendCodePoint(codePoint);
+                return nextIdx + 1 + hexLen;
+            }
+        }
+        sb.append(next);
+        return nextIdx + 1;
     }
 
     private static Expression constraintToExpression(ConstraintAst constraint) {

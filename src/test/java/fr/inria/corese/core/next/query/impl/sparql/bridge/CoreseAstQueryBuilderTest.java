@@ -17,11 +17,13 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ASTConstants;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.ExistsAst;
+import fr.inria.corese.core.next.query.impl.kgram.api.core.Edge;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Expr;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.ExprType;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.impl.kgram.core.Exp;
 import fr.inria.corese.core.next.query.impl.kgram.core.Query;
+import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -65,6 +67,77 @@ class CoreseAstQueryBuilderTest extends AbstractSparqlParserFeatureTest {
 
         assertEquals(List.of("s", "p", "o"), labels(query.getSelect()));
         assertTrue(query.getBody().get(0).isBGP());
+    }
+
+    @Test
+    @DisplayName("Prefixed names and default prefix are expanded to full IRIs in compiled Query")
+    void expandsPrefixesInQuery() {
+        QueryAst ast = newParserDefault().parse(
+                "PREFIX : <http://example.org/ns#> " +
+                "PREFIX ex: <http://example.org/ex#> " +
+                "SELECT * WHERE { ?s :p ex:o . }");
+        SelectQueryAst select = assertInstanceOf(SelectQueryAst.class, ast);
+        Query query = builder.toNextQuery(select);
+
+        Exp bgp = query.getBody().get(0);
+        Edge edge = bgp.get(0).getEdge();
+        assertEquals("http://example.org/ns#p", edge.getEdgeNode().getLabel());
+        assertEquals("http://example.org/ex#o", edge.getNode(1).getLabel());
+    }
+
+    @Test
+    @DisplayName("Explicit angle-bracketed IRIs are not treated as prefixed names")
+    void preservesAngleBracketedIrisWithoutPrefixExpansion() {
+        QueryAst ast = newParserDefault().parse(
+                "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+                "SELECT * WHERE { ?s <rdf:type> ?o . }");
+        SelectQueryAst select = assertInstanceOf(SelectQueryAst.class, ast);
+        Query query = builder.toNextQuery(select);
+
+        Exp bgp = query.getBody().get(0);
+        Edge edge = bgp.get(0).getEdge();
+        assertEquals("rdf:type", edge.getEdgeNode().getLabel());
+    }
+
+    @Test
+    @DisplayName("Multiple identical BASE declarations are rejected with QuerySyntaxException")
+    void rejectsMultipleIdenticalBaseDeclarations() {
+        var parser = newParserDefault();
+        String query = "BASE <http://example.org/> " +
+                "BASE <http://example.org/> " +
+                "SELECT * WHERE { ?s ?p ?o . }";
+        assertThrows(QuerySyntaxException.class, () -> parser.parse(query));
+    }
+
+    @Test
+    @DisplayName("Boolean and numeric literals retain XSD datatypes even if query defines matching prefix like http:")
+    void preservesNormalizedDatatypesWithConflictingPrefix() {
+        QueryAst ast = newParserDefault().parse(
+                "PREFIX http: <http://wrong/> " +
+                "SELECT * WHERE { ?s ?p true . }");
+        SelectQueryAst select = assertInstanceOf(SelectQueryAst.class, ast);
+        Query query = builder.toNextQuery(select);
+
+        Exp bgp = query.getBody().get(0);
+        Edge edge = bgp.get(0).getEdge();
+        Node object = edge.getNode(1);
+        assertEquals("http://www.w3.org/2001/XMLSchema#boolean", object.getDatatypeValue().getDatatypeURI());
+    }
+
+    @Test
+    @DisplayName("urn: and file: can be declared and used as SPARQL prefixes")
+    void expandsUrnAndFilePrefixes() {
+        QueryAst ast = newParserDefault().parse(
+                "PREFIX urn: <http://example.org/urn/> " +
+                "PREFIX file: <http://example.org/file/> " +
+                "SELECT * WHERE { ?s urn:p \"val\"^^file:type . }");
+        SelectQueryAst select = assertInstanceOf(SelectQueryAst.class, ast);
+        Query query = builder.toNextQuery(select);
+
+        Exp bgp = query.getBody().get(0);
+        Edge edge = bgp.get(0).getEdge();
+        assertEquals("http://example.org/urn/p", edge.getEdgeNode().getLabel());
+        assertEquals("http://example.org/file/type", edge.getNode(1).getDatatypeValue().getDatatypeURI());
     }
 
     @Test
