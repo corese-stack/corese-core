@@ -10,6 +10,7 @@ import fr.inria.corese.core.sparql.triple.parser.Metadata;
  * @author Olivier Corby, Wimmics INRIA I3S, 2019
  *
  */
+@SuppressWarnings("java:S4144")
 public class ProcessVisitorDefault implements ProcessVisitor {
 
     public static int SLICE_DEFAULT_VALUE = ProcessVisitor.SLICE_DEFAULT;
@@ -30,7 +31,7 @@ public class ProcessVisitorDefault implements ProcessVisitor {
 
 
     void visit(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
-        if (eval.getQuery().getGlobalAST().hasMetadata(Metadata.Type.REPORT)) {
+        if (eval.getQuery().getGlobalAST() != null && eval.getQuery().getGlobalAST().hasMetadata(Metadata.Type.REPORT)) {
             eval.getBind().visit(e, g, m1, m2);
         }
     }
