@@ -9,7 +9,7 @@ import java.util.Map.Entry;
  * @author Fuqi Song, Wimmics Inria I3S
  * @param <K>
  * @param <V>
- * @date 2 févr. 2015
+ * @since 2 févr. 2015
  */
 public class LRUCache<K, V> extends LinkedHashMap<K, V> implements ICache<K, V> {
 

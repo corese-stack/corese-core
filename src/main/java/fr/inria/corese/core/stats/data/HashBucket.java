@@ -9,7 +9,7 @@ import java.util.Map;
  * Save map between nodes ( convert to hash code) and their count
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 4 juin 2014
+ * @since 4 juin 2014
  */
 public class HashBucket extends BaseMap {
 

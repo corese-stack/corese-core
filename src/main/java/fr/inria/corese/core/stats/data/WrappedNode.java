@@ -7,7 +7,7 @@ import fr.inria.corese.core.kgram.api.core.Node;
  * with same label, that is all
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 4 juil. 2014
+ * @since 4 juil. 2014
  */
 public class WrappedNode {
 

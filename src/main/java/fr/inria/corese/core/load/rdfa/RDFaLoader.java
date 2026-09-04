@@ -14,7 +14,7 @@ import org.semarglproject.source.StreamProcessor;
  * Load RDFa
  *
  * @author Fuqi Song, wimmics inria i3s
- * @date 27 Jan 2014 new
+ * @since 27 Jan 2014 new
  */
 public class RDFaLoader {
 

@@ -418,11 +418,12 @@ public class Transformer implements ExpType {
 
     /**
      * use case:
-     *
+     * <pre>{@code
      * @federate <s1>
      * @federate <s2>
      * select * where { }
-     * Rewrite every triple t as: service <s1> <s2> { t }
+     * }</pre>
+     * Rewrite every triple t as: service &lt;s1&gt; &lt;s2&gt; { t }
      */
     void federate(ASTQuery ast) {
         if (ast.hasMetadata(Metadata.Type.FEDERATION) && !ast.hasMetadata(Metadata.Type.FEDERATE)) {

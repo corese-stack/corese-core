@@ -17,7 +17,7 @@ import com.github.jsonldjava.utils.JsonUtils;
  * Load JSON-LD
  *
  * @author Fuqi Song, wimmics inria i3s
- * @date 12 Feb 2014 new
+ * @since 12 Feb 2014 new
  */
 public class JsonldLoader {
 

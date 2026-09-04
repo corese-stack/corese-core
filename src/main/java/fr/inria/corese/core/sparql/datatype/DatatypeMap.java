@@ -156,8 +156,8 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
     }
 
     /**
-     * @todo: leverage extension and pointer datatype
-     * @todo: isTriple()
+     * TODO: leverage extension and pointer datatype
+     * TODO: isTriple()
      */
     public static IDatatype copy(IDatatype dt) {
         if (dt.isBlank()) {

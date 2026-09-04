@@ -14,7 +14,7 @@ import java.util.TreeMap;
  * size of mapping
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 4 juin 2014
+ * @since 4 juin 2014
  */
 public class ReducedMap extends BaseMap {
 

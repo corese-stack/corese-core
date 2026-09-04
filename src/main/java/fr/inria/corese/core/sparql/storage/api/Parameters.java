@@ -11,7 +11,7 @@ import java.util.Map;
  * Parameters.java
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 13 févr. 2015
+ * @since 13 févr. 2015
  */
 public class Parameters {
 

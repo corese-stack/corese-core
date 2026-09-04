@@ -17,8 +17,8 @@ import fr.inria.corese.core.util.Property.Value;
  * corese graph
  *
  * @author Fuqi Song, wimmics inria i3s
- * @date Jan 28 2014 new
- * @date Feb 12 2014 re-factored
+ * @since Jan 28 2014 new
+ * @since Feb 12 2014 re-factored
  */
 public class AddTripleHelper implements ILoadSerialization {
     private final static String JSONLD_BNODE_PREFIX = ":_";

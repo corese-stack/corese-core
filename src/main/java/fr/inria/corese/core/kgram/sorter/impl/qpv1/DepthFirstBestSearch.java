@@ -25,7 +25,7 @@ import static fr.inria.corese.core.kgram.api.core.ExpType.*;
  * ++ 4.1 now also check BIND 20Jan2015
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 23 Oct. 2014
+ * @since 23 Oct. 2014
  */
 public class DepthFirstBestSearch implements ISort {
 

@@ -21,7 +21,7 @@ import java.util.List;
  * Object class for Json-ld Object
  *
  * @author Fuqi Song, Wimmics - Inria I3S
- * @date Feb. 2014
+ * @since Feb. 2014
  */
 /**
  * Class of JSON Object including pair {key, object}, and modular type, which is

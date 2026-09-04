@@ -6,7 +6,7 @@ import fr.inria.corese.core.kgram.api.core.ExpType;
  * Constants
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 27 oct. 2014
+ * @since 27 oct. 2014
  */
 public final class Const {
 

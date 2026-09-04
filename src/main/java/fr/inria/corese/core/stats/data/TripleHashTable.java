@@ -14,7 +14,7 @@ import java.util.Objects;
  * TripleHashTable.java
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 20 juin 2014
+ * @since 20 juin 2014
  */
 public class TripleHashTable {
 

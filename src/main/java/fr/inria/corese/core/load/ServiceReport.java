@@ -281,7 +281,7 @@ public class ServiceReport implements URLParam {
     }
     
     /**
-     * @report server -> record server only
+     * {@code @report} server -&gt; record server only
      */
     boolean hasKey(String key) {
         if (getQuery() == null) {
