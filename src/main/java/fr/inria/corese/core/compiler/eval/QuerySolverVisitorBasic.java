@@ -25,7 +25,6 @@ import java.util.List;
  * Callback manager for LDScript functions with specific annotations Eval SPARQL
  * processor calls before() and after()
  *
- * @author Olivier Corby, Wimmics INRIA I3S, 2018
  * <pre>{@code
  * @before function us:before(?q) {}
  * @after function us:after(?m) {}
@@ -34,6 +33,8 @@ import java.util.List;
  * @result function us:result(?m) {}
  * @solution function us:solution(?m) {}
  * }</pre>
+ *
+ * @author Olivier Corby, Wimmics INRIA I3S, 2018
  */
 public class QuerySolverVisitorBasic extends PointerObject implements ProcessVisitor {
 

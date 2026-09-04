@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author Olivier Corby, INRIA I3S 2020
  * <pre>{@code @import <url>}</pre>
  * dereference URL at compile time
  * LinkedFunction:
@@ -31,6 +30,8 @@ import java.util.Map;
  * <p>
  * Accept/reject namespace for import and LinkedFunction:
  * AccessNamespace.define(namespace, true|false)
+ *
+ * @author Olivier Corby, INRIA I3S 2020
  */
 public class FunctionCompiler {
 

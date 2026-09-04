@@ -21,7 +21,6 @@ import static fr.inria.corese.core.sparql.triple.parser.Metadata.*;
 /**
  * Prototype for federated query
  *
- * @author Olivier Corby, Wimmics INRIA I3S, 2018
  * <pre>{@code
  * @federate <s1> <s2>
  * select * where { }
@@ -35,6 +34,8 @@ import static fr.inria.corese.core.sparql.triple.parser.Metadata.*;
  * graph ?g { } by default is evaluated as federated onto servers
  * <pre>{@code @skip kg:distributeNamed :}</pre>
  * named graph as a whole on each server
+ *
+ * @author Olivier Corby, Wimmics INRIA I3S, 2018
  */
 public class FederateVisitor implements QueryVisitor, URLParam {
 

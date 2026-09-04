@@ -55,7 +55,7 @@ public class JsonldLoader {
     public void load(JsonLdTripleCallback callback) throws IOException, JsonLdError {
         // resolve the "reader" to JSON objects using parser
         Object jsonObject = JsonUtils.fromReader(this.reader);
-        
+
         JsonLdProcessor.toRDF(jsonObject, callback);
     }
 }
