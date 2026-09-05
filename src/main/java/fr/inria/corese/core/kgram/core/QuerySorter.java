@@ -295,7 +295,7 @@ public class QuerySorter implements ExpType {
     /**
      * Move filter at place where variables are bound in exp 
      * @varList: list of bound variables 
-     * @todo: exists {} could be eval earlier
+     * TODO: exists {} could be eval earlier
      */
     void sortFilter(Exp exp, VString varList) {
         int size = varList.size();

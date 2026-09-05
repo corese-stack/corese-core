@@ -824,11 +824,10 @@ public class QueryProcess extends QuerySolver {
 
     /**
      * Annotated query with a service send query to server
-     *
-     * @federate <http://dbpedia.org/sparql>
-     * select where {}
+     * <pre>{@code @federate <http://dbpedia.org/sparql>
+     * select where {}}</pre>
      * Mapping m may contain Binding which may contain Log
-     * use case: xt:sparql("@federate <uri> select where")
+     * use case: xt:sparql("@federate &lt;uri&gt; select where")
      */
     Mappings service(Query q, Mapping m) throws EngineException {
         Service serv = new Service(q.getService());
@@ -1184,8 +1183,8 @@ public class QueryProcess extends QuerySolver {
     }
 
     /**
-     * @import <uri>
-     * use case: FunctionCompiler @import <uri>
+     * <pre>{@code @import <uri>}</pre>
+     * use case: FunctionCompiler {@code @import <uri>}
      */
     @Override
     public ASTQuery parse(String path, Level level) throws EngineException {

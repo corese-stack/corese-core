@@ -13,7 +13,7 @@ import java.util.Map;
  * quick access the read strings
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 13 janv. 2015 new
+ * @since 13 janv. 2015 new
  */
 public final class StringManager implements IStorage {
 

@@ -12,7 +12,7 @@ import java.util.Map;
  * represent exp in a graph
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 19 mai 2014
+ * @since 19 mai 2014
  */
 public class QPGraph {
 

@@ -17,7 +17,7 @@ import static fr.inria.corese.core.kgram.sorter.core.Const.plannable;
  * A new sorter for QP
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 5 juin 2014
+ * @since 5 juin 2014
  */
 public class SorterNew extends Sorter {
 

@@ -25,13 +25,16 @@ import java.util.List;
  * Callback manager for LDScript functions with specific annotations Eval SPARQL
  * processor calls before() and after()
  *
- * @author Olivier Corby, Wimmics INRIA I3S, 2018
+ * <pre>{@code
  * @before function us:before(?q) {}
  * @after function us:after(?m) {}
  * @produce function us:produce(?q) {}
  * @candidate function us:candidate(?q, ?e) {}
  * @result function us:result(?m) {}
  * @solution function us:solution(?m) {}
+ * }</pre>
+ *
+ * @author Olivier Corby, Wimmics INRIA I3S, 2018
  */
 public class QuerySolverVisitorBasic extends PointerObject implements ProcessVisitor {
 
@@ -216,7 +219,7 @@ public class QuerySolverVisitorBasic extends PointerObject implements ProcessVis
     }
 
     /**
-     * @before function us:before(?q) call function us:before set Visitor as
+     * {@code @before function us:before(?q)} call function us:before set Visitor as
      * inactive during function call to prevent loop and also in case where
      * function execute a query (which would trigger Visitor recursively)
      */
@@ -240,10 +243,10 @@ public class QuerySolverVisitorBasic extends PointerObject implements ProcessVis
     }
 
     /**
-     * @eq function us:eq(?e, ?x, ?y)
-     * @error function us:error(?e, ?x, ?y) Function call is performed even if
+     * {@code @eq function us:eq(?e, ?x, ?y)}
+     * {@code @error function us:error(?e, ?x, ?y)} Function call is performed even if
      * Visitor is inactive use case: @select function execute ?a = ?b on
-     * extension datatype we want @eq function us:eq(?e, ?x, ?y) to handle ?a =
+     * extension datatype we want {@code @eq function us:eq(?e, ?x, ?y)} to handle ?a =
      * ?b
      */
     public IDatatype callbackBasic(Eval ev, String metadata, IDatatype[] param) {

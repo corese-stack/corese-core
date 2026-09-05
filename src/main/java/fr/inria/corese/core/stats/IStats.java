@@ -7,7 +7,7 @@ import fr.inria.corese.core.kgram.api.core.Node;
  * Interface for calling Producer from kgraph to do statistics
  *
  * @author Fuqi Song, WImmics Inria I3S
- * @date 4 juin 2014
+ * @since 4 juin 2014
  * @deprecated 21.10.2014 F. Song
  */
 public interface IStats {

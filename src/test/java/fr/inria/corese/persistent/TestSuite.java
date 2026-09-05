@@ -9,7 +9,7 @@ import java.text.DecimalFormat;
  * TestSuite.java
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 26 janv. 2015
+ * @since 26 janv. 2015
  */
 public class TestSuite {
 

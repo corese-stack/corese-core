@@ -14,7 +14,7 @@ import java.util.Map;
  * Key: (?var, <uri>) Value: (node, similarity, algs)
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 29 oct. 2015
+ * @since 29 oct. 2015
  */
 public class ApproximateSearchEnv {
 

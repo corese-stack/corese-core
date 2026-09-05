@@ -6,7 +6,7 @@ import fr.inria.corese.core.kgram.api.query.Producer;
  * Interface for estimating the cost of nodes and edges in QPGraph
  *
  * @author Fuqi Song, WImmics Inria I3S
- * @date 19 mai 2014
+ * @since 19 mai 2014
  */
 public interface IEstimate {
 

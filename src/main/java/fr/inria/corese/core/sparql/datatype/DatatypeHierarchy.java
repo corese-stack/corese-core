@@ -25,11 +25,11 @@ import java.util.List;
  * xsd datatype hierarchy is not defined yet, it is flat under dt:standard
  * 
  * method is attached to datatype like this:
- * @type dt:literal
- * @type dt:standard
- * @type xsd:int
- * 
- * method is available for datatypes equal or under the @type
+ * Type: dt:literal
+ * Type: dt:standard
+ * Type: xsd:int
+ *
+ * method is available for datatypes equal or under the Type
  * 
  * @author Olivier Corby, Wimmics INRIA I3S, 2017
  *

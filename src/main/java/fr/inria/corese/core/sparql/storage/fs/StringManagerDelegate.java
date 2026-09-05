@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  * delegate class for read/write/delete string from file via file handler
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 13 janv. 2015
+ * @since 13 janv. 2015
  */
 public class StringManagerDelegate {
 

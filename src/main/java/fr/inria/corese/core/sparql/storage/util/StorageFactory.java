@@ -8,7 +8,7 @@ import fr.inria.corese.core.sparql.storage.fs.StringManager;
  * Generate the persistent manager
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 29 janv. 2015
+ * @since 29 janv. 2015
  */
 public class StorageFactory {
 

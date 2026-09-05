@@ -4,7 +4,7 @@ package fr.inria.corese.core.sparql.storage.fs;
  * Constants
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 13 janv. 2015 new
+ * @since 13 janv. 2015 new
  */
 public class Constants {
     public final static int BEGIN = 0;

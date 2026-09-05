@@ -21,18 +21,21 @@ import static fr.inria.corese.core.sparql.triple.parser.Metadata.*;
 /**
  * Prototype for federated query
  *
- * @author Olivier Corby, Wimmics INRIA I3S, 2018
+ * <pre>{@code
  * @federate <s1> <s2>
  * select * where { }
+ * }</pre>
  * Recursively rewrite every triple t as:
- * service <s1> <s2> { t } Generalized service statement with several URI
+ * service &lt;s1&gt; &lt;s2&gt; { t } Generalized service statement with several URI
  * Returns the union of Mappings
  * PRAGMA:
  * Property Path evaluated in each of the services but not on the union
  * (hence PP is not federated)
  * graph ?g { } by default is evaluated as federated onto servers
- * @skip kg:distributeNamed :
+ * <pre>{@code @skip kg:distributeNamed :}</pre>
  * named graph as a whole on each server
+ *
+ * @author Olivier Corby, Wimmics INRIA I3S, 2018
  */
 public class FederateVisitor implements QueryVisitor, URLParam {
 
@@ -414,10 +417,9 @@ public class FederateVisitor implements QueryVisitor, URLParam {
     /**
      * Metadata:
      * default is true:
-     *
-     * @skip kg:select kg:group kg:simplify kg:distributeNamed
+     * <pre>{@code @skip kg:select kg:group kg:simplify kg:distributeNamed}</pre>
      * default is false:
-     * @type kg:exist kg:verbose
+     * <pre>{@code @type kg:exist kg:verbose}</pre>
      */
     void option() {
         logger.info(ast.getMetadata().toString());

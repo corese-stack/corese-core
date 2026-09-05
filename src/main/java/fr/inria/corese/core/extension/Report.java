@@ -16,9 +16,11 @@ import java.util.ArrayList;
  * environment Variable value is a LDScript JSON object, with dt:json datatype
  * prefix js: &lt;function://fr.inria.corese.core.extension.Report>
  *
+ * <pre>{@code
  * @report @header [@enum]
  * values (?akey ?aval) { unnest(js:report()) }
  * values (?akey ?aval) { unnest(js:header()) }
+ * }</pre>
  */
 public class Report extends Extension implements URLParam {
 

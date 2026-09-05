@@ -13,7 +13,7 @@ import fr.inria.corese.core.kgram.sorter.core.IProducerQP;
  * of Subject, Predicate and Object Ns, Np and No
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 8 août 2014
+ * @since 8 août 2014
  */
 public class BasicPatternGenerator {
 

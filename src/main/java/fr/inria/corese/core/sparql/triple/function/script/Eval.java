@@ -24,9 +24,9 @@ public class Eval extends LDScript {
     }
     
     /**
-     * eval(?e) where ?e is a IDatatype Pointer which contains an expression  
+     * eval(?e) where ?e is a IDatatype Pointer which contains an expression
      * use case:
-     * @error function us:error(?e) { eval(?e) }
+     * <pre>{@code @error function us:error(?e) { eval(?e) }}</pre>
      */
     @Override
     public IDatatype eval(Computer eval, Binding b, Environment env, Producer p) throws EngineException {

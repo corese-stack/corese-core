@@ -169,7 +169,7 @@ public interface IDatatype
     }
 
     /**
-     * @todo CoreseMap set(name, value) use newResource(name)
+     * TODO: CoreseMap set(name, value) use newResource(name)
      * whereas here we use key/newInstance(name)
      * ServiceReport make the assumption that it is key/newInstance
      */

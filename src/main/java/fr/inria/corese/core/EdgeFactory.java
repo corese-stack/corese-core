@@ -286,7 +286,7 @@ public class EdgeFactory {
      * to be inserted in same Graph
      * edge nodes are already inserted
      *
-     * @pragma: pred == edge.getPredicate()
+     * Pragma: pred == edge.getPredicate()
      */
     public Edge copy(Node graphNode, Node pred, Edge edge) {
         Edge copy;
