@@ -4,6 +4,7 @@ import fr.inria.corese.core.next.generated.antlr.SparqlParser;
 import fr.inria.corese.core.next.query.impl.sparql.parser.SparqlAstBuilder;
 import fr.inria.corese.core.next.query.impl.sparql.parser.SparqlQueryAstBuilder;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
+import org.antlr.v4.runtime.RuleContext;
 
 import java.util.List;
 
@@ -29,10 +30,20 @@ public class ConstructQueryAstListener extends AbstractSparqlAstListener impleme
     @Override
     public void enterConstructQuery(SparqlParser.ConstructQueryContext ctx) {
         queryBuilder().enterConstructQuery();
+        if (ctx.constructTemplate() == null) {
+            queryBuilder().enterConstructTemplate();
+            queryBuilder().enterGroup();
+            queryBuilder().enterBgp();
+        }
     }
 
     @Override
     public void exitConstructQuery(SparqlParser.ConstructQueryContext ctx) {
+        if (ctx.constructTemplate() == null) {
+            queryBuilder().exitBgp();
+            queryBuilder().exitGroup();
+            queryBuilder().exitConstructTemplate();
+        }
         queryBuilder().exitConstructQuery();
     }
 
@@ -47,11 +58,14 @@ public class ConstructQueryAstListener extends AbstractSparqlAstListener impleme
     }
 
     /**
-     * Only handles {@code triplesSameSubject} nodes inside the CONSTRUCT template (not the WHERE BGP).
+     * Handles {@code triplesSameSubject} nodes inside the CONSTRUCT template
+     * or inside the short-form {@code CONSTRUCT WHERE { triplesTemplate }}.
      */
     @Override
     public void exitTriplesSameSubject(SparqlParser.TriplesSameSubjectContext ctx) {
-        if (!(ctx.getParent() instanceof SparqlParser.ConstructTriplesContext)) {
+        boolean inConstructTriples = ctx.getParent() instanceof SparqlParser.ConstructTriplesContext;
+        boolean inConstructWhere = isConstructWhere(ctx);
+        if (!inConstructTriples && !inConstructWhere) {
             return;
         }
         if (ctx.varOrTerm() == null || ctx.propertyListNotEmpty() == null) {
@@ -64,7 +78,18 @@ public class ConstructQueryAstListener extends AbstractSparqlAstListener impleme
             List<TermAst> objects = queryBuilder().termListFromObjectList(propertyList.objectList(verbIndex));
             for (TermAst object : objects) {
                 queryBuilder().addConstructTriple(subject, predicate, object);
+                if (inConstructWhere) {
+                    queryBuilder().addTriple(subject, predicate, object);
+                }
             }
         }
+    }
+
+    private boolean isConstructWhere(SparqlParser.TriplesSameSubjectContext ctx) {
+        RuleContext parent = ctx.getParent();
+        while (parent instanceof SparqlParser.TriplesTemplateContext) {
+            parent = parent.getParent();
+        }
+        return parent instanceof SparqlParser.ConstructQueryContext;
     }
 }

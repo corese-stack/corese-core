@@ -131,15 +131,39 @@ public final class SparqlAstToExpression {
         return Constant.createString(unquoteLexical(lexical));
     }
 
-    private static String unquoteLexical(String lexical) {
-        if (lexical.length() >= 2 && lexical.startsWith("\"")) {
-            if (lexical.endsWith("\"")) {
-                return lexical.substring(1, lexical.length() - 1);
+    public static String unquoteLexical(String lexical) {
+        if (lexical == null || lexical.length() < 2) {
+            return lexical;
+        }
+        String unquotedTriple = stripTripleQuotes(lexical);
+        if (unquotedTriple != null) {
+            return unquotedTriple;
+        }
+        return stripSingleQuotes(lexical);
+    }
+
+    private static String stripTripleQuotes(String lexical) {
+        if (lexical.length() >= 6) {
+            if (lexical.startsWith("\"\"\"") && lexical.endsWith("\"\"\"")) {
+                return lexical.substring(3, lexical.length() - 3);
             }
-            int langIdx = lexical.lastIndexOf('"');
-            if (langIdx > 0) {
-                return lexical.substring(1, langIdx);
+            if (lexical.startsWith("'''") && lexical.endsWith("'''")) {
+                return lexical.substring(3, lexical.length() - 3);
             }
+        }
+        return null;
+    }
+
+    private static String stripSingleQuotes(String lexical) {
+        char quote = lexical.charAt(0);
+        if (quote != '"' && quote != '\'') {
+            return lexical;
+        }
+        int endIdx = lexical.endsWith(String.valueOf(quote))
+                ? lexical.length() - 1
+                : lexical.lastIndexOf(quote);
+        if (endIdx > 0) {
+            return lexical.substring(1, endIdx);
         }
         return lexical;
     }
@@ -189,7 +213,7 @@ public final class SparqlAstToExpression {
      *   <li>Prefixed names (prefix:local) are expanded using declared prefixes or Corese default namespaces.</li>
      * </ul>
      */
-    static String resolveIri(String raw, QueryPrologueAst prologue) {
+    public static String resolveIri(String raw, QueryPrologueAst prologue) {
         if (raw == null) {
             return null;
         }
