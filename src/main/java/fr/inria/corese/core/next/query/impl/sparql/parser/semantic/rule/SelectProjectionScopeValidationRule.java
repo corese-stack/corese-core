@@ -1,19 +1,20 @@
 package fr.inria.corese.core.next.query.impl.sparql.parser.semantic.rule;
 
 import fr.inria.corese.core.next.query.api.validation.QueryDiagnostic;
-import fr.inria.corese.core.next.query.impl.sparql.ast.ProjectionAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 /**
- * Validates that explicitly projected SELECT variables are visible from the
- * WHERE clause scope.
+ * Validates aliases introduced by explicit SELECT expressions.
+ *
+ * <p>A projected variable, or a variable referenced by a SELECT expression, may be
+ * unbound. The expression then evaluates to an error for that solution. In contrast,
+ * the target variable of {@code (expr AS ?var)} must be new at the point where it is
+ * introduced.</p>
  */
 public final class SelectProjectionScopeValidationRule extends AbstractSemanticValidationRule {
 
@@ -33,14 +34,15 @@ public final class SelectProjectionScopeValidationRule extends AbstractSemanticV
             return List.of();
         }
 
-        Set<String> visibleVariables = collectSelectAvailableVariables(selectQueryAst);
-        List<QueryDiagnostic> diagnostics = new ArrayList<>();
-        validateProjectionVariables(selectQueryAst.projection(), visibleVariables, diagnostics);
-        return List.copyOf(diagnostics);
+        Set<String> inScopeVariables = collectSelectAvailableVariables(selectQueryAst);
+        return selectQueryAst.projection().expressionBoundVariables().stream()
+                .filter(inScopeVariables::contains)
+                .map(this::buildAlreadyInScopeDiagnostic)
+                .toList();
     }
 
     /**
-     * SELECT projections can reuse aliases introduced by {@code GROUP BY (expr AS ?var)}.
+     * GROUP BY aliases are already in scope and cannot be reused as SELECT expression targets.
      */
     private Set<String> collectSelectAvailableVariables(SelectQueryAst selectQueryAst) {
         Set<String> visibleVariables = new LinkedHashSet<>(collectVisibleVariables(selectQueryAst));
@@ -48,38 +50,15 @@ public final class SelectProjectionScopeValidationRule extends AbstractSemanticV
         return visibleVariables;
     }
 
-    private void validateProjectionVariables(
-            ProjectionAst projection,
-            Set<String> visibleVariables,
-            List<QueryDiagnostic> diagnostics
-    ) {
-        Set<String> availableVariables = new LinkedHashSet<>(visibleVariables);
-        for (VarAst projectedVar : projection.variables()) {
-            if (projection.expressionBoundVariables().contains(projectedVar.name())) {
-                validateProjectionExpression(projectedVar.name(), projection, availableVariables, diagnostics);
-                availableVariables.add(projectedVar.name());
-                continue;
-            }
-            if (!availableVariables.contains(projectedVar.name())) {
-                diagnostics.add(buildOutOfScopeDiagnostic(projectedVar.name(), ScopeClause.SELECT_PROJECTION));
-            }
-        }
+    private QueryDiagnostic buildAlreadyInScopeDiagnostic(String variableName) {
+        return new QueryDiagnostic(
+                QueryDiagnostic.Kind.SEMANTIC_ERROR,
+                QueryDiagnostic.Severity.ERROR,
+                "Variable ?" + variableName + " introduced by SELECT expression is already in scope",
+                -1,
+                -1,
+                "?" + variableName,
+                getDiagnosticSource());
     }
 
-    /**
-     * SELECT expressions introduce the projected variable themselves, but the variables they reference
-     * must still be visible from the query scope.
-     */
-    private void validateProjectionExpression(
-            String projectionVariableName,
-            ProjectionAst projection,
-            Set<String> visibleVariables,
-            List<QueryDiagnostic> diagnostics
-    ) {
-        addOutOfScopeDiagnostics(
-                projection.expressionReferencedVariables().getOrDefault(projectionVariableName, Set.of()),
-                visibleVariables,
-                ScopeClause.SELECT_PROJECTION,
-                diagnostics);
-    }
 }

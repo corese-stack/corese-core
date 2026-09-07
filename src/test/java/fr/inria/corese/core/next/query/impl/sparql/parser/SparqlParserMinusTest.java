@@ -1,6 +1,5 @@
 package fr.inria.corese.core.next.query.impl.sparql.parser;
 
-import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
 import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.VariableScopeAnalyzer;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import org.junit.jupiter.api.DisplayName;
@@ -11,7 +10,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class SparqlParserMinusTest extends AbstractSparqlParserFeatureTest {
 
@@ -84,19 +83,15 @@ class SparqlParserMinusTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
-    @DisplayName("SELECT projection should reject a variable declared only inside MINUS")
-    void shouldRejectProjectionOfMinusOnlyVariable() {
+    @DisplayName("SELECT projection may contain a variable declared only inside MINUS")
+    void shouldAcceptProjectionOfMinusOnlyVariable() {
         SparqlParser parser = newParserDefault();
 
-        QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+        assertDoesNotThrow(() -> parser.parse("""
                 SELECT ?hidden WHERE {
                   ?s ?p ?o .
                   MINUS { ?s ?q ?hidden . }
                 }
                 """));
-
-        assertEquals(
-                "Variable ?hidden used in SELECT projection is not visible in WHERE clause",
-                exception.getMessage());
     }
 }
