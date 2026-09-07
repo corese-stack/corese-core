@@ -6,13 +6,12 @@ import fr.inria.corese.core.next.query.impl.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Pointerable;
 import fr.inria.corese.core.next.query.impl.kgram.core.*;
 import fr.inria.corese.core.next.query.impl.kgram.path.Path;
-import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 
 
 /**
  * @author Olivier Corby, Wimmics INRIA I3S, 2018
  */
-@SuppressWarnings("unused")
 public interface ProcessVisitor extends Pointerable<Object> {
 
     int SLICE_DEFAULT = 20;
@@ -21,31 +20,31 @@ public interface ProcessVisitor extends Pointerable<Object> {
         return false;
     }
 
-    default IDatatype defaultValue() {
+    default DatatypeValue defaultValue() {
         return null;
     }
 
-    default IDatatype init(Query q) {
+    default DatatypeValue init(Query q) {
         return defaultValue();
     }
 
-    default IDatatype before(Query q) {
+    default DatatypeValue before(Query q) {
         return defaultValue();
     }
 
-    default IDatatype after(Mappings map) {
+    default DatatypeValue after(Mappings map) {
         return defaultValue();
     }
 
-    default IDatatype start(Query q) {
+    default DatatypeValue start(Query q) {
         return defaultValue();
     }
 
-    default IDatatype finish(Mappings map) {
+    default DatatypeValue finish(Mappings map) {
         return defaultValue();
     }
 
-    default IDatatype orderby(Mappings map) {
+    default DatatypeValue orderby(Mappings map) {
         return defaultValue();
     }
 
@@ -61,15 +60,15 @@ public interface ProcessVisitor extends Pointerable<Object> {
         return SLICE_DEFAULT;
     }
 
-    default IDatatype produce(Eval eval, Node g, Edge edge) {
+    default DatatypeValue produce(Eval eval, Node g, Edge edge) {
         return defaultValue();
     }
 
-    default IDatatype candidate(Eval eval, Node g, Edge q, Edge e) {
+    default DatatypeValue candidate(Eval eval, Node g, Edge q, Edge e) {
         return defaultValue();
     }
 
-    default IDatatype path(Eval eval, Node g, Edge q, Path p, Node s, Node o) {
+    default DatatypeValue path(Eval eval, Node g, Edge q, Path p, Node s, Node o) {
         return defaultValue();
     }
 
@@ -81,44 +80,44 @@ public interface ProcessVisitor extends Pointerable<Object> {
         return true;
     }
 
-    default IDatatype statement(Eval eval, Node g, Exp e) {
+    default DatatypeValue statement(Eval eval, Node g, Exp e) {
         return defaultValue();
     }
 
 
-    default IDatatype bgp(Eval eval, Node g, Exp e, Mappings m) {
+    default DatatypeValue bgp(Eval eval, Node g, Exp e, Mappings m) {
         return defaultValue();
     }
 
-    default IDatatype join(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
+    default DatatypeValue join(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
         return defaultValue();
     }
 
-    default IDatatype optional(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
+    default DatatypeValue optional(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
         return defaultValue();
     }
 
-    default IDatatype minus(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
+    default DatatypeValue minus(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
         return defaultValue();
     }
 
-    default IDatatype union(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
+    default DatatypeValue union(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
         return defaultValue();
     }
 
-    default IDatatype graph(Eval eval, Node g, Exp e, Mappings m) {
+    default DatatypeValue graph(Eval eval, Node g, Exp e, Mappings m) {
         return defaultValue();
     }
 
-    default IDatatype query(Eval eval, Node g, Exp e, Mappings m) {
+    default DatatypeValue query(Eval eval, Node g, Exp e, Mappings m) {
         return defaultValue();
     }
 
-    default IDatatype service(Eval eval, Node s, Exp e, Mappings m) {
+    default DatatypeValue service(Eval eval, Node s, Exp e, Mappings m) {
         return defaultValue();
     }
 
-    default IDatatype values(Eval eval, Node g, Exp e, Mappings m) {
+    default DatatypeValue values(Eval eval, Node g, Exp e, Mappings m) {
         return defaultValue();
     }
 
@@ -130,15 +129,15 @@ public interface ProcessVisitor extends Pointerable<Object> {
         return b;
     }
 
-    default IDatatype bind(Eval eval, Node g, Exp e, IDatatype val) {
+    default DatatypeValue bind(Eval eval, Node g, Exp e, DatatypeValue val) {
         return val;
     }
 
-    default IDatatype select(Eval eval, Expr e, IDatatype val) {
+    default DatatypeValue select(Eval eval, Expr e, DatatypeValue val) {
         return val;
     }
 
-    default IDatatype aggregate(Eval eval, Expr e, IDatatype val) {
+    default DatatypeValue aggregate(Eval eval, Expr e, DatatypeValue val) {
         return val;
     }
 
@@ -158,7 +157,7 @@ public interface ProcessVisitor extends Pointerable<Object> {
         return false;
     }
 
-    default int compare(Eval eval, int res, IDatatype dt1, IDatatype dt2) {
+    default int compare(Eval eval, int res, DatatypeValue dt1, DatatypeValue dt2) {
         return res;
     }
 

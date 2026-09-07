@@ -1,13 +1,14 @@
 package fr.inria.corese.core.next.query.impl.sparql.execution;
 
+import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import fr.inria.corese.core.next.data.api.term.Value;
-import fr.inria.corese.core.next.data.impl.adapter.CoreseValueConverter;
 import fr.inria.corese.core.next.query.api.result.Binding;
 import fr.inria.corese.core.next.query.api.result.BindingSet;
 import fr.inria.corese.core.next.query.impl.kgram.core.Mapping;
 import fr.inria.corese.core.next.query.impl.result.CoreseBinding;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -17,7 +18,6 @@ import java.util.Set;
 public final class CoreseBindingSet implements BindingSet {
 
     private final Mapping mapping;
-    private static final CoreseValueConverter CONVERTER = new CoreseValueConverter();
 
     public CoreseBindingSet(Mapping mapping) {
         this.mapping = Objects.requireNonNull(mapping, "mapping");
@@ -35,19 +35,22 @@ public final class CoreseBindingSet implements BindingSet {
 
     @Override
     public Value getValue(String name) {
-        if (this.hasBinding(name)) {
-            return CONVERTER.fromCoreseNode(this.mapping.getValue(name));
-        }
-        return null;
+        return this.mapping.getValue(name) instanceof Value value ? value : null;
     }
 
     @Override
-    @SuppressWarnings("NullableProblems")
     public Iterator<Binding> iterator() {
         return this.mapping.getMap().entrySet().stream()
-                .<Binding>map(entry -> new CoreseBinding(
-                        entry.getKey(),
-                        CONVERTER.fromCoreseNode(entry.getValue())))
+                .map(CoreseBindingSet::toBinding)
                 .iterator();
+    }
+
+    private static Binding toBinding(
+            Map.Entry<String, DatatypeValue> entry) {
+        if (entry.getValue() instanceof Value value) {
+            return new CoreseBinding(entry.getKey(), value);
+        }
+        throw new IllegalStateException(
+                "Query binding is not backed by an RDF value: " + entry.getKey());
     }
 }

@@ -2,79 +2,69 @@ package fr.inria.corese.core.next.query.impl.kgram.core;
 
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.impl.kgram.api.query.ProcessVisitor;
-import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.triple.parser.Metadata;
+import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 
-/**
- *
- * @author Olivier Corby, Wimmics INRIA I3S, 2019
- *
- */
-@SuppressWarnings("java:S4144")
-public class ProcessVisitorDefault implements ProcessVisitor {
-
-    public static int SLICE_DEFAULT_VALUE = ProcessVisitor.SLICE_DEFAULT;
-
-    int slice = SLICE_DEFAULT_VALUE;
-    IDatatype defaultValue;
+/** No-op process visitor that forwards reporting events to the query binding context. */
+@SuppressWarnings("java:S4144") // Distinct visitor callbacks intentionally share no-op behavior.
+public final class ProcessVisitorDefault implements ProcessVisitor {
 
     @Override
     public int slice() {
-        return slice;
+        return ProcessVisitor.SLICE_DEFAULT;
     }
 
 
     @Override
-    public IDatatype defaultValue() {
-        return defaultValue;
+    public DatatypeValue defaultValue() {
+        return null;
     }
 
 
     void visit(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
-        if (eval.getQuery().getGlobalAST() != null && eval.getQuery().getGlobalAST().hasMetadata(Metadata.Type.REPORT)) {
+        if (eval.getQuery().isReportEnabled()) {
             eval.getBind().visit(e, g, m1, m2);
         }
     }
 
 
     @Override
-    public IDatatype graph(Eval eval, Node g, Exp e, Mappings m1) {
+    public DatatypeValue graph(Eval eval, Node g, Exp e, Mappings m1) {
         visit(eval, g, e, m1, null);
         return defaultValue();
     }
 
     @Override
-    public IDatatype query(Eval eval, Node g, Exp e, Mappings m1) {
+    public DatatypeValue query(Eval eval, Node g, Exp e, Mappings m1) {
         visit(eval, g, e, m1, null);
         return defaultValue();
     }
 
     @Override
-    public IDatatype service(Eval eval, Node g, Exp e, Mappings m1) {
+    public DatatypeValue service(Eval eval, Node g, Exp e, Mappings m1) {
         visit(eval, g, e, m1, null);
         return defaultValue();
     }
 
     @Override
-    public IDatatype optional(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
+    public DatatypeValue optional(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
         visit(eval, g, e, m1, m2);
         return defaultValue();
     }
 
     @Override
-    public IDatatype minus(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
+    public DatatypeValue minus(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
         visit(eval, g, e, m1, m2);
         return defaultValue();
     }
 
     @Override
-    public IDatatype union(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
+    public DatatypeValue union(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
         visit(eval, g, e, m1, m2);
         return defaultValue();
     }
 
     @Override
-    public IDatatype join(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
+    public DatatypeValue join(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
         visit(eval, g, e, m1, m2);
         return defaultValue();
     }

@@ -10,7 +10,7 @@ import fr.inria.corese.core.next.query.impl.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.PointerType;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Regex;
 import fr.inria.corese.core.next.query.impl.kgram.api.query.Producer;
-import fr.inria.corese.core.sparql.triple.parser.Expression;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,9 +31,8 @@ public class Exp extends PointerObject
     public static final int OBJECT = 1;
     public static final int PREDICATE = 2;
 
-    static final String NL = "\n";
+    static final String NEWLINE = "\n";
     static final String SP = " ";
-    static Exp empty = new Exp(Type.EMPTY);
     Type type;
     int index = -1;
     // optional success
@@ -55,15 +54,15 @@ public class Exp extends PointerObject
     // for UNION
     Stack stack;
     // for EXTERN
-    Object object;
+    Object payload;
     Producer producer;
     Regex regex;
     Mappings map;
-    HashMap<Node, Mappings> cache;
+    HashMap<Node, Mappings> mappingCache;
     int min = -1;
     int max = -1;
     private boolean isPostpone = false;
-    private boolean BGPAble = false;
+    private boolean bgpAble = false;
     private boolean isFunctional = false;
     private boolean generated = false;
     private Node arg;
@@ -185,11 +184,11 @@ public class Exp extends PointerObject
     }
 
     public boolean isBGPAble() {
-        return BGPAble;
+        return bgpAble;
     }
 
-    public void setBGPAble(boolean BGPAble) {
-        this.BGPAble = BGPAble;
+    public void setBGPAble(boolean bgpAble) {
+        this.bgpAble = bgpAble;
     }
 
     public Node getCacheNode() {
@@ -279,12 +278,27 @@ public class Exp extends PointerObject
         sb.append(title()).append(SP);
 
         if (type() == Type.VALUES) {
-            sb.append(getNodeList());
-            sb.append(SP);
+            sb.append(getNodeList()).append(SP);
         }
 
         sb.append("{");
 
+        appendEdgeNodeFilter(sb);
+
+        if (type() == Type.VALUES) {
+            nl(sb, 0);
+            sb.append(getMappings().toString(true));
+            indent(sb, n);
+        } else if (type() != Type.WATCH && type() != Type.CONTINUE && type() != Type.BACKJUMP) {
+            // Process normal types (skip WATCH, CONTINUE, BACKJUMP because of loop)
+            appendChildren(sb, n);
+        }
+
+        sb.append("}");
+        return sb;
+    }
+
+    private void appendEdgeNodeFilter(StringBuilder sb) {
         if (edge != null) {
             sb.append(edge);
             if (size() > 0) {
@@ -306,32 +320,22 @@ public class Exp extends PointerObject
                 sb.append(SP);
             }
         }
+    }
 
-        if (type() == Type.VALUES) {
-            nl(sb, 0);
-            sb.append(getMappings().toString(true));
-        } else if (type() != Type.WATCH && type() != Type.CONTINUE && type() != Type.BACKJUMP) {
-            // Process normal types (skip WATCH, CONTINUE, BACKJUMP because of loop)
-            if (isOptional() && isPostpone()) {
-                sb.append("POSTPONE ");
-                getPostpone().toString(sb);
-                nl(sb, n);
-            }
-            for (Exp e : this) {
-                nl(sb, n);
-                e.toString(sb, n + 1).append(SP);
-            }
+    private void appendChildren(StringBuilder sb, int n) {
+        if (isOptional() && isPostpone()) {
+            sb.append("POSTPONE ");
+            getPostpone().toString(sb);
+            nl(sb, n);
         }
-
-        if (type() == Type.VALUES) {
-            indent(sb, n);
+        for (Exp e : this) {
+            nl(sb, n);
+            e.toString(sb, n + 1).append(SP);
         }
-        sb.append("}");
-        return sb;
     }
 
     void nl(StringBuilder sb, int n) {
-        sb.append(NL);
+        sb.append(NEWLINE);
         indent(sb, n);
     }
 
@@ -479,7 +483,7 @@ public class Exp extends PointerObject
         if (!args.isEmpty()) {
             return args.getFirst();
         } else {
-            return empty;
+            return new Exp(Type.EMPTY);
         }
     }
 
@@ -492,7 +496,6 @@ public class Exp extends PointerObject
     }
 
     @Override
-    @SuppressWarnings("NullableProblems")
     public Iterator<Exp> iterator() {
         return args.iterator();
     }
@@ -541,7 +544,7 @@ public class Exp extends PointerObject
         }
     }
 
-    public Expression getFilterExpression() {
+    public TermAst getFilterExpression() {
         return getFilter().getFilterExpression();
     }
 
@@ -553,6 +556,7 @@ public class Exp extends PointerObject
         return lFilter;
     }
 
+    @SuppressWarnings("java:S1172") // Subclasses like ExpEdge override this method with specific filtering
     public List<Filter> getFilters(int n, int t) {
         return new ArrayList<>(0);
     }
@@ -646,11 +650,11 @@ public class Exp extends PointerObject
     }
 
     public Object getObject() {
-        return object;
+        return payload;
     }
 
     public void setObject(Object o) {
-        object = o;
+        payload = o;
     }
 
     public Producer getProducer() {
@@ -661,13 +665,11 @@ public class Exp extends PointerObject
         producer = p;
     }
 
-    @SuppressWarnings("unchecked")
     public List<Object> getObjectValues() {
-        if (object instanceof List) {
-            return (List<Object>) object;
-        } else {
-            return new ArrayList<>();
+        if (payload instanceof List<?> list) {
+            return new ArrayList<>(list);
         }
+        return new ArrayList<>();
     }
 
     public int getMin() {
@@ -706,10 +708,7 @@ public class Exp extends PointerObject
             for (int i = 0; i < size(); i++) {
                 Exp exp = get(i);
                 switch (exp.type()) {
-                    case EDGE:
-                    case PATH:
-                    case XPATH:
-                    case EVAL:
+                    case EDGE, PATH, XPATH, EVAL:
                         if (exp.contains(qNode)) {
                             add(i + 1, Exp.create(Type.ACCEPT, qNode));
                             return true;
@@ -720,6 +719,9 @@ public class Exp extends PointerObject
                         if (exp.distinct(qNode)) {
                             return true;
                         }
+                        break;
+
+                    default:
                         break;
                 }
             }
@@ -864,9 +866,7 @@ public class Exp extends PointerObject
      */
     int nbNode() {
         switch (type) {
-            case EDGE:
-            case PATH:
-            case EVAL:
+            case EDGE, PATH, EVAL:
                 if (edge.getEdgeVariable() == null) {
                     return edge.nbNode();
                 } else {
@@ -875,9 +875,10 @@ public class Exp extends PointerObject
 
             case OPT_BIND:
                 return size();
-        }
 
-        return 0;
+            default:
+                return 0;
+        }
     }
 
     /**
@@ -885,9 +886,7 @@ public class Exp extends PointerObject
      */
     Node getNode(int n) {
         switch (type) {
-            case EDGE:
-            case PATH:
-            case EVAL:
+            case EDGE, PATH, EVAL:
                 if (n < edge.nbNode()) {
                     return edge.getNode(n);
                 } else {
@@ -896,8 +895,10 @@ public class Exp extends PointerObject
 
             case OPT_BIND:
                 return get(n).getNode();
+
+            default:
+                return null;
         }
-        return null;
     }
 
     /**
@@ -922,38 +923,19 @@ public class Exp extends PointerObject
      */
     public void share(List<String> filterVar, List<String> expVar) {
         switch (type()) {
-            case FILTER:
-            case OPT_BIND, OPTION:
+            case FILTER, OPT_BIND, OPTION:
                 break;
 
-            case OPTIONAL:
-            case MINUS:
+            case OPTIONAL, MINUS:
                 first().share(filterVar, expVar);
                 break;
 
             case UNION:
-                // must be bound in both branches
-                ArrayList<String> lVar1 = new ArrayList<>();
-                ArrayList<String> lVar2 = new ArrayList<>();
-                first().share(filterVar, lVar1);
-                rest().share(filterVar, lVar2);
-                for (String varString : lVar1) {
-                    if (lVar2.contains(varString) && !expVar.contains(varString)) {
-                        expVar.add(varString);
-                    }
-                }
+                shareUnion(filterVar, expVar);
                 break;
 
             case QUERY:
-                ArrayList<String> lVar = new ArrayList<>();
-                getQuery().getBody().share(filterVar, lVar);
-
-                for (Exp exp : getQuery().getSelectFun()) {
-                    String name = exp.getNode().getLabel();
-                    if ((lVar.contains(name) || exp.getFilter() != null) && !expVar.contains(name)) {
-                        expVar.add(name);
-                    }
-                }
+                shareQuery(filterVar, expVar);
                 break;
 
             case BIND:
@@ -961,8 +943,7 @@ public class Exp extends PointerObject
                 // hence variable cannot be considered as bound for filter
                 break;
 
-            case EDGE:
-            case PATH:
+            case EDGE, PATH:
                 for (int i = 0; i < nbNode(); i++) {
                     Node nodePath = getNode(i);
                     share(nodePath, filterVar, expVar);
@@ -988,6 +969,30 @@ public class Exp extends PointerObject
         }
     }
 
+    private void shareUnion(List<String> filterVar, List<String> expVar) {
+        ArrayList<String> lVar1 = new ArrayList<>();
+        ArrayList<String> lVar2 = new ArrayList<>();
+        first().share(filterVar, lVar1);
+        rest().share(filterVar, lVar2);
+        for (String varString : lVar1) {
+            if (lVar2.contains(varString) && !expVar.contains(varString)) {
+                expVar.add(varString);
+            }
+        }
+    }
+
+    private void shareQuery(List<String> filterVar, List<String> expVar) {
+        ArrayList<String> lVar = new ArrayList<>();
+        getQuery().getBody().share(filterVar, lVar);
+
+        for (Exp exp : getQuery().getSelectFun()) {
+            String name = exp.getNode().getLabel();
+            if ((lVar.contains(name) || exp.getFilter() != null) && !expVar.contains(name)) {
+                expVar.add(name);
+            }
+        }
+    }
+
     public boolean bound(List<String> fvec, List<String> evec) {
         for (String varString : fvec) {
             if (!evec.contains(varString)) {
@@ -1007,34 +1012,22 @@ public class Exp extends PointerObject
     void getNodes(ExpNodeCollector h) {
         switch (type()) {
             case FILTER:
-                // get exists {} nodes
+                // get exists () nodes
                 if (h.isExist()) {
                     getExistNodes(getFilter().getExp(), h, h.getExistNodeList());
                 }
                 break;
 
-            case NODE:
+            case NODE, ACCEPT:
                 //use case: join() check connection, need all variables
-            case ACCEPT:
                 h.add(getNode());
                 break;
 
-            case EDGE:
-            case PATH:
-                Edge pathEdge = getEdge();
-                h.add(pathEdge.getNode(0));
-                if (pathEdge.getEdgeVariable() != null) {
-                    h.add(pathEdge.getEdgeVariable());
-                }
-                h.add(pathEdge.getNode(1));
-
-                for (int i = 2; i < pathEdge.nbNode(); i++) {
-                    h.add(pathEdge.getNode(i));
-                }
+            case EDGE, PATH:
+                collectEdgeNodes(h);
                 break;
 
-            case XPATH:
-            case EVAL:
+            case XPATH, EVAL:
                 for (int i = 0; i < nbNode(); i++) {
                     Node nodeEval = getNode(i);
                     h.add(nodeEval);
@@ -1055,12 +1048,7 @@ public class Exp extends PointerObject
                 break;
 
             case OPTIONAL:
-                boolean b = h.isOptional();
-                first().getNodes(h.setOptional(true));
-                if (!h.isInSubScope()) {
-                    rest().getNodes(h);
-                }
-                h.setOptional(b);
+                collectOptionalNodes(h);
                 break;
 
             case GRAPH:
@@ -1071,32 +1059,11 @@ public class Exp extends PointerObject
                 break;
 
             case UNION:
-                if (h.isInSubScope()) {
-                    // in-subscope record nodes that are bound in both branches of union
-                    List<Node> left = first().getTheNodes(h.copy());
-                    List<Node> right = rest().getTheNodes(h.copy());
-                    for (Node nodeLeft : left) {
-                        if (right.contains(nodeLeft)) {
-                            h.add(nodeLeft);
-                        }
-                    }
-                } else {
-                    for (Exp ee : this) {
-                        ee.getNodes(h);
-                    }
-                }
+                collectUnionNodes(h);
                 break;
 
             case BIND:
-                if (h.isBind()) {
-                    if (getNodeList() == null) {
-                        h.add(getNode());
-                    } else {
-                        for (Node nodeBind : getNodeList()) {
-                            h.add(nodeBind);
-                        }
-                    }
-                }
+                collectBindNodes(h);
                 break;
 
             case QUERY:
@@ -1104,14 +1071,66 @@ public class Exp extends PointerObject
                 break;
 
             default:
-                // BGP, service, union, named graph pattern
-                for (Exp ee : this) {
-                    ee.getNodes(h);
-                    if (h.isInSubScopeSample() && ee.isSkipStatement()) {
-                        // skip statements after optional/minus/union/.. for in-subscope nodes
-                        break;
-                    }
+                collectDefaultNodes(h);
+                break;
+        }
+    }
+
+    private void collectEdgeNodes(ExpNodeCollector h) {
+        Edge pathEdge = getEdge();
+        h.add(pathEdge.getNode(0));
+        if (pathEdge.getEdgeVariable() != null) {
+            h.add(pathEdge.getEdgeVariable());
+        }
+        h.add(pathEdge.getNode(1));
+        for (int i = 2; i < pathEdge.nbNode(); i++) {
+            h.add(pathEdge.getNode(i));
+        }
+    }
+
+    private void collectOptionalNodes(ExpNodeCollector h) {
+        boolean b = h.isOptional();
+        first().getNodes(h.setOptional(true));
+        if (!h.isInSubScope()) {
+            rest().getNodes(h);
+        }
+        h.setOptional(b);
+    }
+
+    private void collectUnionNodes(ExpNodeCollector h) {
+        if (h.isInSubScope()) {
+            List<Node> left = first().getTheNodes(h.copy());
+            List<Node> right = rest().getTheNodes(h.copy());
+            for (Node nodeLeft : left) {
+                if (right.contains(nodeLeft)) {
+                    h.add(nodeLeft);
                 }
+            }
+        } else {
+            for (Exp ee : this) {
+                ee.getNodes(h);
+            }
+        }
+    }
+
+    private void collectBindNodes(ExpNodeCollector h) {
+        if (h.isBind()) {
+            if (getNodeList() == null) {
+                h.add(getNode());
+            } else {
+                for (Node nodeBind : getNodeList()) {
+                    h.add(nodeBind);
+                }
+            }
+        }
+    }
+
+    private void collectDefaultNodes(ExpNodeCollector h) {
+        for (Exp ee : this) {
+            ee.getNodes(h);
+            if (h.isInSubScopeSample() && ee.isSkipStatement()) {
+                break;
+            }
         }
     }
 
@@ -1300,22 +1319,24 @@ public class Exp extends PointerObject
             Exp f = get(i);
             if (f.isFilter() && f.size() > 0) {
                 Exp bindExp = f.first();
-                if (bindExp.type() == Type.OPT_BIND
-                        // no bind (?x = ?y) in case of JOIN
-                        && (!Query.testJoin || bindExp.isBindCst())) {
-                    int j = i - 1;
-                    while (j > 0 && get(j).isFilter()) {
-                        j--;
-                    }
-                    if (j >= 0) {
-                        Exp g = get(j);
-                        if ((g.isEdge() || g.isPath())
-                                && (!bindExp.isBindCst() || g.bind(bindExp.first().getNode()))) {
-                            bindExp.status(true);
-                            g.setBind(bindExp);
-                        }
-                    }
+                if (bindExp.type() == Type.OPT_BIND) {
+                    processBind(i, bindExp);
                 }
+            }
+        }
+    }
+
+    private void processBind(int index, Exp bindExp) {
+        int j = index - 1;
+        while (j > 0 && get(j).isFilter()) {
+            j--;
+        }
+        if (j >= 0) {
+            Exp g = get(j);
+            if ((g.isEdge() || g.isPath())
+                    && (!bindExp.isBindCst() || g.bind(bindExp.first().getNode()))) {
+                bindExp.status(true);
+                g.setBind(bindExp);
             }
         }
     }
@@ -1333,15 +1354,15 @@ public class Exp extends PointerObject
     }
 
     boolean hasCache() {
-        return cache != null;
+        return mappingCache != null;
     }
 
     void cache(Node n, Mappings m) {
-        cache.put(n, m);
+        mappingCache.put(n, m);
     }
 
     Mappings getMappings(Node n) {
-        return cache.get(n);
+        return mappingCache.get(n);
     }
 
     /**
@@ -1374,9 +1395,9 @@ public class Exp extends PointerObject
     }
 
     /**
-     * BGP1 optional { filter(exp) BGP2 }
+     * BGP1 optional ( filter(exp) BGP2 )
      * var(exp) memberOf inscope(BGP1, BGP2)
-     * TODO:
+     * Note:
      * for safety we skip bind because bind may fail
      * and variable may not be bound whereas we need them to be bound
      * to test in-scope filter
@@ -1436,8 +1457,7 @@ public class Exp extends PointerObject
         List<String> list = new ArrayList<>();
         for (Exp exp : this) {
             switch (exp.type()) {
-                case EDGE:
-                case PATH:
+                case EDGE, PATH:
                     exp.getEdgeVariables(list);
                     break;
                 case BIND:
@@ -1445,6 +1465,8 @@ public class Exp extends PointerObject
                     break;
                 case VALUES:
                     exp.getValuesVariables(list);
+                    break;
+                default:
                     break;
             }
         }
@@ -1632,6 +1654,8 @@ public class Exp extends PointerObject
         }
     }
 
-    static class VExp extends ArrayList<Exp> {
+    static final class VExp extends ArrayList<Exp> {
+
+        private static final long serialVersionUID = 1L;
     }
 }

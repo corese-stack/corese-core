@@ -1,11 +1,13 @@
 package fr.inria.corese.core.next.query.impl.sparql.execution;
 
+import fr.inria.corese.core.next.data.Values;
 import fr.inria.corese.core.next.data.api.term.IRI;
+import fr.inria.corese.core.next.data.api.term.Literal;
 import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
-import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
+import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 import fr.inria.corese.core.next.query.api.dataset.Dataset;
 import fr.inria.corese.core.next.query.api.exception.QueryTimeoutException;
 import fr.inria.corese.core.next.query.api.result.Binding;
@@ -46,7 +48,7 @@ class NextSparqlPipelineExecutorTest {
 
     @BeforeEach
     void setUp() {
-        valueFactory = new CoreseValueFactory();
+        valueFactory = Values.factory();
         storage = MemoryStorageManager.builder().build();
         executor = new NextSparqlPipelineExecutor(storage);
 
@@ -84,6 +86,206 @@ class NextSparqlPipelineExecutorTest {
         var binding = result.next();
         assertEquals(ALICE, binding.getValue("s").stringValue());
         assertEquals("Bob", binding.getValue("name").stringValue());
+        assertFalse(result.hasNext());
+    }
+
+    @Test
+    @DisplayName("FILTER evaluates native numeric expressions")
+    void filterRunsThroughNativeExpressionEvaluator() {
+        String age = "http://example.org/age";
+        insert(iri(ALICE), iri(age), valueFactory.createLiteral(42));
+        insert(iri(BOB), iri(age), valueFactory.createLiteral(18));
+
+        TupleQueryResult result = executor.evaluateTuple("""
+                SELECT ?person WHERE {
+                  ?person <http://example.org/age> ?age .
+                  FILTER(?age >= 21)
+                }
+                ORDER BY ?person
+                """);
+
+        assertTrue(result.hasNext());
+        assertEquals(ALICE, result.next().getValue("person").stringValue());
+        assertFalse(result.hasNext());
+    }
+
+    @Test
+    @DisplayName("BIND evaluates native arithmetic and exposes the result")
+    void bindRunsThroughNativeExpressionEvaluator() {
+        String age = "http://example.org/age";
+        insert(iri(ALICE), iri(age), valueFactory.createLiteral(41));
+
+        TupleQueryResult result = executor.evaluateTuple("""
+                SELECT ?nextAge WHERE {
+                  <http://example.org/alice> <http://example.org/age> ?age .
+                  BIND(?age + 1 AS ?nextAge)
+                }
+                """);
+
+        assertTrue(result.hasNext());
+        assertEquals(42, ((fr.inria.corese.core.next.data.api.term.Literal)
+                result.next().getValue("nextAge")).intValue());
+        assertFalse(result.hasNext());
+    }
+
+    @Test
+    @DisplayName("ORDER BY uses numeric value order rather than lexical order")
+    void orderByUsesNativeRdfValueOrder() {
+        String rank = "http://example.org/rank";
+        insert(iri(ALICE), iri(rank), valueFactory.createLiteral(10));
+        insert(iri(BOB), iri(rank), valueFactory.createLiteral(2));
+
+        TupleQueryResult result = executor.evaluateTuple("""
+                SELECT ?rank WHERE { ?person <http://example.org/rank> ?rank }
+                ORDER BY ?rank
+                """);
+
+        assertEquals(2, ((fr.inria.corese.core.next.data.api.term.Literal)
+                result.next().getValue("rank")).intValue());
+        assertEquals(10, ((fr.inria.corese.core.next.data.api.term.Literal)
+                result.next().getValue("rank")).intValue());
+        assertFalse(result.hasNext());
+    }
+
+    @Test
+    @DisplayName("FILTER numeric comparison does not reuse RDF term tie-breakers")
+    void filterUsesValueComparisonInsteadOfTotalTermOrder() {
+        String rank = "http://example.org/rank";
+        insert(iri(ALICE), iri(rank), valueFactory.createLiteral(1));
+
+        TupleQueryResult result = executor.evaluateTuple("""
+                SELECT ?rank WHERE {
+                  <http://example.org/alice> <http://example.org/rank> ?rank .
+                  FILTER(?rank < 1.0)
+                }
+                """);
+
+        assertFalse(result.hasNext());
+    }
+
+    @Test
+    @DisplayName("STRLEN counts Unicode code points through the native evaluator")
+    void stringLengthUsesUnicodeCodePoints() {
+        insert(iri(ALICE), iri(NAME), valueFactory.createLiteral("A🙂"));
+
+        TupleQueryResult result = executor.evaluateTuple("""
+                SELECT ?length WHERE {
+                  <http://example.org/alice> <http://example.org/name> ?name .
+                  BIND(STRLEN(?name) AS ?length)
+                }
+                """);
+
+        assertTrue(result.hasNext());
+        assertEquals(2, ((fr.inria.corese.core.next.data.api.term.Literal)
+                result.next().getValue("length")).intValue());
+        assertFalse(result.hasNext());
+    }
+
+    @Test
+    @DisplayName("SUBSTR uses Unicode code-point positions and preserves the language tag")
+    void substringUsesUnicodeCodePointPositions() {
+        insert(iri(ALICE), iri(NAME), valueFactory.createLiteral("A🙂B", "fr"));
+
+        TupleQueryResult result = executor.evaluateTuple("""
+                SELECT ?part WHERE {
+                  <http://example.org/alice> <http://example.org/name> ?name .
+                  BIND(SUBSTR(?name, 2, 1) AS ?part)
+                }
+                """);
+
+        Literal part = (Literal) result.next().getValue("part");
+        assertEquals("🙂", part.getLabel());
+        assertEquals("fr", part.getLanguage().orElseThrow());
+        assertFalse(result.hasNext());
+    }
+
+    @Test
+    @DisplayName("NOW returns one stable value throughout a query evaluation")
+    void nowIsStableWithinOneQuery() {
+        TupleQueryResult result = executor.evaluateTuple("""
+                SELECT ?first ?second WHERE {
+                  ?s ?p ?o .
+                  BIND(NOW() AS ?first)
+                  BIND(NOW() AS ?second)
+                }
+                """);
+
+        var binding = result.next();
+        assertTrue(binding.getValue("first").sameTerm(binding.getValue("second")));
+        assertFalse(result.hasNext());
+    }
+
+    @Test
+    @DisplayName("Logical operators apply the SPARQL error truth table")
+    void logicalOperatorsApplySparqlErrorTruthTable() {
+        assertFalse(executor.evaluateTuple("""
+                SELECT ?s WHERE { ?s ?p ?o . FILTER((1 / 0) && false) }
+                """).hasNext());
+        assertTrue(executor.evaluateTuple("""
+                SELECT ?s WHERE { ?s ?p ?o . FILTER((1 / 0) || true) }
+                """).hasNext());
+    }
+
+    @Test
+    @DisplayName("Arithmetic preserves SPARQL floating-point type promotion")
+    void arithmeticPreservesFloatingPointPromotion() {
+        TupleQueryResult result = executor.evaluateTuple("""
+                SELECT ?sum WHERE { ?s ?p ?o . BIND(1e0 + 1 AS ?sum) }
+                """);
+
+        Literal sum = (Literal) result.next().getValue("sum");
+        assertEquals(XSDDatatype.DOUBLE, sum.getCoreDatatype());
+        assertEquals(2.0d, sum.doubleValue());
+        assertFalse(result.hasNext());
+    }
+
+    @Test
+    @DisplayName("FILTER REGEX evaluates without the historical expression interpreter")
+    void regexFilterRunsThroughNativeExpressionEvaluator() {
+        insert(iri(ALICE), iri(NAME), valueFactory.createLiteral("Alice"));
+        insert(iri(BOB), iri(NAME), valueFactory.createLiteral("Bob"));
+
+        TupleQueryResult result = executor.evaluateTuple("""
+                SELECT ?person WHERE {
+                  ?person <http://example.org/name> ?name .
+                  FILTER(REGEX(?name, "^ali", "i"))
+                }
+                """);
+
+        assertTrue(result.hasNext());
+        assertEquals(ALICE, result.next().getValue("person").stringValue());
+        assertFalse(result.hasNext());
+    }
+
+    @Test
+    @DisplayName("FILTER EXISTS evaluates as a correlated native graph pattern")
+    void correlatedExistsFilterRunsEndToEnd() {
+        insert(iri(BOB), iri(NAME), valueFactory.createLiteral("Bob"));
+
+        TupleQueryResult result = executor.evaluateTuple("""
+                SELECT ?person WHERE {
+                  ?person <http://example.org/knows> ?friend .
+                  FILTER EXISTS { ?friend <http://example.org/name> ?name }
+                }
+                """);
+
+        assertTrue(result.hasNext());
+        assertEquals(ALICE, result.next().getValue("person").stringValue());
+        assertFalse(result.hasNext());
+    }
+
+    @Test
+    @DisplayName("FILTER NOT EXISTS rejects solutions with a correlated match")
+    void correlatedNotExistsFilterRunsEndToEnd() {
+        insert(iri(BOB), iri(NAME), valueFactory.createLiteral("Bob"));
+
+        TupleQueryResult result = executor.evaluateTuple("""
+                SELECT ?person WHERE {
+                  ?person <http://example.org/knows> ?friend .
+                  FILTER NOT EXISTS { ?friend <http://example.org/name> ?name }
+                }
+                """);
+
         assertFalse(result.hasNext());
     }
 

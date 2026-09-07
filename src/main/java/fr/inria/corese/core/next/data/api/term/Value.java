@@ -1,15 +1,16 @@
 package fr.inria.corese.core.next.data.api.term;
 
-import java.io.Serializable;
+import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 
 /**
  * Super interface of all elements of an RDF model (triple, nodes, etc).
  */
-public interface Value extends Serializable {
+public interface Value extends DatatypeValue {
 
     /**
      * @return whether this value is a blank node
      */
+    @Override
     default boolean isBNode() {
         return this instanceof BNode;
     }
@@ -17,6 +18,7 @@ public interface Value extends Serializable {
     /**
      * @return whether this value is an IRI
      */
+    @Override
     default boolean isIRI() {
         return this instanceof IRI;
     }
@@ -31,6 +33,7 @@ public interface Value extends Serializable {
     /**
      * @return whether this value is a literal
      */
+    @Override
     default boolean isLiteral() {
         return this instanceof Literal;
     }
@@ -38,6 +41,7 @@ public interface Value extends Serializable {
     /**
      * @return whether this value is an RDF-star triple term
      */
+    @Override
     default boolean isTriple() {
         return this instanceof Triple;
     }

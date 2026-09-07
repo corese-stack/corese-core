@@ -1,7 +1,5 @@
 package fr.inria.corese.core.next.query.impl.kgram.api.core;
 
-import static fr.inria.corese.core.kgram.api.core.ExpType.DT;
-
 /**
  * Pointer type for object that can be object of CoresePointer
  *
@@ -27,10 +25,12 @@ public enum PointerType {
     VISITOR("visitor")
     ;
 
+    private static final String DATATYPE_NAMESPACE = "http://ns.inria.fr/corese/datatype/";
+
     final String name;
 
     PointerType(String n) {
-        name = DT + n;
+        name = DATATYPE_NAMESPACE + n;
     }
 
 }

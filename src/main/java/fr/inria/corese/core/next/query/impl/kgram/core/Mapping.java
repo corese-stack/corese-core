@@ -4,7 +4,7 @@ import fr.inria.corese.core.next.query.impl.kgram.api.core.*;
 import fr.inria.corese.core.next.query.impl.kgram.api.query.Result;
 import fr.inria.corese.core.next.query.impl.kgram.path.Path;
 import fr.inria.corese.core.next.query.impl.kgram.tool.EnvironmentImpl;
-import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 
 import java.util.*;
 
@@ -21,9 +21,9 @@ import static fr.inria.corese.core.next.query.impl.kgram.api.core.PointerType.MA
  *
  * @author Olivier Corby, Edelweiss, INRIA 2009
  */
-public class Mapping
+public final class Mapping
         extends EnvironmentImpl
-        implements Result, Pointerable<List<IDatatype>> {
+        implements Result, Pointerable<List<DatatypeValue>> {
 
 
     static final Edge[] emptyEdge = new Edge[0];
@@ -33,7 +33,7 @@ public class Mapping
     // var -> Node
     HashMap<String, Node> values;
     // aggregate may need to share bnode map
-    Map<String, IDatatype> bnode;
+    Map<String, DatatypeValue> bnode;
     private Edge[] queryEdges;
     private Edge[] targetEdges;
     private Node[] queryNodes;
@@ -49,7 +49,6 @@ public class Mapping
     private Node targetGraphNode;
     private BindingContext bindingContext;
     private Eval eval;
-    private IDatatype report;
 
     public Mapping() {
         init(emptyEdge, emptyEdge);
@@ -197,11 +196,11 @@ public class Mapping
     }
 
     @Override
-    public Map<String, IDatatype> getMap() {
+    public Map<String, DatatypeValue> getMap() {
         return bnode;
     }
 
-    void setMap(Map<String, IDatatype> m) {
+    void setMap(Map<String, DatatypeValue> m) {
         bnode = m;
     }
 
@@ -287,6 +286,7 @@ public class Mapping
     }
 
     void init() {
+        // No-op by default in base Mapping
     }
 
     /**
@@ -353,7 +353,7 @@ public class Mapping
         return create(q, value);
     }
 
-    // TODO: manage Node isPath
+    // Note: manage Node isPath
     public void fixQueryNodes(Query q) {
         for (int i = 0; i < getQueryNodes().length; i++) {
             Node node = getQueryNodes()[i];
@@ -426,7 +426,7 @@ public class Mapping
         return values.keySet();
     }
 
-    public IDatatype getValue(String name) {
+    public DatatypeValue getValue(String name) {
         Node n = getNode(name);
         if (n == null) {
             return null;
@@ -434,7 +434,7 @@ public class Mapping
         return n.getDatatypeValue();
     }
 
-    public IDatatype getValue(Node qn) {
+    public DatatypeValue getValue(Node qn) {
         Node n = getNode(qn);
         if (n == null) {
             return null;
@@ -484,8 +484,9 @@ public class Mapping
         return getValue(varString);
     }
 
-    List<IDatatype> getBinding(int n) {
-        List<List<IDatatype>> l = getList();
+    @SuppressWarnings("java:S1168") // Null signals an unbound index in internal evaluation
+    List<DatatypeValue> getBinding(int n) {
+        List<List<DatatypeValue>> l = getList();
         if (n < l.size()) {
             return l.get(n);
         }
@@ -497,17 +498,17 @@ public class Mapping
      *
      */
     @Override
-    public Iterable<List<IDatatype>> getLoop() {
+    public Iterable<List<DatatypeValue>> getLoop() {
         return getList();
     }
 
-    public List<List<IDatatype>> getList() {
-        ArrayList<List<IDatatype>> list = new ArrayList<>();
+    public List<List<DatatypeValue>> getList() {
+        ArrayList<List<DatatypeValue>> list = new ArrayList<>();
         int i = 0;
         for (Node n : getQueryNodes()) {
             Node val = getNode(i++);
             if (val != null) {
-                ArrayList<IDatatype> l = new ArrayList<>(2);
+                ArrayList<DatatypeValue> l = new ArrayList<>(2);
                 l.add(n.getDatatypeValue());
                 l.add(val.getDatatypeValue());
                 list.add(l);

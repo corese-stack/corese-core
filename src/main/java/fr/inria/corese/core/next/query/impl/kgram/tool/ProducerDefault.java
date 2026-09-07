@@ -1,12 +1,12 @@
 package fr.inria.corese.core.next.query.impl.kgram.tool;
 
+import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.*;
 import fr.inria.corese.core.next.query.impl.kgram.api.query.Environment;
 import fr.inria.corese.core.next.query.impl.kgram.api.query.Producer;
 import fr.inria.corese.core.next.query.impl.kgram.core.Exp;
 import fr.inria.corese.core.next.query.impl.kgram.core.Mappings;
 import fr.inria.corese.core.next.query.impl.kgram.core.Query;
-import fr.inria.corese.core.sparql.api.IDatatype;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +46,7 @@ public class ProducerDefault implements Producer {
 
     @Override
     public void initPath(Edge edge, int index) {
+        // No-op by default in ProducerDefault
     }
 
     @Override
@@ -55,7 +56,7 @@ public class ProducerDefault implements Producer {
 
 
     @Override
-    public Mappings map(List<Node> nodes, IDatatype object) {
+    public Mappings map(List<Node> nodes, DatatypeValue object) {
         return null;
     }
 
@@ -111,12 +112,12 @@ public class ProducerDefault implements Producer {
     }
 
     @Override
-    public IDatatype getValue(Object value) {
+    public DatatypeValue getValue(Object value) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public IDatatype getDatatypeValue(Object value) {
+    public DatatypeValue getDatatypeValue(Object value) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -127,6 +128,7 @@ public class ProducerDefault implements Producer {
 
     @Override
     public void close() {
+        // No resources to release in default implementation
     }
 
     @Override
@@ -145,7 +147,7 @@ public class ProducerDefault implements Producer {
     }
 
     @Override
-    public Mappings map(List<Node> qNodes, IDatatype object, int n) {
+    public Mappings map(List<Node> qNodes, DatatypeValue object, int n) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

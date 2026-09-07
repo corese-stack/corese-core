@@ -3,19 +3,19 @@ package fr.inria.corese.core.next.query.impl.sparql.bridge;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Expr;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Filter;
-import fr.inria.corese.core.sparql.triple.parser.Expression;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BoundAst;
+import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.VariableScopeAnalyzer;
 
 import java.util.List;
 import java.util.Optional;
 
 /**
- * {@link Filter} view for an {@link AstBackedExpr}, delegating metadata to the underlying
- * {@link fr.inria.corese.core.sparql.triple.parser.Expression}
- * while exposing the Corese-next {@link Expr} API.
+ * {@link Filter} view exposing native AST metadata through the Corese-next {@link Expr} API.
  */
 public final class NextFilterFromAst implements Filter {
 
     private final AstBackedExpr owner;
+    private final VariableScopeAnalyzer variables = new VariableScopeAnalyzer();
 
     NextFilterFromAst(AstBackedExpr owner) {
         this.owner = owner;
@@ -23,12 +23,12 @@ public final class NextFilterFromAst implements Filter {
 
     @Override
     public List<String> getVariables() {
-        return owner.asTripleParserExpression().getVariables();
+        return List.copyOf(variables.collectReferencedVariables(owner.sourceAst().orElseThrow()));
     }
 
     @Override
     public List<String> getVariables(boolean excludeLocal) {
-        return owner.asTripleParserExpression().getVariables(excludeLocal);
+        return getVariables();
     }
 
     @Override
@@ -37,33 +37,33 @@ public final class NextFilterFromAst implements Filter {
     }
 
     @Override
-    public Expression getFilterExpression() {
-        return owner.asTripleParserExpression();
+    public TermAst getFilterExpression() {
+        return owner.sourceAst().orElseThrow();
     }
 
     @Override
     public boolean isBound() {
-        return owner.asTripleParserExpression().isBound();
+        return owner.contains(BoundAst.class);
     }
 
     @Override
     public boolean isAggregate() {
-        return owner.asTripleParserExpression().isAggregate();
+        return owner.isAggregate();
     }
 
     @Override
     public boolean isRecAggregate() {
-        return owner.asTripleParserExpression().isRecAggregate();
+        return owner.isRecAggregate();
     }
 
     @Override
     public boolean isFunctional() {
-        return owner.asTripleParserExpression().isFunctional();
+        return owner.oper() == fr.inria.corese.core.next.query.impl.kgram.api.core.ExprType.UNNEST;
     }
 
     @Override
     public boolean isRecExist() {
-        return owner.asTripleParserExpression().isRecExist();
+        return owner.isRecExist();
     }
 
     @Override

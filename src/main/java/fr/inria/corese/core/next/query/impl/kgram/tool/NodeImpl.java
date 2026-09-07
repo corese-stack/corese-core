@@ -1,34 +1,41 @@
 package fr.inria.corese.core.next.query.impl.kgram.tool;
 
+import fr.inria.corese.core.next.data.Values;
+import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import fr.inria.corese.core.next.query.impl.kgram.path.Path;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Edge;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.TripleStore;
-import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.datatype.DatatypeMap;
-import fr.inria.corese.core.sparql.triple.parser.Atom;
-import fr.inria.corese.core.sparql.triple.parser.Constant;
-import fr.inria.corese.core.sparql.triple.parser.Variable;
 
-public class NodeImpl implements Node {
+import java.util.Objects;
 
+/** Native KGRAM node backed exclusively by Corese-next value contracts. */
+public final class NodeImpl implements Node {
 
+    private DatatypeValue value;
+    private final String variableName;
+    private int index = -1;
+    private String key = INITKEY;
+    private Object payload;
 
-    Atom atom;
-    int index = -1;
+    private NodeImpl(DatatypeValue value, String variableName) {
+        this.value = value;
+        this.variableName = variableName;
+    }
 
-    public NodeImpl(Atom at) {
-        atom = at;
+    /** Creates a constant node carrying a Corese-next RDF value. */
+    public static NodeImpl forValue(DatatypeValue value) {
+        return new NodeImpl(Objects.requireNonNull(value, "value"), null);
     }
 
     /** Creates a constant node for an IRI. */
     public static NodeImpl forIRI(String iri) {
-        return new NodeImpl(Constant.create(DatatypeMap.newResource(iri)));
+        return forValue(Values.factory().createIRI(iri));
     }
 
     /** Creates a constant node for a blank node. */
     public static NodeImpl forBlank(String id) {
-        return new NodeImpl(Constant.create(DatatypeMap.createBlank(id)));
+        return forValue(Values.factory().createBNode(id));
     }
 
     /**
@@ -39,31 +46,37 @@ public class NodeImpl implements Node {
      * @param lang        language tag, or {@code null}
      */
     public static NodeImpl forLiteral(String label, String datatypeUri, String lang) {
-        return new NodeImpl(Constant.create(DatatypeMap.createLiteral(label, datatypeUri, lang)));
+        if (lang != null && !lang.isEmpty()) {
+            return forValue(Values.factory().createLiteral(label, lang));
+        }
+        if (datatypeUri != null && !datatypeUri.isEmpty()) {
+            return forValue(Values.factory().createLiteral(
+                    label, Values.factory().createIRI(datatypeUri)));
+        }
+        return forValue(Values.factory().createLiteral(label));
     }
 
     /** Creates a variable node with the given name. */
     public static NodeImpl forVariable(String name) {
-        return new NodeImpl(new Variable(name));
+        return new NodeImpl(null, Objects.requireNonNull(name, "name"));
     }
 
     @Override
-    public IDatatype getValue() {
-        return atom.getDatatypeValue();
-    }
-
-    public IDatatype getValue(Node n) {
-        return  n.getValue();
+    public DatatypeValue getValue() {
+        return value;
     }
 
     @Override
-    public IDatatype getDatatypeValue() {
-        return atom.getDatatypeValue();
+    public DatatypeValue getDatatypeValue() {
+        return getValue();
     }
 
     @Override
-    public void setDatatypeValue(IDatatype dt) {
-        atom = Constant.create(dt);
+    public void setDatatypeValue(DatatypeValue datatypeValue) {
+        if (isVariable()) {
+            throw new IllegalStateException("A variable node cannot become a constant");
+        }
+        value = Objects.requireNonNull(datatypeValue, "datatypeValue");
     }
 
     @Override
@@ -78,13 +91,17 @@ public class NodeImpl implements Node {
 
     @Override
     public String toString() {
-        return atom.toSparql(); // + "[" + getIndex() +"]";
+        if (isVariable()) {
+            return variableName.startsWith("?") ? variableName : "?" + variableName;
+        }
+        return value.toString();
     }
 
     @Override
     public int compare(Node node) {
-        if (node.getValue() != null) {
-            return getValue().compareTo(getValue(node));
+        Objects.requireNonNull(node, "node");
+        if (value != null && node.getDatatypeValue() != null) {
+            return value.compare(node.getDatatypeValue());
         }
         return getLabel().compareTo(node.getLabel());
     }
@@ -96,31 +113,23 @@ public class NodeImpl implements Node {
 
     @Override
     public String getLabel() {
-        if (atom.isResource()) {
-            return atom.getLongName();
-        }
-        return atom.getName();
+        return isVariable() ? variableName : value.getLabel();
     }
 
     @Override
     public boolean isConstant() {
-        return atom.isConstant();
+        return value != null;
     }
 
     @Override
     public boolean isVariable() {
-        return atom.isVariable();
+        return variableName != null;
     }
 
-    // Constant bnode or sparql variable as bnode
+    /** Returns whether this constant node represents an RDF blank node. */
     @Override
     public boolean isBlank() {
-        return atom.isBlankOrBlankNode();
-    }
-
-    @Override
-    public boolean isFuture() {
-        return isConstant() && getDatatypeValue().isFuture();
+        return value != null && value.isBNode();
     }
 
     @Override
@@ -128,34 +137,28 @@ public class NodeImpl implements Node {
         if (isVariable() || n.isVariable()) {
             return sameVariable(n);
         }
-        return getValue().sameTerm(getValue(n));
+        return value.sameTerm(n.getDatatypeValue());
     }
 
-    boolean sameVariable(Node n) {
-        return isVariable() && n.isVariable() && getLabel().equals(n.getLabel());
+    private boolean sameVariable(Node node) {
+        return isVariable() && node.isVariable() && getLabel().equals(node.getLabel());
     }
 
     @Override
     public boolean match(Node n) {
-        if (isVariable() || n.isVariable()) {
-            return sameVariable(n);
-        }
-        return getValue().match(getValue(n));
+        return same(n);
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (o instanceof Node) {
-            return equals((Node) o); // was same
-        }
-        return false;
+    public boolean equals(Object other) {
+        return other instanceof Node node && equals(node);
     }
 
-    public boolean equals(Node n) {
-        if (isVariable() || n.isVariable()) {
-            return sameVariable(n);
+    public boolean equals(Node node) {
+        if (isVariable() || node.isVariable()) {
+            return sameVariable(node);
         }
-        return getValue().equals(getValue(n));
+        return value.equals(node.getDatatypeValue());
     }
 
     @Override
@@ -165,16 +168,17 @@ public class NodeImpl implements Node {
 
     @Override
     public Object getNodeObject() {
-        return null;
+        return payload;
     }
 
-     @Override
+    @Override
     public Edge getEdge() {
-        return (Edge) getDatatypeValue().getEdge();
+        return payload instanceof Edge edge ? edge : null;
     }
 
     @Override
     public void setObject(Object o) {
+        payload = o;
     }
 
     @Override
@@ -184,11 +188,12 @@ public class NodeImpl implements Node {
 
     @Override
     public String getKey() {
-        return INITKEY;
+        return key;
     }
 
     @Override
     public void setKey(String str) {
+        key = Objects.requireNonNull(str, "str");
     }
 
     @Override
@@ -196,5 +201,8 @@ public class NodeImpl implements Node {
         return null;
     }
 
-
+    @Override
+    public int hashCode() {
+        return isVariable() ? variableName.hashCode() : value.hashCode();
+    }
 }

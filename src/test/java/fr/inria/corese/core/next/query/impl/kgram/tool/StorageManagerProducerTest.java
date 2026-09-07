@@ -20,9 +20,6 @@ import fr.inria.corese.core.next.query.impl.kgram.core.Query;
 import fr.inria.corese.core.next.query.impl.kgram.execution.RdfTermMatcher;
 import fr.inria.corese.core.next.query.impl.kgram.execution.SparqlKgramEvaluator;
 import fr.inria.corese.core.next.storage.impl.memory.MemoryStorageManager;
-import fr.inria.corese.core.sparql.datatype.DatatypeMap;
-import fr.inria.corese.core.sparql.triple.parser.Constant;
-import fr.inria.corese.core.sparql.triple.parser.Variable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -301,15 +298,15 @@ class StorageManagerProducerTest {
     }
 
     private static Node variable(String name) {
-        return new NodeImpl(Variable.create(name));
+        return NodeImpl.forVariable(name);
     }
 
     private static Node resource(String iri) {
-        return new NodeImpl(Constant.create(DatatypeMap.newResource(iri)));
+        return NodeImpl.forIRI(iri);
     }
 
     private static Node literal(String label) {
-        return new NodeImpl(Constant.create(DatatypeMap.newLiteral(label)));
+        return NodeImpl.forLiteral(label, null, null);
     }
 
     private static Query selectStarSpoQuery(Node s, Node p, Node o) {

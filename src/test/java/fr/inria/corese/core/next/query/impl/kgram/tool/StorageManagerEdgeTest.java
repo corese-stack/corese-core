@@ -31,15 +31,15 @@ class StorageManagerEdgeTest {
         assertEquals(predicate.stringValue(), edge.getProperty().getLabel());
         assertEquals(predicate.stringValue(), edge.getEdgeLabel());
         assertEquals("Alice", edge.getNode(1).getLabel());
-        assertEquals("en", edge.getNode(1).getDatatypeValue().getLang());
+        assertEquals("en", ((Literal) edge.getNode(1).getDatatypeValue()).getLanguage().orElseThrow());
         assertEquals(graph.stringValue(), edge.getGraph().getLabel());
         assertTrue(edge.contains(edge.getNode(0)));
     }
 
     @Test
-    void convertsTypedLiteralThroughSharedKgramValueHelper() {
+    void exposesTypedLiteralDirectlyAsKgramNode() {
         IRI integerDatatype = valueFactory.createIRI("http://www.w3.org/2001/XMLSchema#integer");
-        Node node = StorageManagerKgramValues.node(valueFactory.createLiteral("42", integerDatatype));
+        Node node = NodeImpl.forValue(valueFactory.createLiteral("42", integerDatatype));
 
         assertEquals("42", node.getLabel());
         assertEquals(integerDatatype.stringValue(), node.getDatatypeValue().getDatatypeURI());

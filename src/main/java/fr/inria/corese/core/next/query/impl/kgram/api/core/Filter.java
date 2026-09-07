@@ -1,23 +1,13 @@
 package fr.inria.corese.core.next.query.impl.kgram.api.core;
 
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
-import fr.inria.corese.core.sparql.triple.parser.Expression;
 
 import java.util.List;
 import java.util.Optional;
 
 
 /**
- * Interface of Filter that contains an evaluable expression
- * Filter (and Expr) api refer to sparql.triple.parser.Expression
- *
- * <p>Migration: filters built from the Corese-next SPARQL AST should use
- * {@link fr.inria.corese.core.next.query.impl.sparql.bridge.SparqlAstToExpression}
- * and {@link fr.inria.corese.core.next.query.impl.sparql.bridge.AstBackedExpr} /
- * {@link fr.inria.corese.core.next.query.impl.sparql.bridge.NextFilterFromAst}.
- * {@link #getFilterExpression()} still exposes the SPARQL {@link Expression} tree for the
- * interpreter; {@link #getExp()} and {@link #coreseNextSource()} carry the
- * {@link fr.inria.corese.core.next.query.impl.kgram.api.core.Expr} / Corese-next AST view.
+ * Native filter contract backed by the Corese-next SPARQL AST.
  *
  * @author Olivier Corby, Edelweiss, INRIA 2010
  */
@@ -39,14 +29,10 @@ public interface Filter {
 
     List<String> getVariables(boolean excludeLocal);
 
-    /**
-     * Evaluable expression processed by KGRAM generic Interpreter
-     * Expr api refer also to sparql.triple.parser.Expression
-     *
-     */
+    /** Evaluable expression processed by the native KGRAM evaluator. */
     Expr getExp();
 
-    Expression getFilterExpression();
+    TermAst getFilterExpression();
 
     /**
      * Does filter contain a bound() function

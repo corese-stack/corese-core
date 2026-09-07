@@ -7,13 +7,13 @@ import fr.inria.corese.core.next.query.impl.kgram.api.query.Producer;
 import fr.inria.corese.core.next.query.impl.kgram.event.Event;
 import fr.inria.corese.core.next.query.impl.kgram.event.EventImpl;
 import fr.inria.corese.core.next.query.impl.kgram.event.KgramEventDispatcher;
-import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 
 import java.util.*;
 
 import static fr.inria.corese.core.next.query.impl.kgram.api.core.PointerType.MAPPINGS;
 
-/*
+/**
  * Manage list of Mapping, result of a query
  *
  * process select distinct
@@ -21,15 +21,17 @@ import static fr.inria.corese.core.next.query.impl.kgram.api.core.PointerType.MA
  *
  * @author Olivier Corby, Edelweiss, INRIA 2009
  */
-public class Mappings extends PointerObject
+public final class Mappings extends PointerObject
         implements Comparator<Mapping>, Iterable<Mapping> {
+
 
     private static final String NL = "\n";
     private static final int SELECT = -1;
     private static final int HAVING = -2;
     // SPARQL: -1 (unbound first)
     // Corese order: 1 (unbound last)
-    public static int unbound = -1;
+    private static final int UNBOUND_ORDER = -1;
+    @SuppressWarnings("java:S1845") // select field holds projection nodes, distinct from SELECT constant
     List<Node> select;
     boolean isDistinct = false;
     // statisfy having(test)
@@ -56,27 +58,20 @@ public class Mappings extends PointerObject
     private Eval eval;
     // service report if Mappings from service
     // json object
-    private IDatatype detail;
     // construct where result graph
     private TripleStore graph;
-    private int nbsolutions = 0;
-    private int nbDelete = 0;
-    private int nbInsert = 0;
     // result of query as a template
-    private Node templateResult;
     // fake result in case of aggregate without result
     private boolean isFake = false;
     // parse error in service result
     private boolean error = false;
     // return Binding stack as part of result to share it
-    private BindingContext bindingContext;
     // Federate Service manage provenance
     private Object provenance;
     // Linked Result URL List
     private final List<String> link;
     // service result log
     private int length = 0;
-    private int queryLength = 0;
     // limit number of results to be displayed
     private int display = Integer.MAX_VALUE;
 
@@ -107,8 +102,9 @@ public class Mappings extends PointerObject
     }
 
     @Override
-    public Iterable getLoop() {
-        return this;
+    @SuppressWarnings("unchecked") // Every Mapping is an Object; preserve the historical self view.
+    public Iterable<Object> getLoop() {
+        return (Iterable<Object>) (Iterable<?>) this;
     }
 
     @Override
@@ -202,7 +198,6 @@ public class Mappings extends PointerObject
     }
 
     @Override
-    @SuppressWarnings("NullableProblems")
     public Iterator<Mapping> iterator() {
         return getMappingList().iterator();
     }
@@ -255,7 +250,6 @@ public class Mappings extends PointerObject
         StringBuilder sb = new StringBuilder();
         int i = 1;
         boolean isSelect = select != null && !all;
-        ArrayList<Node> alist = new ArrayList<>();
 
         for (Mapping map : this) {
             if (i > max) {
@@ -268,12 +262,12 @@ public class Mappings extends PointerObject
 
             if (isSelect) {
                 for (Node qNode : select) {
-                    print(map, qNode, sb, alist, ptr);
+                    print(map, qNode, sb, ptr);
 
                 }
             } else {
                 for (Node qNode : map.getQueryNodes()) {
-                    print(map, qNode, sb, alist, ptr);
+                    print(map, qNode, sb, ptr);
                 }
             }
 
@@ -283,7 +277,7 @@ public class Mappings extends PointerObject
         return sb.toString();
     }
 
-    void print(Mapping map, Node qNode, StringBuilder sb, List<Node> list, boolean ptr) {
+    void print(Mapping map, Node qNode, StringBuilder sb, boolean ptr) {
         Node node = map.getNode(qNode);
         if (node != null) {
             sb.append(qNode).append(" = ").append(node);
@@ -318,7 +312,7 @@ public class Mappings extends PointerObject
         return map.getNode(varString);
     }
 
-    public IDatatype getValue(String varString) {
+    public DatatypeValue getValue(String varString) {
         Node node = getNode(varString);
         if (node == null) {
             return null;
@@ -372,7 +366,7 @@ public class Mappings extends PointerObject
         return getDistinct() == null || getDistinct().accept(node);
     }
 
-    // TODO: check select == null
+    // Note: check select == null
     public boolean accept(Mapping r) {
         if (select == null || select.isEmpty()) {
             return true;
@@ -487,7 +481,7 @@ public class Mappings extends PointerObject
 
     /**
      * comparator of Node for standard sort
-     * use IDatatype compareTo()
+     * use DatatypeValue compareTo()
      * compare with sameTerm semantics: order 1 and 01 in deterministic way
      * authorize overload of comparator for specific datatypes using a Visitor
      */
@@ -514,10 +508,10 @@ public class Mappings extends PointerObject
                 if (order2[i] == null) {
                     res = 0;
                 } else {
-                    res = unbound;
+                    res = UNBOUND_ORDER;
                 }
             } else if (order2[i] == null) {
-                res = -unbound;
+                res = -UNBOUND_ORDER;
             } else {
                 res = 0;
             }
@@ -565,10 +559,10 @@ public class Mappings extends PointerObject
             if (n2 == null) {
                 res = 0;
             } else {
-                res = unbound;
+                res = UNBOUND_ORDER;
             }
         } else {
-            res = -unbound;
+            res = -UNBOUND_ORDER;
         }
         return res;
     }
@@ -596,7 +590,7 @@ public class Mappings extends PointerObject
     void limitOffset() {
         if (getQuery().getOffset() > 0) {
             // skip offset
-            // TODO: optimize this
+            // Note: optimize this
             for (int i = 0; i < getQuery().getOffset() && size() > 0; i++) {
                 remove(0);
             }
@@ -620,11 +614,11 @@ public class Mappings extends PointerObject
      *
      */
 
-    public void aggregate(Evaluator evaluator, Memory memory, Producer p) throws SparqlException {
+    public void aggregate(Evaluator evaluator, Memory memory, Producer p) {
         aggregate(getQuery(), evaluator, memory, p);
     }
 
-    public void aggregate(Query q, Evaluator evaluator, Memory memory, Producer p) throws SparqlException {
+    public void aggregate(Query q, Evaluator evaluator, Memory memory, Producer p) {
         if (size() == 0) {
             if (q.isAggregate()) {
                 // SPARQL semantics requires that aggregate empty result set return one empty result
@@ -657,7 +651,7 @@ public class Mappings extends PointerObject
      * select (aggregate() as ?c)
      * order by aggregate()
      */
-    void aggregateExpList(Query q, Evaluator evaluator, Memory memory, Producer p, List<Exp> list, boolean isSelect) throws SparqlException {
+    void aggregateExpList(Query q, Evaluator evaluator, Memory memory, Producer p, List<Exp> list, boolean isSelect) {
         int n = 0;
         for (Exp exp : list) {
             if (exp.isAggregate()) {
@@ -676,15 +670,15 @@ public class Mappings extends PointerObject
     /**
      * select count(?doc) as ?count group by ?person ?date order by ?count
      */
-    private void aggregateSwitch(Query q, Evaluator eval, Exp exp, Memory mem, Producer p, int n) throws SparqlException {
+    private void aggregateSwitch(Query q, Evaluator eval, Exp exp, Memory mem, Producer p, int n) {
         if (exp.isExpGroupBy()) {
             // min(?l, groupBy(?x, ?y)) as ?min
-            evalGroupByExp(q, eval, exp, mem, p, n);
+            evalGroupByExp(eval, exp, mem, p, n);
         } else if (q.hasGroupBy()) {
             // perform group by and then aggregate
-            aggregateGroupMembers(q, getCreateGroup(), eval, exp, mem, p, n);
+            aggregateGroupMembers(getCreateGroup(), eval, exp, mem, p, n);
         } else {
-            aggregate(q, eval, exp, mem, p, n);
+            aggregate(eval, exp, mem, p, n);
         }
     }
 
@@ -692,64 +686,71 @@ public class Mappings extends PointerObject
      * Compute select aggregate, order by aggregate and having on one group or on
      * whole result (in both case: this Mappings)
      */
-    private void aggregate(Query q, Evaluator eval, Exp exp, Memory memory, Producer p, int n) throws SparqlException {
+    private void aggregate(Evaluator eval, Exp exp, Memory memory, Producer p, int n) {
         // get first Mapping in current group
         Mapping firstMap = get(0);
         // bind the Mapping in memory to retrieve group by variables
         memory.aggregate(firstMap);
-        boolean res = true;
-        Eval ev = memory.getEval();
 
         if (n == HAVING) {
-            res = exp.getFilter().getExp().test(eval, memory.getBind(), memory, p);
-            if (ev != null) {
-                ev.getVisitor().having(ev, exp.getFilter().getExp(), res);
-            }
-            if (hasEvent) {
-                manager.send(EventImpl.create(Event.FILTER, exp, res));
-            }
-            setValid(res);
+            aggregateHaving(eval, exp, memory, p);
         } else {
-            Node aggregateValue;
-            if (exp.getFilter() == null) {
-                // use case: order by var
-                aggregateValue = memory.getNode(exp.getNode());
-            } else {
-                // call fr.inria.corese.core.sparql.triple.function.aggregate.${AggregateFunction}
-                aggregateValue = eval(exp.getFilter(), eval, memory, p);
-                if (ev != null) {
-                    ev.getVisitor().aggregate(ev, exp.getFilter().getExp(),
-                            (aggregateValue == null) ? null : aggregateValue.getDatatypeValue());
-                }
-            }
-
-            if (hasEvent) {
-                manager.send(EventImpl.create(Event.FILTER, exp, aggregateValue));
-            }
-
-            for (Mapping map : this) {
-
-                if (n == SELECT) {
-                    // select (count(?x) as ?c)
-                    map.setNode(exp.getNode(), aggregateValue);
-                } else {
-                    // order by count(?x)
-                    map.setOrderBy(n, aggregateValue);
-                }
-            }
+            aggregateSelectOrOrder(eval, exp, memory, p, n);
         }
 
         memory.pop(firstMap);
     }
 
-    Node eval(Filter f, Evaluator eval, Environment env, Producer p) throws SparqlException {
-        return (Node) f.getExp().evalWE(eval, env.getBind(), env, p);
+    private void aggregateHaving(Evaluator eval, Exp exp, Memory memory, Producer p) {
+        boolean res = exp.getFilter().getExp().test(eval, memory.getBind(), memory, p);
+        Eval ev = memory.getEval();
+        if (ev != null) {
+            ev.getVisitor().having(ev, exp.getFilter().getExp(), res);
+        }
+        if (hasEvent) {
+            manager.send(EventImpl.create(Event.FILTER, exp, res));
+        }
+        setValid(res);
+    }
+
+    private void aggregateSelectOrOrder(Evaluator eval, Exp exp, Memory memory, Producer p, int n) {
+        Eval ev = memory.getEval();
+        Node aggregateValue;
+        if (exp.getFilter() == null) {
+            // use case: order by var
+            aggregateValue = memory.getNode(exp.getNode());
+        } else {
+            // Delegate the aggregate expression to the configured evaluator.
+            aggregateValue = eval(exp.getFilter(), eval, memory, p);
+            if (ev != null) {
+                ev.getVisitor().aggregate(ev, exp.getFilter().getExp(),
+                        (aggregateValue == null) ? null : aggregateValue.getDatatypeValue());
+            }
+        }
+
+        if (hasEvent) {
+            manager.send(EventImpl.create(Event.FILTER, exp, aggregateValue));
+        }
+
+        for (Mapping map : this) {
+            if (n == SELECT) {
+                // select (count(?x) as ?c)
+                map.setNode(exp.getNode(), aggregateValue);
+            } else {
+                // order by count(?x)
+                map.setOrderBy(n, aggregateValue);
+            }
+        }
+    }
+
+    Node eval(Filter f, Evaluator eval, Environment env, Producer p) {
+        return p.getNode(f.getExp().evalWE(eval, env.getBind(), env, p));
     }
 
     /**
      * Process aggregate for each group select, order by, having
      */
-    private void aggregateGroupMembers(Query q, Group group, Evaluator eval, Exp exp, Memory mem, Producer p, int n) throws SparqlException {
+    private void aggregateGroupMembers(Group group, Evaluator eval, Exp exp, Memory mem, Producer p, int n) {
         int mappingCount = 0;
         for (Mappings map : group.getValues()) {
             if (hasEvent) {
@@ -757,21 +758,19 @@ public class Mappings extends PointerObject
             }
             map.setCount(mappingCount++);
             mem.setGroup(map);
-            map.aggregate(q, eval, exp, mem, p, n);
+            map.aggregate(eval, exp, mem, p, n);
             mem.setGroup(null);
         }
     }
 
     void finish(Query qq) {
-        setNbsolutions(size());
         if (qq.hasGroupBy() && !qq.isConstruct()) {
             // after group by (and aggregate), leave one Mapping for each group
             // with result of the group
             groupBy();
         } else if (qq.getHaving() != null) {
             // clause 'having' with no group by
-            // select (max(?x) as ?max) where {}
-            // having(?max > 100)
+            // e.g. select (max(?x) as ?max) having(?max > 100)
             having();
         } else if (qq.isAggregate() && !qq.isConstruct()) {
             clean();
@@ -794,7 +793,7 @@ public class Mappings extends PointerObject
         }
     }
 
-    public void prepareAggregate(Mapping map, Query q, Map<String, IDatatype> bn, int n) {
+    public void prepareAggregate(Mapping map, Query q, Map<String, DatatypeValue> bn, int n) {
         setCount(n);
         // in case there is a nested aggregate, map will be an Environment
         // it must implement aggregate() and hence must know current Mappings group
@@ -805,9 +804,9 @@ public class Mappings extends PointerObject
     }
 
     // min(?l, groupBy(?x, ?y)) as ?min
-    void evalGroupByExp(Query q, Evaluator eval, Exp exp, Memory mem, Producer p, int n) throws SparqlException {
+    void evalGroupByExp(Evaluator eval, Exp exp, Memory mem, Producer p, int n) {
         Group g = createGroup(exp);
-        aggregateGroupMembers(q, g, eval, exp, mem, p, n);
+        aggregateGroupMembers(g, eval, exp, mem, p, n);
         if (exp.isHaving()) {
             // min(?l, groupBy(?x, ?y), (?l = ?min)) as ?min
             having(eval, exp, mem, p, g);
@@ -838,29 +837,29 @@ public class Mappings extends PointerObject
     /**
      * Template perform additionnal group_concat(?out)
      */
-    void template(Evaluator eval, Memory mem, Producer p) throws SparqlException {
+    void template(Evaluator eval, Memory mem, Producer p) {
         template(eval, getQuery(), mem, p);
     }
 
-    void template(Evaluator eval, Query q, Memory mem, Producer p) throws SparqlException {
+    void template(Evaluator eval, Query q, Memory mem, Producer p) {
         if (q.isTemplate() && size() > 0 && !(isFake() && q.isTransformationTemplate())) {
             // fake in transformation template -> fail
             // fake in query template -> not fail
-            setTemplateResult(apply(eval, q.getTemplateGroup(), mem, p));
+            apply(eval, q.getTemplateGroup(), mem, p);
         }
     }
 
     /**
      * Template perform additionnal group_concat(?out)
      */
-    public Node apply(Evaluator eval, Exp exp, Memory memory, Producer p) throws SparqlException {
+    public Node apply(Evaluator eval, Exp exp, Memory memory, Producer p) {
         Mapping firstMap = get(0);
         // bind the Mapping in memory to retrieve group by variables
         memory.aggregate(firstMap);
         if (size() == 1) {
             Node node = eval(exp.getFilter().getExp().getExp(0).getFilter(), eval, memory, p);
-            if (node != null && !node.isFuture()) {
-                // if (node == null) go to aggregate below because we want it to be uniform
+            if (node != null) {
+                // When node is null, go to aggregate below because we want it to be uniform
                 // whether there is one or several results
                 return node;
             }
@@ -1079,49 +1078,60 @@ public class Mappings extends PointerObject
             Node val = m1.getNodeValue(cmn);
             if (val == null) {
                 // common unbound in m1
-                for (Mapping m2 : map2) {
-                    Mapping m = m1.merge(m2);
-                    if (m != null) {
-                        res.add(m);
-                    }
-                }
+                joinCommonUnbound(res, m1, map2);
             } else {
-                for (Mapping m2 : map2) {
-                    Node val2 = m2.getNodeValue(cmn);
-                    if (val2 == null) {
-                        // common unbound in m2
-                        Mapping m = m1.merge(m2);
-                        if (m != null) {
-                            res.add(m);
-                        }
-                    } else {
-                        break;
-                    }
-                }
-
-                // index of common value in map2
-                int index = map2.find(val, cmn);
-
-                if (index >= 0 && index < map2.size()) {
-
-                    for (int i = index; i < map2.size(); i++) {
-
-                        // get value of common in map2
-                        Mapping m2 = map2.get(i);
-                        Node n2 = m2.getNodeValue(cmn);
-
-                        if (n2 == null || !val.match(n2)) { // was equal
-                            break;
-                        }
-                        Mapping m = m1.merge(m2);
-                        if (m != null) {
-                            res.add(m);
-                        }
-                    }
-                }
+                joinCommonBound(res, m1, map2, cmn, val);
             }
         }
         return res;
+    }
+
+    private void joinCommonUnbound(Mappings res, Mapping m1, Mappings map2) {
+        for (Mapping m2 : map2) {
+            Mapping m = m1.merge(m2);
+            if (m != null) {
+                res.add(m);
+            }
+        }
+    }
+
+    private void joinCommonBound(Mappings res, Mapping m1, Mappings map2, Node cmn, Node val) {
+        joinPrefixUnbound(res, m1, map2, cmn);
+        joinMatchingRange(res, m1, map2, cmn, val);
+    }
+
+    private void joinPrefixUnbound(Mappings res, Mapping m1, Mappings map2, Node cmn) {
+        for (Mapping m2 : map2) {
+            Node val2 = m2.getNodeValue(cmn);
+            if (val2 == null) {
+                // common unbound in m2
+                Mapping m = m1.merge(m2);
+                if (m != null) {
+                    res.add(m);
+                }
+            } else {
+                break;
+            }
+        }
+    }
+
+    private void joinMatchingRange(Mappings res, Mapping m1, Mappings map2, Node cmn, Node val) {
+        // index of common value in map2
+        int index = map2.find(val, cmn);
+        if (index >= 0 && index < map2.size()) {
+            for (int i = index; i < map2.size(); i++) {
+                // get value of common in map2
+                Mapping m2 = map2.get(i);
+                Node n2 = m2.getNodeValue(cmn);
+                if (n2 == null || !val.match(n2)) {
+                    break;
+                }
+                Mapping m = m1.merge(m2);
+                if (m != null) {
+                    res.add(m);
+                }
+            }
+        }
     }
 
     public Mappings minus(Mappings lm) {
@@ -1172,16 +1182,14 @@ public class Mappings extends PointerObject
         if (!getSelect().contains(varNode)) {
             getSelect().add(varNode);
         }
-        for (int i = 0; i < size(); ) {
-            Mapping m = getMappingList().get(i);
+        Iterator<Mapping> it = getMappingList().iterator();
+        while (it.hasNext()) {
+            Mapping m = it.next();
             Node node = m.getNodeValue(varNode);
             if (node == null) {
                 m.addNode(varNode, val);
-                i++;
-            } else if (node.equals(val)) {
-                i++;
-            } else {
-                getMappingList().remove(m);
+            } else if (!node.equals(val)) {
+                it.remove();
             }
         }
     }
@@ -1236,13 +1244,6 @@ public class Mappings extends PointerObject
     }
 
 
-    void setNbsolutions(int nbsolutions) {
-        this.nbsolutions = nbsolutions;
-    }
-
-    private void setTemplateResult(Node templateResult) {
-        this.templateResult = templateResult;
-    }
 
     @Override
     public PointerType pointerType() {
@@ -1286,9 +1287,6 @@ public class Mappings extends PointerObject
         this.nodeList = nodeList;
     }
 
-    public void setBindingContext(BindingContext ctx) {
-        bindingContext = ctx;
-    }
 
     public boolean isError() {
         return error;

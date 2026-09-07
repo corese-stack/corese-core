@@ -5,7 +5,7 @@ import fr.inria.corese.core.next.query.impl.kgram.api.query.Environment;
 import fr.inria.corese.core.next.query.impl.kgram.api.query.Evaluator;
 import fr.inria.corese.core.next.query.impl.kgram.api.query.Producer;
 import fr.inria.corese.core.next.query.impl.kgram.core.Exp;
-import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +17,9 @@ import java.util.List;
  *
  * @author Olivier Corby, Edelweiss, INRIA 2010
  */
-public class FilterPattern implements ExprType, Expr {
-	int type, oper;
+public final class FilterPattern implements ExprType, Expr {
+	int type;
+	int oper;
 	String label;
 	// recursive pattern, ako *
 	boolean rec = false;
@@ -130,6 +131,7 @@ public class FilterPattern implements ExprType, Expr {
 	}
 
 	public void setIndex(int index) {
+		// FilterPattern indices are immutable
 	}
 
 	public int type() {
@@ -167,6 +169,7 @@ public class FilterPattern implements ExprType, Expr {
 
 	@Override
 	public void setArg(Expr exp) {
+		// FilterPattern arguments are immutable
 	}
 
 	@Override
@@ -191,10 +194,12 @@ public class FilterPattern implements ExprType, Expr {
 
 	@Override
 	public void setOper(int n) {
+		// FilterPattern operator is immutable
 	}
 
 	@Override
 	public void setExp(int i, Expr e) {
+		// FilterPattern sub-expressions are immutable
 	}
 
 	@Override
@@ -288,7 +293,7 @@ public class FilterPattern implements ExprType, Expr {
 	}
 
 	@Override
-	public IDatatype evalWE(Evaluator eval, BindingContext b, Environment env, Producer p) {
+	public DatatypeValue evalWE(Evaluator eval, BindingContext b, Environment env, Producer p) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 }

@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Checker {
 
-    static Logger logger = LoggerFactory.getLogger(Checker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Checker.class);
 
     Eval eval;
     Producer producer;
@@ -95,8 +95,9 @@ public class Checker {
                 map = ee.query(q);
                 define = !map.isEmpty();
                 report(edge, exist, match, define);
-            } catch (SparqlException e) {
-                throw new RuntimeException(e);
+            } catch (SparqlException failure) {
+                throw new IllegalStateException(
+                        "Failed to evaluate the edge definition query", failure);
             }
 
         } else {
@@ -108,12 +109,12 @@ public class Checker {
     void report(Edge edge, boolean exist, boolean match, boolean define) {
         query.addInfo(edge.toString(),
                 " defined:" + define + " exist: " + exist + " match: " + match);
-        logger.info("Edge: {}: {} {} {}", edge, exist, match, define);
+        LOGGER.info("Edge: {}: {} {} {}", edge, exist, match, define);
     }
 
     void report(Edge edge, boolean exist, boolean match) {
         query.addInfo(edge.toString(), " exist: " + exist + " match: " + match);
-        logger.info("Edge: {}: {} {}", edge, exist, match);
+        LOGGER.info("Edge: {}: {} {}", edge, exist, match);
     }
 
 

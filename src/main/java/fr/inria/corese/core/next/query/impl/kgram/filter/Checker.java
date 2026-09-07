@@ -2,7 +2,6 @@ package fr.inria.corese.core.next.query.impl.kgram.filter;
 
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Expr;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.ExprType;
-import fr.inria.corese.core.next.query.impl.kgram.core.Query;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,30 +17,24 @@ import java.util.List;
  * @author Olivier Corby, Edelweiss, INRIA 2010
  *
  */
-public class Checker implements ExprType {
-	public static boolean verbose = true;
-
+public final class Checker implements ExprType {
 	static final int BOOL = BOOLEAN;
 
-	static List<FilterPattern> alwaysFalse;
+	private final List<FilterPattern> alwaysFalse;
+	private final Matcher matcher;
 
-
-	Matcher matcher;
-	Query query;
-
-	public Checker(Query q){
+	public Checker(){
 		matcher = new Matcher();
-		query = q;
+		alwaysFalse = createAlwaysFalsePatterns();
 	}
 
 	/**
 	 * Check one filter
 	 */
 	public boolean check(Expr ee){
-		boolean b = match(ee);
 		// match = true means that a false pattern matches
 		// hence return false (check correctness is false)
-		return ! b;
+		return !match(ee);
 	}
 
 
@@ -52,21 +45,17 @@ public class Checker implements ExprType {
 	boolean match(Expr ee){
 
 
-		return match(ee, alwaysFalse());
+		return match(ee, alwaysFalse);
 	}
 
 
 	boolean match(Expr ee, List<FilterPattern> pat) {
-		boolean suc = false, b;
-
 		for (FilterPattern p : pat){
-			b = matcher.match(p, ee);
-			if (b){
-				suc = true;
+			if (matcher.match(p, ee)){
+				return true;
 			}
 		}
-
-		return suc;
+		return false;
 	}
 
 
@@ -76,25 +65,20 @@ public class Checker implements ExprType {
 	 *
 	 */
 
-	List<FilterPattern> alwaysFalse(){
-		if (alwaysFalse == null){
-			List<FilterPattern> pat = new ArrayList<>();
-			pat.add(neqSelf());
-			pat.add(ltSelf());
-			pat.add(notEqSelf());
-			pat.add(notGeSelf());
-
-			pat.add(patNotPat());
-			pat.add(notOr());
-			pat.add(eqNeq());
-			pat.add(eqGt());
-			pat.add(ltGt());
-			pat.add(gtNotGe());
-			pat.add(eqNotGe());
-
-			alwaysFalse = pat;
-		}
-		return alwaysFalse;
+	List<FilterPattern> createAlwaysFalsePatterns(){
+		List<FilterPattern> patterns = new ArrayList<>();
+		patterns.add(neqSelf());
+		patterns.add(ltSelf());
+		patterns.add(notEqSelf());
+		patterns.add(notGeSelf());
+		patterns.add(patNotPat());
+		patterns.add(notOr());
+		patterns.add(eqNeq());
+		patterns.add(eqGt());
+		patterns.add(ltGt());
+		patterns.add(gtNotGe());
+		patterns.add(eqNotGe());
+		return List.copyOf(patterns);
 	}
 
 
@@ -152,7 +136,7 @@ public class Checker implements ExprType {
 	}
 
 
-	// TODO:
+	// Note:
 	// we can have both with list of values
 	//  ?x = xpath() && ?x != xpath()
 	FilterPattern eqNeq(){

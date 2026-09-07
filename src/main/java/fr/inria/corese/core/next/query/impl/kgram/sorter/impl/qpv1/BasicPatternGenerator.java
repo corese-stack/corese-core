@@ -10,12 +10,17 @@ import static fr.inria.corese.core.next.query.impl.kgram.sorter.core.QuerySorter
  *
  * @author Fuqi Song, Wimmics Inria I3S
  */
-public class BasicPatternGenerator {
+public final class BasicPatternGenerator {
 
-    public static int[][] BASIC_PATTERN = null;
-    private final static int P = 1, S = 0, O = 2;
-    private final static int[] default_order = {P, S, O};//p<s<o
-    private final static int TRIPLE_LEN = 3, PATTERN_LEN = 8;
+    private static final int P = 1;
+    private static final int S = 0;
+    private static final int O = 2;
+    private static final int[] DEFAULT_ORDER = {P, S, O};
+    private static final int TRIPLE_LENGTH = 3;
+    private static final int PATTERN_LENGTH = 8;
+
+    private BasicPatternGenerator() {
+    }
 
 
     private static int[] getNumbers(IProducerQP ip) {
@@ -38,40 +43,36 @@ public class BasicPatternGenerator {
      * predicate and objects
      *
      */
-    public static int[][] generateBasicPattern(IProducerQP producer, boolean regen) {
-        if (BASIC_PATTERN != null && !regen) {
-            return BASIC_PATTERN;
-        }
-
+    public static int[][] generateBasicPattern(IProducerQP producer) {
         //1 step: get the order of s, p, o according to the number of distinct s, p, o
         // using default settings if the numbers of s, p, o are not available
-        int[] order = default_order;
+        int[] order = DEFAULT_ORDER;
         int[] numbers = getNumbers(producer);
-        if (numbers != null && numbers.length == TRIPLE_LEN) {
+        if (numbers != null && numbers.length == TRIPLE_LENGTH) {
             order = order3Numbers(numbers);
         }
 
         //2 step: generate the patterns
-        //!! TODO LIST needs to be considered in future, at the moment
+        //!! Note: LIST needs to be considered in future, at the moment
         //LIST is considered as BOUND
-        BASIC_PATTERN = new int[PATTERN_LEN][TRIPLE_LEN];
-        BASIC_PATTERN[0] = new int[]{BOUND, BOUND, BOUND};
+        int[][] patterns = new int[PATTERN_LENGTH][TRIPLE_LENGTH];
+        patterns[0] = new int[]{BOUND, BOUND, BOUND};
         for (int i = 0; i < order.length; i++) {
-            for (int j = 0; j < TRIPLE_LEN; j++) {
+            for (int j = 0; j < TRIPLE_LENGTH; j++) {
                 //1 first three patterns with two constants
                 //2 second three patterns with ONE constants
                 if (j == order[i]) {
-                    BASIC_PATTERN[i + 1][j] = UNBOUND;
-                    BASIC_PATTERN[PATTERN_LEN - 2 - i][j] = BOUND;
+                    patterns[i + 1][j] = UNBOUND;
+                    patterns[PATTERN_LENGTH - 2 - i][j] = BOUND;
                 } else {
-                    BASIC_PATTERN[i + 1][j] = BOUND;
-                    BASIC_PATTERN[PATTERN_LEN - 2 - i][j] = UNBOUND;
+                    patterns[i + 1][j] = BOUND;
+                    patterns[PATTERN_LENGTH - 2 - i][j] = UNBOUND;
                 }
             }
         }
-        BASIC_PATTERN[PATTERN_LEN - 1] = new int[]{UNBOUND, UNBOUND, UNBOUND};
+        patterns[PATTERN_LENGTH - 1] = new int[]{UNBOUND, UNBOUND, UNBOUND};
 
-        return BASIC_PATTERN;
+        return patterns;
     }
 
     private static int[] order3Numbers(int[] numbers) {

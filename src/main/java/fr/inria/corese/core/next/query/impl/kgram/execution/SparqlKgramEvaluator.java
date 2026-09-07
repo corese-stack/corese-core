@@ -5,21 +5,26 @@ import fr.inria.corese.core.next.query.impl.kgram.api.query.Evaluator;
 import fr.inria.corese.core.next.query.impl.kgram.api.query.Producer;
 import fr.inria.corese.core.next.query.impl.kgram.core.Eval;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+
 /**
  * KGRAM evaluator for SPARQL query execution.
  *
  * <p>KGRAM requires an {@link Evaluator} even for simple basic graph patterns.
- * This implementation currently covers expression-free graph pattern execution:
- * edge enumeration is delegated to the producer, and RDF term comparison is
- * delegated to the matcher.</p>
- *
- * <p>SPARQL expression features such as FILTER, BIND, and function calls should
- * be added here when they enter the supported execution scope, so expression
- * evaluation remains part of the same KGRAM runtime path.</p>
+ * This implementation owns the small amount of immutable, query-scoped state
+ * required by native expression evaluation. Edge enumeration remains delegated
+ * to the producer and RDF term comparison to the matcher.</p>
  */
 public final class SparqlKgramEvaluator implements Evaluator {
 
+    private final OffsetDateTime queryEvaluationTime = OffsetDateTime.now(ZoneOffset.UTC);
     private Mode mode = Mode.KGRAM_MODE;
+
+    @Override
+    public OffsetDateTime getQueryEvaluationTime() {
+        return queryEvaluationTime;
+    }
 
     @Override
     public Mode getMode() {
@@ -53,6 +58,6 @@ public final class SparqlKgramEvaluator implements Evaluator {
 
     @Override
     public void init(Environment environment) {
-        // Expression evaluation state will be initialized here when supported.
+        // All native expression state is immutable and initialized at construction.
     }
 }

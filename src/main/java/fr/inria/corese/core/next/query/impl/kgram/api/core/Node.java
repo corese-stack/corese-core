@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.query.impl.kgram.api.core;
 
+import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import fr.inria.corese.core.next.query.impl.kgram.path.Path;
-import fr.inria.corese.core.sparql.api.IDatatype;
 
 
 /**
@@ -46,7 +46,7 @@ public interface Node extends Pointerable<Object>, Comparable<Node> {
     int compare(Node node);
 
     default int compareTo(Node node) {
-        return getDatatypeValue().compareTo(node.getDatatypeValue());
+        return compare(node);
     }
 
     String getLabel();
@@ -57,8 +57,6 @@ public interface Node extends Pointerable<Object>, Comparable<Node> {
 
     boolean isBlank();
 
-    boolean isFuture();
-
     default boolean isMatchNodeList() {
         return false;
     }
@@ -68,12 +66,11 @@ public interface Node extends Pointerable<Object>, Comparable<Node> {
     }
 
     // the target value for Matcher and Evaluator
-    // for KGRAM query it returns IDatatype
-    IDatatype getValue();
+    DatatypeValue getValue();
 
-    IDatatype getDatatypeValue();
+    DatatypeValue getDatatypeValue();
 
-    default void setDatatypeValue(IDatatype dt) {
+    default void setDatatypeValue(DatatypeValue dt) {
     }
 
     Node getGraph();

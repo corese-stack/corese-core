@@ -8,7 +8,7 @@ package fr.inria.corese.core.next.query.impl.kgram.core;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Filter;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.impl.kgram.api.query.Producer;
-import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +39,7 @@ public class CompleteSPARQL {
      * group by, order by
      *
      */
-    void complete(Producer p, Mappings map) throws SparqlException {
+    void complete(Producer p, Mappings map) {
         selectExpression(query, p, map);
         distinct(query, map);
         orderGroup(query, p, map);
@@ -55,10 +55,9 @@ public class CompleteSPARQL {
             map.submit(m);
         });
     }
-    @SuppressWarnings("UnusedReturnValue")
-    Mappings selectExpression(Query q, Producer p, Mappings map) throws SparqlException {
+    void selectExpression(Query q, Producer p, Mappings map) {
         if (query.isSelectExpression()) {
-            HashMap<String, IDatatype> bnode = new HashMap<>();
+            HashMap<String, DatatypeValue> bnode = new HashMap<>();
             for (Mapping m : map) {
                 bnode.clear();
                 m.setMap(bnode);
@@ -69,39 +68,15 @@ public class CompleteSPARQL {
                 }
             }
         }
-        return map;
     }
 
-    Mapping selectExpression(Query q, Producer p, Mapping m) throws SparqlException {
+    Mapping selectExpression(Query q, Producer p, Mapping m) {
         ArrayList<Node> ql = new ArrayList<>();
         ArrayList<Node> tl = new ArrayList<>();
 
         for (Exp e : q.getSelectFun()) {
-            Filter f = e.getFilter();
-            if (f != null) {
-                // select (exp as ?y)
-                if (e.isAggregate()) {
-                    // processed later, need place holder
-                    if (m.getNodeValue(e.getNode()) == null) {
-                        ql.add(e.getNode());
-                        tl.add(null);
-                    }
-                } else {
-                    Node qnode = e.getNode();
-                    Node tnode = eval.eval(null, f, m, p);
-                    if (tnode != null) {
-                        Node val = m.getNodeValue(qnode);
-                        if (val == null) {
-                            // bind e.getNode() = node
-                            ql.add(qnode);
-                            tl.add(tnode);
-                            m.setNodeValue(qnode, tnode);
-                        } else if (!val.equals(tnode)) {
-                            // error: select var != bgp var
-                            return null;
-                        }
-                    }
-                }
+            if (!completeProjection(e, p, m, ql, tl)) {
+                return null;
             }
         }
 
@@ -112,7 +87,36 @@ public class CompleteSPARQL {
         return m;
     }
 
-    void orderGroup(Query q, Producer p, Mappings map) throws SparqlException {
+    private boolean completeProjection(Exp expression, Producer producer, Mapping mapping,
+            List<Node> queryNodes, List<Node> targetNodes) {
+        Filter filter = expression.getFilter();
+        if (filter == null) {
+            return true;
+        }
+        Node queryNode = expression.getNode();
+        Node current = mapping.getNodeValue(queryNode);
+        if (expression.isAggregate()) {
+            // Aggregates are evaluated later; reserve their output slot now.
+            if (current == null) {
+                queryNodes.add(queryNode);
+                targetNodes.add(null);
+            }
+            return true;
+        }
+        Node result = eval.eval(null, filter, mapping, producer);
+        if (result == null) {
+            return true;
+        }
+        if (current != null) {
+            return current.equals(result);
+        }
+        queryNodes.add(queryNode);
+        targetNodes.add(result);
+        mapping.setNodeValue(queryNode, result);
+        return true;
+    }
+
+    void orderGroup(Query q, Producer p, Mappings map) {
         for (Mapping m : map) {
             Node[] snode = new Node[q.getOrderBy().size()];
             Node[] gnode = new Node[q.getGroupBy().size()];
@@ -123,7 +127,7 @@ public class CompleteSPARQL {
         }
     }
 
-    void orderGroup(List<Exp> lExp, Node[] nodes, Producer p, Mapping m) throws SparqlException {
+    void orderGroup(List<Exp> lExp, Node[] nodes, Producer p, Mapping m) {
         int n = 0;
         for (Exp e : lExp) {
             Node qNode = e.getNode();

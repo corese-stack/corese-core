@@ -6,8 +6,6 @@ import fr.inria.corese.core.next.query.impl.kgram.api.query.Environment;
 import fr.inria.corese.core.next.query.impl.kgram.api.query.Matcher;
 import fr.inria.corese.core.next.query.impl.kgram.tool.EnvironmentImpl;
 import fr.inria.corese.core.next.query.impl.kgram.tool.NodeImpl;
-import fr.inria.corese.core.sparql.triple.parser.Constant;
-import fr.inria.corese.core.sparql.triple.parser.Variable;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -19,11 +17,11 @@ class RdfTermMatcherTest {
     private final RdfTermMatcher matcher = new RdfTermMatcher();
 
     private static Node iri(String label) {
-        return new NodeImpl(Constant.createResource(label));
+        return NodeImpl.forIRI(label);
     }
 
-    private static Node var(String name) {
-        return new NodeImpl(Variable.create(name));
+    private static Node variable(String name) {
+        return NodeImpl.forVariable(name);
     }
 
     /**
@@ -53,20 +51,20 @@ class RdfTermMatcherTest {
     @Test
     @DisplayName("An unbound variable matches any term (null environment)")
     void unboundVariableMatchesAnyTerm() {
-        assertTrue(matcher.match(var("s"), iri("http://example.org/a"), null));
+        assertTrue(matcher.match(variable("s"), iri("http://example.org/a"), null));
     }
 
     @Test
     @DisplayName("An unbound variable matches any term (environment returns null)")
     void unboundVariableInEnvironmentMatchesAnyTerm() {
-        Environment env = bind(var("other"), iri("http://example.org/z")); // ?s stays unbound
-        assertTrue(matcher.match(var("s"), iri("http://example.org/a"), env));
+        Environment env = bind(variable("other"), iri("http://example.org/z")); // ?s stays unbound
+        assertTrue(matcher.match(variable("s"), iri("http://example.org/a"), env));
     }
 
     @Test
     @DisplayName("An already-bound variable matches only its bound value (BGP join, compatible)")
     void boundVariableMatchesSameValue() {
-        Node s = var("s");
+        Node s = variable("s");
         Environment env = bind(s, iri("http://example.org/a"));
         assertTrue(matcher.match(s, iri("http://example.org/a"), env));
     }
@@ -74,7 +72,7 @@ class RdfTermMatcherTest {
     @Test
     @DisplayName("An already-bound variable rejects a different value (BGP join, conflicting)")
     void boundVariableRejectsDifferentValue() {
-        Node s = var("s");
+        Node s = variable("s");
         Environment env = bind(s, iri("http://example.org/a"));
         assertFalse(matcher.match(s, iri("http://example.org/b"), env));
     }
@@ -93,7 +91,7 @@ class RdfTermMatcherTest {
     @DisplayName("Variable-predicate edge { ?s ?p ?o } matches a concrete triple (predicate via edge variable)")
     void edgeWithVariablePredicateMatches() {
         // query: ?s ?p ?o  (predicate is a variable, exposed via getEdgeVariable())
-        Edge query = new TestEdge(var("s"), null, var("p"), var("o"));
+        Edge query = new TestEdge(variable("s"), null, variable("p"), variable("o"));
         // target: <a> <p> <b>
         Edge target = new TestEdge(iri("http://example.org/a"),
                 iri("http://example.org/p"), null, iri("http://example.org/b"));
@@ -105,7 +103,7 @@ class RdfTermMatcherTest {
     @DisplayName("Fixed-predicate edge { ?s <p> ?o } matches only the same predicate (predicate via edge node)")
     void edgeWithFixedPredicateMatchesSamePredicate() {
         // query: ?s <p> ?o  (fixed predicate, edge variable is null → predicate via getEdgeNode())
-        Edge query = new TestEdge(var("s"), iri("http://example.org/p"), null, var("o"));
+        Edge query = new TestEdge(variable("s"), iri("http://example.org/p"), null, variable("o"));
 
         Edge samePredicate = new TestEdge(iri("http://example.org/a"),
                 iri("http://example.org/p"), null, iri("http://example.org/b"));

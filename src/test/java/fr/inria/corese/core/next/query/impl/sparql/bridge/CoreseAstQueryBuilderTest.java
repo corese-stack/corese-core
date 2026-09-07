@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -83,6 +84,25 @@ class CoreseAstQueryBuilderTest extends AbstractSparqlParserFeatureTest {
         Edge edge = bgp.get(0).getEdge();
         assertEquals("http://example.org/ns#p", edge.getEdgeNode().getLabel());
         assertEquals("http://example.org/ex#o", edge.getNode(1).getLabel());
+    }
+
+    @Test
+    @DisplayName("Concurrent query compilation keeps prologue namespaces isolated")
+    void isolatesConcurrentQueryPrologues() throws Exception {
+        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            var first = executor.submit(() -> compilePredicate(
+                    "PREFIX ex: <http://first.example/> SELECT * WHERE { ?s ex:p ?o }"));
+            var second = executor.submit(() -> compilePredicate(
+                    "PREFIX ex: <http://second.example/> SELECT * WHERE { ?s ex:p ?o }"));
+
+            assertEquals("http://first.example/p", first.get());
+            assertEquals("http://second.example/p", second.get());
+        }
+    }
+
+    private String compilePredicate(String sparql) {
+        SelectQueryAst select = assertInstanceOf(SelectQueryAst.class, newParserDefault().parse(sparql));
+        return builder.toNextQuery(select).getBody().get(0).get(0).getEdge().getEdgeNode().getLabel();
     }
 
     @Test

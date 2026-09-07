@@ -1,10 +1,11 @@
 package fr.inria.corese.core.next.query.impl.query;
 
+import fr.inria.corese.core.next.data.Values;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.data.api.term.Value;
-import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
 import fr.inria.corese.core.next.query.api.Update;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
@@ -56,7 +57,7 @@ public final class CoreseUpdate implements Update {
         executionGuard.run();
         UpdateRequestAst request = (UpdateRequestAst) parser.parse(updateString);
         MutationOperations mutations = storage.mutations();
-        CoreseValueFactory factory = new CoreseValueFactory();
+        ValueFactory factory = Values.factory();
 
         for (UpdateRequestUnitAst operation : request.operations()) {
             switch (operation) {
@@ -74,7 +75,7 @@ public final class CoreseUpdate implements Update {
     // -------------------------------------------------------------------------
 
     private void applyQuads(QuadsAst quads, MutationOperations mutations,
-                            CoreseValueFactory factory, boolean insert) {
+                            ValueFactory factory, boolean insert) {
         for (TriplePatternAst triple : quads.defaultTriples()) {
             Statement stmt = toStatement(triple, null, factory);
             if (insert) {
@@ -96,7 +97,7 @@ public final class CoreseUpdate implements Update {
         }
     }
 
-    private Statement toStatement(TriplePatternAst triple, Resource context, CoreseValueFactory factory) {
+    private Statement toStatement(TriplePatternAst triple, Resource context, ValueFactory factory) {
         Value subject = termToValue(triple.subject(), factory);
         Value object  = termToValue(triple.object(), factory);
 
@@ -119,10 +120,10 @@ public final class CoreseUpdate implements Update {
         return factory.createStatement(s, p, object);
     }
 
-    private Value termToValue(TermAst term, CoreseValueFactory factory) {
+    private Value termToValue(TermAst term, ValueFactory factory) {
         return switch (term) {
             case IriAst(String raw) -> factory.createIRI(RdfText.stripAngleBrackets(raw));
-            case LiteralAst(String lexical, String datatype, String lang) -> {
+            case LiteralAst(String lexical, String lang, String datatype) -> {
                 if (lang != null && !lang.isBlank()) {
                     yield factory.createLiteral(lexical, lang);
                 }

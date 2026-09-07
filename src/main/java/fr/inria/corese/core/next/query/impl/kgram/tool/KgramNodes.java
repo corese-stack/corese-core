@@ -1,9 +1,9 @@
 package fr.inria.corese.core.next.query.impl.kgram.tool;
 
+import fr.inria.corese.core.next.data.Values;
+import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.impl.kgram.path.Path;
-import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 
 /**
  * Factory for Corese-specific KGRAM nodes used by the Corese-next runtime model.
@@ -35,7 +35,7 @@ public final class KgramNodes {
 
     private static final class RootPropertyNode implements Node {
 
-        private static final IDatatype VALUE = DatatypeMap.newResource(ROOT_PROPERTY_URI);
+        private static final DatatypeValue VALUE = Values.factory().createIRI(ROOT_PROPERTY_URI);
 
         private int index = -1;
         private String key = INITKEY;
@@ -67,12 +67,12 @@ public final class KgramNodes {
 
         @Override
         public boolean match(Node n) {
-            return n != null && !n.isVariable() && VALUE.match(n.getDatatypeValue());
+            return n != null && !n.isVariable() && VALUE.sameTerm(n.getDatatypeValue());
         }
 
         @Override
         public int compare(Node node) {
-            return VALUE.compareTo(node.getDatatypeValue());
+            return VALUE.compare(node.getDatatypeValue());
         }
 
         @Override
@@ -96,17 +96,12 @@ public final class KgramNodes {
         }
 
         @Override
-        public boolean isFuture() {
-            return false;
-        }
-
-        @Override
-        public IDatatype getValue() {
+        public DatatypeValue getValue() {
             return VALUE;
         }
 
         @Override
-        public IDatatype getDatatypeValue() {
+        public DatatypeValue getDatatypeValue() {
             return getValue();
         }
 

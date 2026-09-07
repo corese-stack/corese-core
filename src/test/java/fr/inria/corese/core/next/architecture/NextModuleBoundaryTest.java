@@ -23,6 +23,7 @@ class NextModuleBoundaryTest {
     private static final Path NEXT_SOURCES = CORE_SOURCES.resolve("next");
     private static final Pattern CORESE_TYPE_REFERENCE = Pattern.compile(
             "\\bfr\\.inria\\.corese\\.core(?:\\.[A-Za-z_$][A-Za-z0-9_$]*)+");
+    private static final Pattern STATIC_IMPORT_PREFIX = Pattern.compile("^static\\s+");
 
     @Test
     void sharedCodeMustNotDependOnDomainModules() throws IOException {
@@ -68,6 +69,25 @@ class NextModuleBoundaryTest {
     }
 
     @Test
+    void queryRuntimeMustNotDependOnTheLegacyPipeline() throws IOException {
+        Path querySources = NEXT_SOURCES.resolve("query");
+        assertNoReferences(
+                querySources,
+                reference -> reference.startsWith("fr.inria.corese.core.kgram.")
+                        || reference.startsWith("fr.inria.corese.core.sparql."));
+        assertNoSourceText(
+                querySources,
+                List.of(
+                        "IDatatype",
+                        "CoreseValueFactory",
+                        "BindingAdapter",
+                        "DatatypeAdapter",
+                        "KgramNodeConverter",
+                        "NextDatatypeValueAdapter",
+                        "StorageManagerKgramValues"));
+    }
+
+    @Test
     void legacyCodeMustNotDependOnNextImplementations() throws IOException {
         assertNoReferences(
                 CORE_SOURCES,
@@ -84,9 +104,9 @@ class NextModuleBoundaryTest {
     }
 
     @Test
-    void nonKgramImplementationPackagesMustBeDocumented() throws IOException {
+    void implementationPackagesMustBeDocumented() throws IOException {
         assertPackagesAreDocumented(
-                nonKgramImplementationDirectories(), "Undocumented non-KGRAM implementation packages:");
+                implementationDirectories(), "Undocumented implementation packages:");
     }
 
     private static void assertPackagesAreDocumented(List<Path> packageRoots, String message)
@@ -119,10 +139,11 @@ class NextModuleBoundaryTest {
                 NEXT_SOURCES.resolve("query/api"));
     }
 
-    private static List<Path> nonKgramImplementationDirectories() {
+    private static List<Path> implementationDirectories() {
         return List.of(
                 NEXT_SOURCES.resolve("data/impl"),
                 NEXT_SOURCES.resolve("storage/impl"),
+                NEXT_SOURCES.resolve("query/impl/kgram"),
                 NEXT_SOURCES.resolve("query/impl/sparql"));
     }
 
@@ -144,9 +165,9 @@ class NextModuleBoundaryTest {
                 for (String line : Files.readAllLines(source)) {
                     String trimmed = line.trim();
                     if (trimmed.startsWith("import ")) {
-                        String imported = trimmed
-                                .substring("import ".length())
-                                .replaceFirst("^static\\s+", "")
+                        String imported = STATIC_IMPORT_PREFIX
+                                .matcher(trimmed.substring("import ".length()))
+                                .replaceFirst("")
                                 .replace(";", "");
                         if (forbidden.test(imported)) {
                             violations.add(NEXT_SOURCES.relativize(source) + " -> " + imported);
@@ -190,6 +211,24 @@ class NextModuleBoundaryTest {
         }
         if (!violations.isEmpty()) {
             fail("Forbidden next-module dependencies:\n" + String.join("\n", violations));
+        }
+    }
+
+    private static void assertNoSourceText(Path sourceDirectory, List<String> forbiddenTokens)
+            throws IOException {
+        List<String> violations = new ArrayList<>();
+        try (Stream<Path> paths = Files.walk(sourceDirectory)) {
+            for (Path source : paths.filter(path -> path.toString().endsWith(".java")).toList()) {
+                String content = Files.readString(source);
+                for (String token : forbiddenTokens) {
+                    if (content.contains(token)) {
+                        violations.add(NEXT_SOURCES.relativize(source) + " -> " + token);
+                    }
+                }
+            }
+        }
+        if (!violations.isEmpty()) {
+            fail("Forbidden legacy tokens in next.query:\n" + String.join("\n", violations));
         }
     }
 }

@@ -11,11 +11,11 @@ import java.util.List;
  */
 public class EvalGraph {
 
-    Eval eval;
+    Eval engine;
     boolean stop = false;
 
     EvalGraph(Eval e) {
-        eval = e;
+        engine = e;
     }
 
     void setStop() {
@@ -29,44 +29,31 @@ public class EvalGraph {
     int eval(Producer p, Node gNode, Exp exp, Mappings data, Stack stack, int n) throws SparqlException {
         int backtrack = n - 1;
         Node graphNode = exp.getGraphName();
-        Node graph = eval.getNode(p, graphNode);
+        Node graph = engine.getNode(p, graphNode);
         Mappings res;
 
         if (graph == null) {
-            res = graphNodes(p, exp, data, n);
+            res = graphNodes(p, exp, data);
         } else {
-            res = graph(p, graph, exp, data, n);
+            res = graph(p, graph, exp, data);
         }
 
         if (res == null) {
             return backtrack;
         }
 
-        Memory env = eval.getMemory();
+        Memory env = engine.getMemory();
 
         for (Mapping m : res) {
             if (stop) {
                 return Eval.STOP;
             }
 
-            Node namedGraph;
-            if (graphNode.isVariable()) {
-                namedGraph = m.getNode(graphNode);
-                if (namedGraph != null && !namedGraph.equals(m.getNamedGraph())) {
-                    continue;
-                }
-            }
-
-            if (!env.push(m, n)) {
+            if (!pushGraphMapping(env, graphNode, m, n)) {
                 continue;
             }
 
-            if (!env.push(graphNode, m.getNamedGraph())) {
-                env.pop(m);
-                continue;
-            }
-
-            backtrack = eval.eval(p, gNode, stack, n + 1);
+            backtrack = engine.eval(p, gNode, stack, n + 1);
             env.pop(graphNode);
             env.pop(m);
 
@@ -78,15 +65,30 @@ public class EvalGraph {
         return backtrack;
     }
 
+    private boolean pushGraphMapping(Memory environment, Node graphNode, Mapping mapping, int index) {
+        Node boundGraph = graphNode.isVariable() ? mapping.getNode(graphNode) : null;
+        if (boundGraph != null && !boundGraph.equals(mapping.getNamedGraph())) {
+            return false;
+        }
+        if (!environment.push(mapping, index)) {
+            return false;
+        }
+        if (environment.push(graphNode, mapping.getNamedGraph())) {
+            return true;
+        }
+        environment.pop(mapping);
+        return false;
+    }
+
     /**
      * Iterate named graph pattern evaluation on named graph list
      * named graph list may come from Mappings map  from previous statement
      * OR from the "from named" clause OR from dataset named graph list
      */
-    private Mappings graphNodes(Producer p, Exp exp, Mappings map, int n) throws SparqlException {
-        Memory env = eval.getMemory();
-        Query qq = eval.getQuery();
-        Matcher mm = eval.getMatcher();
+    private Mappings graphNodes(Producer p, Exp exp, Mappings map) throws SparqlException {
+        Memory env = engine.getMemory();
+        Query qq = engine.getQuery();
+        Matcher mm = engine.getMatcher();
         Node name = exp.getGraphName();
         Mappings res = null;
         Iterable<Node> graphNodes = null;
@@ -105,7 +107,7 @@ public class EvalGraph {
 
         for (Node graph : graphNodes) {
             if (mm.match(name, graph, env)) {
-                Mappings m = graph(p, graph, exp, map, n);
+                Mappings m = graph(p, graph, exp, map);
                 if (res == null) {
                     res = m;
                 } else {
@@ -121,15 +123,12 @@ public class EvalGraph {
      * Node graph: graph URI or Node graph pointer or Node path pointer
      * Exp exp: graph name { BGP }
      */
-    @SuppressWarnings("unused")
-    private Mappings graph(Producer p, Node graph, Exp exp, Mappings map, int n) throws SparqlException {
+    private Mappings graph(Producer p, Node graph, Exp exp, Mappings map) throws SparqlException {
         boolean external = false;
-        Node graphNode = exp.getGraphName();
         Producer np = p;
         if (graph != null && p.isProducer(graph)) {
-            // graph ? g { }
-            // named graph in GraphStore
-            np = p.getProducer(graph, eval.getMemory());
+            // Named graph pattern in GraphStore
+            np = p.getProducer(graph, engine.getMemory());
             np.setGraphNode(graph);  // the new gNode
             external = true;
         }
@@ -139,38 +138,33 @@ public class EvalGraph {
         Node varNode = null;
         Node target = null;
 
-        if (external) {
-            if (graphNode.isVariable() && graph.getDatatypeValue().isExtension()) {
-                varNode = graphNode;
-                target = graph;
-            }
-        } else {
+        if (!external) {
             target = graph;
         }
 
-        if (eval.isFederate(exp)) {
-            res = eval.subEval(np, target, varNode, body, exp, map, null, false, external);
+        if (engine.isFederate(exp)) {
+            res = engine.subEval(np, target, varNode, body, exp, map, null, false, external);
         } else {
             Exp ee = body;
             Mappings data = null;
 
             if (graph != null && graph.getPath() == null) {
                 // not a path pointer
-                if (Eval.isParameterGraphMappings()) {
-                    // eval graph body with parameter map
-                    // pro: if body is optional, eval it with parameter map
+                if (engine.isParameterGraphMappings()) {
+                    // engine graph body with parameter map
+                    // pro: if body is optional, engine it with parameter map
                     data = map;
                 } else {
-                    // eval graph body with values(map)
+                    // engine graph body with values(map)
                     ee = body.complete(map);
                 }
             }
 
-            res = eval.subEval(np, target, varNode, ee, exp, data, null, false, external);
+            res = engine.subEval(np, target, varNode, ee, exp, data, null, false, external);
         }
         res.setNamedGraph(graph);
 
-        eval.getVisitor().graph(eval, graph, exp, res);
+        engine.getVisitor().graph(engine, graph, exp, res);
         return res;
     }
 

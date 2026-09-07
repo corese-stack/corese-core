@@ -5,7 +5,6 @@ import fr.inria.corese.core.next.query.impl.kgram.api.query.Producer;
 import fr.inria.corese.core.next.query.impl.kgram.sorter.core.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -21,7 +20,7 @@ public class HeuristicsBasedEstimation implements IEstimate {
     @Override
     public void estimate(QPGraph graph, Producer producer, Object parameters) {
         this.graph = graph;
-        this.producer = (producer instanceof IProducerQP) ? (IProducerQP) producer : null;
+        this.producer = producer instanceof IProducerQP queryProducer ? queryProducer : null;
 
         estimateNodes();
         estimateEdges();
@@ -43,7 +42,7 @@ public class HeuristicsBasedEstimation implements IEstimate {
 
         //** 3 sort by priority
         //generate basic patterns using numbers({Ns Np No} | null)
-        int[][] basicPatterns = BasicPatternGenerator.generateBasicPattern(producer, true);
+        int[][] basicPatterns = BasicPatternGenerator.generateBasicPattern(producer);
         QPGNodeCostModel.sort(models, basicPatterns, producer);
 
         //--put the same triple patterns in one list and assign the same selectivity to
@@ -53,30 +52,30 @@ public class HeuristicsBasedEstimation implements IEstimate {
         // l2: t21
         // l3: t31, t32, t33
         // l4..
-        List<List<QPGNodeCostModel>> modelList = new ArrayList<>();
-        //** 1 Group the patterns by their pattern
-        for (int i = 0; i < models.size(); i++) {
-            List<QPGNodeCostModel> l = new ArrayList<>();
-
-            QPGNodeCostModel model = models.get(i);
-            l.add(model);
-            for (int j = i + 1; j < models.size(); j++) {
-                if (QPGNodeCostModel.compareModel(model, models.get(j), basicPatterns, producer) == 0) {
-                    l.add(models.get(j));
-                    i++;
-                } else {
-                    break;
-                }
-            }
-            modelList.add(l);
-        }
+        List<List<QPGNodeCostModel>> modelList = groupModels(models, basicPatterns);
 
         //** 2 assign cost
         for (int i = 0; i < modelList.size(); i++) {
             for (AbstractCostModel model : modelList.get(i)) {
-                model.estimate(Arrays.asList(new Object[]{modelList.size(), i}));
+                model.estimate(List.of(modelList.size(), i));
             }
         }
+    }
+
+    private List<List<QPGNodeCostModel>> groupModels(List<QPGNodeCostModel> models, int[][] patterns) {
+        List<List<QPGNodeCostModel>> groups = new ArrayList<>();
+        int index = 0;
+        while (index < models.size()) {
+            QPGNodeCostModel first = models.get(index++);
+            List<QPGNodeCostModel> group = new ArrayList<>();
+            group.add(first);
+            while (index < models.size()
+                    && QPGNodeCostModel.compareModel(first, models.get(index), patterns, producer) == 0) {
+                group.add(models.get(index++));
+            }
+            groups.add(group);
+        }
+        return groups;
     }
 
     //assign weight/sel for edge between triple pattern

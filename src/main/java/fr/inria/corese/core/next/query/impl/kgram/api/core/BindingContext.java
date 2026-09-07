@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query.impl.kgram.api.core;
 
+import fr.inria.corese.core.next.query.impl.kgram.api.query.ProcessVisitor;
+
 import java.util.Map;
 
 /**
@@ -94,7 +96,7 @@ public interface BindingContext {
      *
      * @return the ProcessVisitor or null
      */
-    default Object getVisitor() {
+    default ProcessVisitor getVisitor() {
         return null;
     }
 
@@ -103,7 +105,7 @@ public interface BindingContext {
      *
      * @param visitor the ProcessVisitor to associate
      */
-    default void setVisitor(Object visitor) {
+    default void setVisitor(ProcessVisitor visitor) {
         // By default, do nothing
     }
 

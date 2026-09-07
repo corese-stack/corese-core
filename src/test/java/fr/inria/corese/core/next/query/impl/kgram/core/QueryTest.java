@@ -3,8 +3,8 @@ package fr.inria.corese.core.next.query.impl.kgram.core;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.ExpType;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Filter;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Node;
-import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
-import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.parser.SparqlParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -655,9 +655,9 @@ class QueryTest {
         @Test
         @DisplayName("Should set and get AST")
         void testSetAndGetAST() {
-            ASTQuery mockAST = mock(ASTQuery.class);
-            query.setAST(mockAST);
-            assertEquals(mockAST, query.getAST(), "AST should match");
+            QueryAst ast = new SparqlParser().parse("SELECT * WHERE { ?s ?p ?o }");
+            query.setAST(ast);
+            assertSame(ast, query.getAST(), "AST should match");
         }
 
         @Test
@@ -706,20 +706,6 @@ class QueryTest {
             assertTrue(query.isExtension(), "Query should be extension");
         }
 
-        @Test
-        @DisplayName("Should set and get extension")
-        void testSetAndGetExtension() {
-            ASTExtension mockExt = mock(ASTExtension.class);
-            query.setExtension(mockExt);
-            assertEquals(mockExt, query.getExtension(), "Extension should match");
-        }
-
-        @Test
-        @DisplayName("Should get actual extension")
-        void testGetActualExtension() {
-            assertDoesNotThrow(() -> query.getActualExtension(),
-                    "Getting actual extension should not throw");
-        }
     }
 
     @Nested

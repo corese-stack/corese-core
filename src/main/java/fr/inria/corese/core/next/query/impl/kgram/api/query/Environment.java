@@ -8,8 +8,7 @@ import fr.inria.corese.core.next.query.impl.kgram.core.*;
 import fr.inria.corese.core.next.query.impl.kgram.event.KgramEventDispatcher;
 import fr.inria.corese.core.next.query.impl.kgram.path.Path;
 import fr.inria.corese.core.next.query.impl.kgram.tool.ApproximateSearchEnv;
-import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
+import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 
 import java.util.Map;
 
@@ -106,7 +105,7 @@ public interface Environment {
     void setExp(Exp exp);
 
     // id -> bnode
-    Map<String, IDatatype> getMap();
+    Map<String, DatatypeValue> getMap();
 
     Edge[] getEdges();
 
@@ -124,8 +123,6 @@ public interface Environment {
 
     Node get(Expr varExpr);
 
-    ASTExtension getExtension();
-
     ApproximateSearchEnv getAppxSearchEnv();
 
     Eval getEval();
@@ -134,9 +131,9 @@ public interface Environment {
 
     ProcessVisitor getVisitor();
 
-    IDatatype getReport();
+    DatatypeValue getReport();
 
-    void setReport(IDatatype dt);
+    void setReport(DatatypeValue dt);
 
     int size();
 

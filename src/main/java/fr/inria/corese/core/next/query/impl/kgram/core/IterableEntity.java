@@ -8,41 +8,37 @@ import java.util.Iterator;
 /**
  * @author Olivier Corby, Wimmics INRIA I3S, 2015
  */
-class IterableEntity implements Iterable<Edge>, Iterator<Edge> {
+final class IterableEntity implements Iterable<Edge> {
 
-    Iterable<Edge> loop;
-    Iterator<Edge> it;
+    private final Iterable<?> values;
 
-    IterableEntity(Iterable<Edge> loop) {
-        this.loop = loop;
-        it = loop.iterator();
+    IterableEntity(Iterable<?> loop) {
+        values = loop;
     }
 
     @Override
-    @SuppressWarnings("NullableProblems")
     public Iterator<Edge> iterator() {
-        return this;
+        Iterator<?> iterator = values.iterator();
+        return new Iterator<>() {
+            @Override
+            public boolean hasNext() {
+                return iterator.hasNext();
+            }
+
+            @Override
+            public Edge next() {
+                return asEdge(iterator.next());
+            }
+        };
     }
 
-    @Override
-    public boolean hasNext() {
-        return it.hasNext();
-    }
-
-    @Override
-    public Edge next() {
-        Edge obj = it.next();
-        if (obj instanceof Node n) {
-            return (Edge) n.getNodeObject();
+    private static Edge asEdge(Object value) {
+        if (value instanceof Edge edge) {
+            return edge;
         }
-
-        return obj;
-
-
+        if (value instanceof Node node && node.getNodeObject() instanceof Edge edge) {
+            return edge;
+        }
+        throw new IllegalStateException("Loop item cannot be converted to a KGRAM edge: " + value);
     }
-
-    @Override
-    public void remove() {
-    }
-
 }

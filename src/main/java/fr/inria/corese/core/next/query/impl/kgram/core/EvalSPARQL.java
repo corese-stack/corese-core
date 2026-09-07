@@ -1,8 +1,9 @@
 package fr.inria.corese.core.next.query.impl.kgram.core;
 
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Node;
+import fr.inria.corese.core.next.query.impl.kgram.api.core.ExpType.Type;
 import fr.inria.corese.core.next.query.impl.kgram.api.query.Producer;
-import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,11 +19,11 @@ public class EvalSPARQL {
 
     private static final Logger logger = LoggerFactory.getLogger(EvalSPARQL.class);
 
-    Eval eval;
+    Eval engine;
     Query query;
 
     EvalSPARQL(Query q, Eval e) {
-        eval = e;
+        engine = e;
         query = q;
     }
 
@@ -38,7 +39,7 @@ public class EvalSPARQL {
             case UNION -> union(graph, p, exp, m);
             case MINUS -> minus(graph, p, exp, m);
             case OPTIONAL -> optional(graph, p, exp, m);
-            case GRAPH -> graph(graph, p, exp, m);
+            case GRAPH -> graph(p, exp, m);
             default -> Mappings.create(query);
         };
     }
@@ -73,12 +74,11 @@ public class EvalSPARQL {
         }
 
         // sort map2 according to common variable, null value first
-        map2.sort(eval, cmn);
+        map2.sort(engine, cmn);
         return map1.joiner(map2, cmn);
     }
 
-    @SuppressWarnings("unused")
-    Mappings graph(Node graph, Producer p, Exp exp, Mapping m) {
+    Mappings graph(Producer p, Exp exp, Mapping m) {
         return bgp(exp.getGraphName(), p, exp.rest(), m);
     }
 
@@ -86,27 +86,15 @@ public class EvalSPARQL {
         Mappings m1 = bgp(graph, p, exp.first(), mm);
         Mappings m2 = bgp(graph, p, exp.rest());
         Mappings res = Mappings.create(query);
-        HashMap<String, IDatatype> hm = new HashMap<>();
+        HashMap<String, DatatypeValue> hm = new HashMap<>();
 
         for (Mapping ma : m1) {
             int nbsuc = 0;
             for (Mapping mb : m2) {
-                boolean success ;
                 Mapping m = ma.merge(mb);
-                if (m != null) {
-                    success = true;
-                    if (exp.isPostpone()) {
-                        m.setQuery(query);
-                        m.setMap(hm);
-                        hm.clear();
-                        if (!postpone(graph, exp, m, p)) {
-                            success = false;
-                        }
-                    }
-                    if (success) {
-                        res.add(m);
-                        nbsuc++;
-                    }
+                if (acceptOptionalMapping(graph, p, exp, m, hm)) {
+                    res.add(m);
+                    nbsuc++;
                 }
             }
 
@@ -117,13 +105,23 @@ public class EvalSPARQL {
         return res;
     }
 
+    private boolean acceptOptionalMapping(Node graph, Producer producer, Exp expression,
+            Mapping mapping, HashMap<String, DatatypeValue> blankNodes) {
+        if (mapping == null) {
+            return false;
+        }
+        if (!expression.isPostpone()) {
+            return true;
+        }
+        mapping.setQuery(query);
+        mapping.setMap(blankNodes);
+        blankNodes.clear();
+        return postpone(graph, expression, mapping, producer);
+    }
+
     boolean postpone(Node gNode, Exp exp, Mapping m, Producer p) {
         for (Exp e : exp.getPostpone()) {
-            try {
-                if (!eval.test(gNode, e.getFilter(), m, p)) {
-                    return false;
-                }
-            } catch (SparqlException ex) {
+            if (!engine.test(gNode, e.getFilter(), m, p)) {
                 return false;
             }
         }
@@ -175,24 +173,24 @@ public class EvalSPARQL {
                 return eval(graph, p, body, m);
             }
         }
-        return basic(graph, p, exp, m);
+        return basic(graph, p, exp);
     }
 
-    Mappings basic(Node graph, Producer p, Exp exp, Mapping m) {
-        exp.setType(Exp.Type.AND);
+    Mappings basic(Node graph, Producer p, Exp exp) {
+        exp.setType(Type.AND);
         try {
-            return eval.exec(graph, p, exp, m);
+            return engine.exec(graph, p, exp);
         } catch (SparqlException ex) {
             logger.error("Error executing basic pattern: {}", ex.getMessage(), ex);
             return null;
         } finally {
-            exp.setType(Exp.Type.BGP);
+            exp.setType(Type.BGP);
         }
     }
 
     private Mappings filter(Producer p, Exp exp, Mappings map) {
         Mappings res = Mappings.create(map.getQuery());
-        HashMap<String, IDatatype> bnode = new HashMap<>();
+        HashMap<String, DatatypeValue> bnode = new HashMap<>();
         for (Mapping m : map) {
             m.setMap(bnode);
             bnode.clear();
@@ -206,11 +204,7 @@ public class EvalSPARQL {
 
     private boolean test(Producer p, Exp exp, Mapping m) {
         for (Exp f : exp) {
-            try {
-                if (!eval.test(null, f.getFilter(), m, p)) {
-                    return false;
-                }
-            } catch (SparqlException ex) {
+            if (!engine.test(null, f.getFilter(), m, p)) {
                 return false;
             }
         }

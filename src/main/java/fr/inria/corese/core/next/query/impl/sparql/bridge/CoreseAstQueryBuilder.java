@@ -10,9 +10,6 @@ import fr.inria.corese.core.next.query.impl.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.impl.kgram.core.Exp;
 import fr.inria.corese.core.next.query.impl.kgram.core.Query;
 import fr.inria.corese.core.next.query.impl.kgram.tool.NodeImpl;
-import fr.inria.corese.core.sparql.triple.parser.Atom;
-import fr.inria.corese.core.sparql.triple.parser.Expression;
-import fr.inria.corese.core.sparql.triple.parser.Variable;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -60,19 +57,16 @@ public final class CoreseAstQueryBuilder {
         Objects.requireNonNull(askQueryAst, "askQueryAst");
         rejectUnsupportedAskClauses(askQueryAst);
 
-        QueryPrologueAst prev = SparqlAstToExpression.getCurrentPrologue();
-        try {
-            SparqlAstToExpression.setCurrentPrologue(askQueryAst.prologue());
-            Query query = createQuery(
-                    askQueryAst.whereClause(),
-                    askQueryAst.datasetClause(),
-                    askQueryAst.solutionModifier());
-            applyOrderBy(query, askQueryAst.solutionModifier());
-            query.setAsk(true);
-            return query;
-        } finally {
-            SparqlAstToExpression.setCurrentPrologue(prev);
-        }
+        WhereCompiler compiler = whereCompiler.withPrologue(askQueryAst.prologue());
+        Query query = createQuery(
+                askQueryAst.whereClause(),
+                askQueryAst.datasetClause(),
+                askQueryAst.solutionModifier(),
+                compiler);
+        applyOrderBy(query, askQueryAst.solutionModifier(), compiler);
+        query.setAsk(true);
+        query.setAST(askQueryAst);
+        return query;
     }
 
     /**
@@ -88,20 +82,17 @@ public final class CoreseAstQueryBuilder {
         Objects.requireNonNull(selectQueryAst, "selectQueryAst");
         rejectUnsupportedSelectClauses(selectQueryAst);
 
-        QueryPrologueAst prev = SparqlAstToExpression.getCurrentPrologue();
-        try {
-            SparqlAstToExpression.setCurrentPrologue(selectQueryAst.prologue());
-            Query query = createQuery(
-                    selectQueryAst.whereClause(),
-                    selectQueryAst.datasetClause(),
-                    selectQueryAst.solutionModifier());
-            applyProjection(query, selectQueryAst.projection());
-            query.setDistinct(selectQueryAst.solutionModifier().distinct());
-            applyOrderBy(query, selectQueryAst.solutionModifier());
-            return query;
-        } finally {
-            SparqlAstToExpression.setCurrentPrologue(prev);
-        }
+        WhereCompiler compiler = whereCompiler.withPrologue(selectQueryAst.prologue());
+        Query query = createQuery(
+                selectQueryAst.whereClause(),
+                selectQueryAst.datasetClause(),
+                selectQueryAst.solutionModifier(),
+                compiler);
+        applyProjection(query, selectQueryAst.projection());
+        query.setDistinct(selectQueryAst.solutionModifier().distinct());
+        applyOrderBy(query, selectQueryAst.solutionModifier(), compiler);
+        query.setAST(selectQueryAst);
+        return query;
     }
 
     /**
@@ -118,20 +109,17 @@ public final class CoreseAstQueryBuilder {
         Objects.requireNonNull(describeQueryAst, "describeQueryAst");
         rejectUnsupportedDescribeClauses(describeQueryAst);
 
-        QueryPrologueAst prev = SparqlAstToExpression.getCurrentPrologue();
-        try {
-            SparqlAstToExpression.setCurrentPrologue(describeQueryAst.prologue());
-            Query query = createQuery(
-                    describeQueryAst.whereClause(),
-                    describeQueryAst.datasetClause(),
-                    describeQueryAst.solutionModifier());
-            applyOrderBy(query, describeQueryAst.solutionModifier());
-            List<Node> describedNodes = describeNodes(query, describeQueryAst);
-            lowerDescribeToConstructQuery(query, describedNodes);
-            return query;
-        } finally {
-            SparqlAstToExpression.setCurrentPrologue(prev);
-        }
+        WhereCompiler compiler = whereCompiler.withPrologue(describeQueryAst.prologue());
+        Query query = createQuery(
+                describeQueryAst.whereClause(),
+                describeQueryAst.datasetClause(),
+                describeQueryAst.solutionModifier(),
+                compiler);
+        applyOrderBy(query, describeQueryAst.solutionModifier(), compiler);
+        List<Node> describedNodes = describeNodes(query, describeQueryAst, compiler);
+        lowerDescribeToConstructQuery(query, describedNodes);
+        query.setAST(describeQueryAst);
+        return query;
     }
 
     /**
@@ -148,22 +136,19 @@ public final class CoreseAstQueryBuilder {
         Objects.requireNonNull(constructQueryAst, "constructQueryAst");
         rejectUnsupportedConstructClauses(constructQueryAst);
 
-        QueryPrologueAst prev = SparqlAstToExpression.getCurrentPrologue();
-        try {
-            SparqlAstToExpression.setCurrentPrologue(constructQueryAst.prologue());
-            Query query = createQuery(
-                    constructQueryAst.whereClause(),
-                    constructQueryAst.datasetClause(),
-                    constructQueryAst.solutionModifier());
-            applyOrderBy(query, constructQueryAst.solutionModifier());
-            Exp template = compileConstructTemplate(query, constructQueryAst.constructTemplate());
-            query.setConstruct(true);
-            query.setConstruct(template);
-            query.setConstructNodes(template.getNodes());
-            return query;
-        } finally {
-            SparqlAstToExpression.setCurrentPrologue(prev);
-        }
+        WhereCompiler compiler = whereCompiler.withPrologue(constructQueryAst.prologue());
+        Query query = createQuery(
+                constructQueryAst.whereClause(),
+                constructQueryAst.datasetClause(),
+                constructQueryAst.solutionModifier(),
+                compiler);
+        applyOrderBy(query, constructQueryAst.solutionModifier(), compiler);
+        Exp template = compileConstructTemplate(query, constructQueryAst.constructTemplate(), compiler);
+        query.setConstruct(true);
+        query.setConstruct(template);
+        query.setConstructNodes(template.getNodes());
+        query.setAST(constructQueryAst);
+        return query;
     }
 
     /**
@@ -183,7 +168,7 @@ public final class CoreseAstQueryBuilder {
      */
     public Filter toNextFilter(ConstraintAst filterExpression) {
         Objects.requireNonNull(filterExpression, "filterExpression");
-        return SparqlAstToExpression.toNextFilter(filterExpression, whereCompiler);
+        return new AstBackedExpr(filterExpression, whereCompiler).getFilter();
     }
 
     /**
@@ -194,13 +179,22 @@ public final class CoreseAstQueryBuilder {
      * {@link WhereCompiler} need a single shared term-to-node conversion rule.</p>
      */
     static Node toNode(TermAst term) {
-        Expression expression = SparqlAstToExpression.convert(term);
-        if (expression instanceof Atom atom) {
-            return new NodeImpl(atom);
-        }
-        throw new IllegalArgumentException(
-                "A query term must be a variable, IRI or literal, got: "
-                        + term.getClass().getSimpleName());
+        return toNode(term, new SparqlTermResolver(null));
+    }
+
+    static Node toNode(TermAst term, SparqlTermResolver resolver) {
+        return switch (term) {
+            case VarAst(String name) -> NodeImpl.forVariable(name);
+            case IriAst(String raw) when raw.startsWith("_:") -> NodeImpl.forBlank(raw.substring(2));
+            case IriAst(String raw) -> NodeImpl.forIRI(resolver.resolveIri(raw));
+            case LiteralAst(String lexical, String lang, String datatype) -> NodeImpl.forLiteral(
+                    resolver.unquoteLexical(lexical),
+                    resolver.normalizeDatatypeIri(datatype),
+                    lang);
+            default -> throw new IllegalArgumentException(
+                    "A query term must be a variable, IRI or literal, got: "
+                            + term.getClass().getSimpleName());
+        };
     }
 
     static TermAst simplePredicate(PathAst path) {
@@ -302,27 +296,28 @@ public final class CoreseAstQueryBuilder {
     private Query createQuery(
             GroupGraphPatternAst whereClause,
             DatasetClauseAst datasetClause,
-            SolutionModifierAst solutionModifier) {
-        Query query = Query.create(whereCompiler.compile(whereClause));
+            SolutionModifierAst solutionModifier,
+            WhereCompiler compiler) {
+        Query query = Query.create(compiler.compile(whereClause));
         // Collect visible nodes once so later clauses (projection, ORDER BY, DESCRIBE)
         // can resolve variables against the compiled runtime body.
         query.collect();
-        applyDataset(query, datasetClause);
+        applyDataset(query, datasetClause, compiler);
         applyLimitOffset(query, solutionModifier);
         return query;
     }
 
-    private void applyDataset(Query query, DatasetClauseAst datasetClause) {
-        query.setFrom(toNodeList(datasetClause.graphs()));
-        query.setNamed(toNodeList(datasetClause.namedGraphs()));
+    private void applyDataset(Query query, DatasetClauseAst datasetClause, WhereCompiler compiler) {
+        query.setFrom(toNodeList(datasetClause.graphs(), compiler));
+        query.setNamed(toNodeList(datasetClause.namedGraphs(), compiler));
         query.setDatasetSpecified(
                 !datasetClause.graphs().isEmpty() || !datasetClause.namedGraphs().isEmpty());
     }
 
-    private List<Node> toNodeList(Iterable<IriAst> iris) {
+    private List<Node> toNodeList(Iterable<IriAst> iris, WhereCompiler compiler) {
         List<Node> nodes = new ArrayList<>();
         for (IriAst iri : iris) {
-            nodes.add(toNode(iri));
+            nodes.add(toNode(iri, compiler.termResolver()));
         }
         return nodes;
     }
@@ -360,7 +355,8 @@ public final class CoreseAstQueryBuilder {
      * A described variable reuses its runtime node (so it is the one bound by the body) and
      * fails fast when it is not visible; a described IRI becomes a fresh constant node.</p>
      */
-    private List<Node> describeNodes(Query query, DescribeQueryAst describeQueryAst) {
+    private List<Node> describeNodes(
+            Query query, DescribeQueryAst describeQueryAst, WhereCompiler compiler) {
         if (describeQueryAst.isDescribeAll()) {
             return query.selectNodesFromPattern();
         }
@@ -374,7 +370,7 @@ public final class CoreseAstQueryBuilder {
                 }
                 nodes.add(node);
             } else {
-                nodes.add(toNode(term));
+                nodes.add(toNode(term, compiler.termResolver()));
             }
         }
         return nodes;
@@ -418,7 +414,7 @@ public final class CoreseAstQueryBuilder {
     }
 
     private Node createSyntheticDescribeNode(String role, int describedIndex, int directionIndex) {
-        return new NodeImpl(Variable.create("__describe_" + role + "_" + describedIndex + "_" + directionIndex));
+        return NodeImpl.forVariable("__describe_" + role + "_" + describedIndex + "_" + directionIndex);
     }
 
     private record DescribePattern(Exp outgoing, Exp incoming, Exp optionalBody) {
@@ -430,21 +426,26 @@ public final class CoreseAstQueryBuilder {
      * <p>Variables reuse already-visible query nodes. Other expressions are wrapped as runtime
      * filters and attached to synthetic internal nodes, just like the historical pipeline does.</p>
      */
-    private void applyOrderBy(Query query, SolutionModifierAst solutionModifier) {
+    private void applyOrderBy(
+            Query query, SolutionModifierAst solutionModifier, WhereCompiler compiler) {
         if (!solutionModifier.hasOrderBy()) {
             return;
         }
         List<Exp> orderByExpressions = new ArrayList<>();
         int syntheticIndex = 0;
         for (OrderConditionAst orderCondition : solutionModifier.orderBy()) {
-            Exp orderExpression = toOrderByExpression(query, orderCondition, syntheticIndex++);
+            Exp orderExpression = toOrderByExpression(query, orderCondition, syntheticIndex++, compiler);
             orderExpression.status(orderCondition.orderDirection() == ASTConstants.OrderDirection.DESC);
             orderByExpressions.add(orderExpression);
         }
         query.setOrderBy(orderByExpressions);
     }
 
-    private Exp toOrderByExpression(Query query, OrderConditionAst orderCondition, int syntheticIndex) {
+    private Exp toOrderByExpression(
+            Query query,
+            OrderConditionAst orderCondition,
+            int syntheticIndex,
+            WhereCompiler compiler) {
         TermAst expression = orderCondition.expression();
         if (expression instanceof VarAst(String name)) {
             Exp selectExpression = query.getSelectExp(name);
@@ -457,14 +458,14 @@ public final class CoreseAstQueryBuilder {
             }
             return Exp.create(Type.NODE, node);
         }
-        Filter filter = SparqlAstToExpression.toNextFilter(expression, whereCompiler);
+        Filter filter = new AstBackedExpr(expression, compiler).getFilter();
         Exp exp = Exp.create(Type.NODE, createSyntheticOrderNode(syntheticIndex));
         exp.setFilter(filter);
         return exp;
     }
 
     private Node createSyntheticOrderNode(int syntheticIndex) {
-        return new NodeImpl(Variable.create("__order_by_" + syntheticIndex));
+        return NodeImpl.forVariable("__order_by_" + syntheticIndex);
     }
 
     private List<Exp> toNodeExpressions(List<Node> nodes) {
@@ -533,12 +534,13 @@ public final class CoreseAstQueryBuilder {
      * Compiles a {@code CONSTRUCT} template into a KGRAM {@link Exp} (a BGP of edges), kept separate
      * from the {@code WHERE} body and carried by {@link Query#setConstruct(Exp)}.
      */
-    private Exp compileConstructTemplate(Query query, ConstructTemplateAst template) {
+    private Exp compileConstructTemplate(
+            Query query, ConstructTemplateAst template, WhereCompiler compiler) {
         Exp bgp = Exp.create(Type.BGP);
         for (TriplePatternAst triple : template.triplePatternAsts()) {
-            Node subject = constructNode(query, triple.subject());
-            Node predicate = constructNode(query, simplePredicate(triple.predicate()));
-            Node object = constructNode(query, triple.object());
+            Node subject = constructNode(query, triple.subject(), compiler);
+            Node predicate = constructNode(query, simplePredicate(triple.predicate()), compiler);
+            Node object = constructNode(query, triple.object(), compiler);
             bgp.add(new AstBackedEdge(subject, predicate, object));
         }
         return bgp;
@@ -550,11 +552,11 @@ public final class CoreseAstQueryBuilder {
      * valid SPARQL and simply skips its triple at instantiation, so this does not throw). IRIs, blank
      * nodes and literals become fresh constant nodes.
      */
-    private Node constructNode(Query query, TermAst term) {
+    private Node constructNode(Query query, TermAst term, WhereCompiler compiler) {
         if (term instanceof VarAst(String name)) {
             Node bound = visibleBodyNode(query, name);
-            return bound != null ? bound : toNode(term);
+            return bound != null ? bound : toNode(term, compiler.termResolver());
         }
-        return toNode(term);
+        return toNode(term, compiler.termResolver());
     }
 }

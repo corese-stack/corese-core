@@ -9,8 +9,7 @@ import fr.inria.corese.core.next.query.impl.kgram.api.query.ProcessVisitor;
 import fr.inria.corese.core.next.query.impl.kgram.core.*;
 import fr.inria.corese.core.next.query.impl.kgram.event.KgramEventDispatcher;
 import fr.inria.corese.core.next.query.impl.kgram.path.Path;
-import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
+import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 
 import java.util.Map;
 
@@ -18,6 +17,7 @@ public class EnvironmentImpl implements Environment {
 	protected Query query;
 
 	public EnvironmentImpl(){
+		// The base environment starts without a query or bindings.
 	}
 
         @Override
@@ -26,7 +26,7 @@ public class EnvironmentImpl implements Environment {
 	}
 
         @Override
-	public Node getNode(Expr var){
+	public Node getNode(Expr variable){
 		return null;
 	}
 
@@ -84,7 +84,7 @@ public class EnvironmentImpl implements Environment {
 
 	@Override
 	public void setObject(Object o) {
-
+		// The base environment does not retain an attached object.
 	}
 
 	@Override
@@ -94,7 +94,7 @@ public class EnvironmentImpl implements Environment {
 
 	@Override
 	public void setExp(Exp exp) {
-
+		// Expression storage is supplied by concrete execution environments.
 	}
 
 	@Override
@@ -102,8 +102,8 @@ public class EnvironmentImpl implements Environment {
 		return null;
 	}
 
-	public Map<String, IDatatype> getMap() {
-		return null;
+	public Map<String, DatatypeValue> getMap() {
+		return Map.of();
 	}
 
     @Override
@@ -132,12 +132,7 @@ public class EnvironmentImpl implements Environment {
     }
 
     @Override
-    public Node get(Expr var) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public ASTExtension getExtension() {
+    public Node get(Expr variable) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -193,12 +188,12 @@ public class EnvironmentImpl implements Environment {
     }
 
     @Override
-    public void setReport(IDatatype dt) {
+    public void setReport(DatatypeValue dt) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public IDatatype getReport() {
+    public DatatypeValue getReport() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

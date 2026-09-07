@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.query.impl.kgram.api.core;
 
-import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 
 /**
  * Interface for Producer iterator that encapsulate Edge or Node with its Graph
@@ -54,8 +54,8 @@ public interface Edge extends Pointerable<Object> {
     default int getEdgeIndex() {
         return -1;
     }
-    @SuppressWarnings("unused")
     default void setEdgeIndex(int n) {
+        // Most immutable edge implementations do not expose a mutable index.
     }
 
     Node getGraph();
@@ -69,6 +69,7 @@ public interface Edge extends Pointerable<Object> {
     }
 
     default void setProvenance(Object obj) {
+        // Provenance is an optional capability of concrete edge implementations.
     }
 
     default boolean isMatchArity() {
@@ -79,11 +80,11 @@ public interface Edge extends Pointerable<Object> {
     default boolean isNested() {
         return false;
     }
-    @SuppressWarnings("unused")
     default void setNested(boolean b) {
+        // RDF-star nesting is an optional capability of concrete edge implementations.
     }
 
-    default IDatatype getGraphValue() {
+    default DatatypeValue getGraphValue() {
         Node node = getGraph();
         if (node == null) {
             return null;
@@ -91,19 +92,19 @@ public interface Edge extends Pointerable<Object> {
         return node.getDatatypeValue();
     }
 
-    default IDatatype getSubjectValue() {
+    default DatatypeValue getSubjectValue() {
         return getNode(0).getDatatypeValue();
     }
 
 
-    default IDatatype getPredicateValue() {
+    default DatatypeValue getPredicateValue() {
         if (getProperty() == null) {
             return null;
         }
         return getProperty().getDatatypeValue();
     }
 
-    default IDatatype getObjectValue() {
+    default DatatypeValue getObjectValue() {
         return getNode(1).getDatatypeValue();
     }
 

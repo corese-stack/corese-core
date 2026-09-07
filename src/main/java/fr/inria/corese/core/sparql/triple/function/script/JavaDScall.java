@@ -23,11 +23,12 @@ import org.slf4j.LoggerFactory;
  * @author Olivier Corby, Wimmics INRIA I3S, 2017
  *
  */
-public class JavaDScall extends JavaFunction {
+@SuppressWarnings("java:S110") // Corese extension function hierarchy exceeds 5 parents by design
+public final class JavaDScall extends JavaFunction {
 
     private static final Logger logger = LoggerFactory.getLogger(JavaDScall.class);
     
-    String javaName;
+    private String javaName;
 
     public JavaDScall() {}
     
@@ -50,15 +51,14 @@ public class JavaDScall extends JavaFunction {
             object = dt.getNodeObject();
         }
         
-        Class<IDatatype>[] types = new Class[param.length];
+        Class<?>[] types = new Class<?>[param.length];
         Arrays.fill(types, IDatatype.class);
         
         try {
             Method meth = object.getClass().getMethod(javaName, types);
-            Object obj = meth.invoke(object, param); 
-            IDatatype res = DatatypeMap.getValue(obj);
-            return res;
-        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+            return DatatypeMap.getValue(meth.invoke(object, (Object[]) param));
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException
+                | IllegalArgumentException | InvocationTargetException ex) {
             logger.error("An unexpected error has occurred", ex);
         }
         return null;
