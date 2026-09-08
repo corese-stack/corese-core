@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
+
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.AstVisitor;
 

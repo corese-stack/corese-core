@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
+
 /**
  * Constructor functions for Graph references
  */

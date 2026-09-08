@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.parser;
 
+
 import fr.inria.corese.core.next.generated.antlr.SparqlParser;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;

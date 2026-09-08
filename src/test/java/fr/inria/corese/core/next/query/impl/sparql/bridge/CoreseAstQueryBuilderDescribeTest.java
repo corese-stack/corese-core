@@ -5,11 +5,11 @@ import fr.inria.corese.core.next.query.impl.sparql.parser.SparqlParser;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.ExistsAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.NotExistsAst;
-import fr.inria.corese.core.next.query.impl.kgram.api.core.Expr;
-import fr.inria.corese.core.next.query.impl.kgram.api.core.ExprType;
-import fr.inria.corese.core.next.query.impl.kgram.api.core.Node;
-import fr.inria.corese.core.next.query.impl.kgram.core.Exp;
-import fr.inria.corese.core.next.query.impl.kgram.core.Query;
+import fr.inria.corese.core.next.query.impl.engine.model.Expr;
+import fr.inria.corese.core.next.query.impl.engine.model.ExprType;
+import fr.inria.corese.core.next.query.impl.engine.model.Node;
+import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
+import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

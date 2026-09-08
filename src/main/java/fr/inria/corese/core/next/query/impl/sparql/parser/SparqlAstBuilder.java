@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.parser;
 
+
 import fr.inria.corese.core.next.common.text.RdfText;
 import fr.inria.corese.core.next.data.spi.term.IRIUtils;
 import fr.inria.corese.core.next.data.api.vocabulary.RDF;
