@@ -109,7 +109,7 @@ public final class Eval implements ExpType, Plugin {
     // Edge and Node producer
     private Producer producer;
     private Stack current;
-    private static final boolean HAS_LISTENER = false;
+    private boolean hasListener = false;
     private int nbResult;
     private boolean hasCandidate = false;
     private boolean hasStatement = false;
@@ -866,7 +866,7 @@ public final class Eval implements ExpType, Plugin {
         }
 
         Exp exp = stack.get(n);
-        if (HAS_LISTENER) {
+        if (hasListener) {
             // rule engine may have a ResultWatcher listener
             exp = getListener().listen(exp, n);
         }
@@ -1351,7 +1351,7 @@ public final class Eval implements ExpType, Plugin {
         int n = 1;
         Expr exp = f.getExp();
         if (exp.oper() == UNNEST) {
-            if (HAS_LISTENER) {
+            if (hasListener) {
                 listener.listen(exp);
             }
             if (exp.arity() == 2) {
@@ -1592,7 +1592,7 @@ public final class Eval implements ExpType, Plugin {
 
             if (entity != null) {
                 nbEdge++;
-                if (HAS_LISTENER && !listener.listen(exp, qEdge, entity)) {
+                if (hasListener && !listener.listen(exp, qEdge, entity)) {
                     continue;
                 }
 
@@ -2133,6 +2133,7 @@ public final class Eval implements ExpType, Plugin {
 
     public void setListener(ResultListener listener) {
         this.listener = listener;
+        this.hasListener = listener != null;
     }
 
 }
