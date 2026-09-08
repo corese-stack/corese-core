@@ -42,12 +42,7 @@ public abstract class AbstractStatement implements Statement {
      */
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 31 * hash + (getSubject() == null ? 0 : getSubject().hashCode());
-        hash = 31 * hash + (getPredicate() == null ? 0 : getPredicate().hashCode());
-        hash = 31 * hash + (getObject() == null ? 0 : getObject().hashCode());
-        hash = 31 * hash + (getContext() == null ? 0 : getContext().hashCode());
-        return hash;
+        return Objects.hash(getSubject(), getPredicate(), getObject(), getContext());
     }
 
     /**
