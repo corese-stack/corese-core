@@ -1,12 +1,11 @@
 package fr.inria.corese.core.next.query.impl.sparql.execution;
 
-import fr.inria.corese.core.next.data.api.term.BNode;
+import fr.inria.corese.core.next.data.Values;
 import fr.inria.corese.core.next.data.api.term.IRI;
-import fr.inria.corese.core.next.data.api.term.Literal;
 import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.data.api.term.Value;
-import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.query.api.dataset.Dataset;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.QueryTimeoutException;
@@ -22,7 +21,6 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.DescribeQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.bridge.CoreseAstQueryBuilder;
-import fr.inria.corese.core.next.query.impl.sparql.bridge.KgramNodeConverter;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Edge;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.impl.kgram.core.Eval;
@@ -40,11 +38,10 @@ import fr.inria.corese.core.next.storage.api.StorageManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Internal orchestrator for the Corese-next SPARQL query path.
@@ -60,18 +57,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * as their runtime implementations become available.</p>
  */
 public final class NextSparqlPipelineExecutor {
-
-    /**
-     * Shared scheduler used to enforce query timeouts. A single daemon thread is
-     * sufficient because the scheduled task is lightweight (set a flag and call
-     * {@link Eval#finish()}).
-     */
-    private static final ScheduledExecutorService TIMEOUT_SCHEDULER =
-            Executors.newSingleThreadScheduledExecutor(r -> {
-                Thread t = new Thread(r, "sparql-query-timeout");
-                t.setDaemon(true);
-                return t;
-            });
 
     private final StorageManager storage;
     private final SparqlParser parser;
@@ -253,26 +238,35 @@ public final class NextSparqlPipelineExecutor {
     /**
      * Runs {@code eval.query()} with a cooperative timeout.
      *
-     * <p>A daemon-thread scheduler calls {@link Eval#finish()} after the deadline
-     * to signal the KGRAM engine to stop at the next opportunity. If the evaluation
-     * completes naturally before the deadline, the scheduler task is cancelled and
-     * results are returned normally.</p>
+     * <p>The evaluation runs in a request-scoped virtual thread. At the deadline,
+     * {@link Eval#finish()} cooperatively stops KGRAM and the task is interrupted.
+     * No process-wide scheduler or mutable global timeout state is retained.</p>
      */
     private Mappings evaluateWithTimeout(Eval eval, Query kgramQuery, Mapping initialMapping, long timeoutMillis) {
-        AtomicBoolean timedOut = new AtomicBoolean(false);
-        ScheduledFuture<?> canceller = TIMEOUT_SCHEDULER.schedule(() -> {
-            timedOut.set(true);
-            eval.finish();
-        }, timeoutMillis, TimeUnit.MILLISECONDS);
-
+        FutureTask<Mappings> evaluation = new FutureTask<>(
+                () -> evaluateCore(eval, kgramQuery, initialMapping));
+        Thread thread = Thread.ofVirtual().name("sparql-query").start(evaluation);
         try {
-            Mappings result = evaluateCore(eval, kgramQuery, initialMapping);
-            if (timedOut.get()) {
-                throw new QueryTimeoutException(timeoutMillis);
+            return evaluation.get(timeoutMillis, TimeUnit.MILLISECONDS);
+        } catch (TimeoutException exception) {
+            eval.finish();
+            evaluation.cancel(true);
+            throw new QueryTimeoutException(timeoutMillis);
+        } catch (InterruptedException exception) {
+            eval.finish();
+            evaluation.cancel(true);
+            Thread.currentThread().interrupt();
+            throw new QueryEvaluationException("Query evaluation was interrupted", exception);
+        } catch (ExecutionException exception) {
+            Throwable cause = exception.getCause();
+            if (cause instanceof QueryEvaluationException queryFailure) {
+                throw queryFailure;
             }
-            return result;
+            throw new QueryEvaluationException("Query evaluation failed", cause);
         } finally {
-            canceller.cancel(false);
+            if (thread.isAlive() && evaluation.isCancelled()) {
+                thread.interrupt();
+            }
         }
     }
 
@@ -297,7 +291,7 @@ public final class NextSparqlPipelineExecutor {
         }
         constructTemplate.getEdgeList(templateEdges);
 
-        CoreseValueFactory factory = new CoreseValueFactory();
+        ValueFactory factory = Values.factory();
         List<Statement> statements = new ArrayList<>();
 
         for (Mapping mapping : mappings) {
@@ -310,9 +304,9 @@ public final class NextSparqlPipelineExecutor {
                     continue;
                 }
 
-                Value subject   = kgramNodeToApiValue(subjectNode, factory);
-                Value predicate = kgramNodeToApiValue(predicateNode, factory);
-                Value object    = kgramNodeToApiValue(objectNode, factory);
+                Value subject   = kgramNodeToApiValue(subjectNode);
+                Value predicate = kgramNodeToApiValue(predicateNode);
+                Value object    = kgramNodeToApiValue(objectNode);
 
                 if (subject instanceof Resource s && predicate instanceof IRI p && object != null) {
                     statements.add(factory.createStatement(s, p, object));
@@ -341,13 +335,13 @@ public final class NextSparqlPipelineExecutor {
     /**
      * Converts a KGRAM constant {@link Node} to the corresponding API {@link Value}.
      *
-     * <p>Delegates to {@link KgramNodeConverter} so that this class does not depend on
-     * {@code IDatatype} directly.</p>
-     *
      * @return the API value, or {@code null} when the node kind is not supported
      */
-    private Value kgramNodeToApiValue(Node node, CoreseValueFactory factory) {
-        return KgramNodeConverter.nodeToValue(node, factory);
+    private Value kgramNodeToApiValue(Node node) {
+        if (node.getDatatypeValue() instanceof Value value) {
+            return value;
+        }
+        return null;
     }
 
     // -------------------------------------------------------------------------
@@ -413,20 +407,6 @@ public final class NextSparqlPipelineExecutor {
      * @return a constant node, or {@code null} when the value type is not supported
      */
     private Node valueToKgramNode(Value value) {
-        if (value instanceof IRI iri) {
-            return NodeImpl.forIRI(iri.stringValue());
-        } else if (value instanceof BNode bNode) {
-            return NodeImpl.forBlank(bNode.getID());
-        } else if (value instanceof Literal literal) {
-            String lang = literal.getLanguage().orElse(null);
-            if (lang != null && !lang.isEmpty()) {
-                return NodeImpl.forLiteral(literal.getLabel(), null, lang);
-            }
-            String datatypeUri = literal.getDatatype() != null
-                    ? literal.getDatatype().stringValue()
-                    : null;
-            return NodeImpl.forLiteral(literal.getLabel(), datatypeUri, null);
-        }
-        return null;
+        return value == null ? null : NodeImpl.forValue(value);
     }
 }

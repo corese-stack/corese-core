@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.query.impl.kgram.core;
 
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Edge;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Node;
-import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -285,12 +285,12 @@ class MappingsTest {
         @Test
         @DisplayName("Should get value by name")
         void testGetValue() {
-            IDatatype mockValue = mock(IDatatype.class);
+            DatatypeValue mockValue = mock(DatatypeValue.class);
             when(mockNode.getDatatypeValue()).thenReturn(mockValue);
             when(mockMapping.getNode("?x")).thenReturn(mockNode);
             mappings.add(mockMapping);
 
-            IDatatype result = mappings.getValue("?x");
+            DatatypeValue result = mappings.getValue("?x");
             assertEquals(mockValue, result, "Should return value");
         }
     }

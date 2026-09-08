@@ -34,34 +34,29 @@ public class Extern extends TermEval {
         } 
         Processor proc = getProcessor();
         proc.compile();
-        if (proc.getProcessor() instanceof FunctionEvaluator){
-            FunctionEvaluator fe = (FunctionEvaluator) proc.getProcessor();
+        if (proc.getProcessor() instanceof FunctionEvaluator fe){
             fe.setProducer(p);
             fe.setEnvironment(env);
         }
         String name = proc.getMethod().getName();
         try {
-            return (IDatatype) proc.getMethod().invoke(proc.getProcessor(), param);
-        } catch (IllegalArgumentException e) {
-           trace(e, "eval", name, param);
-        } catch (IllegalAccessException e) {
+            return (IDatatype) proc.getMethod().invoke(proc.getProcessor(), (Object[]) param);
+        } catch (IllegalArgumentException | IllegalAccessException | NullPointerException e) {
             trace(e, "eval", name, param);
         } catch (InvocationTargetException e) {
-            if (e.getCause() instanceof EngineException) {
-                throw (EngineException) e.getCause();
+            if (e.getCause() instanceof EngineException engineException) {
+                throw engineException;
             }
            trace(e, "eval", name, param);
-        } catch (NullPointerException e) {
-           trace(e, "eval", name, param); 
         }
         
         return null;
     }
     
     void trace(Exception e, String title, String name, IDatatype[] ldt){
-        String str = "";
+        StringBuilder str = new StringBuilder();
         for (IDatatype dt : ldt) {
-            str += dt + " ";
+            str.append(dt).append(' ');
         }
         logger.error(title + " "+ name + " " + str, e);  
     }

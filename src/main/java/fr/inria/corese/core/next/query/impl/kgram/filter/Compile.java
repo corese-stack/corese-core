@@ -34,27 +34,27 @@ import java.util.List;
  */
 public class Compile implements ExprType {
 
-	Query query;
+	Query kgramQuery;
 	Matcher matcher;
 	Checker checker;
 
 	public Compile(Query q){
-		query = q;
+		kgramQuery = q;
 		matcher = new Matcher();
-		checker = new Checker(query);
+		checker = new Checker();
 	}
 
 	/**
 	 * exp is a FILTER Exp
 	 * when !bound(?x) : get Node ?x for optimizing backjump with optional
 	 * when ?x = ?y : get list Node, for optimizing edge
-	 * TODO:
+	 * Note:
 	 * assign filter to edge and put edge first in its component:
 	 * x p t . y p z filter(y = x)
 	 * we can bind y = x before enumerate y p z
 	 */
-	@SuppressWarnings("unused")
 	public void process(Query q, Exp exp) {
+		this.kgramQuery = q;
 		Filter ff = exp.getFilter();
 		Expr ee = ff.getExp();
 
@@ -67,7 +67,7 @@ public class Compile implements ExprType {
 		case EQ:
 			eq(exp);
 			break;
-		//todo: IN, VALUES
+		// Note: IN, VALUES
                 case IN:
                         in(exp);
                         break;
@@ -94,12 +94,12 @@ public class Compile implements ExprType {
 		FilterPattern pat = new FilterPattern(TERM, EQ, VARIABLE, VARIABLE);
 		if (matcher.match(pat, ee)){
 			// compute Node list corresponding to variables
-			List<Node> lNode = query.getNodes(exp);
+			List<Node> lNode = kgramQuery.getNodes(exp);
 			if (lNode.size()==2){
 				Exp bind = Exp.create(ExpType.Type.OPT_BIND);
 				for (Node qNode : lNode){
-					Exp var = Exp.create(ExpType.Type.NODE, qNode);
-					bind.add(var);
+					Exp variable = Exp.create(ExpType.Type.NODE, qNode);
+					bind.add(variable);
 				}
 				exp.add(bind);
 			}
@@ -118,7 +118,7 @@ public class Compile implements ExprType {
 	Exp buildCst(Exp exp, ExpType.Type type){
 		Filter ff = exp.getFilter();
 		Expr ee = ff.getExp();
-		Node node = query.getProperAndSubSelectNode(ff.getVariables().getFirst());
+		Node node = kgramQuery.getProperAndSubSelectNode(ff.getVariables().getFirst());
 		if (node != null){
 			// variable ?x
 			Exp bind = Exp.create(type, Exp.create(ExpType.Type.NODE, node));
@@ -131,7 +131,7 @@ public class Compile implements ExprType {
 	}
 
 	Exp buildVar(Exp exp){
-		List<Node> lNode = query.getNodes(exp);
+		List<Node> lNode = kgramQuery.getNodes(exp);
 		if (lNode.size()==2){
 			Exp bind = Exp.create(ExpType.Type.TEST);
 			for (Node node : lNode){
@@ -177,7 +177,7 @@ public class Compile implements ExprType {
 		pat.setRec();
 		pat.setMatchConstant();
 		if (matcher.match(pat, ee)) {
-			Node node = query.getProperAndSubSelectNode(ff.getVariables().getFirst());
+			Node node = kgramQuery.getProperAndSubSelectNode(ff.getVariables().getFirst());
 			if (node != null){
 				List<Expr> list = getConstants(ee);
 				Exp bind = Exp.create(ExpType.Type.OPT_BIND, Exp.create(ExpType.Type.NODE, node));
@@ -196,8 +196,8 @@ public class Compile implements ExprType {
         Filter ff = exp.getFilter();
         Expr expr = ff.getExp();
         List<String> lvar = ff.getVariables();
-        Expr var = expr.getExp(0);
-        if (! var.isVariable()){
+        Expr variable = expr.getExp(0);
+        if (! variable.isVariable()){
             return;
         }
         List<Expr> values = expr.getExp(1).getExpList();
@@ -210,7 +210,7 @@ public class Compile implements ExprType {
             list.add(e);
         }
 
-        Node node = query.getProperAndSubSelectNode(lvar.getFirst());
+        Node node = kgramQuery.getProperAndSubSelectNode(lvar.getFirst());
         if (node != null) {
             Exp bind = Exp.create(ExpType.Type.OPT_BIND, Exp.create(ExpType.Type.NODE, node));
             bind.setObject(list);

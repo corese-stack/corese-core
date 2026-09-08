@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.query.impl.kgram.api.core;
 
-import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 
 /**
  * Interface of Property Path Regex
@@ -26,7 +26,7 @@ public interface Regex {
 
     String getLongName();
 
-    IDatatype getDatatypeValue();
+    DatatypeValue getDatatypeValue();
 
     int retype();
 

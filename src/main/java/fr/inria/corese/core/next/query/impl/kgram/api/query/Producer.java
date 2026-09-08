@@ -1,11 +1,11 @@
 package fr.inria.corese.core.next.query.impl.kgram.api.query;
 
+import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.*;
 import fr.inria.corese.core.next.query.impl.kgram.core.Exp;
 import fr.inria.corese.core.next.query.impl.kgram.core.Mappings;
 import fr.inria.corese.core.next.query.impl.kgram.core.Query;
 import fr.inria.corese.core.next.query.impl.kgram.core.SparqlException;
-import fr.inria.corese.core.sparql.api.IDatatype;
 
 import java.util.List;
 
@@ -24,8 +24,8 @@ public interface Producer {
      * KGRAM calls this method before executing a query. It enables to
      * initialize the Producer
      */
-    @SuppressWarnings("unused")
     default void init(Query q) {
+        // Optional lifecycle hook for producer implementations.
     }
 
     default void start(Query q) {
@@ -125,6 +125,7 @@ public interface Producer {
      *              exist)
      * @return Iterable of start nodes for exp
      */
+    @SuppressWarnings("java:S107") // Core KGRAM Producer interface method requires 8 execution parameters
     Iterable<Edge> getEdges(Node gNode, List<Node> from, Edge qEdge, Environment env,
                             Regex exp, Node src, Node start, int index);
 
@@ -140,11 +141,11 @@ public interface Producer {
      */
     Node getNode(Object value);
 
-    // cast java value into IDatatype value
-    IDatatype getValue(Object value);
+    // Cast a Java or RDF value into the native datatype contract.
+    DatatypeValue getValue(Object value);
 
-    // DatatypeValue from IDatatype or from Java value
-    IDatatype getDatatypeValue(Object value);
+    // Native datatype value from an RDF or Java value.
+    DatatypeValue getDatatypeValue(Object value);
 
     /**
      * use case: filter (?x = ?y) filter(?x = 'cst') is it possible to bind ?x
@@ -164,9 +165,9 @@ public interface Producer {
      * @param qNodes the query nodes to bind with values of object
      * @return Mappings
      */
-    Mappings map(List<Node> qNodes, IDatatype value);
+    Mappings map(List<Node> qNodes, DatatypeValue value);
 
-    Mappings map(List<Node> qNodes, IDatatype value, int n);
+    Mappings map(List<Node> qNodes, DatatypeValue value, int n);
 
     /**
      * graph node { } Node node represents (contains) a graph

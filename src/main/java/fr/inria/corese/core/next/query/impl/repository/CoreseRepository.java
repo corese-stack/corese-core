@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.query.impl.repository;
 
+import fr.inria.corese.core.next.data.Values;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
-import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
 import fr.inria.corese.core.next.query.api.exception.RepositoryException;
 import fr.inria.corese.core.next.query.api.repository.Repository;
 import fr.inria.corese.core.next.query.api.repository.RepositoryConnection;
@@ -39,7 +39,7 @@ public final class CoreseRepository implements Repository {
     public CoreseRepository(StorageManager storage, StorageConfig config) {
         this.storage = Objects.requireNonNull(storage, "storage");
         this.lifecycle = Objects.requireNonNull(storage.lifecycle(), "storage lifecycle");
-        this.valueFactory = new CoreseValueFactory();
+        this.valueFactory = Values.factory();
         initialize(Objects.requireNonNull(config, "config"));
         this.open = true;
     }
@@ -55,8 +55,9 @@ public final class CoreseRepository implements Repository {
         }
         try {
             lifecycle.initialize(config);
-        } catch (StorageException | IllegalStateException e) {
-            throw new RepositoryException("Failed to initialize repository: " + e.getMessage(), e);
+        } catch (StorageException | IllegalStateException failure) {
+            throw new RepositoryException(
+                    "Failed to initialize repository: " + failure.getMessage(), failure);
         }
     }
 
@@ -76,8 +77,9 @@ public final class CoreseRepository implements Repository {
         }
         try {
             lifecycle.shutdown();
-        } catch (StorageException | IllegalStateException e) {
-            throw new RepositoryException("Failed to shut down repository: " + e.getMessage(), e);
+        } catch (StorageException | IllegalStateException failure) {
+            throw new RepositoryException(
+                    "Failed to shut down repository: " + failure.getMessage(), failure);
         }
     }
 

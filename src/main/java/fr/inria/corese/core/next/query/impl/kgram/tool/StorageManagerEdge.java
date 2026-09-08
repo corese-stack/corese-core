@@ -23,10 +23,10 @@ public final class StorageManagerEdge implements Edge {
 
     public StorageManagerEdge(Statement statement) {
         this.statement = Objects.requireNonNull(statement, "statement");
-        this.subject = StorageManagerKgramValues.node(statement.getSubject());
-        this.predicate = StorageManagerKgramValues.node(statement.getPredicate());
-        this.object = StorageManagerKgramValues.node(statement.getObject());
-        this.graph = statement.getContext() == null ? null : StorageManagerKgramValues.node(statement.getContext());
+        this.subject = NodeImpl.forValue(statement.getSubject());
+        this.predicate = NodeImpl.forValue(statement.getPredicate());
+        this.object = NodeImpl.forValue(statement.getObject());
+        this.graph = statement.getContext() == null ? null : NodeImpl.forValue(statement.getContext());
     }
 
     public Statement getSourceStatement() {

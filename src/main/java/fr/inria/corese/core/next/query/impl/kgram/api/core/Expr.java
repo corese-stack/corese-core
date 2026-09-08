@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.query.impl.kgram.api.core;
 import fr.inria.corese.core.next.query.impl.kgram.api.query.Environment;
 import fr.inria.corese.core.next.query.impl.kgram.api.query.Evaluator;
 import fr.inria.corese.core.next.query.impl.kgram.api.query.Producer;
-import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 
 import java.util.List;
 
@@ -118,7 +118,7 @@ public interface Expr {
      * @param p the producer
      * @return the result of the evaluation
      */
-    IDatatype evalWE(Evaluator eval, BindingContext b, Environment env, Producer p);
+    DatatypeValue evalWE(Evaluator eval, BindingContext b, Environment env, Producer p);
 
     /**
      * Tests if this expression evaluates to true.
@@ -130,11 +130,11 @@ public interface Expr {
      * @return true if the expression is truthy
      */
     default boolean test(Evaluator eval, BindingContext b, Environment env, Producer p) {
-        IDatatype dt = evalWE(eval, b, env, p);
+        DatatypeValue dt = evalWE(eval, b, env, p);
         if (dt == null) {
             return false;
         }
-        return dt.isTrueTest();
+        return dt.isTrue();
     }
 
 }

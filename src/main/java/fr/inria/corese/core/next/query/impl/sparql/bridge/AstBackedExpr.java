@@ -1,66 +1,51 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
-import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
-import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
+import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.BindingContext;
-import fr.inria.corese.core.next.query.impl.kgram.api.core.DatatypeValue;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Expr;
+import fr.inria.corese.core.next.query.impl.kgram.api.core.ExprType;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Filter;
-import fr.inria.corese.core.next.query.impl.kgram.adapter.BindingAdapter;
-import fr.inria.corese.core.next.query.impl.kgram.adapter.TripleParserEvalSupport;
 import fr.inria.corese.core.next.query.impl.kgram.api.query.Environment;
 import fr.inria.corese.core.next.query.impl.kgram.api.query.Evaluator;
 import fr.inria.corese.core.next.query.impl.kgram.api.query.Producer;
-import fr.inria.corese.core.sparql.api.Computer;
-import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.triple.function.term.Binding;
-import fr.inria.corese.core.sparql.triple.parser.Expression;
+import fr.inria.corese.core.next.query.impl.sparql.ast.AggregateAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ConstraintAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
+import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.VariableScopeAnalyzer;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-/**
- * Wraps a {@link fr.inria.corese.core.sparql.triple.parser.Expression} (SPARQL interpreter tree) as a
- * {@link fr.inria.corese.core.next.query.impl.kgram.api.core.Expr}.
- *
- */
+/** Immutable KGRAM expression backed directly by a Corese-next AST term. */
 public final class AstBackedExpr implements Expr {
 
-    private final Expression delegate;
-    private final Optional<TermAst> sourceAst;
+    private final TermAst source;
+    private final WhereCompiler whereCompiler;
     private final NextFilterFromAst filterView;
+    private int index = ExprType.UNBOUND;
+    private int subtype = ExprType.GLOBAL;
+    private int operator;
+    private boolean publicExpression;
 
-    public AstBackedExpr(Expression delegate) {
-        this(delegate, Optional.empty());
+    public AstBackedExpr(TermAst source) {
+        this(source, null);
     }
 
-    public AstBackedExpr(Expression delegate, Optional<TermAst> sourceAst) {
-        this.delegate = Objects.requireNonNull(delegate, "delegate");
-        this.sourceAst = Objects.requireNonNull(sourceAst, "sourceAst");
+    AstBackedExpr(TermAst source, WhereCompiler whereCompiler) {
+        this.source = Objects.requireNonNull(source, "source");
+        this.whereCompiler = whereCompiler;
+        this.operator = operator(source);
         this.filterView = new NextFilterFromAst(this);
     }
 
-    /**
-     * The underlying SPARQL interpreter {@link Expression} (triple.parser), for metadata and {@link Filter#getFilterExpression()}.
-     */
-    public Expression asTripleParserExpression() {
-        return delegate;
-    }
-
     public Optional<TermAst> sourceAst() {
-        return sourceAst;
-    }
-
-    private static Expr wrapInterpreterSubexpr(Object node) {
-        if (node == null) {
-            return null;
-        }
-        if (node instanceof Expression ex) {
-            return new AstBackedExpr(ex);
-        }
-        throw new IllegalArgumentException("Cannot wrap as AstBackedExpr: " + node);
+        return Optional.of(source);
     }
 
     @Override
@@ -70,245 +55,340 @@ public final class AstBackedExpr implements Expr {
 
     @Override
     public Object getPattern() {
-        if (delegate instanceof AstBackedExistTerm exist) {
-            return exist.compiledPattern();
-        }
-        return delegate.getPattern();
+        return switch (source) {
+            case ExistsAst(var pattern) ->
+                    whereCompiler == null ? null : whereCompiler.compile(pattern);
+            default -> null;
+        };
     }
 
     @Override
     public boolean isSystem() {
-        return delegate.isSystem();
+        return false;
     }
 
     @Override
     public boolean isPublic() {
-        return delegate.isPublic();
+        return publicExpression;
     }
 
     @Override
-    public void setPublic(boolean b) {
-        delegate.setPublic(b);
+    public void setPublic(boolean value) {
+        publicExpression = value;
     }
 
     @Override
     public boolean isDynamic() {
-        return delegate.isDynamic();
+        return false;
     }
 
     @Override
     public boolean isTrace() {
-        return delegate.isTrace();
+        return false;
     }
 
     @Override
     public boolean isDebug() {
-        return delegate.isDebug();
+        return false;
     }
 
     @Override
     public String getLabel() {
-        return delegate.getLabel();
+        return source.getName();
     }
 
     @Override
     public String getModality() {
-        return delegate.getModality();
+        return null;
     }
 
     @Override
     public List<Expr> getExpList() {
-        List<?> in = delegate.getExpList();
-        List<Expr> out = new ArrayList<>(in.size());
-        for (Object o : in) {
-            out.add(wrapInterpreterSubexpr(o));
+        List<Expr> expressions = new ArrayList<>();
+        for (TermAst child : children(source)) {
+            expressions.add(new AstBackedExpr(child, whereCompiler));
         }
-        return out;
+        return List.copyOf(expressions);
     }
 
     @Override
-    public Expr getExp(int i) {
-        return wrapInterpreterSubexpr(delegate.getExp(i));
+    public Expr getExp(int childIndex) {
+        return getExpList().get(childIndex);
     }
 
     @Override
-    public void setExp(int i, Expr e) {
-        if (e instanceof AstBackedExpr ab) {
-            delegate.setExp(i, ab.delegate);
-        } else {
-            throw new IllegalArgumentException("Expr must be AstBackedExpr");
-        }
+    public void setExp(int childIndex, Expr expression) {
+        throw new UnsupportedOperationException("Corese-next AST expressions are immutable");
     }
 
     @Override
     public Expr getArg() {
-        return wrapInterpreterSubexpr(delegate.getArg());
+        return getExpList().isEmpty() ? null : getExpList().getFirst();
     }
 
     @Override
-    public void setArg(Expr exp) {
-        if (exp instanceof AstBackedExpr ab) {
-            delegate.setArg(ab.delegate);
-        } else {
-            throw new IllegalArgumentException("Expr must be AstBackedExpr");
-        }
+    public void setArg(Expr expression) {
+        throw new UnsupportedOperationException("Corese-next AST expressions are immutable");
     }
 
     @Override
     public DatatypeValue getValue() {
-        return NextDatatypeValueAdapter.ofNullable(delegate.getValue());
+        if (source instanceof IriAst || source instanceof LiteralAst) {
+            SparqlTermResolver resolver = whereCompiler == null
+                    ? new SparqlTermResolver(null)
+                    : whereCompiler.termResolver();
+            return CoreseAstQueryBuilder.toNode(source, resolver).getDatatypeValue();
+        }
+        return null;
     }
 
     @Override
     public DatatypeValue getDatatypeValue() {
-        return NextDatatypeValueAdapter.ofNullable(delegate.getDatatypeValue());
+        return getValue();
     }
 
     @Override
     public int type() {
-        return delegate.type();
+        return switch (source) {
+            case VarAst ignored -> ExprType.VARIABLE;
+            case IriAst ignored -> ExprType.CONSTANT;
+            case LiteralAst ignored -> ExprType.CONSTANT;
+            case BooleanExpressionAst ignored -> ExprType.BOOLEAN;
+            case ConstraintAst ignored -> ExprType.FUNCTION;
+        };
     }
 
     @Override
     public int subtype() {
-        return delegate.subtype();
+        return subtype;
     }
 
     @Override
-    public void setSubtype(int n) {
-        delegate.setSubtype(n);
+    public void setSubtype(int value) {
+        subtype = value;
     }
 
     @Override
     public int oper() {
-        return delegate.oper();
+        return operator;
     }
 
     @Override
-    public boolean match(int oper) {
-        return delegate.match(oper);
+    public boolean match(int value) {
+        return operator == value;
     }
 
     @Override
-    public void setOper(int n) {
-        delegate.setOper(n);
+    public void setOper(int value) {
+        operator = value;
     }
 
     @Override
     public boolean isAggregate() {
-        return delegate.isAggregate();
+        return source instanceof AggregateAst;
     }
 
     @Override
     public boolean isRecAggregate() {
-        return delegate.isRecAggregate();
+        return new VariableScopeAnalyzer().containsAggregate(source);
     }
 
     @Override
     public boolean isExist() {
-        return delegate.isExist();
+        return source instanceof ExistsAst || source instanceof NotExistsAst;
     }
 
     @Override
     public boolean isRecExist() {
-        return delegate.isRecExist();
+        return contains(ExistsAst.class) || contains(NotExistsAst.class);
     }
 
     @Override
     public boolean isVariable() {
-        return delegate.isVariable();
+        return source instanceof VarAst;
     }
 
     @Override
     public boolean isConstant() {
-        return delegate.isConstant();
+        return source instanceof IriAst || source instanceof LiteralAst;
     }
 
     @Override
     public boolean isFuncall() {
-        return delegate.isFuncall();
+        return source instanceof FunctionCallAst;
     }
 
     @Override
     public boolean isBound() {
-        return delegate.isBound();
+        return source instanceof BoundAst;
     }
 
     @Override
     public boolean isDistinct() {
-        return delegate.isDistinct();
+        return source instanceof AggregateAst aggregate && aggregate.distinct();
     }
 
     @Override
     public int arity() {
-        return delegate.arity();
+        return children(source).size();
     }
 
     @Override
     public int getIndex() {
-        return delegate.getIndex();
+        return index;
     }
 
     @Override
-    public void setIndex(int index) {
-        delegate.setIndex(index);
+    public void setIndex(int value) {
+        index = value;
     }
 
     @Override
     public Expr getDefine() {
-        return wrapInterpreterSubexpr(delegate.getDefine());
+        return null;
     }
 
     @Override
-    public void setDefine(Expr exp) {
-        if (exp instanceof AstBackedExpr ab) {
-            delegate.setDefine(ab.delegate);
-        } else {
-            throw new IllegalArgumentException("Expr must be AstBackedExpr");
-        }
+    public void setDefine(Expr expression) {
+        throw new UnsupportedOperationException("Corese-next AST expressions are immutable");
     }
 
     @Override
     public Expr getFunction() {
-        return wrapInterpreterSubexpr(delegate.getFunction());
+        return null;
     }
 
     @Override
     public Expr getBody() {
-        return wrapInterpreterSubexpr(delegate.getBody());
+        return null;
     }
 
     @Override
     public Expr getVariable() {
-        return wrapInterpreterSubexpr(delegate.getVariable());
+        return isVariable() ? this : null;
     }
 
     @Override
     public Expr getDefinition() {
-        return wrapInterpreterSubexpr(delegate.getDefinition());
+        return null;
     }
 
     @Override
     public boolean hasMetadata(String name) {
-        return delegate.hasMetadata(name);
+        return false;
     }
 
     @Override
-    public IDatatype evalWE(Evaluator eval, BindingContext b, Environment env, Producer p) {
-        if (!(eval instanceof Computer computer)) {
-            throw new QueryEvaluationException("Evaluator must implement Computer for triple.parser Expression evaluation");
-        }
-        Binding binding = bindingFrom(b);
-        return TripleParserEvalSupport.evalWE(delegate, computer, binding, env, p);
+    public DatatypeValue evalWE(
+            Evaluator evaluator,
+            BindingContext bindings,
+            Environment environment,
+            Producer producer) {
+        return NativeExpressionEvaluator.evaluate(source, evaluator, environment, producer, whereCompiler);
     }
 
-    private static Binding bindingFrom(BindingContext b) {
-        if (b instanceof BindingAdapter(Binding delegate1)) {
-            return delegate1;
+    boolean contains(Class<? extends TermAst> type) {
+        if (type.isInstance(source)) {
+            return true;
         }
-        if (b instanceof Binding binding) {
-            return binding;
+        for (TermAst child : children(source)) {
+            if (new AstBackedExpr(child, whereCompiler).contains(type)) {
+                return true;
+            }
         }
-        throw new QueryEvaluationException("BindingContext must be BindingAdapter or Binding");
+        return false;
+    }
+
+    private static int operator(TermAst term) {
+        if (term instanceof VarAst) {
+            return ExprType.VARIABLE;
+        }
+        if (term instanceof IriAst || term instanceof LiteralAst) {
+            return ExprType.CONSTANT;
+        }
+        if (term instanceof FunctionCallAst call) {
+            return functionOperator(call);
+        }
+        return switch (term) {
+            case AndAst ignored -> ExprType.AND;
+            case OrAst ignored -> ExprType.OR;
+            case BooleanNotAst ignored -> ExprType.NOT;
+            case NotExistsAst ignored -> ExprType.NOT;
+            case EqualsAst ignored -> ExprType.EQ;
+            case DifferentAst ignored -> ExprType.NE;
+            case LowerThanAst ignored -> ExprType.LT;
+            case LowerOrEqualThanAst ignored -> ExprType.LE;
+            case GreaterThanAst ignored -> ExprType.GT;
+            case GreaterOrEqualThanAst ignored -> ExprType.GE;
+            case AddAst ignored -> ExprType.PLUS;
+            case UnaryPlusAst ignored -> ExprType.PLUS;
+            case SubtractAst ignored -> ExprType.MINUS;
+            case UnaryMinusAst ignored -> ExprType.MINUS;
+            case MultiplyAst ignored -> ExprType.MULT;
+            case BoundAst ignored -> ExprType.BOUND;
+            case SameTermAst ignored -> ExprType.SAMETERM;
+            case LangAst ignored -> ExprType.LANG;
+            case DatatypeAst ignored -> ExprType.DATATYPE;
+            case BinaryRegexAst ignored -> ExprType.REGEX;
+            case TrinaryRegexAst ignored -> ExprType.REGEX;
+            case ExistsAst ignored -> ExprType.EXIST;
+            case BnodeAst ignored -> ExprType.BNODE;
+            case CoalesceAst ignored -> ExprType.COALESCE;
+            case IfAst ignored -> ExprType.IF;
+            case StrLenAst ignored -> ExprType.STRLEN;
+            case ContainsAst ignored -> ExprType.CONTAINS;
+            case ConcatAst ignored -> ExprType.CONCAT;
+            case IriFunctionAst ignored -> ExprType.URI;
+            default -> ExprType.UNDEF;
+        };
+    }
+
+    static List<TermAst> children(TermAst term) {
+        if (term instanceof UnaryConstraintAst unary) {
+            return List.of(unary.argument());
+        }
+        if (term instanceof BinaryConstraintAst binary) {
+            return List.of(binary.getLeftArgument(), binary.getRightArgument());
+        }
+        if (term instanceof UnlimitedArgumentsFunctionAst unlimited) {
+            return unlimited.arguments();
+        }
+        return switch (term) {
+            case AggregateAst aggregate -> aggregate.expression() == null
+                    ? List.of() : List.of(aggregate.expression());
+            case FunctionCallAst call -> call.arguments();
+            case BnodeAst bnode -> bnode.getLabel() == null ? List.of() : List.of(bnode.getLabel());
+            case TrinaryRegexAst regex -> List.of(regex.getString(), regex.getPattern(), regex.getFlags());
+            case SubstrAst substring -> substring.getLength() == null
+                    ? List.of(substring.getString(), substring.getStart())
+                    : List.of(substring.getString(), substring.getStart(), substring.getLength());
+            case ReplaceAst replace -> replace.hasFlags()
+                    ? List.of(replace.getString(), replace.getPattern(), replace.getReplacement(), replace.getFlags())
+                    : List.of(replace.getString(), replace.getPattern(), replace.getReplacement());
+            case IfAst(var condition, var thenExpr, var elseExpr) -> List.of(condition, thenExpr, elseExpr);
+            case InAst(var left, var candidates) -> prepend(left, candidates);
+            case NotInAst(var left, var candidates) -> prepend(left, candidates);
+            case NotExistsAst(var pattern) -> List.of(new ExistsAst(pattern));
+            default -> List.of();
+        };
+    }
+
+    private static int functionOperator(FunctionCallAst call) {
+        if (call.functionName() instanceof IriAst(String raw)) {
+            String name = raw.startsWith("<") && raw.endsWith(">")
+                    ? raw.substring(1, raw.length() - 1)
+                    : raw;
+            if (name.equals("unnest") || name.endsWith("/unnest") || name.endsWith("#unnest")) {
+                return ExprType.UNNEST;
+            }
+        }
+        return ExprType.UNDEF;
+    }
+
+    private static List<TermAst> prepend(TermAst first, List<TermAst> remaining) {
+        List<TermAst> terms = new ArrayList<>(remaining.size() + 1);
+        terms.add(first);
+        terms.addAll(remaining);
+        return List.copyOf(terms);
     }
 }

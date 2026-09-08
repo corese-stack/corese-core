@@ -351,65 +351,40 @@ class EvalTest {
     }
 
     @Nested
-    @DisplayName("Static Configuration Tests")
-    class StaticConfigurationTests {
+    @DisplayName("Evaluation Configuration Tests")
+    class EvaluationConfigurationTests {
 
         @Test
         @DisplayName("Should get and set push edge mappings")
         void testPushEdgeMappings() {
-            boolean original = Eval.isPushEdgeMappings();
-
-            Eval.setPushEdgeMappings(false);
-            assertFalse(Eval.isPushEdgeMappings(),
+            eval.setPushEdgeMappings(false);
+            assertFalse(eval.isPushEdgeMappings(),
                     "PushEdgeMappings should be false");
-
-            // Reset to original
-            Eval.setPushEdgeMappings(original);
         }
 
         @Test
         @DisplayName("Should get and set parameter graph mappings")
         void testParameterGraphMappings() {
-            boolean original = Eval.isParameterGraphMappings();
-
-            Eval.setParameterGraphMappings(false);
-            assertFalse(Eval.isParameterGraphMappings(),
+            eval.setParameterGraphMappings(false);
+            assertFalse(eval.isParameterGraphMappings(),
                     "ParameterGraphMappings should be false");
-
-            // Reset to original
-            Eval.setParameterGraphMappings(original);
         }
 
         @Test
         @DisplayName("Should get and set parameter union mappings")
         void testParameterUnionMappings() {
-            boolean original = Eval.isParameterUnionMappings();
-
-            Eval.setParameterUnionMappings(false);
-            assertFalse(Eval.isParameterUnionMappings(),
+            eval.setParameterUnionMappings(false);
+            assertFalse(eval.isParameterUnionMappings(),
                     "ParameterUnionMappings should be false");
-
-            // Reset to original
-            Eval.setParameterUnionMappings(original);
         }
 
         @Test
         @DisplayName("Should set all new mappings versions")
         void testSetNewMappingsVersion() {
-            // Save originals
-            boolean origPush = Eval.isPushEdgeMappings();
-            boolean origGraph = Eval.isParameterGraphMappings();
-            boolean origUnion = Eval.isParameterUnionMappings();
-
-            Eval.setNewMappingsVersion(false);
-            assertFalse(Eval.isPushEdgeMappings(), "All flags should be false");
-            assertFalse(Eval.isParameterGraphMappings(), "All flags should be false");
-            assertFalse(Eval.isParameterUnionMappings(), "All flags should be false");
-
-            // Reset to originals
-            Eval.setPushEdgeMappings(origPush);
-            Eval.setParameterGraphMappings(origGraph);
-            Eval.setParameterUnionMappings(origUnion);
+            eval.setNewMappingsVersion(false);
+            assertFalse(eval.isPushEdgeMappings(), "All flags should be false");
+            assertFalse(eval.isParameterGraphMappings(), "All flags should be false");
+            assertFalse(eval.isParameterUnionMappings(), "All flags should be false");
         }
     }
 
@@ -470,25 +445,6 @@ class EvalTest {
         void testIsJoinMappings() {
             boolean flag = eval.isJoinMappings();
             assertTrue(flag, "JoinMappings should be true by default");
-        }
-    }
-
-    @Nested
-    @DisplayName("Static Count Tests")
-    class StaticCountTests {
-
-        @Test
-        @DisplayName("Should access static count")
-        void testStaticCount() {
-            int count = Eval.count;
-            assertTrue(count >= 0, "Static count should be non-negative");
-        }
-
-        @Test
-        @DisplayName("Should access display result max")
-        void testDisplayResultMax() {
-            int max = Eval.DISPLAY_RESULT_MAX;
-            assertTrue(max > 0, "Display result max should be positive");
         }
     }
 

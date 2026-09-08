@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.query.impl.kgram.filter;
 
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Expr;
-import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 
 /**
  * Manage extension functions
@@ -25,7 +25,7 @@ public interface Extension {
 
     Expr getMetadata(String metadata, int n);
 
-    Expr getMethod(String label, IDatatype type, IDatatype[] param);
+    Expr getMethod(String label, DatatypeValue type, DatatypeValue[] param);
 
 
     void removeNamespace(String name);

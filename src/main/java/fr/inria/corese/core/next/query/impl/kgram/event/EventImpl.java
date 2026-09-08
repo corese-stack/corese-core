@@ -4,9 +4,6 @@ package fr.inria.corese.core.next.query.impl.kgram.event;
 import fr.inria.corese.core.next.query.impl.kgram.core.Exp;
 import fr.inria.corese.core.next.query.impl.kgram.core.Stack;
 
-import java.util.Hashtable;
-
-
 /**
  * Event to trace KGRAM execution
  * @author Olivier Corby, Edelweiss, INRIA 2010
@@ -15,11 +12,11 @@ import java.util.Hashtable;
 public class EventImpl implements Event {
 
 
-	static Hashtable<Integer, String> titles;
-
 	int type;
 	boolean isSuccess = true;
-	Object object, arg, arg2;
+	Object object;
+	Object arg;
+	Object arg2;
 
 	EventImpl(int n, Object o){
 		type = n;
@@ -30,8 +27,8 @@ public class EventImpl implements Event {
 		type = n;
 		object = o;
 		arg = o2;
-		if (o2 instanceof Boolean){
-			isSuccess = (Boolean) o2;
+		if (o2 instanceof Boolean success){
+			isSuccess = success;
 		}
 	}
 
@@ -40,8 +37,8 @@ public class EventImpl implements Event {
 		object = o;
 		arg = o2;
 		arg2 = o3;
-		if (o3 instanceof Boolean){
-			isSuccess = (Boolean) o3;
+		if (o3 instanceof Boolean success){
+			isSuccess = success;
 		}
 	}
 
@@ -49,10 +46,8 @@ public class EventImpl implements Event {
 		String str = getTitle();
 		if (object != null){
 			str += " ";
-			if (object instanceof Exp exp){
-                if (exp.isEdge()){
+			if (object instanceof Exp exp && exp.isEdge()){
 					str += "("+ exp.getEdge().getEdgeIndex() + ") ";
-				}
 			}
 			str += object;
 		}
@@ -66,50 +61,33 @@ public class EventImpl implements Event {
 	}
 
 
-	static void deftitle(int type, String title){
-		titles.put(type, title);
-	}
-
 	String getTitle(){
-		if (titles == null){
-			init();
-		}
-		return titles.get(type);
-	}
-
-	static void init(){
-		titles = new Hashtable<>();
-		deftitle(BEGIN, "begin");
-		deftitle(START, "start");
-		deftitle(ENUM, 	"enum");
-		deftitle(FILTER, "filter");
-		deftitle(BIND, 	"bind");
-		deftitle(MATCH, "match");
-		deftitle(GRAPH, "graph");
-		deftitle(PATH, 	"path");
-		deftitle(PATHSTEP, "step");
-		deftitle(FINISH, "finish");
-
-
-		deftitle(AGG, "aggregate");
-		deftitle(DISTINCT, "distinct");
-		deftitle(LIMIT, "limit");
-
-		deftitle(RESULT, "result");
-		deftitle(END, "end");
-
-		// User Event
-
-		deftitle(COMPLETE, 	"complete");
-		deftitle(FORWARD, 	"forward");
-		deftitle(MAP, 		"map");
-		deftitle(NEXT, 		"next");
-		deftitle(QUIT, 		"quit");
-		deftitle(STEP, 		"step");
-		deftitle(SUCCESS, 	"success");
-
-		deftitle(VERBOSE, "verbose");
-		deftitle(HELP, "help");
+		return switch (type) {
+			case BEGIN -> "begin";
+			case START -> "start";
+			case ENUM -> "enum";
+			case FILTER -> "filter";
+			case BIND -> "bind";
+			case MATCH -> "match";
+			case GRAPH -> "graph";
+			case PATH -> "path";
+			case PATHSTEP, STEP -> "step";
+			case FINISH -> "finish";
+			case AGG -> "aggregate";
+			case DISTINCT -> "distinct";
+			case LIMIT -> "limit";
+			case RESULT -> "result";
+			case END -> "end";
+			case COMPLETE -> "complete";
+			case FORWARD -> "forward";
+			case MAP -> "map";
+			case NEXT -> "next";
+			case QUIT -> "quit";
+			case SUCCESS -> "success";
+			case VERBOSE -> "verbose";
+			case HELP -> "help";
+			default -> "event(" + type + ')';
+		};
 	}
 
 
@@ -144,8 +122,8 @@ public class EventImpl implements Event {
     }
 
 	public Exp getExp(){
-		if (object instanceof Exp){
-			return (Exp) object;
+		if (object instanceof Exp expression){
+			return expression;
 		}
 		return null;
 	}

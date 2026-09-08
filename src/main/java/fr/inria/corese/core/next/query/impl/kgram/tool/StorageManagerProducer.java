@@ -3,9 +3,8 @@ package fr.inria.corese.core.next.query.impl.kgram.tool;
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.term.Value;
-import fr.inria.corese.core.next.data.api.factory.ValueFactory;
+import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import fr.inria.corese.core.next.data.api.model.Statement;
-import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
 import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.BindingContext;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.Edge;
@@ -23,8 +22,6 @@ import fr.inria.corese.core.next.query.impl.kgram.event.KgramEventDispatcher;
 import fr.inria.corese.core.next.query.impl.kgram.path.Path;
 import fr.inria.corese.core.next.storage.api.StorageManager;
 import fr.inria.corese.core.next.storage.api.model.StatementPattern;
-import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +39,6 @@ import java.util.stream.Stream;
 public final class StorageManagerProducer extends ProducerDefault {
 
     private final StorageManager storage;
-    private final ValueFactory valueFactory;
 
     /**
      * Creates a KGRAM producer backed by the given storage manager.
@@ -50,18 +46,7 @@ public final class StorageManagerProducer extends ProducerDefault {
      * @param storage storage manager queried by this producer
      */
     public StorageManagerProducer(StorageManager storage) {
-        this(storage, new CoreseValueFactory());
-    }
-
-    /**
-     * Creates a producer with an explicit value factory.
-     *
-     * @param storage storage manager queried by this producer
-     * @param valueFactory factory used to convert KGRAM values to storage values
-     */
-    StorageManagerProducer(StorageManager storage, ValueFactory valueFactory) {
         this.storage = Objects.requireNonNull(storage, "storage");
-        this.valueFactory = Objects.requireNonNull(valueFactory, "valueFactory");
     }
 
     @Override
@@ -92,7 +77,7 @@ public final class StorageManagerProducer extends ProducerDefault {
         }
         List<Node> nodes = new ArrayList<>();
         for (Resource context : storage.metadata().getContexts()) {
-            Node node = StorageManagerKgramValues.node(context);
+            Node node = NodeImpl.forValue(context);
             if (matchesFrom(node, namedGraphs, environment)) {
                 nodes.add(node);
             }
@@ -129,27 +114,34 @@ public final class StorageManagerProducer extends ProducerDefault {
         if (value instanceof Node node) {
             return node;
         }
-        if (value instanceof Value rdfValue) {
-            return StorageManagerKgramValues.node(rdfValue);
-        }
-        if (value instanceof IDatatype datatype) {
-            return StorageManagerKgramValues.node(datatype);
+        if (value instanceof DatatypeValue datatypeValue) {
+            return NodeImpl.forValue(datatypeValue);
         }
         return null;
     }
 
     @Override
-    public IDatatype getDatatypeValue(Object value) {
+    public DatatypeValue getDatatypeValue(Object value) {
         if (value instanceof Node node) {
             return node.getDatatypeValue();
         }
-        if (value instanceof Value rdfValue) {
-            return StorageManagerKgramValues.datatypeValue(rdfValue);
-        }
-        if (value instanceof IDatatype datatype) {
-            return datatype;
+        if (value instanceof DatatypeValue datatypeValue) {
+            return datatypeValue;
         }
         return null;
+    }
+
+    @Override
+    public DatatypeValue getValue(Object value) {
+        return getDatatypeValue(value);
+    }
+
+    private static Value rdfValue(Node node) {
+        DatatypeValue value = Objects.requireNonNull(node, "node").getDatatypeValue();
+        if (value instanceof Value rdfValue) {
+            return rdfValue;
+        }
+        throw new IllegalArgumentException("KGRAM node does not carry an RDF value: " + node);
     }
 
     @Override
@@ -214,21 +206,21 @@ public final class StorageManagerProducer extends ProducerDefault {
         // Subject and predicate have stricter RDF roles than object: subject must
         // be a resource, predicate must be an IRI, while object accepts any RDF value.
         if (subjectNode != null) {
-            Value value = StorageManagerKgramValues.rdfValue(subjectNode, valueFactory);
+            Value value = rdfValue(subjectNode);
             if (!(value instanceof Resource resource)) {
                 return StorageQueryPattern.emptyResult();
             }
             subject = resource;
         }
         if (predicateNode != null) {
-            Value value = StorageManagerKgramValues.rdfValue(predicateNode, valueFactory);
+            Value value = rdfValue(predicateNode);
             if (!(value instanceof IRI iri)) {
                 return StorageQueryPattern.emptyResult();
             }
             predicate = iri;
         }
         if (objectNode != null) {
-            object = StorageManagerKgramValues.rdfValue(objectNode, valueFactory);
+            object = rdfValue(objectNode);
         }
 
         // Graph and dataset clauses become the statement contexts passed to storage.
@@ -292,7 +284,7 @@ public final class StorageManagerProducer extends ProducerDefault {
                     ? ContextSelection.emptyResult()
                     : ContextSelection.allContexts();
         }
-        Value value = StorageManagerKgramValues.rdfValue(resolvedGraphNode, valueFactory);
+        Value value = rdfValue(resolvedGraphNode);
         if (!(value instanceof Resource resource)) {
             return ContextSelection.emptyResult();
         }
@@ -315,7 +307,7 @@ public final class StorageManagerProducer extends ProducerDefault {
             if (resolvedNode == null) {
                 continue;
             }
-            Value value = StorageManagerKgramValues.rdfValue(resolvedNode, valueFactory);
+            Value value = rdfValue(resolvedNode);
             if (!(value instanceof Resource resource)) {
                 return ContextSelection.emptyResult();
             }
@@ -630,7 +622,7 @@ public final class StorageManagerProducer extends ProducerDefault {
         }
 
         @Override
-        public java.util.Map<String, IDatatype> getMap() {
+        public java.util.Map<String, DatatypeValue> getMap() {
             return delegate == null ? java.util.Map.of() : delegate.getMap();
         }
 
@@ -677,11 +669,6 @@ public final class StorageManagerProducer extends ProducerDefault {
         }
 
         @Override
-        public ASTExtension getExtension() {
-            return delegate == null ? null : delegate.getExtension();
-        }
-
-        @Override
         public ApproximateSearchEnv getAppxSearchEnv() {
             return delegate == null ? null : delegate.getAppxSearchEnv();
         }
@@ -704,12 +691,12 @@ public final class StorageManagerProducer extends ProducerDefault {
         }
 
         @Override
-        public IDatatype getReport() {
+        public DatatypeValue getReport() {
             return delegate == null ? null : delegate.getReport();
         }
 
         @Override
-        public void setReport(IDatatype datatype) {
+        public void setReport(DatatypeValue datatype) {
             if (delegate != null) {
                 delegate.setReport(datatype);
             }

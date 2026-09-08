@@ -16,11 +16,9 @@ import static fr.inria.corese.core.next.common.text.RdfText.stripAngleBrackets;
  * after the prologue (parser options initial base, possibly overridden by
  * {@code BASE}).
  * <p>
- * For now this type is only attached to {@link SelectQueryAst}; other query
- * forms still expose
- * prefix/base state via
- * {@link fr.inria.corese.core.next.data.api.namespace.PrefixMapping} on
- * {@link QueryAst}.
+ * Every query form carries its own immutable prologue snapshot, allowing
+ * parsing and compilation of unrelated queries to run concurrently without
+ * process-wide namespace state.
  */
 public record QueryPrologueAst(List<PrefixDeclarationAst> prefixDeclarations, IriAst baseIri) implements VisitableAst {
 

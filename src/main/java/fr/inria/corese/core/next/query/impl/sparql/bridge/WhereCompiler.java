@@ -8,6 +8,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.MinusAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.OptionalAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.PatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.QueryPrologueAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ServiceAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.UnionAst;
@@ -26,6 +27,24 @@ import java.util.Objects;
  * evaluate.
  */
 public final class WhereCompiler {
+
+    private final SparqlTermResolver termResolver;
+
+    public WhereCompiler() {
+        this(QueryPrologueAst.empty());
+    }
+
+    private WhereCompiler(QueryPrologueAst prologue) {
+        termResolver = new SparqlTermResolver(prologue);
+    }
+
+    WhereCompiler withPrologue(QueryPrologueAst prologue) {
+        return new WhereCompiler(prologue);
+    }
+
+    SparqlTermResolver termResolver() {
+        return termResolver;
+    }
 
     /**
      * Compiles a full SPARQL {@code WHERE} clause into the runtime body carried by a
@@ -100,14 +119,15 @@ public final class WhereCompiler {
     }
 
     private Edge toEdge(TriplePatternAst triple) {
-        Node subject = CoreseAstQueryBuilder.toNode(triple.subject());
-        Node predicate = CoreseAstQueryBuilder.toNode(CoreseAstQueryBuilder.simplePredicate(triple.predicate()));
-        Node object = CoreseAstQueryBuilder.toNode(triple.object());
+        Node subject = CoreseAstQueryBuilder.toNode(triple.subject(), termResolver);
+        Node predicate = CoreseAstQueryBuilder.toNode(
+                CoreseAstQueryBuilder.simplePredicate(triple.predicate()), termResolver);
+        Node object = CoreseAstQueryBuilder.toNode(triple.object(), termResolver);
         return new AstBackedEdge(subject, predicate, object);
     }
 
     private Exp compileFilter(FilterAst filter) {
-        Filter nextFilter = SparqlAstToExpression.toNextFilter(filter, this);
+        Filter nextFilter = new AstBackedExpr(filter.operator(), this).getFilter();
         return Exp.create(Type.FILTER, nextFilter);
     }
 
@@ -143,8 +163,8 @@ public final class WhereCompiler {
      * Compiles {@code BIND(expression AS ?var)} into a KGRAM {@link Exp}.
      */
     private Exp compileBind(BindAst bind) {
-        Filter filter = SparqlAstToExpression.toNextFilter(bind.expression(), this);
-        Node variable = CoreseAstQueryBuilder.toNode(bind.variable());
+        Filter filter = new AstBackedExpr(bind.expression(), this).getFilter();
+        Node variable = CoreseAstQueryBuilder.toNode(bind.variable(), termResolver);
         Exp exp = Exp.create(Type.BIND);
         exp.setFilter(filter);
         exp.setFunctional(filter.isFunctional());
@@ -156,7 +176,7 @@ public final class WhereCompiler {
      * Compiles {@code SERVICE <endpoint> { ... }} into a KGRAM {@link Exp}.
      */
     private Exp compileService(ServiceAst service) {
-        Node endpoint = CoreseAstQueryBuilder.toNode(service.endpoint());
+        Node endpoint = CoreseAstQueryBuilder.toNode(service.endpoint(), termResolver);
         Exp endpointNode = Exp.create(Type.NODE, endpoint);
         Query body = Query.create(compile(service.pattern()));
         body.setService(true);

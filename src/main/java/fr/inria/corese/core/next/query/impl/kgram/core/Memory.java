@@ -1,14 +1,11 @@
 package fr.inria.corese.core.next.query.impl.kgram.core;
 
-import fr.inria.corese.core.next.query.impl.kgram.adapter.BindingAdapter;
 import fr.inria.corese.core.next.query.impl.kgram.api.core.*;
 import fr.inria.corese.core.next.query.impl.kgram.api.query.*;
 import fr.inria.corese.core.next.query.impl.kgram.event.KgramEventDispatcher;
 import fr.inria.corese.core.next.query.impl.kgram.path.Path;
 import fr.inria.corese.core.next.query.impl.kgram.tool.ApproximateSearchEnv;
-import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.triple.function.term.Binding;
-import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
+import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,15 +19,16 @@ import java.util.Map;
  */
 public class Memory extends PointerObject implements Environment {
 
+    private static final String SERVICE_REPORT_ZERO = "?_service_report_0";
     static final Edge[] emptyEdges = new Edge[0];
     static final Edge[] emptyEntities = new Edge[0];
-    public static boolean IS_EDGE = false;
     // number of times nodes are bound by Stack
     // decrease with backtrack
-    int[] nbNodes, nbEdges,
+    int[] nbNodes;
+    int[] nbEdges;
     // stackIndex[n] = index in Eval Exp stack where nth node is bound first
     // enable to compute where to backjump
-    stackIndex;
+    int[] stackIndex;
     Edge[] qEdges;
     Edge[] result;
     Node[] qNodes;
@@ -43,7 +41,7 @@ public class Memory extends PointerObject implements Environment {
     Object object;
     // bnode(label) must return same bnode in same solution, different otherwise.
     // hence must clear bnodes after each solution
-    Map<String, IDatatype> bnode;
+    Map<String, DatatypeValue> bnode;
     //  query or sub query
     Query query;
     Node gNode;
@@ -58,9 +56,8 @@ public class Memory extends PointerObject implements Environment {
     int nbEdge = 0;
     int nbNode = 0;
     // service evaluation detail report
-    private IDatatype detail;
-    private boolean isFake = false;
-    private boolean isEdge = IS_EDGE;
+    private DatatypeValue detail;
+    private boolean isEdge;
     private BindingContext bindingContext;
     private ApproximateSearchEnv appxSearchEnv;
 
@@ -233,15 +230,14 @@ public class Memory extends PointerObject implements Environment {
 
     /**
      * mem is a fresh new Memory, init() has been done Copy this memory into mem
-     * Use case: exists {} , sub query Can bind all Memory nodes or bind only
+     * Use case: exists pattern , sub query Can bind all Memory nodes or bind only
      * subquery select nodes (2 different semantics)
-     * TODO: let ( .., exists {}),
+     * Note: let ( .., exists pattern),
      * MUST push BGP solution and then push Bind
      */
     void copyInto(Query sub, Memory mem, Exp exp) {
-        int n = 0;
         if (sub == null) {
-            // exists {}
+            // exists pattern
             copyInto(mem, exp);
         } else if (eval.getMode() != Evaluator.Mode.SPARQL_MODE) {
             // bind subquery select nodes
@@ -249,19 +245,18 @@ public class Memory extends PointerObject implements Environment {
             // that are select nodes of sub query
             // hence sub query memory share only select node bindings
             // with outer query memory
-            // use case: ?x :p ?z  {select ?z where {?x :q ?z}}
+            // use case: ?x :p ?z (select ?z where (?x :q ?z))
             // ?x in sub query is not the same as ?x in outer query (it is not bound here)
             // only ?z is the same
             for (Node subNode : sub.getSelect()) {
-                copyInto(subNode, mem, n);
-                n++;
+                copyInto(subNode, mem);
             }
             mem.share(this);
         }
     }
 
     /**
-     * exists { }
+     * exists pattern
      * PRAGMA: when exists is in function, this memory is empty
      */
     void copyInto(Memory mem, Exp exp) {
@@ -288,49 +283,28 @@ public class Memory extends PointerObject implements Environment {
     }
 
     /**
-     * Copy this Bind local variable stack into this memory
-     * Use case: function xt:foo(?x) { exists { ?x ex:pp ?y } }
-     */
-    void copy(Binding bind, Exp exp) {
-        List<Node> list = exp.getNodes();
-        for (fr.inria.corese.core.kgram.api.core.Expr var : bind.getVariables()) {
-            Node qn = getNode(var.getLabel(), list);
-            if (qn != null) {
-                push(qn, (Node) bind.get(var));
-            }
-        }
-    }
-
-    /**
      * Copy this BindingContext local variable stack into this memory
      */
     void copy(BindingContext bindCtx, Exp exp) {
-        if (bindCtx instanceof BindingAdapter) {
-            Binding binding = ((BindingAdapter) bindCtx).delegate();
-            copy(binding, exp);
-        } else {
-            List<Node> list = exp.getNodes();
-            for (Map.Entry<String, Node> entry : bindCtx.getBindings().entrySet()) {
-                String varLabel = entry.getKey();
-                Node qn = getNode(varLabel, list);
-                if (qn != null) {
-                    push(qn, entry.getValue());
-                }
+        List<Node> list = exp.getNodes();
+        for (Map.Entry<String, Node> entry : bindCtx.getBindings().entrySet()) {
+            String varLabel = entry.getKey();
+            Node qn = getNode(varLabel, list);
+            if (qn != null) {
+                push(qn, entry.getValue());
             }
         }
     }
 
     void copyInto(Memory mem) {
-        int n = 0;
         // bind all nodes
         // use case: inpath copy the memory
         for (Node qNode : qNodes) {
-            copyInto(qNode, mem, n);
-            n++;
+            copyInto(qNode, mem);
         }
     }
 
-    void copyInto(Node qNode, Memory mem, int n) {
+    void copyInto(Node qNode, Memory mem) {
         if (qNode != null) {
             Node tNode = getNode(qNode);
             if (tNode != null) {
@@ -339,8 +313,8 @@ public class Memory extends PointerObject implements Environment {
         }
     }
 
-    Mapping store(Query q, Producer p, boolean subEval) throws SparqlException {
-        return store(query, p, subEval, false);
+    Mapping store(Query q, Producer p, boolean subEval) {
+        return store(q, p, subEval, false);
     }
 
     /**
@@ -348,7 +322,8 @@ public class Memory extends PointerObject implements Environment {
      * in this case: no select exp, no order by, no group by, etc
      * subEval = false: main or nested select query.
      */
-    Mapping store(Query q, Producer p, boolean subEval, boolean func) throws SparqlException {
+    @SuppressWarnings("java:S3776") // Legacy KGRAM solution construction algorithm assembling Mapping results from memory state
+    Mapping store(Query q, Producer p, boolean subEval, boolean func) {
         boolean complete = !q.getGlobalQuery().isAlgebra();
 
         Node detailNode = null;
@@ -357,7 +332,7 @@ public class Memory extends PointerObject implements Environment {
             // use case: xt:sparql() return map with report
             // PluginImpl sparql() record report in Environment
             // detailNode is defined by ASTParser with @report metadata
-            detailNode = getQuery().getSelectNode(Binding.SERVICE_REPORT_ZERO);
+            detailNode = getQuery().getSelectNode(SERVICE_REPORT_ZERO);
             if (detailNode != null) {
                 push(detailNode, (Node) getReport());
             }
@@ -382,7 +357,8 @@ public class Memory extends PointerObject implements Environment {
         Node[] snode = new Node[q.getOrderBy().size()];
         Node[] gnode = new Node[q.getGroupBy().size()];
 
-        int n = 0, i = 0;
+        int n = 0;
+        int i = 0;
         if (isEdge) {
             qedge = new Edge[nbEdge];
             tedge = new Edge[nbEdge];
@@ -521,15 +497,15 @@ public class Memory extends PointerObject implements Environment {
     }
 
     @Override
-    public Map<String, IDatatype> getMap() {
+    public Map<String, DatatypeValue> getMap() {
         return bnode;
     }
 
-    void setMap(Map<String, IDatatype> m) {
+    void setMap(Map<String, DatatypeValue> m) {
         bnode = m;
     }
 
-    void orderGroup(List<Exp> lExp, Node[] nodes, Producer p) throws SparqlException {
+    void orderGroup(List<Exp> lExp, Node[] nodes, Producer p) {
         int n = 0;
         for (Exp e : lExp) {
             Node qNode = e.getNode();
@@ -577,51 +553,53 @@ public class Memory extends PointerObject implements Environment {
     }
 
     boolean push(Producer p, Edge q, Edge ent, int n) {
-        boolean success = true;
-        int max = q.nbNode();
+        if (!pushNodes(p, q, ent, n)) {
+            return false;
+        }
+        if (!pushEdgeVariable(q, ent, n)) {
+            return false;
+        }
+        if (isEdge) {
+            recordEdge(q, ent);
+        }
+        return true;
+    }
 
+    private boolean pushNodes(Producer p, Edge q, Edge ent, int n) {
+        int max = q.nbNode();
         for (int i = 0; i < max; i++) {
             Node node = q.getNode(i);
             if (node != null) {
-                if (node.isMatchNodeList()) {
-                    success = pushNodeList(p, node, ent, i);
-                } else {
-                    success = push(node, ent.getNode(i), n);
-                }
-
+                boolean success = node.isMatchNodeList() ? pushNodeList(p, node, ent, i) : push(node, ent.getNode(i), n);
                 if (!success) {
-                    // it fail: pop right now
                     pop(q, i);
-                    // stop pushing as ith node failed
-                    break;
+                    return false;
                 }
             }
         }
+        return true;
+    }
 
-        if (success) {
-            // explicit edge node
-            // e.g. the node that represents the property/relation
-            Node pNode = q.getEdgeVariable();
-            if (pNode != null) {
-                success = push(pNode, ent.getEdgeNode(), n);
-
-                if (!success) {
-                    // it fail: pop nodes
-                    pop(q, q.nbNode());
-                }
+    private boolean pushEdgeVariable(Edge q, Edge ent, int n) {
+        Node pNode = q.getEdgeVariable();
+        if (pNode != null) {
+            boolean success = push(pNode, ent.getEdgeNode(), n);
+            if (!success) {
+                pop(q, q.nbNode());
+                return false;
             }
         }
+        return true;
+    }
 
-        if (isEdge && success) {
-            int index = q.getEdgeIndex();
-            if (nbEdges[index] == 0) {
-                nbEdge++;
-            }
-            nbEdges[index]++;
-            qEdges[index] = q;
-            result[index] = ent;
+    private void recordEdge(Edge q, Edge ent) {
+        int index = q.getEdgeIndex();
+        if (nbEdges[index] == 0) {
+            nbEdge++;
         }
-        return success;
+        nbEdges[index]++;
+        qEdges[index] = q;
+        result[index] = ent;
     }
 
     void pop(Edge q, int length) {
@@ -734,14 +712,14 @@ public class Memory extends PointerObject implements Environment {
         return stackIndex[node.getIndex()];
     }
 
-    void pop(Edge q, Edge r) {
-        popNode(q, r);
+    void pop(Edge q) {
+        popNode(q);
         if (isEdge) {
-            popEdge(q, r);
+            popEdge(q);
         }
     }
 
-    void popNode(Edge q, Edge r) {
+    void popNode(Edge q) {
         if (q != null) {
             int max = q.nbNode();
             for (int i = 0; i < max; i++) {
@@ -761,7 +739,7 @@ public class Memory extends PointerObject implements Environment {
         }
     }
 
-    void popEdge(Edge q, Edge r) {
+    void popEdge(Edge q) {
         int index = q.getEdgeIndex();
         if (nbEdges[index] > 0) {
             nbEdges[index]--;
@@ -787,7 +765,7 @@ public class Memory extends PointerObject implements Environment {
      */
     void aggregate(Mapping map) {
         push(map, -1);
-        Map<String, IDatatype> bnodeMap = map.getMap();
+        Map<String, DatatypeValue> bnodeMap = map.getMap();
         if (bnodeMap == null) {
             bnodeMap = new HashMap<>();
             map.setMap(bnodeMap);
@@ -800,38 +778,40 @@ public class Memory extends PointerObject implements Environment {
     }
 
     boolean push(Mapping res, int n, boolean isEdge, boolean isBlank) {
+        if (!pushMappingNodes(res, n, isBlank)) {
+            return false;
+        }
+        return !isEdge || pushMappingEdges(res, n);
+    }
+
+    private boolean pushMappingNodes(Mapping res, int n, boolean isBlank) {
         int k = 0;
         for (Node qNode : res.getQueryNodes()) {
-            if (qNode != null && qNode.getIndex() >= 0) {
-                // use case: skip select fun() as var
-                // when var has no index
-                if (!qNode.isBlank() || isBlank) {
-                    // do not push service bnode
-                    Node node = res.getNode(k);
-                    if (!push(qNode, node, n)) {
-                        for (int i = 0; i < k; i++) {
-                            pop(res.getQueryNode(i));
-                        }
-                        return false;
+            if (qNode != null && qNode.getIndex() >= 0 && (!qNode.isBlank() || isBlank)) {
+                Node node = res.getNode(k);
+                if (!push(qNode, node, n)) {
+                    for (int i = 0; i < k; i++) {
+                        pop(res.getQueryNode(i));
                     }
+                    return false;
                 }
             }
             k++;
         }
+        return true;
+    }
 
-        if (isEdge) {
-            k = 0;
-            for (Edge qEdge : res.getQueryEdges()) {
-                Edge edge = res.getEdge(k);
-                if (!push(qEdge, edge, n)) {
-                    for (int i = 0; i < k; i++) {
-                        pop(res.getQueryEdge(i), res.getEdge(i));
-                    }
-                    // TODO: pop the nodes
-                    return false;
+    private boolean pushMappingEdges(Mapping res, int n) {
+        int k = 0;
+        for (Edge qEdge : res.getQueryEdges()) {
+            Edge edge = res.getEdge(k);
+            if (!push(qEdge, edge, n)) {
+                for (int i = 0; i < k; i++) {
+                    pop(res.getQueryEdge(i));
                 }
-                k++;
+                return false;
             }
+            k++;
         }
         return true;
     }
@@ -847,16 +827,7 @@ public class Memory extends PointerObject implements Environment {
                 if (tNode != null) {
                     Node node = map.getNodeProtect(k);
                     if (!push(tNode, node, n)) {
-                        // pop
-                        for (int i = 0; i < k; i++) {
-                            Node qq = map.getQueryNode(i);
-                            if (qq != null) {
-                                Node tt = list.get(qq.getLabel());
-                                if (tt != null) {
-                                    pop(tt);
-                                }
-                            }
-                        }
+                        popPreviousNodes(list, map, k);
                         return false;
                     }
                 }
@@ -866,8 +837,19 @@ public class Memory extends PointerObject implements Environment {
         return true;
     }
 
+    private void popPreviousNodes(HashMap<String, Node> list, Mapping map, int limit) {
+        for (int i = 0; i < limit; i++) {
+            Node qq = map.getQueryNode(i);
+            if (qq != null) {
+                Node tt = list.get(qq.getLabel());
+                if (tt != null) {
+                    pop(tt);
+                }
+            }
+        }
+    }
+
     void pop(HashMap<String, Node> list, Mapping map) {
-        int n = 0;
         for (Node qNode : map.getQueryNodes()) {
             if (qNode != null) {
                 Node tNode = list.get(qNode.getLabel());
@@ -875,7 +857,6 @@ public class Memory extends PointerObject implements Environment {
                     pop(tNode);
                 }
             }
-            n++;
         }
     }
 
@@ -887,18 +868,15 @@ public class Memory extends PointerObject implements Environment {
     }
 
     void pop(Mapping res, boolean isEdge) {
-        int n = 0;
         for (Node qNode : res.getQueryNodes()) {
             if (qNode != null && qNode.getIndex() >= 0) {
                 pop(qNode);
             }
-            n++;
         }
 
         if (isEdge) {
-            n = 0;
             for (Edge qEdge : res.getQueryEdges()) {
-                pop(qEdge, res.getEdge(n++));
+                pop(qEdge);
             }
         }
     }
@@ -1008,7 +986,10 @@ public class Memory extends PointerObject implements Environment {
                 if (index == ExprType.UNBOUND) {
                     return null;
                 }
+                break;
 
+            default:
+                break;
         }
         return getNode(index);
     }
@@ -1094,14 +1075,6 @@ public class Memory extends PointerObject implements Environment {
         object = o;
     }
 
-    public void setFake(boolean isFake) {
-        this.isFake = isFake;
-    }
-
-    @Override
-    public ASTExtension getExtension() {
-        return query.getActualExtension();
-    }
 
     @Override
     public Node get(Expr varExpr) {
@@ -1146,13 +1119,13 @@ public class Memory extends PointerObject implements Environment {
         return new ArrayList<>(0);
     }
 
-    List<List<IDatatype>> getList() {
-        ArrayList<List<IDatatype>> list = new ArrayList<>();
+    List<List<DatatypeValue>> getList() {
+        ArrayList<List<DatatypeValue>> list = new ArrayList<>();
         int i = 0;
         for (Node n : getQueryNodes()) {
             Node val = getNode(i++);
             if (n != null && val != null) {
-                ArrayList<IDatatype> l = new ArrayList<>(2);
+                ArrayList<DatatypeValue> l = new ArrayList<>(2);
                 l.add(n.getDatatypeValue());
                 l.add(val.getDatatypeValue());
                 list.add(l);
@@ -1183,20 +1156,21 @@ public class Memory extends PointerObject implements Environment {
         return node.getDatatypeValue();
     }
 
-    List<IDatatype> getBinding(int n) {
-        List<List<IDatatype>> l = getList();
+    @SuppressWarnings("java:S1168") // Null signals an unbound index in internal evaluation
+    List<DatatypeValue> getBinding(int n) {
+        List<List<DatatypeValue>> l = getList();
         if (n < l.size()) {
             return l.get(n);
         }
         return null;
     }
 
-    public IDatatype getReport() {
+    public DatatypeValue getReport() {
         return detail;
     }
 
     @Override
-    public void setReport(IDatatype detail) {
+    public void setReport(DatatypeValue detail) {
         this.detail = detail;
     }
 
