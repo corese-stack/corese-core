@@ -104,6 +104,6 @@ public final class SimpleLiteral extends AbstractLiteral {
 
     @Override
     public int hashCode() {
-        return Objects.hash(label, datatype, language);
+        return Objects.hash(label, datatype, getLanguage());
     }
 }
