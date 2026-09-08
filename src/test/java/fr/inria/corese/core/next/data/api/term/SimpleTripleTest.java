@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.data.api.term;
 
-import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
+import fr.inria.corese.core.next.data.Values;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -11,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SimpleTripleTest {
 
-    private final CoreseValueFactory values = new CoreseValueFactory();
+    private final ValueFactory values = Values.factory();
 
     @Test
     void factoryCreatesImmutableTripleTerm() {

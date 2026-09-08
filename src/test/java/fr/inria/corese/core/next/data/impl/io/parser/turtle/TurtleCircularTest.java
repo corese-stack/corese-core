@@ -10,7 +10,7 @@ import fr.inria.corese.core.next.data.impl.io.parser.DefaultRDFParserFactory;
 import fr.inria.corese.core.next.data.impl.io.serializer.DefaultRDFSerializerFactory;
 import fr.inria.corese.core.next.data.impl.io.serializer.turtle.TurtleSerializerOptions;
 import fr.inria.corese.core.next.data.impl.io.parser.support.ParserTestBase;
-import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
+import fr.inria.corese.core.next.data.Values;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -53,7 +53,7 @@ class TurtleCircularTest extends ParserTestBase {
 
     @BeforeEach
     void setUp() {
-        valueFactory = new CoreseValueFactory();
+        valueFactory = Values.factory();
         serializerFactory = new DefaultRDFSerializerFactory();
         parserFactory = new DefaultRDFParserFactory();
         defaultConfig = TurtleSerializerOptions.defaultConfig();

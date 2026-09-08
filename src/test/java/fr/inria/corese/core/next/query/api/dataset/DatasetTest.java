@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.query.api.dataset;
 
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.term.IRI;
-import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
+import fr.inria.corese.core.next.data.Values;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DatasetTest {
 
-    private final ValueFactory values = new CoreseValueFactory();
+    private final ValueFactory values = Values.factory();
 
     @Test
     void emptyDatasetIsSharedAndImmutable() {

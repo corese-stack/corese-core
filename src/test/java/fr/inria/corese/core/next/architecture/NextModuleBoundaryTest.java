@@ -88,6 +88,25 @@ class NextModuleBoundaryTest {
     }
 
     @Test
+    void dataModuleMustNotDependOnTheLegacyPipeline() throws IOException {
+        Path dataSources = NEXT_SOURCES.resolve("data");
+        assertNoReferences(
+                dataSources,
+                reference -> reference.startsWith("fr.inria.corese.core.kgram.")
+                        || reference.startsWith("fr.inria.corese.core.sparql.")
+                        || (reference.startsWith("fr.inria.corese.core.")
+                                && !reference.startsWith("fr.inria.corese.core.next.")));
+        assertNoSourceText(
+                dataSources,
+                List.of(
+                        "IDatatype",
+                        "CoreseValueFactory",
+                        "CoreseIRI",
+                        "CoreseBNode",
+                        "CoreseLiteral"));
+    }
+
+    @Test
     void legacyCodeMustNotDependOnNextImplementations() throws IOException {
         assertNoReferences(
                 CORE_SOURCES,

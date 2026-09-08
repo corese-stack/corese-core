@@ -7,7 +7,7 @@ import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
 import fr.inria.corese.core.next.storage.impl.model.StorageModel;
 import fr.inria.corese.core.next.data.api.io.JSONLDOptions;
-import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
+import fr.inria.corese.core.next.data.Values;
 import fr.inria.corese.core.next.storage.Storages;
 import fr.inria.corese.core.next.storage.api.config.StorageConfig;
 import jakarta.json.Json;
@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class JSONLDSerializerTest {
 
     private Model model;
-    private final ValueFactory factory = new CoreseValueFactory();
+    private final ValueFactory factory = Values.factory();
     private final IRI iriNode = factory.createIRI("http://example.org/iri1");
     private final IRI iriPred = factory.createIRI("http://example.org/pred1");
     private final Literal basicLiteral = factory.createLiteral("literal1");
@@ -43,7 +43,7 @@ class JSONLDSerializerTest {
 
         model = StorageModel.builder()
                 .storage(Storages.create(config))
-                .valueFactory(new CoreseValueFactory())
+                .valueFactory(Values.factory())
                 .build();
     }
 

@@ -7,7 +7,7 @@ import fr.inria.corese.core.next.data.spi.model.AbstractModel;
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.term.Value;
-import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
+import fr.inria.corese.core.next.data.Values;
 import fr.inria.corese.core.next.data.impl.io.parser.support.ParserTestBase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FilteredModelTest extends ParserTestBase {
 
-    private final ValueFactory vf = new CoreseValueFactory();
+    private final ValueFactory vf = Values.factory();
     private AbstractModel baseModel;
     private Resource subjectFilter;
     private IRI predicateFilter;

@@ -6,7 +6,7 @@ import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Literal;
 import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
-import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
+import fr.inria.corese.core.next.data.Values;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class StorageManagerEdgeTest {
 
-    private final ValueFactory valueFactory = new CoreseValueFactory();
+    private final ValueFactory valueFactory = Values.factory();
 
     @Test
     void exposesStorageStatementAsKgramEdge() {
