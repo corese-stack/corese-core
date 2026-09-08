@@ -1,5 +1,10 @@
 package fr.inria.corese.core.next.query.impl.sparql.execution;
 
+import fr.inria.corese.core.next.query.impl.engine.model.Graph;
+import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.spi.Result;
+import fr.inria.corese.core.next.query.impl.engine.storage.StorageManagerProducer;
+
 import fr.inria.corese.core.next.data.Values;
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Literal;

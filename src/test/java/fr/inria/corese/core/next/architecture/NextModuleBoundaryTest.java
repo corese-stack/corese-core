@@ -94,8 +94,8 @@ class NextModuleBoundaryTest {
                 source -> !source.startsWith(NEXT_SOURCES),
                 imported -> imported.startsWith("fr.inria.corese.core.next.")
                         && imported.contains(".impl.")
-                        // KGRAM migration hooks are deliberately outside the next boundary.
-                        && !imported.startsWith("fr.inria.corese.core.next.query.impl.kgram."));
+                        // Engine migration hooks are deliberately outside the next boundary.
+                        && !imported.startsWith("fr.inria.corese.core.next.query.impl.engine."));
     }
 
     @Test
@@ -143,7 +143,7 @@ class NextModuleBoundaryTest {
         return List.of(
                 NEXT_SOURCES.resolve("data/impl"),
                 NEXT_SOURCES.resolve("storage/impl"),
-                NEXT_SOURCES.resolve("query/impl/kgram"),
+                NEXT_SOURCES.resolve("query/impl/engine"),
                 NEXT_SOURCES.resolve("query/impl/sparql"));
     }
 

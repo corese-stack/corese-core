@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.io.serializer.support;
 
+import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
+
 import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.data.api.io.serializer.option.LineEndingOptions;
 import fr.inria.corese.core.next.data.spi.io.IOConstants;

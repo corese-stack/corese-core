@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.parser;
 
+import fr.inria.corese.core.next.query.impl.engine.model.Graph;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

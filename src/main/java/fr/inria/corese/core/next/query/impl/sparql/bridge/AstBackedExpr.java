@@ -1,13 +1,14 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
+
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
-import fr.inria.corese.core.next.query.impl.kgram.api.core.BindingContext;
-import fr.inria.corese.core.next.query.impl.kgram.api.core.Expr;
-import fr.inria.corese.core.next.query.impl.kgram.api.core.ExprType;
-import fr.inria.corese.core.next.query.impl.kgram.api.core.Filter;
-import fr.inria.corese.core.next.query.impl.kgram.api.query.Environment;
-import fr.inria.corese.core.next.query.impl.kgram.api.query.Evaluator;
-import fr.inria.corese.core.next.query.impl.kgram.api.query.Producer;
+import fr.inria.corese.core.next.query.impl.engine.model.BindingContext;
+import fr.inria.corese.core.next.query.impl.engine.model.Expr;
+import fr.inria.corese.core.next.query.impl.engine.model.ExprType;
+import fr.inria.corese.core.next.query.impl.engine.model.Filter;
+import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
+import fr.inria.corese.core.next.query.impl.engine.spi.Evaluator;
+import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
 import fr.inria.corese.core.next.query.impl.sparql.ast.AggregateAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ConstraintAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;

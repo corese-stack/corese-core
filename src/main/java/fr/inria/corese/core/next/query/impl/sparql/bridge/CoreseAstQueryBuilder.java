@@ -1,15 +1,17 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
+import fr.inria.corese.core.next.query.impl.engine.model.ExpType;
+
 import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.path.PathAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.path.PredicatePathAst;
-import fr.inria.corese.core.next.query.impl.kgram.api.core.ExpType.Type;
-import fr.inria.corese.core.next.query.impl.kgram.api.core.Filter;
-import fr.inria.corese.core.next.query.impl.kgram.api.core.Node;
-import fr.inria.corese.core.next.query.impl.kgram.core.Exp;
-import fr.inria.corese.core.next.query.impl.kgram.core.Query;
-import fr.inria.corese.core.next.query.impl.kgram.tool.NodeImpl;
+import fr.inria.corese.core.next.query.impl.engine.model.ExpType.Type;
+import fr.inria.corese.core.next.query.impl.engine.model.Filter;
+import fr.inria.corese.core.next.query.impl.engine.model.Node;
+import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
+import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.model.NodeImpl;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;

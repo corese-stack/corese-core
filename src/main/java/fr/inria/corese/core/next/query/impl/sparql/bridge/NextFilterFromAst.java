@@ -1,8 +1,10 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
+import fr.inria.corese.core.next.query.impl.engine.model.ExprType;
+
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
-import fr.inria.corese.core.next.query.impl.kgram.api.core.Expr;
-import fr.inria.corese.core.next.query.impl.kgram.api.core.Filter;
+import fr.inria.corese.core.next.query.impl.engine.model.Expr;
+import fr.inria.corese.core.next.query.impl.engine.model.Filter;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BoundAst;
 import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.VariableScopeAnalyzer;
 
@@ -58,7 +60,7 @@ public final class NextFilterFromAst implements Filter {
 
     @Override
     public boolean isFunctional() {
-        return owner.oper() == fr.inria.corese.core.next.query.impl.kgram.api.core.ExprType.UNNEST;
+        return owner.oper() == fr.inria.corese.core.next.query.impl.engine.model.ExprType.UNNEST;
     }
 
     @Override

@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.execution;
 
+import fr.inria.corese.core.next.query.impl.engine.model.Graph;
+
 import fr.inria.corese.core.next.data.Values;
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Resource;
@@ -21,18 +23,18 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.DescribeQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.bridge.CoreseAstQueryBuilder;
-import fr.inria.corese.core.next.query.impl.kgram.api.core.Edge;
-import fr.inria.corese.core.next.query.impl.kgram.api.core.Node;
-import fr.inria.corese.core.next.query.impl.kgram.core.Eval;
-import fr.inria.corese.core.next.query.impl.kgram.core.Exp;
-import fr.inria.corese.core.next.query.impl.kgram.core.Mapping;
-import fr.inria.corese.core.next.query.impl.kgram.core.Mappings;
-import fr.inria.corese.core.next.query.impl.kgram.core.Query;
-import fr.inria.corese.core.next.query.impl.kgram.core.SparqlException;
-import fr.inria.corese.core.next.query.impl.kgram.execution.RdfTermMatcher;
-import fr.inria.corese.core.next.query.impl.kgram.execution.SparqlKgramEvaluator;
-import fr.inria.corese.core.next.query.impl.kgram.tool.NodeImpl;
-import fr.inria.corese.core.next.query.impl.kgram.tool.StorageManagerProducer;
+import fr.inria.corese.core.next.query.impl.engine.model.Edge;
+import fr.inria.corese.core.next.query.impl.engine.model.Node;
+import fr.inria.corese.core.next.query.impl.engine.eval.Eval;
+import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
+import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
+import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
+import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.eval.SparqlException;
+import fr.inria.corese.core.next.query.impl.engine.eval.RdfTermMatcher;
+import fr.inria.corese.core.next.query.impl.engine.eval.SparqlKgramEvaluator;
+import fr.inria.corese.core.next.query.impl.engine.model.NodeImpl;
+import fr.inria.corese.core.next.query.impl.engine.storage.StorageManagerProducer;
 import fr.inria.corese.core.next.storage.api.StorageManager;
 
 import java.util.ArrayList;

@@ -1,5 +1,8 @@
 package fr.inria.corese.core.next.query.impl.sparql.io.serializer.json;
 
+import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.spi.Results;
+
 import fr.inria.corese.core.next.data.api.exception.SerializationException;
 import fr.inria.corese.core.next.data.api.io.format.FileFormat;
 import fr.inria.corese.core.next.data.api.io.option.IOOptions;

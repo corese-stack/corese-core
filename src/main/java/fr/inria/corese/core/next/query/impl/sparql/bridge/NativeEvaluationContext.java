@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
+import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+
 import fr.inria.corese.core.next.data.Values;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.literal.RDFDatatype;
@@ -8,11 +10,11 @@ import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import fr.inria.corese.core.next.data.api.term.Literal;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
-import fr.inria.corese.core.next.query.impl.kgram.api.core.Node;
-import fr.inria.corese.core.next.query.impl.kgram.api.query.Environment;
-import fr.inria.corese.core.next.query.impl.kgram.api.query.Evaluator;
-import fr.inria.corese.core.next.query.impl.kgram.api.query.Producer;
-import fr.inria.corese.core.next.query.impl.kgram.core.SparqlException;
+import fr.inria.corese.core.next.query.impl.engine.model.Node;
+import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
+import fr.inria.corese.core.next.query.impl.engine.spi.Evaluator;
+import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
+import fr.inria.corese.core.next.query.impl.engine.eval.SparqlException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 

@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.parser;
 
+import fr.inria.corese.core.next.query.impl.engine.model.Filter;
+
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 import org.junit.jupiter.api.Test;

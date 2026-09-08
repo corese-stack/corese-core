@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
+import fr.inria.corese.core.next.query.impl.engine.path.Record;
+
 import fr.inria.corese.core.next.query.impl.sparql.ast.path.NegatedPropertySetPathAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.path.PathAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.path.PredicatePathAst;

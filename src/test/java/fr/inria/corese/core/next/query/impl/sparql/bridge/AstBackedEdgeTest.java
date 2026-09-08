@@ -1,8 +1,8 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
-import fr.inria.corese.core.next.query.impl.kgram.api.core.Node;
-import fr.inria.corese.core.next.query.impl.kgram.tool.KgramNodes;
-import fr.inria.corese.core.next.query.impl.kgram.tool.NodeImpl;
+import fr.inria.corese.core.next.query.impl.engine.model.Node;
+import fr.inria.corese.core.next.query.impl.engine.model.KgramNodes;
+import fr.inria.corese.core.next.query.impl.engine.model.NodeImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

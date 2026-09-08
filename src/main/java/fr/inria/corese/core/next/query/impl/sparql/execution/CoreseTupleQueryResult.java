@@ -2,9 +2,9 @@ package fr.inria.corese.core.next.query.impl.sparql.execution;
 
 import fr.inria.corese.core.next.query.api.result.BindingSet;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
-import fr.inria.corese.core.next.query.impl.kgram.api.core.Node;
-import fr.inria.corese.core.next.query.impl.kgram.core.Mapping;
-import fr.inria.corese.core.next.query.impl.kgram.core.Mappings;
+import fr.inria.corese.core.next.query.impl.engine.model.Node;
+import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
+import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 
 import java.util.Iterator;
 import java.util.List;

@@ -1,5 +1,9 @@
 package fr.inria.corese.core.next.query.impl.sparql.parser;
 
+import fr.inria.corese.core.next.query.impl.engine.model.Graph;
+import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.spi.Result;
+
 import fr.inria.corese.core.next.common.text.RdfText;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
