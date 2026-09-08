@@ -4,12 +4,6 @@ import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 
 import fr.inria.corese.core.next.query.impl.engine.model.ExpType;
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
-import fr.inria.corese.core.next.query.impl.engine.sorter.IEstimate;
-import fr.inria.corese.core.next.query.impl.engine.sorter.ISort;
-import fr.inria.corese.core.next.query.impl.engine.sorter.QPGNode;
-import fr.inria.corese.core.next.query.impl.engine.sorter.QPGraph;
-import fr.inria.corese.core.next.query.impl.engine.sorter.DepthFirstBestSearch;
-import fr.inria.corese.core.next.query.impl.engine.sorter.HeuristicsBasedEstimation;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

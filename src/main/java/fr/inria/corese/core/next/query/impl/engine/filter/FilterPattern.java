@@ -22,6 +22,7 @@ import java.util.List;
  * @author Olivier Corby, Edelweiss, INRIA 2010
  */
 public final class FilterPattern implements ExprType, Expr {
+    private static final String NOT_SUPPORTED_YET = "Not supported yet.";
 	int type;
 	int oper;
 	String label;
@@ -208,96 +209,96 @@ public final class FilterPattern implements ExprType, Expr {
 
 	@Override
 	public Expr getDefine() {
-		throw new UnsupportedOperationException("Not supported yet.");
+		throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
 	}
 
 	@Override
 	public void setDefine(Expr exp) {
-		throw new UnsupportedOperationException("Not supported yet.");
+		throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
 	}
 
 	@Override
 	public int subtype() {
-		throw new UnsupportedOperationException("Not supported yet.");
+		throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
 	}
 
 	@Override
 	public Expr getFunction() {
-		throw new UnsupportedOperationException("Not supported yet.");
+		throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
 	}
 
 	@Override
 	public Expr getBody() {
-		throw new UnsupportedOperationException("Not supported yet.");
+		throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
 	}
 
 	@Override
 	public Expr getVariable() {
-		throw new UnsupportedOperationException("Not supported yet.");
+		throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
 	}
 
 	@Override
 	public Expr getDefinition() {
-		throw new UnsupportedOperationException("Not supported yet.");
+		throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
 	}
 
 	@Override
 	public boolean isSystem() {
-		throw new UnsupportedOperationException("Not supported yet.");
+		throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
 	}
 
 	@Override
 	public boolean isTrace() {
-		throw new UnsupportedOperationException("Not supported yet.");
+		throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
 	}
 
 	@Override
 	public boolean isDebug() {
-		throw new UnsupportedOperationException("Not supported yet.");
+		throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
 	}
 
 	@Override
 	public boolean isPublic() {
-		throw new UnsupportedOperationException("Not supported yet.");
+		throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
 	}
 
 	@Override
 	public DatatypeValue getDatatypeValue() {
-		throw new UnsupportedOperationException("Not supported yet.");
+		throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
 	}
 
 	@Override
 	public void setPublic(boolean b) {
-		throw new UnsupportedOperationException("Not supported yet.");
+		throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
 	}
 
 	@Override
 	public void setSubtype(int n) {
-		throw new UnsupportedOperationException("Not supported yet.");
+		throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
 	}
 
 	@Override
 	public boolean match(int oper) {
-		throw new UnsupportedOperationException("Not supported yet.");
+		throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
 	}
 
 	@Override
 	public boolean isConstant() {
-		throw new UnsupportedOperationException("Not supported yet.");
+		throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
 	}
 
 	@Override
 	public boolean hasMetadata(String type) {
-		throw new UnsupportedOperationException("Not supported yet.");
+		throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
 	}
 
 	@Override
 	public boolean isDynamic() {
-		throw new UnsupportedOperationException("Not supported yet.");
+		throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
 	}
 
 	@Override
 	public DatatypeValue evalWE(Evaluator eval, BindingContext b, Environment env, Producer p) {
-		throw new UnsupportedOperationException("Not supported yet.");
+		throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
 	}
 }

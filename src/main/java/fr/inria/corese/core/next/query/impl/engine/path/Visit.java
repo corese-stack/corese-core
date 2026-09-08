@@ -2,8 +2,11 @@ package fr.inria.corese.core.next.query.impl.engine.path;
 
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.model.Regex;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.TreeMap;
 
 /**
  * Record intermediate nodes that are visited by a loop path expression such as

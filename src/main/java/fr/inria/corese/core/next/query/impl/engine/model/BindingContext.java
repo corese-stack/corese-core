@@ -1,10 +1,5 @@
 package fr.inria.corese.core.next.query.impl.engine.model;
 
-import fr.inria.corese.core.next.query.impl.engine.event.ProcessVisitorDefault;
-import fr.inria.corese.core.next.query.impl.engine.path.Visit;
-import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
-import fr.inria.corese.core.next.query.impl.engine.solution.Memory;
-
 import fr.inria.corese.core.next.query.impl.engine.event.ProcessVisitor;
 
 import java.util.Map;

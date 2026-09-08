@@ -18,6 +18,7 @@ import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import java.util.Map;
 
 public class EnvironmentImpl implements Environment {
+    protected static final String NOT_SUPPORTED_YET = "Not supported yet.";
 	protected Query query;
 
 	public EnvironmentImpl(){
@@ -112,93 +113,93 @@ public class EnvironmentImpl implements Environment {
 
     @Override
     public Edge[] getEdges() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public Node[] getNodes() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public Node[] getQueryNodes() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public Path getPath(Node qNode) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public Mappings getMappings() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public Node get(Expr variable) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public BindingContext  getBind() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
 
     @Override
     public boolean hasBind() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public ApproximateSearchEnv getAppxSearchEnv() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public void setBind(BindingContext b) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public Iterable<Mapping> getAggregate() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public void aggregate(Mapping m, int n) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public Mapping getMapping() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public Eval getEval() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public void setEval(Eval e) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public ProcessVisitor getVisitor() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public void setReport(DatatypeValue dt) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public DatatypeValue getReport() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
 

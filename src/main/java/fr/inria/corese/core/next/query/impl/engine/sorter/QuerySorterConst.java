@@ -9,17 +9,23 @@ import fr.inria.corese.core.next.query.impl.engine.model.ExpType;
  */
 public final class QuerySorterConst {
 
-    public static final int ALL = 0;
-    public static final int SUBJECT = 1;
-    public static final int PREDICATE = 2;
-    public static final int OBJECT = 3;
-    public static final int TRIPLE = 4;
-    public static final int NA = -1;
+    private QuerySorterConst() {
+        // Utility class
+    }
 
-    public final static int BOUND = 0, LIST = 0, UNBOUND = Integer.MAX_VALUE;
+    static final int ALL = 0;
+    static final int SUBJECT = 1;
+    static final int PREDICATE = 2;
+    static final int OBJECT = 3;
+    static final int TRIPLE = 4;
+    static final int NA = -1;
 
-    public static final ExpType.Type[] EVALUABLE_TYPES = {ExpType.Type.EDGE, ExpType.Type.GRAPH};
-    public static final ExpType.Type[] NOT_EVALUABLE_TYPES = {ExpType.Type.FILTER, ExpType.Type.VALUES, ExpType.Type.BIND, ExpType.Type.OPTIONAL};
+    static final int BOUND = 0;
+    static final int LIST = 0;
+    static final int UNBOUND = Integer.MAX_VALUE;
+
+    static final ExpType.Type[] EVALUABLE_TYPES = {ExpType.Type.EDGE, ExpType.Type.GRAPH};
+    static final ExpType.Type[] NOT_EVALUABLE_TYPES = {ExpType.Type.FILTER, ExpType.Type.VALUES, ExpType.Type.BIND, ExpType.Type.OPTIONAL};
 
     public static boolean plannable(ExpType.Type type) {
         for (ExpType.Type e : NOT_EVALUABLE_TYPES) {

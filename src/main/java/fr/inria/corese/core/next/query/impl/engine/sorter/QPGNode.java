@@ -5,13 +5,16 @@ import fr.inria.corese.core.next.query.impl.engine.model.ExpType;
 import fr.inria.corese.core.next.query.impl.engine.model.Filter;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.sorter.QPGNodeCostModel;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static fr.inria.corese.core.next.query.impl.engine.sorter.QuerySorterConst.*;
+import static fr.inria.corese.core.next.query.impl.engine.sorter.QuerySorterConst.OBJECT;
+import static fr.inria.corese.core.next.query.impl.engine.sorter.QuerySorterConst.PREDICATE;
+import static fr.inria.corese.core.next.query.impl.engine.sorter.QuerySorterConst.SUBJECT;
 
 /**
  * The node for triple pattern graph, which encapsualtes an expression (contain

@@ -1,6 +1,4 @@
 package fr.inria.corese.core.next.query.impl.engine.sorter;
-
-import fr.inria.corese.core.next.query.impl.engine.eval.Eval;
 import fr.inria.corese.core.next.query.impl.engine.model.ExpType;
 import fr.inria.corese.core.next.query.impl.engine.model.Expr;
 import fr.inria.corese.core.next.query.impl.engine.model.ExprType;

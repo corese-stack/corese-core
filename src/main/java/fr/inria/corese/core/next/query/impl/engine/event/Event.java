@@ -1,7 +1,5 @@
 package fr.inria.corese.core.next.query.impl.engine.event;
 
-import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
-
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 
 /**

@@ -3,8 +3,9 @@ package fr.inria.corese.core.next.query.impl.engine.sorter;
 import fr.inria.corese.core.next.query.impl.engine.model.ExpType;
 
 import java.util.List;
-
-import static fr.inria.corese.core.next.query.impl.engine.sorter.QuerySorterConst.*;
+import static fr.inria.corese.core.next.query.impl.engine.sorter.QuerySorterConst.OBJECT;
+import static fr.inria.corese.core.next.query.impl.engine.sorter.QuerySorterConst.PREDICATE;
+import static fr.inria.corese.core.next.query.impl.engine.sorter.QuerySorterConst.SUBJECT;
 import static fr.inria.corese.core.next.query.impl.engine.sorter.IEstimate.MAX_COST;
 
 /**

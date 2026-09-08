@@ -1,7 +1,5 @@
 package fr.inria.corese.core.next.query.impl.engine.sorter;
 
-import fr.inria.corese.core.next.query.impl.engine.model.ExpType;
-
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 
 import java.util.ArrayList;
@@ -139,7 +137,6 @@ public class DepthFirstBestSearch implements ISort {
     //then add this filter just after these triple patterns
     private void addFilters() {
         List<QPGNode> filters = this.g.getAllNodes(Type.FILTER);
-        //others.addAll(g.getNodeList(VALUES));
 
         for (QPGNode f : filters) {
             //if there are no edges left linking to the filter (values, etc...)
@@ -167,10 +164,8 @@ public class DepthFirstBestSearch implements ISort {
     private void findAdjacentNodes(QPGNode minNode, Map<QPGNode, Double> pool) {
         //add adjacent unvisted nodes to a pool
         List<QPGEdge> lEdges = this.g.getEdges(minNode, QPGEdge.BI_DIRECT);
-        //final Map<QPGNode, Double> weights = new HashMap<QPGNode, Double>();
 
         for (QPGEdge e : lEdges) {
-            //pool.add(e.get(minNode));
             // get the linked node
             QPGNode linkedNode = e.get(minNode);
             //get the cost of the linked node

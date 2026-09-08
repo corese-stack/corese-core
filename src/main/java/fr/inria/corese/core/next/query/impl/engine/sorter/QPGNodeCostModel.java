@@ -7,8 +7,11 @@ import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static fr.inria.corese.core.next.query.impl.engine.sorter.QuerySorterConst.*;
+import static fr.inria.corese.core.next.query.impl.engine.sorter.QuerySorterConst.BOUND;
+import static fr.inria.corese.core.next.query.impl.engine.sorter.QuerySorterConst.LIST;
+import static fr.inria.corese.core.next.query.impl.engine.sorter.QuerySorterConst.NA;
+import static fr.inria.corese.core.next.query.impl.engine.sorter.QuerySorterConst.PREDICATE;
+import static fr.inria.corese.core.next.query.impl.engine.sorter.QuerySorterConst.UNBOUND;
 import static fr.inria.corese.core.next.query.impl.engine.sorter.IEstimate.MAX_COST;
 import static fr.inria.corese.core.next.query.impl.engine.sorter.IEstimate.MIN_COST_0;
 
@@ -23,8 +26,8 @@ public class QPGNodeCostModel extends AbstractCostModel {
     //    the more the better (less selectivity)
     //FN: filter, variables appeared in how many filters
     //G: graph
-    private final static int S = 0, P = 1, O = 2, G = 3, FF = 4, FV = 5;
-    private final static int PARAMETER_LEN = 6;
+    private static final int S = 0, P = 1, O = 2, G = 3, FF = 4, FV = 5;
+    private static final int PARAMETER_LEN = 6;
     //list of vairables appeared in the expression
     List<String> variables = new ArrayList<>();
     private final int[] pattern = new int[PARAMETER_LEN];

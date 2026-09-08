@@ -10,7 +10,6 @@ import fr.inria.corese.core.next.query.impl.engine.model.PointerType;
 import fr.inria.corese.core.next.query.impl.engine.model.Pointerable;
 import fr.inria.corese.core.next.query.impl.engine.model.TripleStore;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
-import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 
 import fr.inria.corese.core.next.query.impl.engine.spi.Result;
 import fr.inria.corese.core.next.query.impl.engine.path.Path;
@@ -19,8 +18,11 @@ import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static fr.inria.corese.core.next.query.impl.engine.model.PointerType.MAPPING;
 
@@ -862,12 +864,12 @@ public final class Mapping
 
     @Override
     public Edge getEdge() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public TripleStore getTripleStore() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override

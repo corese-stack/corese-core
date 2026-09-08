@@ -1,7 +1,5 @@
 package fr.inria.corese.core.next.query.impl.engine.sorter;
 
-import fr.inria.corese.core.next.query.impl.engine.model.Node;
-
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 
 import java.util.List;

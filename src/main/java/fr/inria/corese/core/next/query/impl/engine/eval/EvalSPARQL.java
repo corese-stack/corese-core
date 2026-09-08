@@ -1,6 +1,4 @@
 package fr.inria.corese.core.next.query.impl.engine.eval;
-
-import fr.inria.corese.core.next.query.impl.engine.model.ExpType;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;

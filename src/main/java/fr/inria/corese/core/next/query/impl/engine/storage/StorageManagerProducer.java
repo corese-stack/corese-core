@@ -1,7 +1,6 @@
 package fr.inria.corese.core.next.query.impl.engine.storage;
 
 import fr.inria.corese.core.next.query.impl.engine.eval.ApproximateSearchEnv;
-import fr.inria.corese.core.next.query.impl.engine.model.Graph;
 import fr.inria.corese.core.next.query.impl.engine.model.NodeImpl;
 
 import fr.inria.corese.core.next.data.api.term.IRI;

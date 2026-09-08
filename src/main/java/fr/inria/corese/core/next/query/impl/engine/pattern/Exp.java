@@ -1,12 +1,8 @@
 package fr.inria.corese.core.next.query.impl.engine.pattern;
-
-import fr.inria.corese.core.next.query.impl.engine.eval.EvalOptional;
 import fr.inria.corese.core.next.query.impl.engine.eval.PointerObject;
 import fr.inria.corese.core.next.query.impl.engine.eval.Stack;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
-import fr.inria.corese.core.next.query.impl.engine.solution.MappingSet;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
-import fr.inria.corese.core.next.query.impl.engine.sorter.Sorter;
 
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.ExpPattern;

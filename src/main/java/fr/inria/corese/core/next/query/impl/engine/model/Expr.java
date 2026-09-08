@@ -1,7 +1,5 @@
 package fr.inria.corese.core.next.query.impl.engine.model;
 
-import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import fr.inria.corese.core.next.query.impl.engine.spi.Evaluator;
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;

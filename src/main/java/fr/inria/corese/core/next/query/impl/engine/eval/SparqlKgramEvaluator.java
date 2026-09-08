@@ -1,12 +1,8 @@
 package fr.inria.corese.core.next.query.impl.engine.eval;
 
-import fr.inria.corese.core.next.query.impl.engine.model.Edge;
-import fr.inria.corese.core.next.query.impl.engine.model.Graph;
-
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import fr.inria.corese.core.next.query.impl.engine.spi.Evaluator;
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
-import fr.inria.corese.core.next.query.impl.engine.eval.Eval;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

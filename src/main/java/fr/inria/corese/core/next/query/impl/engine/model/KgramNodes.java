@@ -2,7 +2,6 @@ package fr.inria.corese.core.next.query.impl.engine.model;
 
 import fr.inria.corese.core.next.data.Values;
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
-import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.path.Path;
 
 /**

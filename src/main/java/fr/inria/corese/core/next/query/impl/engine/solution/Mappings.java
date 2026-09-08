@@ -10,7 +10,6 @@ import fr.inria.corese.core.next.query.impl.engine.model.TripleStore;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Group;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
-import fr.inria.corese.core.next.query.impl.engine.spi.Result;
 
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import fr.inria.corese.core.next.query.impl.engine.spi.Evaluator;
@@ -19,8 +18,12 @@ import fr.inria.corese.core.next.query.impl.engine.event.Event;
 import fr.inria.corese.core.next.query.impl.engine.event.EventImpl;
 import fr.inria.corese.core.next.query.impl.engine.event.KgramEventDispatcher;
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import static fr.inria.corese.core.next.query.impl.engine.model.PointerType.MAPPINGS;
 

@@ -5,7 +5,6 @@ import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
-import fr.inria.corese.core.next.query.impl.engine.event.ProcessVisitor;
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 
 /** No-op process visitor that forwards reporting events to the query binding context. */

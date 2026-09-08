@@ -1,10 +1,5 @@
 package fr.inria.corese.core.next.query.impl.engine.sorter;
 
-import fr.inria.corese.core.next.query.impl.engine.model.Graph;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
-
-import fr.inria.corese.core.next.query.impl.engine.sorter.QPGEdgeCostModel;
-
 import java.util.List;
 
 /**
@@ -14,8 +9,8 @@ import java.util.List;
  */
 public class QPGEdge {
 
-    public final static int BI_DIRECT = 10;
-    public final static int SIMPLE = 20;
+    static final int BI_DIRECT = 10;
+    static final int SIMPLE = 20;
 
     private final QPGNode n1;
     private final QPGNode n2;

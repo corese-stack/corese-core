@@ -1,9 +1,5 @@
 package fr.inria.corese.core.next.query.impl.engine.model;
 
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
-import fr.inria.corese.core.next.query.impl.engine.spi.Evaluator;
-import fr.inria.corese.core.next.query.impl.engine.spi.Matcher;
-
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import fr.inria.corese.core.next.query.impl.engine.path.Path;
 

@@ -2,8 +2,9 @@ package fr.inria.corese.core.next.query.impl.engine.eval;
 
 import fr.inria.corese.core.next.query.impl.engine.model.Expr;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
-
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Data structure: Key -> (node -> Value)

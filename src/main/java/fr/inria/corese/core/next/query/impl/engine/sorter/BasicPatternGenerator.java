@@ -1,8 +1,10 @@
 package fr.inria.corese.core.next.query.impl.engine.sorter;
-
-import fr.inria.corese.core.next.query.impl.engine.sorter.IProducerQP;
-
-import static fr.inria.corese.core.next.query.impl.engine.sorter.QuerySorterConst.*;
+import static fr.inria.corese.core.next.query.impl.engine.sorter.QuerySorterConst.BOUND;
+import static fr.inria.corese.core.next.query.impl.engine.sorter.QuerySorterConst.NA;
+import static fr.inria.corese.core.next.query.impl.engine.sorter.QuerySorterConst.OBJECT;
+import static fr.inria.corese.core.next.query.impl.engine.sorter.QuerySorterConst.PREDICATE;
+import static fr.inria.corese.core.next.query.impl.engine.sorter.QuerySorterConst.SUBJECT;
+import static fr.inria.corese.core.next.query.impl.engine.sorter.QuerySorterConst.UNBOUND;
 
 /**
  * Generate the basic patterns ordering by the selectivity acorrding to the size

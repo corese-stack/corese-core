@@ -1,7 +1,5 @@
 package fr.inria.corese.core.next.query.impl.engine.sorter;
 
-import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
-
 /**
  * Interface for calling Producer from kgraph, these methods are implemented
  * without the needs of stats data, only depending on the structure/index of

@@ -1,11 +1,8 @@
 package fr.inria.corese.core.next.query.impl.engine.pattern;
-
-import fr.inria.corese.core.next.query.impl.engine.eval.Eval;
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.Expr;
 import fr.inria.corese.core.next.query.impl.engine.model.ExprType;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
-import fr.inria.corese.core.next.query.impl.engine.path.PathFinder;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
 import fr.inria.corese.core.next.query.impl.engine.sorter.QuerySorter;
 
@@ -333,7 +330,6 @@ public final class Query extends Exp {
                     }
                 }
             }
-            //logger.error(str);
             errors.add(str);
         }
     }

@@ -1,7 +1,5 @@
 package fr.inria.corese.core.next.query.impl.engine.model;
 
-import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
-
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 
 /**

@@ -1,8 +1,5 @@
 package fr.inria.corese.core.next.query.impl.engine.event;
 
-import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
-import fr.inria.corese.core.next.query.impl.engine.spi.Result;
-
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.Expr;
 import fr.inria.corese.core.next.query.impl.engine.model.Regex;

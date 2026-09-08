@@ -1,7 +1,5 @@
 package fr.inria.corese.core.next.query.impl.engine.path;
 
-import fr.inria.corese.core.next.query.impl.engine.eval.Stack;
-
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.model.Regex;
 

@@ -22,6 +22,7 @@ import java.util.List;
  *
  */
 public class ProducerDefault implements Producer {
+    private static final String NOT_SUPPORTED_YET = "Not supported yet.";
 
     int mode = Producer.DEFAULT;
     Node graphNode;
@@ -118,12 +119,12 @@ public class ProducerDefault implements Producer {
 
     @Override
     public DatatypeValue getValue(Object value) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public DatatypeValue getDatatypeValue(Object value) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
@@ -138,27 +139,27 @@ public class ProducerDefault implements Producer {
 
     @Override
     public void start(Query q) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public void finish(Query q) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public DatatypeNodeFactory getDatatypeNodeFactory() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public Mappings map(List<Node> qNodes, DatatypeValue object, int n) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public String blankNode() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
 }

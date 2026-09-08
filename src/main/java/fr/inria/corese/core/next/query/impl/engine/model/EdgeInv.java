@@ -1,8 +1,4 @@
 package fr.inria.corese.core.next.query.impl.engine.model;
-
-import fr.inria.corese.core.next.query.impl.engine.model.Edge;
-import fr.inria.corese.core.next.query.impl.engine.model.Node;
-import fr.inria.corese.core.next.query.impl.engine.model.PointerType;
 import fr.inria.corese.core.next.query.impl.engine.eval.PointerObject;
 
 import static fr.inria.corese.core.next.query.impl.engine.model.PointerType.TRIPLE;

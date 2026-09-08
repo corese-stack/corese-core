@@ -4,8 +4,10 @@ import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.TreeMap;
 
 /**
  * select distinct ?x ?y select (count(distinct *) as ?c)
