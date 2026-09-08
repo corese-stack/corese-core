@@ -22,7 +22,7 @@ public final class SimpleDuration extends AbstractDuration {
     private static final long serialVersionUID = 1L;
 
     private final String label;
-    private final TemporalAmount temporalAmount;
+    private transient final TemporalAmount temporalAmount;
 
     public SimpleDuration(String lexicalValue) {
         this(lexicalValue, XSDDatatype.DURATION.getIRI(), XSDDatatype.DURATION);
@@ -38,6 +38,7 @@ public final class SimpleDuration extends AbstractDuration {
         this(lexicalValue, datatype, null);
     }
 
+    @SuppressWarnings("java:S1172") // Kept for source compatibility with the temporal literal API.
     public SimpleDuration(String lexicalValue, IRI datatype, CoreDatatype coreDatatype) {
         super();
         this.label = Objects.requireNonNull(lexicalValue, "lexicalValue");

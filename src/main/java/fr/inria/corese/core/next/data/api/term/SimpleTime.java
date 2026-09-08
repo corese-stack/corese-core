@@ -36,6 +36,7 @@ public final class SimpleTime extends AbstractTemporalPointLiteral {
         this(lexicalValue, datatype, null);
     }
 
+    @SuppressWarnings("java:S1172") // Kept for source compatibility with the temporal literal API.
     public SimpleTime(String lexicalValue, IRI datatype, CoreDatatype coreDatatype) {
         super(datatype == null ? XSDDatatype.TIME.getIRI() : datatype);
         this.label = Objects.requireNonNull(lexicalValue, "lexicalValue");

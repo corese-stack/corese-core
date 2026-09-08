@@ -36,6 +36,7 @@ public final class SimpleDate extends AbstractTemporalPointLiteral {
         this(lexicalValue, datatype, null);
     }
 
+    @SuppressWarnings("java:S1172") // Kept for source compatibility with the temporal literal API.
     public SimpleDate(String lexicalValue, IRI datatype, CoreDatatype coreDatatype) {
         super(datatype == null ? XSDDatatype.DATE.getIRI() : datatype);
         this.label = Objects.requireNonNull(lexicalValue, "lexicalValue");

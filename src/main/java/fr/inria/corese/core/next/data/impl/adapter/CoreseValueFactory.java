@@ -40,7 +40,6 @@ import fr.inria.corese.core.next.data.impl.adapter.literal.CoreseTyped;
 /**
  * Factory for all the Corese adapted values.
  */
-@Deprecated
 public class CoreseValueFactory implements ValueFactory {
 
     private static final String LABEL_PARAMETER = "label";
