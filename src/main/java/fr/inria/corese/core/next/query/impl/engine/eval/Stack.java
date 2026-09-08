@@ -62,4 +62,21 @@ public class Stack extends ArrayList<Exp> implements ExpType {
 		return str.toString();
 	}
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj) || getClass() != obj.getClass()) {
+            return false;
+        }
+        Stack other = (Stack) obj;
+        return level == other.level;
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 * super.hashCode() + Integer.hashCode(level);
+    }
+
 }

@@ -3,6 +3,9 @@ package fr.inria.corese.core.next.query.impl.engine.eval;
 
 public class Message {
 
+    private Message() {
+        // Utility class
+    }
 
     public enum Prefix {
         UNDEF_VAR("Undefined variable: "),
@@ -17,12 +20,12 @@ public class Message {
         LOOP("Loop: "),
         AGG("Aggregate limited to (defined) variable: ");
 
-        private final String prefix;
-        Prefix(String p) {
-            prefix = p;
+        private final String text;
+        Prefix(String text) {
+            this.text = text;
         }
         public String getString() {
-            return prefix;
+            return text;
         }
     }
 

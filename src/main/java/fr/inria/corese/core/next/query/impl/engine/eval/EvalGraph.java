@@ -18,7 +18,7 @@ import java.util.List;
 public class EvalGraph {
 
     Eval engine;
-    boolean stop = false;
+    volatile boolean stop = false;
 
     EvalGraph(Eval e) {
         engine = e;

@@ -1393,8 +1393,10 @@ public final class Eval implements ExpType, Plugin {
 
         if (data != null && data.getNodeList() != null && isPushEdgeMappings()) {
             // push values(data) before edge in stack
-            logger.info("Push path mappings:\nvalue {}\n{}",
-                    data.getNodeList(), data.toString(false, false, DISPLAY_RESULT_LIMIT));
+            if (logger.isInfoEnabled()) {
+                logger.info("Push path mappings:\nvalue {}\n{}",
+                        data.getNodeList(), data.toString(false, false, DISPLAY_RESULT_LIMIT));
+            }
             return eval(p, graphNode, stack.addCopy(n, exp.getValues(data)), n);
         }
 
@@ -2116,7 +2118,7 @@ public final class Eval implements ExpType, Plugin {
     @Deprecated(since = "4.0.0")
     @SuppressWarnings("java:S1133")
     public void exec(Exp exp, Environment env, int n) {
-        if (exp.getObject() instanceof String label && env.getNode(label) != null) {
+        if (exp.getObject() instanceof String label && env.getNode(label) != null && logger.isDebugEnabled()) {
             logger.debug("{}: {} {}", n, label, env.getNode(label).getLabel());
         }
     }

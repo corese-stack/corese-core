@@ -1,4 +1,5 @@
 package fr.inria.corese.core.next.query.impl.engine.solution;
+
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
 
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * Utilitary class for Join Minus Optional
@@ -35,7 +37,6 @@ public class MappingSet {
     HashMap<String, String> intersection; // intersection of variables
     List<String> varList;
     boolean isBound = false;
-    private Query query;
 
 
     public MappingSet(Query q, Exp exp, MappingSet s1, MappingSet s2) {
@@ -45,8 +46,8 @@ public class MappingSet {
         setQuery(q);
     }
 
-    public MappingSet(Query q, Mappings map) {
-        this.map = map;
+    public MappingSet(Query q, Mappings mappings) {
+        this.map = mappings;
         union = new HashMap<>();
         intersection = new HashMap<>();
         setQuery(q);
@@ -67,8 +68,8 @@ public class MappingSet {
     /**
      * Common variables bound in every Mapping in map1 and map2 ?
      */
-    boolean isBound(List<String> varList) {
-        return set1.inIntersection(varList) && set2.inIntersection(varList);
+    boolean checkBound(List<String> vars) {
+        return set1.inIntersection(vars) && set2.inIntersection(vars);
     }
 
     boolean hasIntersection(List<Node> nodeList) {
@@ -82,7 +83,7 @@ public class MappingSet {
 
     public void start() {
         varList = computeVarList();
-        isBound = isBound(varList);
+        isBound = checkBound(varList);
 
         if (isBound) {
             set2.getMappings().sort(varList);
@@ -115,7 +116,7 @@ public class MappingSet {
      */
     public Iterable<Mapping> getCandidateMappings(Mapping m) {
         if (isBound) {
-            return new Iterate(m);
+            return () -> new Iterate(m);
         }
         return set2.getMappings();
     }
@@ -123,18 +124,18 @@ public class MappingSet {
     /**
      * Is there one Mapping in map2 minus compatible with map in map1
      */
-    public boolean minusCompatible(Mapping map) {
+    public boolean minusCompatible(Mapping targetMap) {
         if (varList.isEmpty()) {
             // no common variables
             return false;
         } else {
             if (isBound) {
                 // check map compatible by dichotomy in map2
-                return set2.getMappings().minusCompatible(map, varList);
+                return set2.getMappings().minusCompatible(targetMap, varList);
             } else {
                 for (Mapping minus : set2.getMappings()) {
                     // enumerate map2
-                    if (map.minusCompatible(minus, varList)) {
+                    if (targetMap.minusCompatible(minus, varList)) {
                         return true;
                     }
                 }
@@ -144,22 +145,22 @@ public class MappingSet {
     }
 
     List<String> intersectionOfUnion(MappingSet model) {
-        ArrayList<String> varList = new ArrayList<>();
-        for (String var : getUnion().keySet()) {
-            if (model.getUnion().containsKey(var)) {
-                varList.add(var);
+        ArrayList<String> commonVars = new ArrayList<>();
+        for (String v : getUnion().keySet()) {
+            if (model.getUnion().containsKey(v)) {
+                commonVars.add(v);
             }
         }
-        return varList;
+        return commonVars;
     }
 
-    boolean inIntersection(List<String> varList) {
-        return inSet(varList, getIntersection());
+    boolean inIntersection(List<String> vars) {
+        return inSet(vars, getIntersection());
     }
 
-    boolean inSet(List<String> varList, HashMap<String, String> table) {
-        for (String var : varList) {
-            if (!table.containsKey(var)) {
+    boolean inSet(List<String> vars, HashMap<String, String> table) {
+        for (String v : vars) {
+            if (!table.containsKey(v)) {
                 return false;
             }
         }
@@ -207,61 +208,57 @@ public class MappingSet {
      * right arg of an optional in exp and skip statements after first
      * union/minus/optional/graph in exp
      */
-    public Mappings prepareMappingsRest(Exp exp) {
-        List<Node> nodeListInScope = exp.getRecordInScopeNodesWithoutBind();
+    public Mappings prepareMappingsRest(Exp expression) {
+        List<Node> nodeListInScope = expression.getRecordInScopeNodesWithoutBind();
         if (!nodeListInScope.isEmpty() && hasIntersection(nodeListInScope)) {
             // generate values when at least one variable in-subscope is always
             // bound in map1, otherwise it would generate duplicates in map2
             // or impose irrelevant bindings
             // map = select distinct map1 wrt exp inscope nodes
-            Mappings map = getMappings().distinct(nodeListInScope);
-            map.setNodeList(nodeListInScope);
+            Mappings distinctMap = getMappings().distinct(nodeListInScope);
+            distinctMap.setNodeList(nodeListInScope);
             // record original Mappings because union in exp may process it
             // more precisely. see Eval unionData()
             // s p o {s q r} union {o q r}
             // map node list = {r}
             // whereas we can get s for first branch and o for second branch
             // this is why we record original Mappings for union in exp if any
-            map.setJoinMappings(getMappings());
-            return map;
+            distinctMap.setJoinMappings(getMappings());
+            return distinctMap;
         }
         // there is no in-scope variable.
         // return original Mappings in case of union in exp (see comment above)
-        return getMappings(); // return null
+        return getMappings();
     }
 
     public void setQuery(Query query) {
-        this.query = query;
+        // query is kept for compatibility
     }
 
-    class Iterate implements Iterable<Mapping>, Iterator<Mapping> {
+    class Iterate implements Iterator<Mapping> {
 
         int n;
         Mapping m;
-        Mappings map;
+        Mappings targetMap;
 
         Iterate(Mapping m) {
-            map = set2.getMappings();
-            this.n = map.find(m, varList);
+            targetMap = set2.getMappings();
+            this.n = targetMap.find(m, varList);
             this.m = m;
         }
 
         @Override
         public boolean hasNext() {
-            return n >= 0 && n < map.size() && map.get(n).optionalCompatible(m, varList);
+            return n >= 0 && n < targetMap.size() && targetMap.get(n).optionalCompatible(m, varList);
         }
 
         @Override
         public Mapping next() {
-            return map.get(n++);
-        }
-
-        @Override
-        @SuppressWarnings("NullableProblems")
-        public Iterator<Mapping> iterator() {
-            return this;
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            return targetMap.get(n++);
         }
     }
-
 
 }

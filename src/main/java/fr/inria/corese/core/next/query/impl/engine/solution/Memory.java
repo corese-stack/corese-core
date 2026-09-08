@@ -834,7 +834,7 @@ public class Memory extends PointerObject implements Environment {
     /**
      * values (?x ?y) { unnest(exp) } exp returns Mappings map push ?x and ?y
      */
-    public boolean push(HashMap<String, Node> list, Mapping map, int n) {
+    public boolean push(Map<String, Node> list, Mapping map, int n) {
         int k = 0;
         for (Node qNode : map.getQueryNodes()) {
             if (qNode != null) {
@@ -852,7 +852,7 @@ public class Memory extends PointerObject implements Environment {
         return true;
     }
 
-    private void popPreviousNodes(HashMap<String, Node> list, Mapping map, int limit) {
+    private void popPreviousNodes(Map<String, Node> list, Mapping map, int limit) {
         for (int i = 0; i < limit; i++) {
             Node qq = map.getQueryNode(i);
             if (qq != null) {
@@ -864,7 +864,7 @@ public class Memory extends PointerObject implements Environment {
         }
     }
 
-    public void pop(HashMap<String, Node> list, Mapping map) {
+    public void pop(Map<String, Node> list, Mapping map) {
         for (Node qNode : map.getQueryNodes()) {
             if (qNode != null) {
                 Node tNode = list.get(qNode.getLabel());

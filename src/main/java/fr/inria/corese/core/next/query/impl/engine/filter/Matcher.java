@@ -93,9 +93,7 @@ public class Matcher implements ExprType {
 			}
 
 		case TERM:
-			//if (qe.arity() == 2 && qe.arity() == te.arity()){
-				return matchTerm(qe, te, bind);
-			//}
+			return matchTerm(qe, te, bind);
 		}
 
 		return false;

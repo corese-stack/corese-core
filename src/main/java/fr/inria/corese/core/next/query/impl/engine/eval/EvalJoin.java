@@ -19,7 +19,7 @@ import static fr.inria.corese.core.next.query.impl.engine.eval.Eval.STOP;
 public class EvalJoin {
 
     Eval engine;
-    boolean stop = false;
+    volatile boolean stop = false;
 
     EvalJoin(Eval engine) {
         this.engine = engine;

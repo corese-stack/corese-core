@@ -1,4 +1,5 @@
 package fr.inria.corese.core.next.query.impl.engine.eval;
+
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
@@ -10,6 +11,8 @@ import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
 
+import java.util.Iterator;
+
 import static fr.inria.corese.core.next.query.impl.engine.eval.Eval.STOP;
 
 /**
@@ -17,11 +20,11 @@ import static fr.inria.corese.core.next.query.impl.engine.eval.Eval.STOP;
  */
 public class EvalOptional {
 
-    Eval eval;
-    private boolean stop = false;
+    Eval engine;
+    private volatile boolean stop = false;
 
     EvalOptional(Eval e) {
-        eval = e;
+        engine = e;
     }
 
     /**
@@ -45,11 +48,12 @@ public class EvalOptional {
      * if m1.compatible(m2): merge = m1.merge(m2) if eval(F(merge)) result +=
      * merge ...
      */
+    @SuppressWarnings("java:S3776")
     int eval(Producer p, Node graphNode, Exp exp, Mappings data, Stack stack, int n) throws SparqlException {
         int backtrack = n - 1;
-        Memory env = eval.getMemory();
+        Memory env = engine.getMemory();
 
-        Mappings map1 = eval.subEval(p, graphNode, null, exp.first(), exp, data);
+        Mappings map1 = engine.subEval(p, graphNode, null, exp.first(), exp, data);
         if (isStop()) {
             return STOP;
         }
@@ -89,10 +93,10 @@ public class EvalOptional {
             // Every Mapping fail filter, rest() will always fail: skip optional rest()
             map2 = Mappings.create(env.getQuery());
         } else {
-            map2 = eval.subEval(p, graphNode, null, rest, exp, map);
+            map2 = engine.subEval(p, graphNode, null, rest, exp, map);
         }
 
-        eval.getVisitor().optional(eval, eval.getGraphNode(graphNode), exp, map1, map2);
+        engine.getVisitor().optional(engine, engine.getGraphNode(graphNode), exp, map1, map2);
 
         MappingSet set = new MappingSet(getQuery(), exp, set1,
                 new MappingSet(getQuery(), map2));
@@ -115,7 +119,7 @@ public class EvalOptional {
                     if (success) {
                         nbsuc++;
                         if (env.push(merge, n)) {
-                            backtrack = eval.eval(p, graphNode, stack, n + 1);
+                            backtrack = engine.eval(p, graphNode, stack, n + 1);
                             env.pop(merge);
                             if (backtrack < n) {
                                 return backtrack;
@@ -126,7 +130,7 @@ public class EvalOptional {
             }
 
             if ((nbsuc == 0) && (env.push(m1, n))) {
-                backtrack = eval.eval(p, graphNode, stack, n + 1);
+                backtrack = engine.eval(p, graphNode, stack, n + 1);
                 env.pop(m1);
                 if (backtrack < n) {
                     return backtrack;
@@ -143,34 +147,33 @@ public class EvalOptional {
      * (BGP1) skip binding Mapping m when it fail filter(var) Remove such
      * Mapping m from map before binding BGP2 with map
      */
-    Mappings filter(Node gNode, Exp exp, Environment memory, Producer p, Mappings map) throws SparqlException {
-        for (int i = 0; i < map.size(); ) {
-            Mapping m = map.get(i);
+    Mappings filter(Node gNode, Exp exp, Environment memory, Producer p, Mappings map) {
+        Iterator<Mapping> it = map.iterator();
+        while (it.hasNext()) {
+            Mapping m = it.next();
             m.setQuery(memory.getQuery());
             m.setMap(memory.getMap());
             m.setBind(memory.getBind());
-            m.setEval(eval);
+            m.setEval(engine);
             boolean suc = true;
 
             for (Exp ft : exp.getInscopeFilter()) {
-                boolean b = eval.test(gNode, ft.getFilter(), m, p);
+                boolean b = engine.test(gNode, ft.getFilter(), m, p);
                 if (!b) {
                     suc = false;
                     break;
                 }
             }
 
-            if (suc) {
-                i++;
-            } else {
-                map.remove(i);
+            if (!suc) {
+                it.remove();
             }
         }
         return map;
     }
 
 
-    boolean filter(Environment memory, Producer p, Node gNode, Mapping map, Exp exp) throws SparqlException {
+    boolean filter(Environment memory, Producer p, Node gNode, Mapping map, Exp exp) {
         if (exp.isPostpone()) {
             // A optional B
             // filters of B must be evaluated now
@@ -178,10 +181,10 @@ public class EvalOptional {
                 map.setQuery(memory.getQuery());
                 map.setMap(memory.getMap());
                 map.setBind(memory.getBind());
-                map.setEval(eval);
-                boolean b = eval.test(gNode, f.getFilter(), map, p);
-                if (eval.hasFilter) {
-                    b = eval.getVisitor().filter(eval, gNode, f.getFilter().getExp(), b);
+                map.setEval(engine);
+                boolean b = engine.test(gNode, f.getFilter(), map, p);
+                if (engine.hasFilter) {
+                    b = engine.getVisitor().filter(engine, gNode, f.getFilter().getExp(), b);
                 }
                 if (!b) {
                     return false;
@@ -192,6 +195,6 @@ public class EvalOptional {
     }
 
     Query getQuery() {
-        return eval.getMemory().getQuery();
+        return engine.getMemory().getQuery();
     }
 }
