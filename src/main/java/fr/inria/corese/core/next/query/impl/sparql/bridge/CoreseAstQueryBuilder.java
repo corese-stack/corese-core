@@ -3,8 +3,6 @@ package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
 import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
-import fr.inria.corese.core.next.query.impl.sparql.ast.path.PathAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.path.PredicatePathAst;
 import fr.inria.corese.core.next.query.impl.engine.model.ExpType.Type;
 import fr.inria.corese.core.next.query.impl.engine.model.Filter;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
@@ -170,22 +168,6 @@ public final class CoreseAstQueryBuilder {
     public Filter toNextFilter(ConstraintAst filterExpression) {
         Objects.requireNonNull(filterExpression, "filterExpression");
         return new AstBackedExpr(filterExpression, whereCompiler).getFilter();
-    }
-
-    /**
-     * Converts a query term used as subject, predicate, object, or variable reference
-     * into a runtime {@link Node}.
-     *
-     * <p>This helper is package-visible because both the query builder and the
-     * {@link WhereCompiler} need a single shared term-to-node conversion rule.</p>
-     */
-    static TermAst simplePredicate(PathAst path) {
-        if (path instanceof PredicatePathAst(TermAst predicate)) {
-            return predicate;
-        }
-        throw new UnsupportedQueryFeatureException(
-                "Property path bridge compilation is not supported yet by the next pipeline for: "
-                        + path.getClass().getSimpleName());
     }
 
     /**
@@ -521,7 +503,8 @@ public final class CoreseAstQueryBuilder {
         Exp bgp = Exp.create(Type.BGP);
         for (TriplePatternAst triple : template.triplePatternAsts()) {
             Node subject = constructNode(query, triple.subject(), compiler);
-            Node predicate = constructNode(query, simplePredicate(triple.predicate()), compiler);
+            Node predicate = constructNode(
+                    query, WhereCompiler.simplePredicate(triple.predicate()), compiler);
             Node object = constructNode(query, triple.object(), compiler);
             bgp.add(new AstBackedEdge(subject, predicate, object));
         }

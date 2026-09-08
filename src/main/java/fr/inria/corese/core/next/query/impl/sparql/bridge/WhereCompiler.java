@@ -11,8 +11,11 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.OptionalAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.PatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryPrologueAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ServiceAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.UnionAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.path.PathAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.path.PredicatePathAst;
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.ExpType.Type;
 import fr.inria.corese.core.next.query.impl.engine.model.Filter;
@@ -122,9 +125,18 @@ public final class WhereCompiler {
     private Edge toEdge(TriplePatternAst triple) {
         Node subject = termResolver.toNode(triple.subject());
         Node predicate = termResolver.toNode(
-            CoreseAstQueryBuilder.simplePredicate(triple.predicate()));
+            simplePredicate(triple.predicate()));
         Node object = termResolver.toNode(triple.object());
         return new AstBackedEdge(subject, predicate, object);
+    }
+
+    static TermAst simplePredicate(PathAst path) {
+        if (path instanceof PredicatePathAst(TermAst predicate)) {
+            return predicate;
+        }
+        throw new UnsupportedQueryFeatureException(
+                "Property path bridge compilation is not supported yet by the next pipeline for: "
+                        + path.getClass().getSimpleName());
     }
 
     private Exp compileFilter(FilterAst filter) {
