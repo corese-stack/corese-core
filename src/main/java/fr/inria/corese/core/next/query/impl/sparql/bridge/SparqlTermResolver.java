@@ -5,10 +5,14 @@ import fr.inria.corese.core.next.data.api.vocabulary.RDF;
 import fr.inria.corese.core.next.data.impl.namespace.PrefixHandler;
 import fr.inria.corese.core.next.data.spi.io.IOConstants;
 import fr.inria.corese.core.next.data.spi.term.IRIUtils;
+import fr.inria.corese.core.next.query.impl.engine.model.Node;
+import fr.inria.corese.core.next.query.impl.engine.model.NodeImpl;
+import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.PrefixDeclarationAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryPrologueAst;
-
-import java.util.Objects;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 
 /** Resolves SPARQL terms against one immutable query-prologue snapshot. */
 public final class SparqlTermResolver {
@@ -43,6 +47,20 @@ public final class SparqlTermResolver {
             return raw;
         }
         return resolvePrefixedIri(raw);
+    }
+
+    public Node toNode(TermAst term) {
+        return switch (term) {
+            case VarAst(String name) -> NodeImpl.forVariable(name);
+            case IriAst(String raw) when raw.startsWith(IOConstants.BLANK_NODE_PREFIX) ->
+                    NodeImpl.forBlank(raw.substring(IOConstants.BLANK_NODE_PREFIX.length()));
+            case IriAst(String raw) -> NodeImpl.forIRI(resolveIri(raw));
+            case LiteralAst(String lexical, String lang, String datatype) -> NodeImpl.forLiteral(
+                    unquoteLexical(lexical), normalizeDatatypeIri(datatype), lang);
+            default -> throw new IllegalArgumentException(
+                    "A query term must be a variable, IRI or literal, got: "
+                            + term.getClass().getSimpleName());
+        };
     }
 
     public String normalizeDatatypeIri(String datatype) {

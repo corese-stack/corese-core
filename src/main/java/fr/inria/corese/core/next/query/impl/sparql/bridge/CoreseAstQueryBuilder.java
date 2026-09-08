@@ -184,18 +184,7 @@ public final class CoreseAstQueryBuilder {
     }
 
     static Node toNode(TermAst term, SparqlTermResolver resolver) {
-        return switch (term) {
-            case VarAst(String name) -> NodeImpl.forVariable(name);
-            case IriAst(String raw) when raw.startsWith("_:") -> NodeImpl.forBlank(raw.substring(2));
-            case IriAst(String raw) -> NodeImpl.forIRI(resolver.resolveIri(raw));
-            case LiteralAst(String lexical, String lang, String datatype) -> NodeImpl.forLiteral(
-                    resolver.unquoteLexical(lexical),
-                    resolver.normalizeDatatypeIri(datatype),
-                    lang);
-            default -> throw new IllegalArgumentException(
-                    "A query term must be a variable, IRI or literal, got: "
-                            + term.getClass().getSimpleName());
-        };
+        return resolver.toNode(term);
     }
 
     static TermAst simplePredicate(PathAst path) {
