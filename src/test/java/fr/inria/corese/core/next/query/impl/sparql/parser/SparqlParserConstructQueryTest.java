@@ -101,6 +101,47 @@ class SparqlParserConstructQueryTest extends AbstractSparqlParserFeatureTest {
         assertEquals(5L, solutionModifier.offset());
     }
 
+    @Test
+    @DisplayName("Should parse short-form CONSTRUCT WHERE query")
+    void shouldParseShortFormConstructWhereQuery() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+            CONSTRUCT WHERE {
+                ?s ?p ?o .
+                ?o <http://example.org/p2> ?x
+            }
+            """);
+
+        assertInstanceOf(ConstructQueryAst.class, ast);
+        ConstructQueryAst construct = (ConstructQueryAst) ast;
+
+        assertNotNull(construct.constructTemplate());
+        assertNotNull(construct.whereClause());
+        assertEquals(2, construct.constructTemplate().triplePatternAsts().size());
+
+        GroupGraphPatternAst where = construct.whereClause();
+        assertEquals(1, where.patterns().size());
+        assertInstanceOf(BgpAst.class, where.patterns().getFirst());
+        BgpAst bgp = (BgpAst) where.patterns().getFirst();
+        assertEquals(2, bgp.triples().size());
+    }
+
+    @Test
+    @DisplayName("Should expand the W3C CONSTRUCT WHERE object-list shorthand in both clauses")
+    void shouldParseW3cConstructWhereObjectList() {
+        SparqlParser parser = newParserDefault();
+
+        ConstructQueryAst construct = assertInstanceOf(ConstructQueryAst.class, parser.parse("""
+                PREFIX : <http://example.org/>
+                CONSTRUCT WHERE { :s2 :p ?o1, ?o2 }
+                """));
+
+        assertEquals(2, construct.constructTemplate().triplePatternAsts().size());
+        BgpAst bgp = assertInstanceOf(BgpAst.class, construct.whereClause().patterns().getFirst());
+        assertEquals(2, bgp.triples().size());
+    }
+
     private void assertTemplateWithBlankNodes(ConstructTemplateAst template) {
         assertEquals(3, template.triplePatternAsts().size());
 

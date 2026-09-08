@@ -31,7 +31,7 @@ import java.util.List;
  *
  * @deprecated stats-based QP is not supported and not recommended to use 22 Oct. 2014
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 19 mai 2014
+ * @since 19 mai 2014
  */
 public class StatsBasedEstimation implements IEstimate {
 

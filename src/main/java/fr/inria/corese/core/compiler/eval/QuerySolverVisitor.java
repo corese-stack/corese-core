@@ -16,13 +16,15 @@ import java.util.List;
  * Callback manager for LDScript functions with specific annotations Eval SPARQL
  * processor calls before() and after()
  *
+ * <pre>{@code
  * @before      function us:before(?q) {}
  * @after       function us:after(?m) {}
  * @produce     function us:produce(?q) {}
  * @candidate   function us:candidate(?q, ?e) {}
  * @result      function us:result(?m) {}
  * @solution    function us:solution(?m) {}
-
+ * }</pre>
+ *
  * @author Olivier Corby, Wimmics INRIA I3S, 2018
  *
  */

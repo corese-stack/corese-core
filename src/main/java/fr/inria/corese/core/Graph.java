@@ -2681,7 +2681,7 @@ public class Graph extends GraphObject implements
      * Iterate nodes from basic graph node tables
      * not exactly graph vertex with rdf star
      *
-     * @note: consider nodes from nested triple
+     * Note: consider nodes from nested triple
      *        although they are just quoted
      */
     public Iterable<Node> getNodeIterator() {
@@ -3786,9 +3786,9 @@ public class Graph extends GraphObject implements
     }
 
     /**
-     * @Draft For each triple pattern: Search if there exists graph name,
+     * Draft: For each triple pattern: Search if there exists graph name,
      *        subject, property, object in the graph with similar URI
-     *        mode=message&param=sv:distance~n => levenshtein distance <= n
+     *        mode=message&amp;param=sv:distance~n =&gt; levenshtein distance &lt;= n
      */
     public JSONObject match(ASTQuery ast) {
         return match(ast, 1);

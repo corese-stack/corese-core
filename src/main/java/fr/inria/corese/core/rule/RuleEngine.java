@@ -362,7 +362,7 @@ public class RuleEngine implements Engine, Graphable {
 
     /**
      * @return a Graph of Constraint Violation, may be empty
-     * @todo: DataManager
+     * TODO: DataManager
      */
     public Graph constraint() {
         try {

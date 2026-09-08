@@ -75,7 +75,7 @@ public class CoreseMap extends CoreseExtension {
     }
 
     /**
-     * @todo check IDatatype set(name,value) use newInstance instead of newResource.
+     * TODO: check IDatatype set(name,value) use newInstance instead of newResource.
      */
     @Override
     public IDatatype set(String key, IDatatype val) {

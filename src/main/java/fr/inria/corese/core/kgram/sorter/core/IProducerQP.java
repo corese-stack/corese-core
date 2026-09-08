@@ -6,7 +6,7 @@ package fr.inria.corese.core.kgram.sorter.core;
  * graph
  *
  * @author Fuqi Song, WImmics Inria I3S
- * @date 4 juin 2014
+ * @since 4 juin 2014
  */
 public interface IProducerQP {
 

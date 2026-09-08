@@ -9,7 +9,7 @@ import java.util.Map;
  * map between distinct node and its number
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 17 juin 2014
+ * @since 17 juin 2014
  */
 public class BaseMap {
 

@@ -25,9 +25,9 @@ import jakarta.ws.rs.core.Response;
  * or Property SERVICE_REPORT = true
  * or url parameter mode=report 
  * record subset of key value:
- * @record server url 
+ * {@code @record server url}
  * generate record when service return empty results:
- * @record empty
+ * {@code @record empty}
  */
 public class ServiceReport implements URLParam {
     
@@ -281,7 +281,7 @@ public class ServiceReport implements URLParam {
     }
     
     /**
-     * @report server -> record server only
+     * {@code @report} server -&gt; record server only
      */
     boolean hasKey(String key) {
         if (getQuery() == null) {

@@ -672,7 +672,7 @@ public class Context extends ASTObject implements URLParam {
      * a) url = http://corese.inria.fr/psparql          -> name = url
      * b) url = http://corese.inria.fr/sparql?mode=demo -> name = demo
      * 
-     * @fixit: may loop when mode recursively refers to mode.
+     * Fixit: may loop when mode recursively refers to mode.
      */
     public void context(Context gc, String name) {
         // Consult Profile Context to get predefined parameters associated to name

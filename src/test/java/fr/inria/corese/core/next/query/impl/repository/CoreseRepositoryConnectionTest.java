@@ -10,6 +10,7 @@ import fr.inria.corese.core.next.query.api.TupleQuery;
 import fr.inria.corese.core.next.query.api.Update;
 import fr.inria.corese.core.next.query.api.dataset.Dataset;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
+import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.RepositoryException;
 import fr.inria.corese.core.next.query.api.result.GraphQueryResult;
 import fr.inria.corese.core.next.data.api.model.Statement;
@@ -207,6 +208,23 @@ class CoreseRepositoryConnectionTest {
         }
 
         @Test
+        @DisplayName("CONSTRUCT WHERE { ?s ?p ?o } short form returns the stored triple")
+        void constructWhereReturnsStoredTriple() {
+            try (RepositoryConnection conn = repository.getConnection()) {
+                GraphQuery q = conn.prepareGraphQuery(
+                        "CONSTRUCT WHERE { ?s ?p ?o }");
+                try (GraphQueryResult result = q.evaluate()) {
+                    assertTrue(result.hasNext(), "Expected at least one constructed statement");
+                    Statement stmt = result.next();
+                    assertEquals(ALICE, stmt.getSubject().stringValue());
+                    assertEquals(KNOWS, stmt.getPredicate().stringValue());
+                    assertEquals(BOB,   stmt.getObject().stringValue());
+                    assertFalse(result.hasNext(), "Expected exactly one statement");
+                }
+            }
+        }
+
+        @Test
         @DisplayName("Throws QuerySyntaxException for a non-CONSTRUCT/DESCRIBE query string")
         void throwsSyntaxExceptionForSelect() {
             try (RepositoryConnection conn = repository.getConnection()) {
@@ -260,17 +278,84 @@ class CoreseRepositoryConnectionTest {
         }
 
         @Test
-        @DisplayName("DELETE DATA removes a triple from the store")
-        void deleteDataRemovesTriple() {
+        @DisplayName("DELETE DATA resolves prefixed IRIs and removes a triple from the store")
+        void deleteDataResolvesPrefixedIris() {
             try (RepositoryConnection conn = repository.getConnection()) {
-                Update u = conn.prepareUpdate(
-                        "DELETE DATA { <" + ALICE + "> <" + KNOWS + "> <" + BOB + "> }");
+                Update u = conn.prepareUpdate("""
+                        PREFIX ex: <http://example.org/>
+                        DELETE DATA { ex:alice ex:knows ex:bob }
+                        """);
                 u.execute();
             }
             try (RepositoryConnection conn = repository.getConnection()) {
                 BooleanQuery q = conn.prepareBooleanQuery(
                         "ASK WHERE { <" + ALICE + "> <" + KNOWS + "> <" + BOB + "> }");
                 assertFalse(q.evaluate(), "DELETE DATA should have removed alice→knows→bob");
+            }
+        }
+
+        @Test
+        @DisplayName("DELETE DATA rejects blank nodes")
+        void deleteDataRejectsBlankNodes() {
+            try (RepositoryConnection conn = repository.getConnection()) {
+                Update u = conn.prepareUpdate("""
+                        PREFIX ex: <http://example.org/>
+                        DELETE DATA { _:b ex:knows ex:bob }
+                        """);
+                assertThrows(QueryEvaluationException.class, u::execute);
+            }
+        }
+
+        @Test
+        @DisplayName("INSERT DATA supports prefixed IRIs, blank nodes and literals")
+        void insertDataSupportsPrefixedIrisAndBlankNodes() {
+            try (RepositoryConnection conn = repository.getConnection()) {
+                Update u = conn.prepareUpdate("""
+                        PREFIX ex: <http://example.org/>
+                        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+                        INSERT DATA {
+                            ex:dave ex:knows _:b1 .
+                            _:b1 ex:name "Dave Friend"@en ;
+                                 ex:age "30"^^xsd:integer .
+                        }
+                        """);
+                u.execute();
+            }
+            try (RepositoryConnection conn = repository.getConnection()) {
+                BooleanQuery q = conn.prepareBooleanQuery("""
+                        PREFIX ex: <http://example.org/>
+                        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+                        ASK WHERE {
+                            ex:dave ex:knows ?b .
+                            ?b ex:name "Dave Friend"@en .
+                            ?b ex:age "30"^^xsd:integer .
+                        }
+                        """);
+                assertTrue(q.evaluate(), "Prefixed IRIs, blank nodes, and literals should be inserted");
+            }
+        }
+
+        @Test
+        @DisplayName("INSERT DATA blank node labels are fresh for each update request")
+        void insertDataCreatesFreshBlankNodesForEachRequest() {
+            try (RepositoryConnection conn = repository.getConnection()) {
+                conn.prepareUpdate("""
+                        PREFIX ex: <http://example.org/>
+                        INSERT DATA { ex:dave ex:knows _:b1 }
+                        """).execute();
+                conn.prepareUpdate("""
+                        PREFIX ex: <http://example.org/>
+                        INSERT DATA { ex:erin ex:knows _:b1 }
+                        """).execute();
+
+                BooleanQuery q = conn.prepareBooleanQuery("""
+                        PREFIX ex: <http://example.org/>
+                        ASK WHERE {
+                            ex:dave ex:knows ?b .
+                            ex:erin ex:knows ?b
+                        }
+                        """);
+                assertFalse(q.evaluate(), "Blank node labels must not leak across update requests");
             }
         }
     }

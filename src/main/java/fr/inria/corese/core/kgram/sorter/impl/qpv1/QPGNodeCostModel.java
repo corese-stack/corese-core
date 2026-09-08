@@ -26,7 +26,7 @@ import java.util.List;
  * Class for constructing the pattern of a triple, including many parameters
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 25 juin 2014 new
+ * @since 25 juin 2014 new
  */
 public class QPGNodeCostModel extends AbstractCostModel {
 

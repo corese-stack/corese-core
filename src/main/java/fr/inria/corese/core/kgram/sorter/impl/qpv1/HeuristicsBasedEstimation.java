@@ -12,7 +12,7 @@ import java.util.List;
  * Estimate the selectivity of triple pattern by heuristics
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 23 juin 2014
+ * @since 23 juin 2014
  */
 public class HeuristicsBasedEstimation implements IEstimate {
 

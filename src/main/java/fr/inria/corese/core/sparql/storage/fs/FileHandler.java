@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  * FileHandler.java
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 3 févr. 2015 new
+ * @since 3 févr. 2015 new
  */
 public class FileHandler {
 

@@ -387,7 +387,7 @@ public class EdgeManager implements Iterable<Edge> {
     /**
      * use case: Construct find occurrence of edge for rdf star
      *
-     * @todo: Index is sorted and reduced ?
+     * TODO: Index is sorted and reduced ?
      */
     Edge findEdge(Edge edge) {
         int i = findEdgeEqualWithoutMetadata(edge);
@@ -687,7 +687,7 @@ public class EdgeManager implements Iterable<Edge> {
      * not considering triple ref id
      * g s p o = g s p o t
      *
-     * @note: sort is not deterministic for rdf star triple with same g s p o
+     * Note: sort is not deterministic for rdf star triple with same g s p o
      * list will be reduced by metadata()
      */
 

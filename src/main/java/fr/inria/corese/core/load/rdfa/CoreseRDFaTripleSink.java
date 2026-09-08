@@ -16,7 +16,7 @@ import fr.inria.corese.core.storage.api.datamanager.DataManager;
  * triples (that are parsed by parser of semargl) to the graph of corese system
  *
  * @author Fuqi Song, wimmics inria i3s
- * @date Jan 2014 new
+ * @since Jan 2014 new
  */
 public class CoreseRDFaTripleSink implements TripleSink {
 

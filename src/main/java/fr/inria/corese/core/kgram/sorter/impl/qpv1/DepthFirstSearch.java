@@ -13,7 +13,7 @@ import static fr.inria.corese.core.kgram.api.core.ExpType.*;
  * algorithm
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 19 mai 2014
+ * @since 19 mai 2014
  */
 public class DepthFirstSearch implements ISort {
 

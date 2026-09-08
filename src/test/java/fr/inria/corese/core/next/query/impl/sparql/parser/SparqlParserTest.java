@@ -14,8 +14,13 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 
+import java.util.stream.Stream;
+
 import fr.inria.corese.core.next.query.impl.sparql.ast.SparqlQueryAst;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
@@ -219,7 +224,7 @@ class SparqlParserTest {
                 """);
 
         assertFalse(result.isValid());
-        assertEquals(4, result.diagnostics().size());
+        assertEquals(2, result.diagnostics().size());
         assertTrue(result.diagnostics().stream()
                 .allMatch(diagnostic -> diagnostic.kind() == QueryDiagnostic.Kind.SEMANTIC_ERROR));
     }
@@ -247,87 +252,130 @@ class SparqlParserTest {
         assertEquals("OrderByScopeValidationRule", result.diagnostics().getFirst().source());
     }
 
-    @Test
-    void validateAcceptsConstructOrderByVariableVisibleInValues() {
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("validQueryValidationCases")
+    void validateAcceptsValidQueries(String testName, String query) {
         SparqlParser parser = new SparqlParser();
-
-        QueryValidationResult result = parser.validate("""
-                CONSTRUCT {
-                    ?s ?p ?o
-                }
-                WHERE {
-                    ?s ?p ?o
-                }
-                ORDER BY ?rank
-                VALUES ?rank { 1 }
-                """);
-
+        QueryValidationResult result = parser.validate(query);
         assertTrue(result.isValid());
         assertTrue(result.diagnostics().isEmpty());
     }
 
-    @Test
-    void validateReturnsAskSemanticDiagnostic() {
-        SparqlParser parser = new SparqlParser();
-
-        QueryValidationResult result = parser.validate("""
-                ASK
-                WHERE {
-                    ?s ?p ?o
-                }
-                ORDER BY ?z
-                """);
-
-        assertFalse(result.isValid());
-        assertEquals(1, result.diagnostics().size());
-        assertEquals("OrderByScopeValidationRule", result.diagnostics().getFirst().source());
+    private static Stream<Arguments> validQueryValidationCases() {
+        return Stream.of(
+                Arguments.of("Construct ORDER BY variable visible in VALUES", """
+                        CONSTRUCT {
+                            ?s ?p ?o
+                        }
+                        WHERE {
+                            ?s ?p ?o
+                        }
+                        ORDER BY ?rank
+                        VALUES ?rank { 1 }
+                        """),
+                Arguments.of("SELECT expression referencing an unbound variable", """
+                        SELECT (STR(?x) AS ?label) WHERE {
+                            ?s ?p ?o
+                        }
+                        """),
+                Arguments.of("SELECT expression using earlier alias", """
+                        SELECT (?p AS ?price) (STR(?price) AS ?label) WHERE {
+                            ?s ?p ?o
+                        }
+                        """),
+                Arguments.of("Implicit aggregate projection", """
+                        SELECT (COUNT(?o) AS ?count) WHERE {
+                            ?s ?p ?o
+                        }
+                        """),
+                Arguments.of("GROUP BY expression alias projection", """
+                        SELECT ?key WHERE {
+                            ?s ?p ?o
+                        }
+                        GROUP BY (CONCAT(STR(?s), STR(?o)) AS ?key)
+                        """),
+                Arguments.of("HAVING using GROUP BY expression alias", """
+                        SELECT ?key WHERE {
+                            ?s ?p ?o
+                        }
+                        GROUP BY (CONCAT(STR(?s), STR(?o)) AS ?key)
+                        HAVING (BOUND(?key))
+                        """),
+                Arguments.of("ORDER BY using GROUP BY expression alias", """
+                        SELECT ?key WHERE {
+                            ?s ?p ?o
+                        }
+                        GROUP BY (CONCAT(STR(?s), STR(?o)) AS ?key)
+                        ORDER BY ?key
+                        """),
+                Arguments.of("ORDER BY using projected aggregate alias", """
+                        SELECT ?s (COUNT(?o) AS ?count) WHERE {
+                            ?s ?p ?o
+                        }
+                        GROUP BY ?s
+                        ORDER BY ?count
+                        """)
+        );
     }
 
-    @Test
-    void validateReturnsGroupBySemanticDiagnostic() {
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("semanticDiagnosticQueryCases")
+    void validateReturnsSemanticDiagnostic(String testName, String query, String expectedSource) {
         SparqlParser parser = new SparqlParser();
-
-        QueryValidationResult result = parser.validate("""
-                SELECT ?s WHERE {
-                    ?s ?p ?o
-                }
-                GROUP BY ?z
-                """);
-
+        QueryValidationResult result = parser.validate(query);
         assertFalse(result.isValid());
         assertEquals(1, result.diagnostics().size());
-        assertEquals("GroupByScopeValidationRule", result.diagnostics().getFirst().source());
+        assertEquals(expectedSource, result.diagnostics().getFirst().source());
     }
 
-    @Test
-    void validateReturnsGroupedSelectProjectionSemanticDiagnostic() {
-        SparqlParser parser = new SparqlParser();
-
-        QueryValidationResult result = parser.validate("""
-                SELECT ?s ?o WHERE {
-                    ?s ?p ?o
-                }
-                GROUP BY ?s
-                """);
-
-        assertFalse(result.isValid());
-        assertEquals(1, result.diagnostics().size());
-        assertEquals("GroupedSelectProjectionValidationRule", result.diagnostics().getFirst().source());
-    }
-
-    @Test
-    void validateReturnsImplicitAggregateProjectionSemanticDiagnostic() {
-        SparqlParser parser = new SparqlParser();
-
-        QueryValidationResult result = parser.validate("""
-                SELECT ?s (COUNT(?o) AS ?count) WHERE {
-                    ?s ?p ?o
-                }
-                """);
-
-        assertFalse(result.isValid());
-        assertEquals(1, result.diagnostics().size());
-        assertEquals("GroupedSelectProjectionValidationRule", result.diagnostics().getFirst().source());
+    private static Stream<Arguments> semanticDiagnosticQueryCases() {
+        return Stream.of(
+                Arguments.of("ASK query with out-of-scope ORDER BY", """
+                        ASK
+                        WHERE {
+                            ?s ?p ?o
+                        }
+                        ORDER BY ?z
+                        """, "OrderByScopeValidationRule"),
+                Arguments.of("GROUP BY with out-of-scope variable", """
+                        SELECT ?s WHERE {
+                            ?s ?p ?o
+                        }
+                        GROUP BY ?z
+                        """, "GroupByScopeValidationRule"),
+                Arguments.of("Grouped SELECT projection with ungrouped variable", """
+                        SELECT ?s ?o WHERE {
+                            ?s ?p ?o
+                        }
+                        GROUP BY ?s
+                        """, "GroupedSelectProjectionValidationRule"),
+                Arguments.of("Implicit aggregate projection with ungrouped variable", """
+                        SELECT ?s (COUNT(?o) AS ?count) WHERE {
+                            ?s ?p ?o
+                        }
+                        """, "GroupedSelectProjectionValidationRule"),
+                Arguments.of("HAVING with out-of-scope variable", """
+                        SELECT ?s WHERE {
+                            ?s ?p ?o
+                        }
+                        GROUP BY ?s
+                        HAVING (BOUND(?z))
+                        """, "HavingScopeValidationRule"),
+                Arguments.of("Grouped HAVING with ungrouped variable", """
+                        SELECT ?s WHERE {
+                            ?s ?p ?o
+                        }
+                        GROUP BY ?s
+                        HAVING (BOUND(?o))
+                        """, "GroupedHavingValidationRule"),
+                Arguments.of("Grouped ORDER BY with ungrouped variable", """
+                        SELECT ?s WHERE {
+                            ?s ?p ?o
+                        }
+                        GROUP BY ?s
+                        ORDER BY ?o
+                        """, "GroupedOrderByValidationRule")
+        );
     }
 
     @Test
@@ -348,35 +396,6 @@ class SparqlParserTest {
     }
 
     @Test
-    void validateReturnsSelectExpressionSemanticDiagnostic() {
-        SparqlParser parser = new SparqlParser();
-
-        QueryValidationResult result = parser.validate("""
-                SELECT (STR(?x) AS ?label) WHERE {
-                    ?s ?p ?o
-                }
-                """);
-
-        assertFalse(result.isValid());
-        assertEquals(1, result.diagnostics().size());
-        assertEquals("SelectProjectionScopeValidationRule", result.diagnostics().getFirst().source());
-    }
-
-    @Test
-    void validateAcceptsSelectExpressionUsingEarlierAlias() {
-        SparqlParser parser = new SparqlParser();
-
-        QueryValidationResult result = parser.validate("""
-                SELECT (?p AS ?price) (STR(?price) AS ?label) WHERE {
-                    ?s ?p ?o
-                }
-                """);
-
-        assertTrue(result.isValid());
-        assertTrue(result.diagnostics().isEmpty());
-    }
-
-    @Test
     void validateRejectsGroupedSelectExpressionMatchingGroupExpression() {
         SparqlParser parser = new SparqlParser();
 
@@ -391,134 +410,6 @@ class SparqlParserTest {
         assertEquals(2, result.diagnostics().size());
         assertTrue(result.diagnostics().stream()
                 .allMatch(diagnostic -> "GroupedSelectProjectionValidationRule".equals(diagnostic.source())));
-    }
-
-    @Test
-    void validateAcceptsImplicitAggregateProjection() {
-        SparqlParser parser = new SparqlParser();
-
-        QueryValidationResult result = parser.validate("""
-                SELECT (COUNT(?o) AS ?count) WHERE {
-                    ?s ?p ?o
-                }
-                """);
-
-        assertTrue(result.isValid());
-        assertTrue(result.diagnostics().isEmpty());
-    }
-
-    @Test
-    void validateAcceptsGroupByExpressionAliasProjection() {
-        SparqlParser parser = new SparqlParser();
-
-        QueryValidationResult result = parser.validate("""
-                SELECT ?key WHERE {
-                    ?s ?p ?o
-                }
-                GROUP BY (CONCAT(STR(?s), STR(?o)) AS ?key)
-                """);
-
-        assertTrue(result.isValid());
-        assertTrue(result.diagnostics().isEmpty());
-    }
-
-    @Test
-    void validateReturnsHavingSemanticDiagnostic() {
-        SparqlParser parser = new SparqlParser();
-
-        QueryValidationResult result = parser.validate("""
-                SELECT ?s WHERE {
-                    ?s ?p ?o
-                }
-                GROUP BY ?s
-                HAVING (BOUND(?z))
-                """);
-
-        assertFalse(result.isValid());
-        assertEquals(1, result.diagnostics().size());
-        assertEquals("HavingScopeValidationRule", result.diagnostics().getFirst().source());
-    }
-
-    @Test
-    void validateAcceptsHavingUsingGroupByExpressionAlias() {
-        SparqlParser parser = new SparqlParser();
-
-        QueryValidationResult result = parser.validate("""
-                SELECT ?key WHERE {
-                    ?s ?p ?o
-                }
-                GROUP BY (CONCAT(STR(?s), STR(?o)) AS ?key)
-                HAVING (BOUND(?key))
-                """);
-
-        assertTrue(result.isValid());
-        assertTrue(result.diagnostics().isEmpty());
-    }
-
-    @Test
-    void validateReturnsGroupedHavingSemanticDiagnostic() {
-        SparqlParser parser = new SparqlParser();
-
-        QueryValidationResult result = parser.validate("""
-                SELECT ?s WHERE {
-                    ?s ?p ?o
-                }
-                GROUP BY ?s
-                HAVING (BOUND(?o))
-                """);
-
-        assertFalse(result.isValid());
-        assertEquals(1, result.diagnostics().size());
-        assertEquals("GroupedHavingValidationRule", result.diagnostics().getFirst().source());
-    }
-
-    @Test
-    void validateAcceptsOrderByUsingGroupByExpressionAlias() {
-        SparqlParser parser = new SparqlParser();
-
-        QueryValidationResult result = parser.validate("""
-                SELECT ?key WHERE {
-                    ?s ?p ?o
-                }
-                GROUP BY (CONCAT(STR(?s), STR(?o)) AS ?key)
-                ORDER BY ?key
-                """);
-
-        assertTrue(result.isValid());
-        assertTrue(result.diagnostics().isEmpty());
-    }
-
-    @Test
-    void validateAcceptsOrderByUsingProjectedAggregateAlias() {
-        SparqlParser parser = new SparqlParser();
-
-        QueryValidationResult result = parser.validate("""
-                SELECT ?s (COUNT(?o) AS ?count) WHERE {
-                    ?s ?p ?o
-                }
-                GROUP BY ?s
-                ORDER BY ?count
-                """);
-
-        assertTrue(result.isValid());
-        assertTrue(result.diagnostics().isEmpty());
-    }
-
-    @Test
-    void validateReturnsGroupedOrderBySemanticDiagnostic() {
-        SparqlParser parser = new SparqlParser();
-
-        QueryValidationResult result = parser.validate("""
-                SELECT ?s WHERE {
-                    ?s ?p ?o
-                }
-                GROUP BY ?s
-                ORDER BY ?o
-                """);
-
-        assertFalse(result.isValid());
-        assertEquals(1, result.diagnostics().size());
-        assertEquals("GroupedOrderByValidationRule", result.diagnostics().getFirst().source());
     }
 
     @Test

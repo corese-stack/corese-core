@@ -21,7 +21,7 @@ import fr.inria.corese.core.sparql.triple.parser.NSManager;
  * Pretty printing for JSON-LD format
  *
  * @author Fuqi Song wimmics inria i3s
- * @date Feb 2014
+ * @since Feb 2014
  */
 public class JSONLDFormat extends RDFFormat {
 

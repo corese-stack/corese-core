@@ -8,7 +8,7 @@ import java.util.List;
  * Basic Query triple Pattern Graph edge used to connect two QPG nodes
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 27 juin 2014
+ * @since 27 juin 2014
  */
 public class QPGEdge {
 

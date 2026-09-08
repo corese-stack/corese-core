@@ -4,7 +4,7 @@ package fr.inria.corese.core.stats;
  * Options and parameters for setting meta data statistics 
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 17 juin 2014
+ * @since 17 juin 2014
  */
 public class Options {
 

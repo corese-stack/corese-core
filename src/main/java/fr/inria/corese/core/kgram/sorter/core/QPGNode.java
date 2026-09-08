@@ -18,7 +18,7 @@ import java.util.List;
  * an object exp) with cost
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 19 mai 2014
+ * @since 19 mai 2014
  */
 public class QPGNode {
 

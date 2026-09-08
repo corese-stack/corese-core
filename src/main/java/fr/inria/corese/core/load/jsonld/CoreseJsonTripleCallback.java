@@ -18,7 +18,7 @@ import fr.inria.corese.core.storage.api.datamanager.DataManager;
  * triples to corese graph
  *
  * @author Fuqi Song, Wimmics inria i3s
- * @date 10 Feb. 2014 new
+ * @since 10 Feb. 2014 new
  */
 public class CoreseJsonTripleCallback implements JsonLdTripleCallback {
 

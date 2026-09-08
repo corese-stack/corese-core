@@ -7,7 +7,7 @@ import java.util.List;
  * Interface for sorting and rewriting the QPG nodes
  * 
  * @author Fuqi Song, WImmics Inria I3S
- * @date 19 mai 2014
+ * @since 19 mai 2014
  */
 public interface ISort {
 

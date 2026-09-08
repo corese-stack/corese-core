@@ -16,12 +16,6 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
 
     private static final String ORDER_BY_SCOPE_MESSAGE =
             "Variable ?z used in ORDER BY is not visible in WHERE clause";
-    private static final String SELECT_PROJECTION_SCOPE_MESSAGE =
-            "Variable ?x used in SELECT projection is not visible in WHERE clause";
-    private static final String CITY_LABEL_SCOPE_MESSAGE =
-            "Variable ?cityLabel used in SELECT projection is not visible in WHERE clause";
-    private static final String LABEL_SCOPE_MESSAGE =
-            "Variable ?label used in SELECT projection is not visible in WHERE clause";
     private static final String GROUP_BY_SCOPE_MESSAGE =
             "Variable ?z used in GROUP BY is not visible in WHERE clause";
     private static final String HAVING_SCOPE_MESSAGE =
@@ -45,6 +39,28 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
         QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse(query));
 
         assertEquals(expectedMessage, exception.getMessage());
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("validUnboundProjectionQueries")
+    void shouldAcceptUnboundProjectionQueries(String testName, String query) {
+        assertDoesNotThrow(() -> newParserDefault().parse(query));
+    }
+
+    @Test
+    @DisplayName("Should reject a SELECT expression alias already introduced by the graph pattern")
+    void shouldRejectSelectExpressionAliasAlreadyInScope() {
+        SparqlParser parser = newParserDefault();
+        String query = """
+                SELECT (?p AS ?s) WHERE {
+                  ?s ?p ?o
+                }
+                """;
+        QueryValidationException exception = assertThrows(
+                QueryValidationException.class,
+                () -> parser.parse(query));
+
+        assertEquals("Variable ?s introduced by SELECT expression is already in scope", exception.getMessage());
     }
 
     @Nested
@@ -146,484 +162,349 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
 
     @Nested
     class FilterValidationTest {
-        @Test
-        void shouldRejectConcatUsedAsNumericOperand() {
+
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("invalidFilterQueries")
+        void shouldRejectInvalidFilterQueries(String testName, String query, String expectedMessage) {
             SparqlParser parser = newParserDefault();
-
-            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
-            SELECT * WHERE {
-              ?x ?p ?o .
-              FILTER(CONCAT("1", "2") + 1 = ?o)
-            }
-            """));
-
-            assertEquals("CONCAT used in + should be resolvable to a numeric", exception.getMessage());
+            QueryValidationException exception = assertThrows(
+                    QueryValidationException.class,
+                    () -> parser.parse(query));
+            assertEquals(expectedMessage, exception.getMessage());
         }
 
-        @Test
-        @DisplayName("Should accept FILTER with numeric operator")
-        void shouldAcceptFilterWithNumericOperator() {
-            SparqlParser parser = newParserDefault();
-
-            assertDoesNotThrow(() -> parser.parse("""
-                        SELECT * WHERE {
-                          ?x ?p ?o .
-                          FILTER(RAND())
-                        }
-                    """));
+        private static Stream<Arguments> invalidFilterQueries() {
+            return Stream.of(
+                    Arguments.of(
+                            "Should reject CONCAT used as numeric operand",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER(CONCAT("1", "2") + 1 = ?o)
+                            }
+                            """,
+                            "CONCAT used in + should be resolvable to a numeric"),
+                    Arguments.of(
+                            "Should reject FILTER with IRI-returning operator",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER(DATATYPE("test"^^<http://ns.inria.fr/test>))
+                            }
+                            """,
+                            "DATATYPE used in FILTER should be resolvable to a boolean"),
+                    Arguments.of(
+                            "Should reject FILTER with datetime operator",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER(NOW())
+                            }
+                            """,
+                            "NOW used in FILTER should be resolvable to a boolean"),
+                    Arguments.of(
+                            "Should reject FILTER when IF condition is not EBV-compatible",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER(IF(NOW(), true, false))
+                            }
+                            """,
+                            "IF used in FILTER should be resolvable to a boolean"),
+                    Arguments.of(
+                            "Should reject FILTER containing an IF that does not return boolean or acceptable AST type",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER(IF(?s, 4, <http://test.inria.fr>))
+                            }
+                            """,
+                            "IF used in FILTER should be resolvable to a boolean"),
+                    Arguments.of(
+                            "Should reject FILTER containing an IF that does not return only boolean or acceptable AST type",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER(IF(?s, true, <http://test.inria.fr>))
+                            }
+                            """,
+                            "IF used in FILTER should be resolvable to a boolean")
+            );
         }
 
-        @Test
-        @DisplayName("Should reject FILTER with IRI-returning operator")
-        void shouldRejectFilterWithIRIOperator() {
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("validFilterQueries")
+        void shouldAcceptValidFilterQueries(String testName, String query) {
             SparqlParser parser = newParserDefault();
-
-            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
-                        SELECT * WHERE {
-                          ?x ?p ?o .
-                          FILTER(DATATYPE("test"^^<http://ns.inria.fr/test>))
-                        }
-                    """));
-
-            assertEquals("DATATYPE used in FILTER should be resolvable to a boolean", exception.getMessage());
+            assertDoesNotThrow(() -> parser.parse(query));
         }
 
-        @Test
-        @DisplayName("Should reject FILTER with datetime operator")
-        void shouldRejectFilterWithDatetime() {
-            SparqlParser parser = newParserDefault();
-
-            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
-                        SELECT * WHERE {
-                          ?x ?p ?o .
-                          FILTER(NOW())
-                        }
-                    """));
-
-            assertEquals("NOW used in FILTER should be resolvable to a boolean", exception.getMessage());
-        }
-
-        @Test
-        @DisplayName("Should accept FILTER with numeric expression derived from datetime")
-        void shouldAcceptFilterWithDuration() {
-            SparqlParser parser = newParserDefault();
-
-            assertDoesNotThrow(() -> parser.parse("""
-                        SELECT * WHERE {
-                          ?x ?p ?o .
-                          FILTER(DAY(NOW()))
-                        }
-                    """));
-        }
-
-        @Test
-        @DisplayName("Should accept FILTER with plain literal")
-        void shouldAcceptFilterWithPlainLiteral() {
-            SparqlParser parser = newParserDefault();
-
-            assertDoesNotThrow(() -> parser.parse("""
-                        SELECT * WHERE {
-                          ?x ?p ?o .
-                          FILTER("test")
-                        }
-                    """));
-        }
-
-        @Test
-        @DisplayName("Should accept FILTER with CONCAT result")
-        void shouldAcceptFilterWithConcat() {
-            SparqlParser parser = newParserDefault();
-
-            assertDoesNotThrow(() -> parser.parse("""
-                        SELECT * WHERE {
-                          ?x ?p ?o .
-                          FILTER(CONCAT("te", "st"))
-                        }
-                    """));
-        }
-
-        @Test
-        @DisplayName("Should reject FILTER when IF condition is not EBV-compatible")
-        void shouldRejectFilterContainingIfWithIncorrectConditionType() {
-            SparqlParser parser = newParserDefault();
-
-            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
-                        SELECT * WHERE {
-                          ?x ?p ?o .
-                          FILTER(IF(NOW(), true, false))
-                        }
-                    """));
-
-            assertEquals("IF used in FILTER should be resolvable to a boolean", exception.getMessage());
-        }
-
-        @Test
-        @DisplayName("Should let pass FILTER with simple literal operator")
-        void shouldAcceptFilterWithStringOperator() {
-            SparqlParser parser = newParserDefault();
-
-            assertDoesNotThrow(() -> parser.parse("""
-                        SELECT * WHERE {
-                          ?x ?p ?o .
-                          FILTER(STR("test"^^<http://ns.inria.fr/test>))
-                        }
-                    """));
-        }
-
-        @Test
-        @DisplayName("Should let pass FILTER with variable")
-        void shouldAcceptFilterWithVariable() {
-            SparqlParser parser = newParserDefault();
-
-            assertDoesNotThrow(() -> parser.parse("""
-                        SELECT * WHERE {
-                          ?x ?p ?o .
-                          FILTER(?o)
-                        }
-                    """));
-        }
-
-        @Test
-        @DisplayName("Should let pass FILTER with boolean")
-        void shouldAcceptFilterWithBoolean() {
-            SparqlParser parser = newParserDefault();
-
-            assertDoesNotThrow(() -> parser.parse("""
-                        SELECT * WHERE {
-                          ?x ?p ?o .
-                          FILTER(true)
-                        }
-                    """));
-        }
-
-        @Test
-        @DisplayName("Should let pass FILTER containing a IF that returns boolean or any acceptable AST type.")
-        void shouldAcceptFilterContainingIfWithCorrectType() {
-            SparqlParser parser = newParserDefault();
-            assertDoesNotThrow(() -> {
-                parser.parse("""
-                           SELECT * WHERE {
-                             ?x ?p ?o .
-                             FILTER(IF(?s, true, ?o))
-                           }
-                        """);
-            });
-        }
-
-        @Test
-        @DisplayName("Should reject FILTER containing a IF that does not returns boolean or any acceptable AST type.")
-        void shouldRejectFilterContainingIfWithIncorrectType() {
-            SparqlParser parser = newParserDefault();
-
-            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
-                       SELECT * WHERE {
-                         ?x ?p ?o .
-                         FILTER(IF(?s, 4, <http://test.inria.fr>))
-                       }
-                    """));
-
-            assertEquals("IF used in FILTER should be resolvable to a boolean", exception.getMessage());
-        }
-
-        @Test
-        @DisplayName("Should reject FILTER containing a IF that does not returns only boolean or any acceptable AST type.")
-        void shouldRejectFilterContainingIfWithIncorrectTypeMix() {
-            SparqlParser parser = newParserDefault();
-
-            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
-                       SELECT * WHERE {
-                         ?x ?p ?o .
-                         FILTER(IF(?s, true, <http://test.inria.fr>))
-                       }
-                    """));
-
-            assertEquals("IF used in FILTER should be resolvable to a boolean", exception.getMessage());
-        }
-
-        @Test
-        @DisplayName("Should accept FILTER with numeric operator in a nested BGP")
-        void shouldAcceptFilterWithNumericOperatorInNestedBGP() {
-            SparqlParser parser = newParserDefault();
-
-            assertDoesNotThrow(() -> parser.parse("""
-                        SELECT * WHERE {
-                          {
+        private static Stream<Arguments> validFilterQueries() {
+            return Stream.of(
+                    Arguments.of(
+                            "Should accept FILTER with numeric operator",
+                            """
+                            SELECT * WHERE {
                               ?x ?p ?o .
                               FILTER(RAND())
-                          } UNION {
-                              ?s ?p ?o .
-                          }
-                        }
-                    """));
+                            }
+                            """),
+                    Arguments.of(
+                            "Should accept FILTER with numeric expression derived from datetime",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER(DAY(NOW()))
+                            }
+                            """),
+                    Arguments.of(
+                            "Should accept FILTER with plain literal",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER("test")
+                            }
+                            """),
+                    Arguments.of(
+                            "Should accept FILTER with CONCAT result",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER(CONCAT("te", "st"))
+                            }
+                            """),
+                    Arguments.of(
+                            "Should let pass FILTER with simple literal operator",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER(STR("test"^^<http://ns.inria.fr/test>))
+                            }
+                            """),
+                    Arguments.of(
+                            "Should let pass FILTER with variable",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER(?o)
+                            }
+                            """),
+                    Arguments.of(
+                            "Should let pass FILTER with boolean",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER(true)
+                            }
+                            """),
+                    Arguments.of(
+                            "Should let pass FILTER containing an IF that returns boolean or acceptable AST type",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER(IF(?s, true, ?o))
+                            }
+                            """),
+                    Arguments.of(
+                            "Should accept FILTER with numeric operator in a nested BGP",
+                            """
+                            SELECT * WHERE {
+                              {
+                                  ?x ?p ?o .
+                                  FILTER(RAND())
+                              } UNION {
+                                  ?s ?p ?o .
+                              }
+                            }
+                            """)
+            );
         }
     }
 
     @Nested
     class OperandTypeTest {
 
-        @Test
-        @DisplayName("Should accept + operator with numerics")
-        void shouldAcceptPlusWithNumerics() {
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("validOperandQueries")
+        void shouldAcceptValidOperandQueries(String testName, String query) {
             SparqlParser parser = newParserDefault();
-            assertDoesNotThrow(() -> {
-                parser.parse("""
-                           SELECT * WHERE {
-                             ?x ?p ?o .
-                             FILTER(RAND() + 1 = ?o)
-                           }
-                        """);
-            });
+            assertDoesNotThrow(() -> parser.parse(query));
         }
 
-        @Test
-        @DisplayName("Should accept - operator with numerics")
-        void shouldAcceptMinusWithNumerics() {
-            SparqlParser parser = newParserDefault();
-            assertDoesNotThrow(() -> {
-                parser.parse("""
-                           SELECT * WHERE {
-                             ?x ?p ?o .
-                             FILTER(STRLEN("test") - 1 = ?o)
-                           }
-                        """);
-            });
+        private static Stream<Arguments> validOperandQueries() {
+            return Stream.of(
+                    Arguments.of(
+                            "Should accept + operator with numerics",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER(RAND() + 1 = ?o)
+                            }
+                            """),
+                    Arguments.of(
+                            "Should accept - operator with numerics",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER(STRLEN("test") - 1 = ?o)
+                            }
+                            """),
+                    Arguments.of(
+                            "Should accept * operator with numerics",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER(STRLEN("test") * RAND() = ?o)
+                            }
+                            """),
+                    Arguments.of(
+                            "Should accept / operator with numerics",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER(DAY(NOW()) / 2 = ?o)
+                            }
+                            """),
+                    Arguments.of(
+                            "Should accept || operator with booleans",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER(IsIri(?s) || false)
+                            }
+                            """),
+                    Arguments.of(
+                            "Should accept && operator with booleans",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER(NOT EXISTS { ?s ?p false } && STRSTARTS("test", "t"))
+                            }
+                            """),
+                    Arguments.of(
+                            "Should accept ! operator with booleans",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER(! NOT EXISTS { ?s ?p false } && STRSTARTS("test", "t"))
+                            }
+                            """)
+            );
         }
 
-        @Test
-        @DisplayName("Should accept * operator with numerics")
-        void shouldAcceptMultiplyWithNumerics() {
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("invalidOperandQueries")
+        void shouldRejectInvalidOperandQueries(String testName, String query, String expectedMessage) {
             SparqlParser parser = newParserDefault();
-            assertDoesNotThrow(() -> {
-                parser.parse("""
-                           SELECT * WHERE {
-                             ?x ?p ?o .
-                             FILTER(STRLEN("test") * RAND() = ?o)
-                           }
-                        """);
-            });
+            QueryValidationException exception = assertThrows(
+                    QueryValidationException.class,
+                    () -> parser.parse(query));
+            assertEquals(expectedMessage, exception.getMessage());
         }
 
-        @Test
-        @DisplayName("Should accept / operator with numerics")
-        void shouldAcceptDivideWithNumerics() {
-            SparqlParser parser = newParserDefault();
-            assertDoesNotThrow(() -> {
-                parser.parse("""
-                           SELECT * WHERE {
-                             ?x ?p ?o .
-                             FILTER(DAY(NOW()) / 2 = ?o)
-                           }
-                        """);
-            });
+        private static Stream<Arguments> invalidOperandQueries() {
+            return Stream.of(
+                    Arguments.of(
+                            "Should reject + operator with non numerics",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER(RAND() + "one" = ?o)
+                            }
+                            """,
+                            "\"one\" used in + should be resolvable to a numeric"),
+                    Arguments.of(
+                            "Should reject - operator with non numerics",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER((3 - STRENDS("test", "")) = ?o)
+                            }
+                            """,
+                            "STRENDS used in - should be resolvable to a numeric"),
+                    Arguments.of(
+                            "Should reject / operator with non numerics",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER(<http://ns.inria.fr/test> / 2 = ?o)
+                            }
+                            """,
+                            "<http://ns.inria.fr/test> used in / should be resolvable to a numeric"),
+                    Arguments.of(
+                            "Should reject * operator with non numerics",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER(STRLEN("test") * NOW() = ?o)
+                            }
+                            """,
+                            "NOW used in * should be resolvable to a numeric"),
+                    Arguments.of(
+                            "Should reject || operator with non booleans",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER(IsIri(?s) || "potato"^^<http://ns.inria.fr/vegetable>)
+                            }
+                            """,
+                            "\"potato\"^^<http://ns.inria.fr/vegetable> used in || should be resolvable to a boolean"),
+                    Arguments.of(
+                            "Should reject && operator with non booleans",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER(<http://ns.inria.fr/test> && langMatches("potato", "fr"))
+                            }
+                            """,
+                            "<http://ns.inria.fr/test> used in && should be resolvable to a boolean"),
+                    Arguments.of(
+                            "Should reject ! operator with non booleans",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER(! <http://ns.inria.fr/test>)
+                            }
+                            """,
+                            "<http://ns.inria.fr/test> used in ! should be resolvable to a boolean"),
+                    Arguments.of(
+                            "Should reject < operator with IRIs",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER(2 < <http://ns.inria.fr/test>)
+                            }
+                            """,
+                            "<http://ns.inria.fr/test> used in < should be resolvable to a not an IRI"),
+                    Arguments.of(
+                            "Should reject <= operator with IRIs",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER(STRLEN("test") <= <http://ns.inria.fr/test>)
+                            }
+                            """,
+                            "<http://ns.inria.fr/test> used in <= should be resolvable to a not an IRI"),
+                    Arguments.of(
+                            "Should reject > operator with IRIs",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER("2"^^<http://www.w3.org/2001/XMLSchema#integer> > <http://ns.inria.fr/test>)
+                            }
+                            """,
+                            "<http://ns.inria.fr/test> used in > should be resolvable to a not an IRI"),
+                    Arguments.of(
+                            "Should reject >= operator with IRIs",
+                            """
+                            SELECT * WHERE {
+                              ?x ?p ?o .
+                              FILTER(datatype("2"^^<http://www.w3.org/2001/XMLSchema#integer>) >= 4)
+                            }
+                            """,
+                            "DATATYPE used in >= should be resolvable to a not an IRI")
+            );
         }
-
-        @Test
-        @DisplayName("Should reject + operator with non numerics")
-        void shouldRefusePlusWithNonNumerics() {
-            SparqlParser parser = newParserDefault();
-            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> {
-                parser.parse("""
-                           SELECT * WHERE {
-                             ?x ?p ?o .
-                             FILTER(RAND() + "one" = ?o)
-                           }
-                        """);
-            });
-            assertEquals("\"one\" used in + should be resolvable to a numeric", exception.getMessage());
-        }
-
-        @Test
-        @DisplayName("Should reject - operator with non numerics")
-        void shouldRejectMinusWithNonNumerics() {
-            SparqlParser parser = newParserDefault();
-            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> {
-                parser.parse("""
-                           SELECT * WHERE {
-                             ?x ?p ?o .
-                             FILTER((3 - STRENDS("test", "")) = ?o)
-                           }
-                        """);
-            });
-            assertEquals("STRENDS used in - should be resolvable to a numeric", exception.getMessage());
-        }
-
-        @Test
-        @DisplayName("Should reject * operator with non numerics")
-        void shouldRejectDivideWithNonNumerics() {
-            SparqlParser parser = newParserDefault();
-            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> {
-                parser.parse("""
-                           SELECT * WHERE {
-                             ?x ?p ?o .
-                             FILTER(<http://ns.inria.fr/test> / 2 = ?o)
-                           }
-                        """);
-            });
-            assertEquals("<http://ns.inria.fr/test> used in / should be resolvable to a numeric", exception.getMessage());
-        }
-
-        @Test
-        @DisplayName("Should reject / operator with non numerics")
-        void shouldRejectMultiplyWithNonNumerics() {
-            SparqlParser parser = newParserDefault();
-            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> {
-                parser.parse("""
-                           SELECT * WHERE {
-                             ?x ?p ?o .
-                             FILTER(STRLEN("test") * NOW() = ?o)
-                           }
-                        """);
-            });
-            assertEquals("NOW used in * should be resolvable to a numeric", exception.getMessage());
-        }
-
-        @Test
-        @DisplayName("Should accept || operator with booleans")
-        void shouldAcceptOrWithBoolean() {
-            SparqlParser parser = newParserDefault();
-            assertDoesNotThrow(() -> {
-                parser.parse("""
-                           SELECT * WHERE {
-                             ?x ?p ?o .
-                             FILTER(IsIri(?s) || false)
-                           }
-                        """);
-            });
-        }
-
-        @Test
-        @DisplayName("Should accept && operator with booleans")
-        void shouldAcceptAndWithBoolean() {
-            SparqlParser parser = newParserDefault();
-            assertDoesNotThrow(() -> {
-                parser.parse("""
-                           SELECT * WHERE {
-                             ?x ?p ?o .
-                             FILTER(NOT EXISTS { ?s ?p false } && STRSTARTS("test", "t"))
-                           }
-                        """);
-            });
-        }
-
-        @Test
-        @DisplayName("Should reject || operator with non booleans")
-        void shouldRejectOrWithNonBoolean() {
-            SparqlParser parser = newParserDefault();
-            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> {
-                parser.parse("""
-                           SELECT * WHERE {
-                             ?x ?p ?o .
-                             FILTER(IsIri(?s) || "potato"^^<http://ns.inria.fr/vegetable>)
-                           }
-                        """);
-            });
-            assertEquals("\"potato\"^^<http://ns.inria.fr/vegetable> used in || should be resolvable to a boolean", exception.getMessage());
-        }
-
-        @Test
-        @DisplayName("Should reject && operator with non booleans")
-        void shouldRejectAndWithNonBoolean() {
-            SparqlParser parser = newParserDefault();
-            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> {
-                parser.parse("""
-                           SELECT * WHERE {
-                             ?x ?p ?o .
-                             FILTER(<http://ns.inria.fr/test> && langMatches("potato", "fr"))
-                           }
-                        """);
-            });
-            assertEquals("<http://ns.inria.fr/test> used in && should be resolvable to a boolean", exception.getMessage());
-        }
-
-        @Test
-        @DisplayName("Should accept ! operator with booleans")
-        void shouldAcceptNotWithBoolean() {
-            SparqlParser parser = newParserDefault();
-            assertDoesNotThrow(() -> {
-                parser.parse("""
-                           SELECT * WHERE {
-                             ?x ?p ?o .
-                             FILTER(! NOT EXISTS { ?s ?p false } && STRSTARTS("test", "t"))
-                           }
-                        """);
-            });
-        }
-
-        @Test
-        @DisplayName("Should reject ! operator with non booleans")
-        void shouldRejectNotWithNonBoolean() {
-            SparqlParser parser = newParserDefault();
-            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> {
-                parser.parse("""
-                           SELECT * WHERE {
-                             ?x ?p ?o .
-                             FILTER(! <http://ns.inria.fr/test>)
-                           }
-                        """);
-            });
-            assertEquals("<http://ns.inria.fr/test> used in ! should be resolvable to a boolean", exception.getMessage());
-        }
-
-        @Test
-        @DisplayName("Should reject < operator with IRIs")
-        void shouldRejectLTWithIRIs() {
-            SparqlParser parser = newParserDefault();
-            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> {
-                parser.parse("""
-                           SELECT * WHERE {
-                             ?x ?p ?o .
-                             FILTER(2 < <http://ns.inria.fr/test>)
-                           }
-                        """);
-            });
-            assertEquals("<http://ns.inria.fr/test> used in < should be resolvable to a not an IRI", exception.getMessage());
-        }
-
-        @Test
-        @DisplayName("Should reject <= operator with IRIs")
-        void shouldRejectLTEWithIRIs() {
-            SparqlParser parser = newParserDefault();
-            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> {
-                parser.parse("""
-                           SELECT * WHERE {
-                             ?x ?p ?o .
-                             FILTER(STRLEN("test") <= <http://ns.inria.fr/test>)
-                           }
-                        """);
-            });
-            assertEquals("<http://ns.inria.fr/test> used in <= should be resolvable to a not an IRI", exception.getMessage());
-        }
-
-        @Test
-        @DisplayName("Should reject > operator with IRIs")
-        void shouldRejectGTWithIRIs() {
-            SparqlParser parser = newParserDefault();
-            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> {
-                parser.parse("""
-                           SELECT * WHERE {
-                             ?x ?p ?o .
-                             FILTER("2"^^<http://www.w3.org/2001/XMLSchema#integer> > <http://ns.inria.fr/test>)
-                           }
-                        """);
-            });
-            assertEquals("<http://ns.inria.fr/test> used in > should be resolvable to a not an IRI", exception.getMessage());
-        }
-
-        @Test
-        @DisplayName("Should reject >= operator with IRIs")
-        void shouldRejectGTEWithIRIs() {
-            SparqlParser parser = newParserDefault();
-            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> {
-                parser.parse("""
-                           SELECT * WHERE {
-                             ?x ?p ?o .
-                             FILTER(datatype("2"^^<http://www.w3.org/2001/XMLSchema#integer>) >= 4)
-                           }
-                        """);
-            });
-            assertEquals("DATATYPE used in >= should be resolvable to a not an IRI", exception.getMessage());
-        }
-
     }
 
     private static Stream<Arguments> invalidSelectQueries() {
@@ -637,26 +518,6 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
                                 ORDER BY ?z
                                 """,
                         ORDER_BY_SCOPE_MESSAGE),
-                Arguments.of(
-                        "Should reject projection variable only referenced in FILTER",
-                        """
-                                SELECT ?x WHERE {
-                                  ?s ?p ?o .
-                                  FILTER(BOUND(?x))
-                                }
-                                """,
-                        SELECT_PROJECTION_SCOPE_MESSAGE),
-                Arguments.of(
-                        "Should reject projection variable not visible through UNION",
-                        """
-                                SELECT ?cityLabel
-                                WHERE {
-                                  { ?country wdt:P36 ?city. }
-                                  UNION
-                                  { ?city wdt:P17 ?country. }
-                                }
-                                """,
-                        CITY_LABEL_SCOPE_MESSAGE),
                 Arguments.of(
                         "Should reject ORDER BY variable not visible in WHERE",
                         """
@@ -693,22 +554,6 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
                                 ORDER BY IF(BOUND(?o), ?o, ?z)
                                 """,
                         ORDER_BY_SCOPE_MESSAGE),
-                Arguments.of(
-                        "Should reject SELECT expression projection using a variable not visible in WHERE",
-                        """
-                        SELECT (STR(?x) AS ?label) WHERE {
-                            ?s ?p ?o
-                        }
-                        """,
-                        SELECT_PROJECTION_SCOPE_MESSAGE),
-                Arguments.of(
-                        "Should reject SELECT expression projection using a later alias not yet visible in SELECT",
-                        """
-                        SELECT (STR(?label) AS ?copy) (STR(?p) AS ?label) WHERE {
-                            ?s ?p ?o
-                        }
-                        """,
-                        LABEL_SCOPE_MESSAGE),
                 Arguments.of(
                         "Should reject GROUP BY variable not visible in WHERE",
                         """
@@ -826,14 +671,54 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
                         }
                         ORDER BY ?s
                         """,
-                        "Variable ?s used in ORDER BY must be grouped or aggregated"),
+                        "Variable ?s used in ORDER BY must be grouped or aggregated"));
+    }
+
+    private static Stream<Arguments> validUnboundProjectionQueries() {
+        return Stream.of(
                 Arguments.of(
-                        "Should reject SELECT projection variables not visible in WHERE",
+                        "Should accept projection variable only referenced in FILTER",
                         """
                                 SELECT ?x WHERE {
-                                    ?s ?p ?o
+                                  ?s ?p ?o .
+                                  FILTER(BOUND(?x))
                                 }
-                                """,
-                        SELECT_PROJECTION_SCOPE_MESSAGE));
+                                """),
+                Arguments.of(
+                        "Should accept projection variable not visible through UNION",
+                        """
+                                SELECT ?cityLabel
+                                WHERE {
+                                  { ?country wdt:P36 ?city. }
+                                  UNION
+                                  { ?city wdt:P17 ?country. }
+                                }
+                                """),
+                Arguments.of(
+                        "Should accept SELECT expression projection using an unbound variable",
+                        """
+                                SELECT (STR(?x) AS ?label) WHERE {
+                                  ?s ?p ?o
+                                }
+                                """),
+                Arguments.of(
+                        "Should accept aggregate projection over an empty group",
+                        """
+                                SELECT (SUM(?x) AS ?y) {}
+                                """),
+                Arguments.of(
+                        "Should accept SELECT expression projection referring to a later alias",
+                        """
+                                SELECT (STR(?label) AS ?copy) (STR(?p) AS ?label) WHERE {
+                                  ?s ?p ?o
+                                }
+                                """),
+                Arguments.of(
+                        "Should accept a projected variable not visible in WHERE",
+                        """
+                                SELECT ?x WHERE {
+                                  ?s ?p ?o
+                                }
+                                """));
     }
 }

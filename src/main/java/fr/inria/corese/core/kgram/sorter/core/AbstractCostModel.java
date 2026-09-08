@@ -7,7 +7,7 @@ import java.util.List;
  * Cost model used to estimate the cost for node or edge in a QPG
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 20 oct. 2014 added
+ * @since 20 oct. 2014 added
  */
 public abstract class AbstractCostModel {
 

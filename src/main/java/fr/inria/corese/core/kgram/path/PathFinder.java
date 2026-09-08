@@ -67,9 +67,9 @@ import org.slf4j.LoggerFactory;
  * Check Loop: pf.setCheckLoop(true) => exp+ exp{n,m} without loop
  * exec.setPathLoop(false) pragma {kg:path kg:loop false}
  *
- * @author Olivier Corby, Edelweiss, INRIA 2010
- * @thanx Corentin Follenfant for the idea of property weight into the regex
+ * Thanks to Corentin Follenfant for the idea of property weight into the regex.
  *
+ * @author Olivier Corby, Edelweiss, INRIA 2010
  ********************************************************
  */
 public class PathFinder {

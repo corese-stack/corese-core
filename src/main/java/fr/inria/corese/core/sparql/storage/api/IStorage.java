@@ -5,7 +5,7 @@ package fr.inria.corese.core.sparql.storage.api;
  * Interface that needs to be implemented for persistenting literal/string
  * 
  * @author Fuqi Song, WImmics Inria I3S
- * @date 13 janv. 2015
+ * @since 13 janv. 2015
  */
 public interface IStorage {
 

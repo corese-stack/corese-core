@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  * FileHandlerCache.java
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 3 févr. 2015
+ * @since 3 févr. 2015
  */
 public class FileHandlersManager extends LRUCache<Integer, FileHandler> {
 

@@ -13,10 +13,12 @@ import static fr.inria.corese.core.compiler.federate.util.RewriteErrorMessage.NO
  * Rewrite rdf list into one service bgp
  * Rewrite bgp with bnode into one service bgp: ?s :p [ :q ?v ]
  *
+ * <pre>{@code
  * @focus "?var" -> merge triple with variable var in bgp with bnode and var
  * @focus "?s"
  * ?s p [q u] . ?s p v
  * -> add ?s p v in bgp because it share variable ?s
+ * }</pre>
  */
 public class RewriteList implements FederateMerge {
 

@@ -207,7 +207,7 @@ public class ASTParser implements Walker, URLParam {
 
     /**
      *
-     * @report @enum generate values (?key ?val) {unnest(js:reportsEnum())}
+     * <pre>{@code @report @enum}</pre> generate values (?key ?val) {unnest(js:reportsEnum())}
      * js:reportsEnum() ::= (key_i (val_i1 .. val_in))
      *
      */
@@ -296,7 +296,7 @@ public class ASTParser implements Walker, URLParam {
     }
 
     /**
-     * @report Generate service number on leave when nested services: inner
+     * {@code @report} Generate service number on leave when nested services: inner
      * service is 0 and outer service is 1
      */
     void processLeave(Service exp) {

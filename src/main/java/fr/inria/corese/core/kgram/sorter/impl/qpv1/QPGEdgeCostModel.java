@@ -11,7 +11,7 @@ import static fr.inria.corese.core.kgram.sorter.core.IEstimate.MAX_COST;
  * Cost model for QPG edge 
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 20 oct. 2014
+ * @since 20 oct. 2014
  */
 public class QPGEdgeCostModel extends AbstractCostModel {
 

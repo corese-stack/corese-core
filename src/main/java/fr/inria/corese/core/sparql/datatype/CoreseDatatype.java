@@ -308,7 +308,7 @@ public class CoreseDatatype
     }
 
     /**
-     * @todo: leverage extension and pointer datatype
+     * TODO: leverage extension and pointer datatype
      */
     @Override
     public IDatatype copy() {
@@ -769,7 +769,7 @@ public class CoreseDatatype
      * string/literal/XMLLiteral/undef/boolean are sorted alphabetically then by
      * datatypes (by their code) literals are sorted with their lang if any
      *
-     * @todo: the primary order (Lit URI BN) is inverse of SPARQL !!!
+     * TODO: the primary order (Lit URI BN) is inverse of SPARQL !!!
      * used for select distinct, group by (sameTerm semantics)
      * used by Graph Node table to retrieve an existing Node
      * Distinguish 1 01 1.0 '1'^^xsd:long (does not return 0 but -1 or +1)

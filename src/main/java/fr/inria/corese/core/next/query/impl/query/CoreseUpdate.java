@@ -2,14 +2,15 @@ package fr.inria.corese.core.next.query.impl.query;
 
 import fr.inria.corese.core.next.data.Values;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
+import fr.inria.corese.core.next.data.api.model.Statement;
+import fr.inria.corese.core.next.data.api.term.BNode;
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Resource;
-import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.data.api.term.Value;
+import fr.inria.corese.core.next.data.spi.io.IOConstants;
 import fr.inria.corese.core.next.query.api.Update;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
-import fr.inria.corese.core.next.query.impl.sparql.parser.SparqlParser;
 import fr.inria.corese.core.next.query.impl.sparql.ast.DeleteDataRequestAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.InsertDataRequestAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
@@ -21,10 +22,13 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.UpdateRequestAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.UpdateRequestUnitAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.path.PredicatePathAst;
+import fr.inria.corese.core.next.query.impl.sparql.bridge.SparqlTermResolver;
+import fr.inria.corese.core.next.query.impl.sparql.parser.SparqlParser;
 import fr.inria.corese.core.next.storage.api.StorageManager;
 import fr.inria.corese.core.next.storage.api.operations.MutationOperations;
-import fr.inria.corese.core.next.common.text.RdfText;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -58,11 +62,12 @@ public final class CoreseUpdate implements Update {
         UpdateRequestAst request = (UpdateRequestAst) parser.parse(updateString);
         MutationOperations mutations = storage.mutations();
         ValueFactory factory = Values.factory();
+        SparqlTermResolver resolver = new SparqlTermResolver(request.prologue());
 
         for (UpdateRequestUnitAst operation : request.operations()) {
             switch (operation) {
-                case InsertDataRequestAst(QuadsAst data) -> applyQuads(data, mutations, factory, true);
-                case DeleteDataRequestAst(QuadsAst data) -> applyQuads(data, mutations, factory, false);
+                case InsertDataRequestAst(QuadsAst data) -> applyQuads(data, mutations, factory, resolver, true);
+                case DeleteDataRequestAst(QuadsAst data) -> applyQuads(data, mutations, factory, resolver, false);
                 default -> throw new UnsupportedQueryFeatureException(
                         "SPARQL UPDATE operation not yet supported: "
                                 + operation.getClass().getSimpleName());
@@ -75,9 +80,10 @@ public final class CoreseUpdate implements Update {
     // -------------------------------------------------------------------------
 
     private void applyQuads(QuadsAst quads, MutationOperations mutations,
-                            ValueFactory factory, boolean insert) {
+                            ValueFactory factory, SparqlTermResolver resolver, boolean insert) {
+        Map<String, BNode> blankNodes = new HashMap<>();
         for (TriplePatternAst triple : quads.defaultTriples()) {
-            Statement stmt = toStatement(triple, null, factory);
+            Statement stmt = toStatement(triple, null, factory, resolver, blankNodes, insert);
             if (insert) {
                 mutations.add(stmt);
             } else {
@@ -85,9 +91,9 @@ public final class CoreseUpdate implements Update {
             }
         }
         for (NamedGraphQuadsAst block : quads.namedGraphBlocks()) {
-            Resource context = (Resource) termToValue(block.graph(), factory);
+            Resource context = (Resource) termToValue(block.graph(), factory, resolver, blankNodes, insert);
             for (TriplePatternAst triple : block.triples()) {
-                Statement stmt = toStatement(triple, context, factory);
+                Statement stmt = toStatement(triple, context, factory, resolver, blankNodes, insert);
                 if (insert) {
                     mutations.add(stmt);
                 } else {
@@ -97,16 +103,18 @@ public final class CoreseUpdate implements Update {
         }
     }
 
-    private Statement toStatement(TriplePatternAst triple, Resource context, ValueFactory factory) {
-        Value subject = termToValue(triple.subject(), factory);
-        Value object  = termToValue(triple.object(), factory);
+    private Statement toStatement(TriplePatternAst triple, Resource context,
+                                  ValueFactory factory, SparqlTermResolver resolver,
+                                  Map<String, BNode> blankNodes, boolean insert) {
+        Value subject = termToValue(triple.subject(), factory, resolver, blankNodes, insert);
+        Value object  = termToValue(triple.object(), factory, resolver, blankNodes, insert);
 
         // Resolve predicate — INSERT/DELETE DATA only allows simple predicate IRIs
         if (!(triple.predicate() instanceof PredicatePathAst(TermAst pp))) {
             throw new UnsupportedQueryFeatureException(
                     "Property paths are not allowed in INSERT/DELETE DATA");
         }
-        Value predicate = termToValue(pp, factory);
+        Value predicate = termToValue(pp, factory, resolver, blankNodes, insert);
 
         if (!(subject instanceof Resource s)) {
             throw new QueryEvaluationException("UPDATE subject must be a Resource, got: " + subject);
@@ -120,17 +128,33 @@ public final class CoreseUpdate implements Update {
         return factory.createStatement(s, p, object);
     }
 
-    private Value termToValue(TermAst term, ValueFactory factory) {
+    private Value termToValue(
+            TermAst term,
+            ValueFactory factory,
+            SparqlTermResolver resolver,
+            Map<String, BNode> blankNodes,
+            boolean insert) {
         return switch (term) {
-            case IriAst(String raw) -> factory.createIRI(RdfText.stripAngleBrackets(raw));
+            case IriAst(String raw) -> {
+                String resolved = resolver.resolveIri(raw);
+                if (resolved != null && resolved.startsWith(IOConstants.BLANK_NODE_PREFIX)) {
+                    if (!insert) {
+                        throw new QueryEvaluationException("Blank nodes are not allowed in DELETE DATA");
+                    }
+                    yield blankNodes.computeIfAbsent(resolved, ignored -> factory.createBNode());
+                }
+                yield factory.createIRI(resolved);
+            }
             case LiteralAst(String lexical, String lang, String datatype) -> {
+                String clean = resolver.unquoteLexical(lexical);
                 if (lang != null && !lang.isBlank()) {
-                    yield factory.createLiteral(lexical, lang);
+                    yield factory.createLiteral(clean, lang);
                 }
                 if (datatype != null && !datatype.isBlank()) {
-                    yield factory.createLiteral(lexical, factory.createIRI(datatype));
+                    String resolvedDatatype = resolver.resolveIri(datatype);
+                    yield factory.createLiteral(clean, factory.createIRI(resolvedDatatype));
                 }
-                yield factory.createLiteral(lexical);
+                yield factory.createLiteral(clean);
             }
             default -> throw new UnsupportedQueryFeatureException(
                     "Variables are not allowed in INSERT/DELETE DATA: " + term);

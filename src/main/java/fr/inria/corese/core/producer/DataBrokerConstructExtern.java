@@ -74,7 +74,7 @@ public class DataBrokerConstructExtern extends DataBrokerExtern implements DataB
      * edge has no named graph
      * Return list of deleted edges
      * 
-     * @todo: Constant -> IDatatype as Node
+     * TODO: Constant -> IDatatype as Node
      */
     @Override
     public List<Edge> delete(Edge edge, List<Constant> from) {

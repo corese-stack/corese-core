@@ -6,7 +6,7 @@ package fr.inria.corese.core.sparql.storage.fs;
  * StringMeta.java
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 13 janv. 2015
+ * @since 13 janv. 2015
  */
 public class StringMeta {
 

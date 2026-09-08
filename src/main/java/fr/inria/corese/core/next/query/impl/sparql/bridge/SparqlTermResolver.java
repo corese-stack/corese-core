@@ -11,12 +11,12 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.QueryPrologueAst;
 import java.util.Objects;
 
 /** Resolves SPARQL terms against one immutable query-prologue snapshot. */
-final class SparqlTermResolver {
+public final class SparqlTermResolver {
 
     private final PrefixHandler prefixes;
     private final String baseIri;
 
-    SparqlTermResolver(QueryPrologueAst prologue) {
+    public SparqlTermResolver(QueryPrologueAst prologue) {
         QueryPrologueAst effectivePrologue = prologue == null ? QueryPrologueAst.empty() : prologue;
         this.prefixes = new PrefixHandler(true);
         for (PrefixDeclarationAst declaration : effectivePrologue.prefixDeclarations()) {
@@ -26,7 +26,7 @@ final class SparqlTermResolver {
         this.baseIri = effectivePrologue.baseIri().raw();
     }
 
-    String resolveIri(String raw) {
+    public String resolveIri(String raw) {
         if (raw == null) {
             return null;
         }
@@ -45,7 +45,7 @@ final class SparqlTermResolver {
         return resolvePrefixedIri(raw);
     }
 
-    String normalizeDatatypeIri(String datatype) {
+    public String normalizeDatatypeIri(String datatype) {
         if (datatype == null || datatype.isEmpty()) {
             return null;
         }
@@ -59,16 +59,41 @@ final class SparqlTermResolver {
         return resolvePrefixedIri(datatype);
     }
 
-    String unquoteLexical(String lexical) {
-        Objects.requireNonNull(lexical, "lexical");
-        if (lexical.length() < 2 || !lexical.startsWith("\"")) {
+    public String unquoteLexical(String lexical) {
+        if (lexical == null || lexical.length() < 2) {
             return lexical;
         }
-        if (lexical.endsWith("\"")) {
-            return lexical.substring(1, lexical.length() - 1);
+        String unquotedTriple = stripTripleQuotes(lexical);
+        if (unquotedTriple != null) {
+            return unquotedTriple;
         }
-        int closingQuote = lexical.lastIndexOf('"');
-        return closingQuote > 0 ? lexical.substring(1, closingQuote) : lexical;
+        return stripSingleQuotes(lexical);
+    }
+
+    private static String stripTripleQuotes(String lexical) {
+        if (lexical.length() >= 6) {
+            if (lexical.startsWith("\"\"\"") && lexical.endsWith("\"\"\"")) {
+                return lexical.substring(3, lexical.length() - 3);
+            }
+            if (lexical.startsWith("'''") && lexical.endsWith("'''")) {
+                return lexical.substring(3, lexical.length() - 3);
+            }
+        }
+        return null;
+    }
+
+    private static String stripSingleQuotes(String lexical) {
+        char quote = lexical.charAt(0);
+        if (quote != '"' && quote != '\'') {
+            return lexical;
+        }
+        int endIdx = lexical.endsWith(String.valueOf(quote))
+                ? lexical.length() - 1
+                : lexical.lastIndexOf(quote);
+        if (endIdx > 0) {
+            return lexical.substring(1, endIdx);
+        }
+        return lexical;
     }
 
     private String resolvePrefixedIri(String raw) {

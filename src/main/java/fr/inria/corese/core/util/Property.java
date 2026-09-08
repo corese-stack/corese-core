@@ -597,8 +597,8 @@ public class Property {
     }
 
     /**
-     * @todo: ./ in imported file is the path of main property file
-     * @todo: there is no recursive import
+     * TODO: ./ in imported file is the path of main property file
+     * TODO: there is no recursive import
      */
     private void imports() throws IOException {
         if (getProperties().containsKey(IMPORT.toString())) {
