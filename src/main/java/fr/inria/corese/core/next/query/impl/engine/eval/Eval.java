@@ -1381,8 +1381,8 @@ public final class Eval implements ExpType, Plugin {
      * in this case graphNode = g_i and from is useless here
      * from named has been used in named graph pattern evaluator
      * data is possible relevant bindings coming from preceding statement evaluation
-     * data may be null
      */
+    @SuppressWarnings("java:S3776") // Core KGRAM property path evaluation loop managing automaton candidate matching and backtracking
     private int path(Producer p, Node graphNode, Exp exp, Mappings data, Stack stack, int n) throws SparqlException {
         int backtrack = n - 1;
         int evENUM = Event.ENUM;
