@@ -112,9 +112,7 @@ class NextModuleBoundaryTest {
                 CORE_SOURCES,
                 source -> !source.startsWith(NEXT_SOURCES),
                 imported -> imported.startsWith("fr.inria.corese.core.next.")
-                        && imported.contains(".impl.")
-                        // Engine migration hooks are deliberately outside the next boundary.
-                        && !imported.startsWith("fr.inria.corese.core.next.query.impl.engine."));
+                        && imported.contains(".impl."));
     }
 
     @Test
