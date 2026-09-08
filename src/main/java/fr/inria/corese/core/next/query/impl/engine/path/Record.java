@@ -10,12 +10,14 @@ import java.util.ArrayList;
  * @author Olivier Corby, Edelweiss, INRIA 2011
  *
  */
+// Execution metadata does not participate in List equality or serialization.
+@SuppressWarnings("java:S2160")
 public class Record extends ArrayList<Regex> {
 
-	Visit visit;
-        Node target;
+	transient Visit visit;
+        transient Node target;
 
-	ArrayList<Node> stack;
+	transient ArrayList<Node> stack;
 
 	boolean success = false;
 

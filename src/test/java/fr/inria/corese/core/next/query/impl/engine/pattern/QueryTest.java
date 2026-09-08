@@ -1,8 +1,5 @@
 package fr.inria.corese.core.next.query.impl.engine.pattern;
 
-import fr.inria.corese.core.next.query.impl.engine.filter.Extension;
-import fr.inria.corese.core.next.query.impl.engine.model.Edge;
-import fr.inria.corese.core.next.query.impl.engine.model.Graph;
 
 import fr.inria.corese.core.next.query.impl.engine.model.ExpType;
 import fr.inria.corese.core.next.query.impl.engine.model.Filter;

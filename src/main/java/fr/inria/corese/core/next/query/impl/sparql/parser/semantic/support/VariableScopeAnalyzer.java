@@ -1,6 +1,5 @@
 package fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support;
 
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
 
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;

@@ -1,8 +1,5 @@
 package fr.inria.corese.core.next.query.impl.sparql.parser;
 
-import fr.inria.corese.core.next.query.impl.engine.eval.Stack;
-import fr.inria.corese.core.next.query.impl.engine.model.Filter;
-import fr.inria.corese.core.next.query.impl.engine.model.Graph;
 
 import fr.inria.corese.core.next.common.text.RdfText;
 import fr.inria.corese.core.next.data.spi.term.IRIUtils;

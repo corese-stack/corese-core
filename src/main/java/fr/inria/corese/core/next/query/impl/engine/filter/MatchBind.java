@@ -1,6 +1,5 @@
 package fr.inria.corese.core.next.query.impl.engine.filter;
 
-import fr.inria.corese.core.next.query.impl.engine.eval.Stack;
 
 import fr.inria.corese.core.next.query.impl.engine.model.Expr;
 import org.slf4j.Logger;

@@ -3,6 +3,7 @@ package fr.inria.corese.core.next.query.impl.engine.path;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Synchronized buffer to put/get path edges
@@ -11,6 +12,8 @@ import java.util.Iterator;
  * @author Olivier Corby, Edelweiss, INRIA 2010
  *
  */
+// A producer/consumer stream is consumed once; replay would require unbounded buffering.
+@SuppressWarnings("java:S4348")
 public class PathMappingBuffer implements Iterable<Mapping>, Iterator<Mapping> {
 
 	private Mapping map;
@@ -18,16 +21,11 @@ public class PathMappingBuffer implements Iterable<Mapping>, Iterator<Mapping> {
 	private boolean available = false;
 
 	public synchronized Mapping next() {
-		while (!available) {
-			try {
-				wait();
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-				return null;
-			}
-		}
+        if (!hasNext()) {
+            throw new NoSuchElementException("Path enumeration has ended");
+        }
 		available = false;
-		notify();
+		notifyAll();
 		return map;
 	}
 
@@ -40,7 +38,7 @@ public class PathMappingBuffer implements Iterable<Mapping>, Iterator<Mapping> {
 				return false;
 			}
 		}
-		notify();
+		notifyAll();
 		return hasNext;
 	}
 
@@ -56,7 +54,7 @@ public class PathMappingBuffer implements Iterable<Mapping>, Iterator<Mapping> {
 		map = val;
 		hasNext = next;
 		available = true;
-		notify();
+		notifyAll();
 	}
 
 	@Override
@@ -65,9 +63,4 @@ public class PathMappingBuffer implements Iterable<Mapping>, Iterator<Mapping> {
 		return this;
 	}
 
-	@Override
-	@Deprecated
-	public void remove() {
-		throw new UnsupportedOperationException("Remove operation is not supported");
-	}
 }

@@ -13,7 +13,6 @@ import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.triple.parser.Access;
 import fr.inria.corese.core.sparql.triple.parser.AccessRight;
 import fr.inria.corese.core.sparql.triple.parser.Context;
-import fr.inria.corese.core.sparql.triple.parser.HashMapList;
 import fr.inria.corese.core.sparql.triple.parser.context.ContextLog;
 import fr.inria.corese.core.sparql.triple.parser.Variable;
 import fr.inria.corese.core.sparql.triple.parser.VariableLocal;
@@ -22,18 +21,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+
 
 /**
  *
  * Stack vor LDScript variable bindings Variable have a relative index stack
- * index = level + var index level is the level of current function call in the
+ * index = level + variable index level is the level of current function call in the
  * stack
  *
  * @author Olivier Corby, Wimmics INRIA I3S, 2017
  *
  */
+@SuppressWarnings("deprecation")
 public class Binding implements Binder {
     
     private static final String URI = "uri";
@@ -59,14 +58,14 @@ public class Binding implements Binder {
     // level of the stack before function call
     // every funcall add a level
     ArrayList<Integer> level;
-    int currentLevel = 0, count = 0;
+    int currentLevel = 0;
+    int count = 0;
     
     HashMap<String, IDatatype> globalValue;
     HashMap<String, Variable>  globalVariable;
     private ProcessVisitor visitor;
     private AccessRight accessRight;
 
-    private static final Logger logger = LoggerFactory.getLogger(Binding.class);
     private boolean dynamicCapture = DYNAMIC_CAPTURE_DEFAULT;
     private boolean result;
     private boolean coalesce = false;
@@ -89,9 +88,9 @@ public class Binding implements Binder {
     }
 
     Binding() {
-        varList = new ArrayList();
-        valList = new ArrayList();
-        level = new ArrayList();
+        varList = new ArrayList<>();
+        valList = new ArrayList<>();
+        level = new ArrayList<>();
         setReport(DatatypeMap.newServiceReport());
         setGlobalVariableValues(new HashMap<>());
         setGlobalVariableNames(new HashMap<>());
@@ -181,15 +180,15 @@ public class Binding implements Binder {
      */
     @Override
     public boolean hasBind() {
-        return varList.size() > 0 || level.size() > 0;
+        return !varList.isEmpty() || !level.isEmpty();
     }
     
 
-    int getIndex(Expr var) {
-        return currentLevel + var.getIndex();
+    int getIndex(Expr variable) {
+        return currentLevel + variable.getIndex();
     }
 
-    public void set(Expr exp, Expr var, IDatatype val) {
+    public void set(Expr exp, Expr variable, IDatatype val) {
         switch (exp.oper()) {
             case ExprType.FUNCTION:
                 // special case: walker aggregate
@@ -197,21 +196,27 @@ public class Binding implements Binder {
                 allocate(exp);
                 break;
 
-            case ExprType.LET:               
-            case ExprType.FOR:
+            case ExprType.LET, ExprType.FOR:
                 allocation(exp);
+                break;
+            default:
+                break;
         }
-        set(var, val);
+        set(variable, val);
     }
     
     // must perform allocation before
-    public void setlet(Expr exp, Expr var, IDatatype val) {
-        set(var, val);
+    // Preserve the call signature shared by LDScript evaluation sites.
+    @SuppressWarnings("java:S1172")
+    public void setlet(Expr exp, Expr variable, IDatatype val) {
+        set(variable, val);
     }
     
     // do it when desallocation return false
-    public void unsetlet(Expr exp, Expr var, IDatatype val) {
-        unset(var);
+    // Preserve the call signature shared by LDScript evaluation sites.
+    @SuppressWarnings("java:S1172")
+    public void unsetlet(Expr exp, Expr variable, IDatatype val) {
+        unset(variable);
     }
     
     public void allocation(Expr exp) {
@@ -228,35 +233,30 @@ public class Binding implements Binder {
         return false;
     }
 
-    public void unset(Expr exp, Expr var, IDatatype val) {
-        switch (exp.oper()) {
-            case ExprType.FUNCTION:
-                // special case: walker aggregate
-                desallocate(exp);
-                break;
-
-            case ExprType.LET:
-            case ExprType.FOR:
-                if (desallocation(exp)) {
-                    return;
-                }
-
-            default:
-                unset(var);
+    // Preserve the call signature shared by LDScript evaluation sites.
+    @SuppressWarnings("java:S1172")
+    public void unset(Expr exp, Expr variable, IDatatype val) {
+        if (exp.oper() == ExprType.FUNCTION) {
+            desallocate(exp);
+        } else if ((exp.oper() != ExprType.LET && exp.oper() != ExprType.FOR)
+                || !desallocation(exp)) {
+            unset(variable);
         }
     }
 
      //special case: unary function
-    public void set(Function exp, Expr var, IDatatype val) {
+    public void set(Function exp, Expr variable, IDatatype val) {
         pushLevel();
-        push(var, val);
+        push(variable, val);
         // allocate additional variables
         for (int j = 1; j < exp.getNbVariable(); j++) {
             push(null, null);
         }
     }
     
-    public void setTailRec(Function exp, Expr var, IDatatype val) {
+    // Preserve the call signature shared by LDScript evaluation sites.
+    @SuppressWarnings("java:S1172")
+    public void setTailRec(Function exp, Expr variable, IDatatype val) {
         valList.set(currentLevel, val);
         // unset additional variables
         for (int j = 1; j < exp.getNbVariable(); j++) {
@@ -353,8 +353,8 @@ public class Binding implements Binder {
         count++;
         pushLevel();
         int i = 0;
-        for (Expr var : lvar) {
-            push(var, value[i++]);
+        for (Expr variable : lvar) {
+            push(variable, value[i++]);
         } 
         // allocate additional variables:
         for (int j = i; j<exp.getNbVariable(); j++){
@@ -362,24 +362,26 @@ public class Binding implements Binder {
         }
     }
 
-    void push(Expr var, IDatatype val) {
-        varList.add(var);
+    void push(Expr variable, IDatatype val) {
+        varList.add(variable);
         valList.add(val); 
     }
     
-    public void set(Expr var, IDatatype val) {
-        int index = getIndex(var);
-        varList.set(index, var);
+    public void set(Expr variable, IDatatype val) {
+        int index = getIndex(variable);
+        varList.set(index, variable);
         valList.set(index, val);
     }
 
     //@Override
+    // Preserve the call signature shared by LDScript evaluation sites.
+    @SuppressWarnings("java:S1172")
     public void unset(Expr exp, List<Expr> lvar) {
         desallocate(exp);
     }
 
-    void unset(Expr var) {
-        valList.set(getIndex(var), null);
+    void unset(Expr variable) {
+        valList.set(getIndex(variable), null);
     }
 
     /**
@@ -387,31 +389,24 @@ public class Binding implements Binder {
      * between top of stack and level
      */
     @Override
-    public IDatatype get(Expr var) {
-        return getBasic(var, true);
+    public IDatatype get(Expr variable) {
+        return getBasic(variable, true);
     }
 
-    public IDatatype getBasic(Expr var, boolean withStatic) {
-        switch (var.getIndex()) {
-            case UNBOUND: {
-                if (isDynamicCapture()) {
-                    for (int i = varList.size() - 1; i >= 0; i--) {
-                        Expr vv = varList.get(i);
-                        if (vv != null && vv.isDynamic() && vv.equals(var)) {
-                            return valList.get(i);
-                        }
-                    }
-                }
-
-                return (withStatic)?getGlobalVariable(var.getLabel()):getBasicGlobalVariable(var.getLabel());
-            }
-            default:
-                return valList.get(getIndex(var));
+    public IDatatype getBasic(Expr variable, boolean withStatic) {
+        if (variable.getIndex() != UNBOUND) {
+            return valList.get(getIndex(variable));
         }
+        int capturedIndex = findDynamicVariable(variable);
+        if (capturedIndex >= 0) {
+            return valList.get(capturedIndex);
+        }
+        return withStatic ? getGlobalVariable(variable.getLabel())
+                : getBasicGlobalVariable(variable.getLabel());
     }
 
 
-    // todo:  why not level ???
+    // Search all stack levels, including bindings captured from enclosing calls.
     @Override
     public boolean isBound(String label) {
         for (int i = index(); i >= 0; i--) {
@@ -472,56 +467,58 @@ public class Binding implements Binder {
     
     
     // must be LocalVariable, i.e. LDScript Variable
-    public Binding bind(Variable var, IDatatype val) {
-        bind(null, var, val);
+    public Binding bind(Variable variable, IDatatype val) {
+        bind(null, variable, val);
         return this;
     }
 
     /**
      * set(?x = exp) ?x is already bound, assign variable
      */
-    public void bind(Expr exp, Variable var, IDatatype val) {
-        switch (var.subtype()) {
-            // global means SPARQL variable
-            // local  means LDScript variable
-            case ExprType.GLOBAL:
-                break;
-            default:
-                switch (var.getIndex()) {
-                    case UNBOUND:
-                        
-                        if (isDynamicCapture()) {
-                            for (int i = varList.size() - 1; i >= 0; i--) {
-                                Expr vv = varList.get(i);
-                                if (vv != null && vv.isDynamic() && vv.equals(var)) {
-                                     valList.set(i, val);
-                                     return;
-                                }
-                            }
-                        }
-                        
-                        // global variable
-                        define(var, val);
-                        break;
-                    default:
-                        valList.set(getIndex(var), val);
-                }
+    // Preserve the call signature shared by LDScript evaluation sites.
+    @SuppressWarnings("java:S1172")
+    public void bind(Expr exp, Variable variable, IDatatype val) {
+        // GLOBAL denotes a SPARQL variable rather than an LDScript variable.
+        if (variable.subtype() == ExprType.GLOBAL) {
+            return;
+        }
+        if (variable.getIndex() != UNBOUND) {
+            valList.set(getIndex(variable), val);
+            return;
+        }
+        int capturedIndex = findDynamicVariable(variable);
+        if (capturedIndex >= 0) {
+            valList.set(capturedIndex, val);
+        } else {
+            define(variable, val);
         }
     }
     
-    public void unbind(Expr exp, Variable var) {
-        bind(exp, var, null);
+    private int findDynamicVariable(Expr variable) {
+        if (isDynamicCapture()) {
+            for (int i = varList.size() - 1; i >= 0; i--) {
+                Expr candidate = varList.get(i);
+                if (candidate != null && candidate.isDynamic() && candidate.equals(variable)) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+    public void unbind(Expr exp, Variable variable) {
+        bind(exp, variable, null);
     }
     
-    void define(Variable var, IDatatype val) {
-        getGlobalVariableValues().put(var.getLabel(), val);
-        getGlobalVariableNames().put(var.getLabel(), var);
+    void define(Variable variable, IDatatype val) {
+        getGlobalVariableValues().put(variable.getLabel(), val);
+        getGlobalVariableNames().put(variable.getLabel(), variable);
     }
 
     @Override
     public List<Expr> getVariables() {
-        if (level.size() > 0) {
-            // funcall: return variables of this funcall (including let var)
+        if (!level.isEmpty()) {
+            // funcall: return variables of this funcall (including let variable)
             return getVar();
         } else {
             // let variables
@@ -530,7 +527,7 @@ public class Binding implements Binder {
     }
     
     List<Expr> getLetVar() {
-        ArrayList<Expr> list = new ArrayList();
+        ArrayList<Expr> list = new ArrayList<>();
         list.addAll(varList);
         addGlobalVariables(list);
         return list;
@@ -545,7 +542,7 @@ public class Binding implements Binder {
     List<Expr> getVar() {
         int start = getLevel();
         int top = varList.size();
-        ArrayList<Expr> list = new ArrayList();
+        ArrayList<Expr> list = new ArrayList<>();
         for (int i = start; i < top; i++) {
             if (varList.get(i) != null && valList.get(i) != null) {
                 list.add(varList.get(i));
@@ -556,9 +553,9 @@ public class Binding implements Binder {
     }
     
     void addGlobalVariables(List<Expr> list) {
-        for (Variable var : getGlobalVariableNames().values()) {
-            if (!list.contains(var)) {
-                list.add(var);
+        for (Variable variable : getGlobalVariableNames().values()) {
+            if (!list.contains(variable)) {
+                list.add(variable);
             }
         }
     }
@@ -628,10 +625,14 @@ public class Binding implements Binder {
         getShare().setNowValue(nowValue);
     }
     
+    // Existing callers link to this concrete return type.
+    @SuppressWarnings("java:S1319")
     public HashMap<String, Variable> getGlobalVariableNames() {
         return globalVariable;
     }
     
+    // Existing callers link to this concrete return type.
+    @SuppressWarnings("java:S1319")
     public HashMap<String, IDatatype> getGlobalVariableValues() {
         return globalValue;
     }
@@ -728,11 +729,11 @@ public class Binding implements Binder {
     }
 
     
-    synchronized public ContextLog getLog() {
+    public synchronized ContextLog getLog() {
         return contextLog;
     }
     
-    synchronized public ContextLog getCreateLog() {
+    public synchronized ContextLog getCreateLog() {
         if (getLog() == null) {
             setLog(new ContextLog());
         }
@@ -740,7 +741,7 @@ public class Binding implements Binder {
     }
 
    
-    public void setLog(ContextLog context) {
+    public synchronized void setLog(ContextLog context) {
         this.contextLog = context;
     }
     

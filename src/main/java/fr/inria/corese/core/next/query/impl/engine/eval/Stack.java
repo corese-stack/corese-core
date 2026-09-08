@@ -14,7 +14,6 @@ import java.util.ArrayList;
  */
 public class Stack extends ArrayList<Exp> implements ExpType {
 
-	int level = 0;
 
 	public static Stack create(Exp e){
 		Stack st = new Stack();
@@ -54,29 +53,12 @@ public class Stack extends ArrayList<Exp> implements ExpType {
 
         @Override
 	public String toString(){
-		StringBuilder str = new StringBuilder(); //"[" + level +"] ";
+		StringBuilder str = new StringBuilder();
 		int i = 0;
 		for (Exp e : this){
 			str.append(i++).append(" ").append(e).append(", ");
 		}
 		return str.toString();
 	}
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj) || getClass() != obj.getClass()) {
-            return false;
-        }
-        Stack other = (Stack) obj;
-        return level == other.level;
-    }
-
-    @Override
-    public int hashCode() {
-        return 31 * super.hashCode() + Integer.hashCode(level);
-    }
 
 }

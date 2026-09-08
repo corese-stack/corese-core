@@ -1229,12 +1229,8 @@ public final class Query extends Exp {
             if (qNode == null) {
                 // Note: does not work with filter in exists pattern
                 // because getProperAndSubSelectNode does not go into exists pattern
-                if (!isTriple(exp, variable)) {
-                    // no error message for use case:
-                    // variable = ?_bn = <<s p o>>
-                    logger.warn(Message.Prefix.UNDEF_VAR.getString(), variable);
-                    addError(Message.Prefix.UNDEF_VAR.getString(), variable);
-                }
+                logger.warn(Message.Prefix.UNDEF_VAR.getString(), variable);
+                addError(Message.Prefix.UNDEF_VAR.getString(), variable);
             } else if (!isExist && !hasExist) {
                 int n = qIndex(query, qNode);
                 min = Math.min(min, n);
@@ -1508,9 +1504,7 @@ public final class Query extends Exp {
                 // next kg:pprint() will use this one
                 this.transformer = transformer;
             }
-            if (! tprinter.containsKey(p)){
-                tprinter.put(p, transformer);
-            }
+            tprinter.putIfAbsent(p, transformer);
         }
     }
 

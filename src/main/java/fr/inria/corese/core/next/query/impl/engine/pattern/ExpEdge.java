@@ -58,28 +58,27 @@ public class ExpEdge extends Exp {
                 }
             }
             return true;
-        } else if (e.match(type) && match(e, n, node)) {
-            if (e.arity() == 1) {
-                return true;
-            } else {
-                Expr cst = e.getExp(1);
-                if (cst.isConstant()) {
-                    if (e.arity() == 3){
-                        // regex
-                        return e.getExp(2).isConstant();
-                    }
-                    return true;
-                } else if (e.oper() == ExprType.IN) {
-                    for (Expr ee : cst.getExpList()) {
-                        if (!ee.isConstant()) {
-                            return false;
-                        }
-                    }
-                    return true;
-                }
+        }
+        if (!e.match(type) || !match(e, n, node)) {
+            return false;
+        }
+        if (e.arity() == 1) {
+            return true;
+        }
+        Expr constant = e.getExp(1);
+        if (constant.isConstant()) {
+            return e.arity() != 3 || e.getExp(2).isConstant();
+        }
+        return e.oper() == ExprType.IN && allConstant(constant.getExpList());
+    }
+
+    private boolean allConstant(List<Expr> expressions) {
+        for (Expr expression : expressions) {
+            if (!expression.isConstant()) {
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     /**

@@ -1,6 +1,5 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
-import fr.inria.corese.core.next.query.impl.engine.pattern.Group;
 
 import java.util.List;
 

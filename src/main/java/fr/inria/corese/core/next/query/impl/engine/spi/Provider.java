@@ -12,7 +12,6 @@ import fr.inria.corese.core.next.query.impl.engine.eval.SparqlException;
  * @author Olivier Corby, Edelweiss, INRIA 2011
  */
 public interface Provider {
-    @SuppressWarnings("unused")
     default Mappings service(Node serv, Exp exp, Mappings map, Eval eval)
             throws SparqlException {
         return null;

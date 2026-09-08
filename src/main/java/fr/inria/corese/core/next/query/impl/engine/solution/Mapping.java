@@ -629,6 +629,9 @@ public final class Mapping
             if (node.isVariable()) {
                 Node val1 = getNodeValue(node);
                 Node val2 = map.getNodeValue(node);
+                if (val1 == null || val2 == null) {
+                    continue;
+                }
                 if (!val1.match(val2)) { // was same
                     return false;
                 } else {
@@ -641,21 +644,24 @@ public final class Mapping
 
     boolean compatible2(Mapping map) {
         boolean sameVarValue = false;
-        for (Node node1 : getSelectQueryNodes()) {
-            if (node1.isVariable()) {
-                Node node2 = map.getSelectQueryNode(node1.getLabel());
-                if (node2 != null) {
-                    Node val1 = getNodeValue(node1);
-                    Node val2 = map.getNodeValue(node2);
-                    if (!val1.match(val2)) { // was same
+        for (Node node : getSelectQueryNodes()) {
+            if (node.isVariable()) {
+                Node val1 = getNodeValue(node);
+                Node val2 = selectedValue(map, node);
+                if (val1 != null && val2 != null) {
+                    if (!val1.match(val2)) {
                         return false;
-                    } else {
-                        sameVarValue = true;
                     }
+                    sameVarValue = true;
                 }
             }
         }
         return sameVarValue;
+    }
+
+    private Node selectedValue(Mapping map, Node node) {
+        Node selectedNode = map.getSelectQueryNode(node.getLabel());
+        return selectedNode == null ? null : map.getNodeValue(selectedNode);
     }
 
     /**
@@ -757,8 +763,11 @@ public final class Mapping
             Node q2 = m.getSelectQueryNode(q1.getLabel());
             if (q2 != null) {
                 Node n2 = m.getNodeValue(q2);
-                if (!n1.match(n2)) { // was same
+                if (n1 != null && n2 != null && !n1.match(n2)) {
                     return null;
+                }
+                if (n1 == null) {
+                    n1 = n2;
                 }
             }
             qNodes.add(q1);

@@ -4,12 +4,9 @@ import fr.inria.corese.core.next.query.impl.engine.eval.Stack;
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.ExpType;
 import fr.inria.corese.core.next.query.impl.engine.model.Filter;
-import fr.inria.corese.core.next.query.impl.engine.model.Graph;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.model.Regex;
-import fr.inria.corese.core.next.query.impl.engine.path.Path;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
-import fr.inria.corese.core.next.query.impl.engine.spi.Result;
 
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
 import org.junit.jupiter.api.BeforeEach;
@@ -708,7 +705,8 @@ class ExpTest {
             exp.add(Exp.create(ExpType.Type.EDGE));
 
             int count = 0;
-            for (Exp ignored : exp) {
+            for (Exp subExp : exp) {
+                assertNotNull(subExp);
                 count++;
             }
             assertEquals(2, count, "Should iterate through 2 expressions");
@@ -718,7 +716,8 @@ class ExpTest {
         @DisplayName("Empty exp should have no iterations")
         void testEmptyIterator() {
             int count = 0;
-            for (Exp ignored : exp) {
+            for (Exp subExp : exp) {
+                assertNotNull(subExp);
                 count++;
             }
             assertEquals(0, count, "Empty exp should not iterate");

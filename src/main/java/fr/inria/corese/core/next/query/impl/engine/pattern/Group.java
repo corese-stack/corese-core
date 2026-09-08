@@ -1,13 +1,13 @@
 package fr.inria.corese.core.next.query.impl.engine.pattern;
 
-import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
-import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
-
-import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.TreeMap;
+
+import fr.inria.corese.core.next.query.impl.engine.model.Node;
+import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
+import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 
 /**
  * select distinct ?x ?y select (count(distinct *) as ?c)
@@ -20,7 +20,7 @@ import java.util.TreeMap;
  */
 public class Group implements Comparator<Mappings> {
 
-    private static final boolean compareIndex = false;
+    private static final boolean COMPARE_INDEX = false;
     TreeMapping table;
 
     boolean isDistinct = false;
@@ -29,11 +29,9 @@ public class Group implements Comparator<Mappings> {
     private List<Node> nodes;
     private boolean isFake = false;
 
-
     public Group() {
 
     }
-
 
     public Group(List<Node> list) {
         setNodeList(list);
@@ -41,9 +39,8 @@ public class Group implements Comparator<Mappings> {
     }
 
     public static boolean isCompareIndex() {
-        return compareIndex;
+        return COMPARE_INDEX;
     }
-
 
     public static Group create(List<Node> lNode) {
         return new Group(lNode);
@@ -65,7 +62,6 @@ public class Group implements Comparator<Mappings> {
         this.isFake = afake;
     }
 
-
     public List<Node> getNodeList() {
         return nodes;
     }
@@ -81,11 +77,13 @@ public class Group implements Comparator<Mappings> {
     public void setExtend(boolean b) {
         isExtend = b;
     }
-    @SuppressWarnings("unused")
+
     public void setDuplicate(boolean b) {
+        // Duplicates are managed by the mappings collection, not this grouping
+        // comparator.
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings("java:S1172")
     public boolean accept(Node node) {
         return true;
     }
@@ -212,6 +210,5 @@ public class Group implements Comparator<Mappings> {
             }
         }
     }
-
 
 }

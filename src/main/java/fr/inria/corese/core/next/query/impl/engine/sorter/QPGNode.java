@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import static fr.inria.corese.core.next.query.impl.engine.sorter.QuerySorterConst.OBJECT;
 import static fr.inria.corese.core.next.query.impl.engine.sorter.QuerySorterConst.PREDICATE;
@@ -132,7 +131,9 @@ public class QPGNode {
                             return this.isShared(bpn2.exp.getNode(), bpn1.exp);
                         }
                     default:
+                        break;
                 }
+                break;
             case BIND:
                 switch (type2) {
                     case FILTER:
@@ -147,7 +148,9 @@ public class QPGNode {
                             return this.compare(bpn2.exp.getNode(), bpn1.exp.getNode());
                         }
                     default:
+                        break;
                 }
+                break;
             default:
                 break;
         }
@@ -214,30 +217,33 @@ public class QPGNode {
                 .filter(Objects::nonNull)
                 .filter(Node::isVariable)
                 .distinct()
-                .collect(Collectors.toList());
+                .toList();
     }
 
-    //GRAPH{GRAPHNODE{NODE{data:aliceFoaf } } AND{EDGE{?alice foaf:mbox <mailto:alice@work.example>} ...}}
     private List<Node> getVariablesInGraph(Exp graph) {
         Set<Node> uniqueVariables = new LinkedHashSet<>();
 
         for (Exp outerExp : graph) {
             for (Exp innerExp : outerExp) {
-                if (innerExp.type() == ExpType.Type.NODE) {
-                    Node node = innerExp.getNode();
-                    if (node != null && node.isVariable()) {
-                        uniqueVariables.add(node);
-                    }
-                } else if (innerExp.type() == ExpType.Type.EDGE) {
-                    Edge edge = innerExp.getEdge();
-                    if (edge != null) {
-                        uniqueVariables.addAll(getVariablesInEdge(edge));
-                    }
-                }
+                collectInnerVariables(innerExp, uniqueVariables);
             }
         }
 
         return new ArrayList<>(uniqueVariables);
+    }
+
+    private void collectInnerVariables(Exp innerExp, Set<Node> uniqueVariables) {
+        if (innerExp.type() == ExpType.Type.NODE) {
+            Node node = innerExp.getNode();
+            if (node != null && node.isVariable()) {
+                uniqueVariables.add(node);
+            }
+        } else if (innerExp.type() == ExpType.Type.EDGE) {
+            Edge edge = innerExp.getEdge();
+            if (edge != null) {
+                uniqueVariables.addAll(getVariablesInEdge(edge));
+            }
+        }
     }
     //compare between a list of strings and a list of nodes
     private List<String> compareString(List<String> l1, List<Node> l2) {
@@ -298,11 +304,10 @@ public class QPGNode {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof QPGNode)) {
-            return false;
-        } else {
-            return this.exp.equals(((QPGNode) obj).exp);
+        if (obj instanceof QPGNode other) {
+            return this.exp.equals(other.exp);
         }
+        return false;
     }
 
     @Override

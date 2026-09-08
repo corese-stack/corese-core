@@ -23,7 +23,9 @@ import static fr.inria.corese.core.next.query.impl.engine.model.ExpType.Type;
  */
 public class DepthFirstBestSearch implements ISort {
 
-    private final List<QPGNode> visited, notVisited, binds;
+    private final List<QPGNode> visited;
+    private final List<QPGNode> notVisited;
+    private final List<QPGNode> binds;
     private QPGraph g = null;
 
     public DepthFirstBestSearch() {

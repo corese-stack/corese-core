@@ -18,6 +18,7 @@ import java.util.List;
 public class Sorter {
 
 
+    @SuppressWarnings("java:S3776")
     public void sort(Query q, Exp exp, List<String> lVar, List<Exp> lBind) {
 
         List<Node> lNode = new ArrayList<>();
@@ -34,17 +35,14 @@ public class Sorter {
                             // cannot move option because it may bind free variables
                             // that may influence next exp
                             break;
-                        } else if (e2.isSortable()) {
-
-                            if (shift(q, e1, e2, lNode, lVar, lBind)) {
-                                // ej<ei : put ej at i and shift
-                                for (int k = j; k > i; k--) {
-                                    // shift to the right
-                                    exp.set(k, exp.get(k - 1));
-                                }
-                                exp.set(i, e2);
-                                e1 = e2;
+                        } else if (e2.isSortable() && shift(q, e1, e2, lNode, lVar, lBind)) {
+                            // ej<ei : put ej at i and shift
+                            for (int k = j; k > i; k--) {
+                                // shift to the right
+                                exp.set(k, exp.get(k - 1));
                             }
+                            exp.set(i, e2);
+                            e1 = e2;
                         }
                     }
                 }

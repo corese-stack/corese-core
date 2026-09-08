@@ -19,15 +19,16 @@ import static fr.inria.corese.core.next.query.impl.engine.sorter.QuerySorterCons
  */
 public class SorterNew extends Sorter {
 
+    @SuppressWarnings("java:S3776")
     public void sort(Exp expression, List<Exp> bindings, Producer prod) {
         if (expression.size() < 2) return;
 
-        Map<Integer, List<Exp>> ESGs = tokenize(expression);
-        if (ESGs.isEmpty()) return;
+        Map<Integer, List<Exp>> esgMap = tokenize(expression);
+        if (esgMap.isEmpty()) return;
 
 
         // === Iterate each sub set and create ESG and sorting ===
-        for (Entry<Integer, List<Exp>> entrySet : ESGs.entrySet()) {
+        for (Entry<Integer, List<Exp>> entrySet : esgMap.entrySet()) {
             Integer startIndex = entrySet.getKey();
             List<Exp> exps = entrySet.getValue();
 
@@ -47,11 +48,9 @@ public class SorterNew extends Sorter {
 
             List<QPGNode> l = is.sort(bpg);
 
-            //** For the following case where a graph has a bound value, put the BIND before
-            //** the graph pattern (because normally we put BIND just after where its variable
-            //** is used.
-            //** bind (<uri> as ?g)
-            //** graph ?g {?x ?p ?y}
+            // For the case where a graph has a bound value, put the BIND before
+            // the graph pattern (because normally we put BIND just after where its variable is used).
+            // Example: when binding a graph variable before a graph pattern
             List<QPGNode> graphs = bpg.getAllNodes(ExpType.Type.GRAPH);
             for (QPGNode graph : graphs) {
                 List<QPGNode> linkedNodes = bpg.getLinkedNodes(graph);
@@ -79,9 +78,9 @@ public class SorterNew extends Sorter {
     // (4, <T3, T4, VA>)
     // (8, <T5, T6>)
     private Map<Integer, List<Exp>> tokenize(Exp e) {
-        List<Exp> aESG = new ArrayList<>();
-        Map<Integer, List<Exp>> ESGs = new LinkedHashMap<>();
-        ESGs.put(0, aESG);
+        List<Exp> group = new ArrayList<>();
+        Map<Integer, List<Exp>> esgMap = new LinkedHashMap<>();
+        esgMap.put(0, group);
 
         // == 1. split the expressions
         List<Exp> exps = e.getExpList();
@@ -89,17 +88,17 @@ public class SorterNew extends Sorter {
             Exp ee = exps.get(i);
             if (plannable(ee.type())) {
                 if (i > 0 && !plannable(exps.get(i - 1).type())) {
-                    aESG = new ArrayList<>();
-                    ESGs.put(i, aESG);
+                    group = new ArrayList<>();
+                    esgMap.put(i, group);
                 }
 
-                aESG.add(ee);
+                group.add(ee);
             }
         }
 
         // == 2.remove the ones containing less that 2 expressions
-        ESGs.entrySet().removeIf(integerListEntry -> integerListEntry.getValue().size() < 2);
+        esgMap.entrySet().removeIf(integerListEntry -> integerListEntry.getValue().size() < 2);
 
-        return ESGs;
+        return esgMap;
     }
 }

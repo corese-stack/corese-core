@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query.impl.engine.model;
 
+// Opcode constants remain inherited by existing engine expression implementations.
+@SuppressWarnings("java:S1214")
 public interface ExprType {
 
     int UNDEF = -1;

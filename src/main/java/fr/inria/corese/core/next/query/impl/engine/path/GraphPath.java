@@ -30,4 +30,8 @@ public class GraphPath extends Thread {
 		this.mem = mem;
     }
 
+    @Override
+    public void run() {
+        finder.process(finder.get(mem, finder.getIndex()), mem);
+    }
 }

@@ -1,6 +1,5 @@
 package fr.inria.corese.core.next.query.impl.sparql.execution;
 
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
 
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import fr.inria.corese.core.next.data.api.term.Value;

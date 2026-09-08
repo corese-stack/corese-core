@@ -21,50 +21,54 @@ public class QPGEdgeCostModel extends AbstractCostModel {
         {OBJECT, OBJECT}, {SUBJECT, SUBJECT}, {PREDICATE, PREDICATE}
     };
     private final QPGEdge edge;
-    private int Nshare = 0;
-    private int Jtype = -1;
+    private int nShare = 0;
+    private int jType = -1;
 
     public QPGEdgeCostModel(QPGEdge edge) {
         this.edge = edge;
         if (this.estimatable()) {
-            if(this.edge.get(0).getType()== ExpType.Type.EDGE &&this.edge.get(1).getType()== ExpType.Type.EDGE){
-                this.setJtype();
+            if (this.edge.get(0).getType() == ExpType.Type.EDGE && this.edge.get(1).getType() == ExpType.Type.EDGE) {
+                this.setJType();
             }
-            this.setNshare();
+            this.setNShare();
             this.edge.setType(QPGEdge.BI_DIRECT);
-        }else{
+        } else {
             this.edge.setType(QPGEdge.SIMPLE);
         }
     }
 
-    private void setNshare() {
-        this.Nshare = this.edge.getVariables().size();
+    private void setNShare() {
+        this.nShare = this.edge.getVariables().size();
     }
 
-    private void setJtype() {
-        QPGNode node1 = edge.get(0), node2 = edge.get(1);
+    private void setJType() {
+        QPGNode node1 = edge.get(0);
+        QPGNode node2 = edge.get(1);
 
         int[][] jp = JOINT_PATTERN;
         for (int i = 0; i < jp.length; i++) {
-            int p1 = jp[i][0], p2 = jp[i][1];
+            int p1 = jp[i][0];
+            int p2 = jp[i][1];
 
             if (node1.getExpNode(p1).getLabel().equals(node2.getExpNode(p2).getLabel())
                     || node1.getExpNode(p2).getLabel().equals(node2.getExpNode(p1).getLabel())) {
-                Jtype = jp.length - i;
+                jType = jp.length - i;
             }
         }
     }
 
     @Override
     public void estimate(List<Object> params) {
-        if(!(isParametersOK(params) && estimatable())){
+        if (!(isParametersOK(params) && estimatable())) {
             this.edge.setCost(IEstimate.NA_COST);
             return;
         }
 
-        QPGNode node1 = edge.get(0), node2 = edge.get(1);
+        QPGNode node1 = edge.get(0);
+        QPGNode node2 = edge.get(1);
 
-        ExpType.Type tNode1 = node1.getType(), tNode2 = node2.getType();
+        ExpType.Type tNode1 = node1.getType();
+        ExpType.Type tNode2 = node2.getType();
         //1. type of one of them is FILTER or VALUES or BIND, ne assign pas le weight
         if (!QuerySorterConst.evaluable(tNode1) && !QuerySorterConst.evaluable(tNode2)) {
             this.edge.setCost(MAX_COST);
@@ -72,31 +76,31 @@ public class QPGEdgeCostModel extends AbstractCostModel {
         }
 
         //3.2. no pattern matched: means no shared variables
-        if (Nshare == 0) {
+        if (nShare == 0) {
             this.edge.setCost(MAX_COST);
             return;
         }
 
         //2 The EDGE connects at least a GRAPH
         if (tNode1 == ExpType.Type.GRAPH || tNode2 == ExpType.Type.GRAPH) {
-            this.edge.setCost(1.0 / 3.0 * Nshare);
+            this.edge.setCost(1.0 / 3.0 * nShare);
             return;
         }
 
         //3. two EDGEs
         //3.2. no pattern matched: means no shared variables
-        if (Jtype == -1) {
+        if (jType == -1) {
             this.edge.setCost(MAX_COST);
             return;
         }
 
         //3.3 pattern matched, assign weight
-        this.edge.setCost(1.0 / Jtype / Nshare);
+        this.edge.setCost(1.0 / jType / nShare);
     }
 
     @Override
     public String toString() {
-        return "QPGEdgeWeightModel{" + "Nshare=" + Nshare + ", Jtype=" + Jtype + '}';
+        return "QPGEdgeWeightModel{" + "nShare=" + nShare + ", jType=" + jType + '}';
     }
 
     @Override
@@ -105,7 +109,7 @@ public class QPGEdgeCostModel extends AbstractCostModel {
     }
 
     @Override
-    final public boolean estimatable() {
+    public final boolean estimatable() {
         return QuerySorterConst.evaluable(this.edge.get(0).getType()) && QuerySorterConst.evaluable(this.edge.get(1).getType());
     }
 }

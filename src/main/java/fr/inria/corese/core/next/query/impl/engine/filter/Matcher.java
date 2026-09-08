@@ -11,9 +11,8 @@ import fr.inria.corese.core.next.query.impl.engine.model.ExprType;
  *
  */
 public class Matcher implements ExprType {
-	boolean
-		rec = false,
-		matchConstant = true;
+	boolean rec = false;
+    boolean matchConstant = true;
 
 
 	public boolean match(FilterPattern qe, Expr te){
@@ -40,91 +39,57 @@ public class Matcher implements ExprType {
 	 * Afterwards, Pattern variable must match same target variables in all EXPi
 	 *
 	 */
-	boolean process(Expr qe, Expr te, MatchBind bind){
-
-		if (qe.type() == ALTER){
-			for (Expr ee : qe.getExpList()){
-				int size = bind.size();
-				boolean b = process(ee, te, bind);
-				if (b) return true;
-				else bind.clean(size);
-			}
-			return false;
-		}
-
-		// LT GT LE GE comparison operator match any comparison operator here
-		// args will be sorted in matchTerm
-		if (! matchType(qe, te))	return false;
-
-		// When Pattern is already bound, recurse on its value
-        if (qe.type() == CONSTANT) {
-            if (matchConstant && bind.hasValue(qe)) {
-                return process(bind.getValue(qe), te, bind);
-            }
-        } else {
-            if (bind.hasValue(qe)) {
-                return process(bind.getValue(qe), te, bind);
-            }
+    boolean process(Expr qe, Expr te, MatchBind bind) {
+        if (qe.type() == ALTER) {
+            return matchAlternative(qe, te, bind);
         }
+        if (!matchType(qe, te)) {
+            return false;
+        }
+        if ((qe.type() != CONSTANT || matchConstant) && bind.hasValue(qe)) {
+            return process(bind.getValue(qe), te, bind);
+        }
+        return switch (qe.type()) {
+            case VARIABLE, CONSTANT -> matchVarConst(qe, te, bind);
+            case FUNCTION, JOKER -> matchBoolFunAny(qe, te, bind);
+            case BOOLEAN -> matchBoolean(qe, te, bind);
+            case TERM -> matchTerm(qe, te, bind);
+            default -> false;
+        };
+    }
 
+    private boolean matchAlternative(Expr qe, Expr te, MatchBind bind) {
+        for (Expr alternative : qe.getExpList()) {
+            int size = bind.size();
+            if (process(alternative, te, bind)) {
+                return true;
+            }
+            bind.clean(size);
+        }
+        return false;
+    }
 
-		switch (qe.type()){
+    private boolean matchBoolean(Expr qe, Expr te, MatchBind bind) {
+        if (qe.arity() == 2 && te.arity() == 2) {
+            return matchTerm(qe, te, bind);
+        }
+        return qe.arity() <= te.arity() && matchBoolFunAny(qe, te, bind);
+    }
 
-		case VARIABLE:
-		case CONSTANT:
-			return matchVarConst(qe, te, bind);
-
-		case FUNCTION:
-		case JOKER:
-			return matchBoolFunAny(qe, te, bind);
-
-		case BOOLEAN:
-			if (qe.arity() == 2 && te.arity() == 2){
-				return matchTerm(qe, te, bind);
-			}
-			else if (qe.arity() > te.arity()){
-				// BOOLEAN ANY Pat Pat vs NOT EXP
-				return false;
-			}
-			else {
-				// NOT has only one argument
-				// rec = true has only argument
-				return matchBoolFunAny(qe, te, bind);
-			}
-
-		case TERM:
-			return matchTerm(qe, te, bind);
-		}
-
-		return false;
-	}
-
-
-
-	boolean matchVarConst(Expr qe, Expr te, MatchBind bind){
-		switch (qe.type()){
-
-		case VARIABLE:
-			if (qe.getLabel() != null) return qe.getLabel().equals(te.getLabel());
-			else bind.setValue(qe, te);
-			break;
-
-
-		case CONSTANT:
-			if (matchConstant){
-				if (isBindable(qe)){
-					bind.setValue(qe, te);
-				}
-				else {
-					// target values
-					return qe.equals(te);
-				}
-			}
-		}
-
-		return true;
-	}
-
+    boolean matchVarConst(Expr qe, Expr te, MatchBind bind) {
+        if (qe.type() == VARIABLE) {
+            if (qe.getLabel() != null) {
+                return qe.getLabel().equals(te.getLabel());
+            }
+            bind.setValue(qe, te);
+        } else if (qe.type() == CONSTANT && matchConstant) {
+            if (!isBindable(qe)) {
+                return qe.equals(te);
+            }
+            bind.setValue(qe, te);
+        }
+        return true;
+    }
 
 
 	/**
@@ -164,21 +129,10 @@ public class Matcher implements ExprType {
 				return false;
 			}
 
-			if (!process(qarg, targ, bind)) {
-				if (rec) {
-					// recursive match of Pattern qe on argument targ
-					// qe = OR(EXP)
-					// qarg = EXP
-					// targ = OR(EXP1, EXP2)
-					if (!process(qe, targ, bind)) {
-						bind.clean(size);
-						return false;
-					}
-				} else {
-					bind.clean(size);
-					return false;
-				}
-			}
+            if (!process(qarg, targ, bind) && (!rec || !process(qe, targ, bind))) {
+                bind.clean(size);
+                return false;
+            }
 		}
 
 		if (!bind.hasValue(qe)) {
@@ -190,7 +144,8 @@ public class Matcher implements ExprType {
 
 
 	boolean matchTerm(Expr qe, Expr te, MatchBind bind) {
-		Expr fst = qe.getExp(0), snd = qe.getExp(1);
+		Expr fst = qe.getExp(0);
+        Expr snd = qe.getExp(1);
 
 		if (isGL(qe.oper()) && qe.oper() != te.oper()) {
 
@@ -263,7 +218,9 @@ public class Matcher implements ExprType {
 
 	boolean matchType(Expr qe, Expr te){
 		if (qe.oper() == EXIST || te.oper() == EXIST) return false;
-		if (qe.type() == JOKER) return true;
+		if (qe.type() == JOKER) {
+            return true;
+        }
         return switch (qe.type()) {
             case VARIABLE, CONSTANT -> match(qe.type(), te.type());
             default -> match(qe.type(), te.type()) && match(qe.oper(), te.oper());

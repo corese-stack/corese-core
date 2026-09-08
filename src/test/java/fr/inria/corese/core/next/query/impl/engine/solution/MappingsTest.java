@@ -185,7 +185,8 @@ class MappingsTest {
             mappings.add(mock(Mapping.class));
 
             int count = 0;
-            for (Mapping ignored : mappings) {
+            for (Mapping m : mappings) {
+                assertNotNull(m);
                 count++;
             }
             assertEquals(3, count, "Should iterate through 3 mappings");

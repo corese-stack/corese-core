@@ -36,13 +36,6 @@ public class QPGraph {
         createEdges();
     }
 
-    // Encapsulate expression into BPGNode and add them to a list
-    private void createNodes(Exp exp) {
-        for (Exp ee : exp) {
-            nodes.add(new QPGNode(ee, this.bindings));
-        }
-    }
-
       // Encapsulate expression into BPGNode and add them to a list
     private void createNodes(List<Exp> exps) {
         for (Exp ee : exps) {

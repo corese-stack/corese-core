@@ -1,6 +1,5 @@
 package fr.inria.corese.core.next.query.impl.sparql.parser;
 
-import fr.inria.corese.core.next.query.impl.engine.model.Graph;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -11,6 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 
@@ -136,76 +137,23 @@ class SparqlParserBgpTest extends AbstractSparqlParserFeatureTest {
         assertEquals("xsd:integer", lit.datatype());
     }
 
-    @Test
-    void shouldParsePrefixedNameWithDigitOnlyLocalPart() {
+    @ParameterizedTest
+    @CsvSource({
+            "ex, http://example.org/, ex:1",
+            "ex, http://example.org/, ex:abc-def",
+            "ns, http://example.org/ns#, ns:id\\=123",
+            "'', http://example.org/default#, :foo"
+    })
+    void shouldParsePrefixedName(String prefix, String namespace, String name) {
         SparqlParser parser = newParserDefault();
-
         SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
-                PREFIX ex: <http://example.org/>
-                SELECT * WHERE {
-                  ?s ex:1 ?o .
-                }
-                """);
-
+                PREFIX %s: <%s>
+                SELECT * WHERE { ?s %s ?o . }
+                """.formatted(prefix, namespace, name));
         BgpAst bgp = (BgpAst) ast.whereClause().patterns().getFirst();
         TriplePatternAst triple = bgp.triples().getFirst();
-
-        assertInstanceOf(IriAst.class, simplePredicateTerm(triple));
-        assertEquals("ex:1", ((IriAst) simplePredicateTerm(triple)).raw());
-    }
-
-    @Test
-    void shouldParsePrefixedNameWithHyphenInLocalPart() {
-        SparqlParser parser = newParserDefault();
-
-        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
-                PREFIX ex: <http://example.org/>
-                SELECT * WHERE {
-                  ?s ex:abc-def ?o .
-                }
-                """);
-
-        BgpAst bgp = (BgpAst) ast.whereClause().patterns().getFirst();
-        TriplePatternAst triple = bgp.triples().getFirst();
-
-        assertInstanceOf(IriAst.class, simplePredicateTerm(triple));
-        assertEquals("ex:abc-def", ((IriAst) simplePredicateTerm(triple)).raw());
-    }
-
-    @Test
-    void shouldParsePrefixedNameWithEscapedReservedCharacterInLocalPart() {
-        SparqlParser parser = newParserDefault();
-
-        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
-                PREFIX ns: <http://example.org/ns#>
-                SELECT * WHERE {
-                  ?s ns:id\\=123 ?o .
-                }
-                """);
-
-        BgpAst bgp = (BgpAst) ast.whereClause().patterns().getFirst();
-        TriplePatternAst triple = bgp.triples().getFirst();
-
-        assertInstanceOf(IriAst.class, simplePredicateTerm(triple));
-        assertEquals("ns:id\\=123", ((IriAst) simplePredicateTerm(triple)).raw());
-    }
-
-    @Test
-    void shouldParsePrefixedNameWithDefaultPrefix() {
-        SparqlParser parser = newParserDefault();
-
-        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
-                PREFIX : <http://example.org/default#>
-                SELECT * WHERE {
-                  ?s :foo ?o .
-                }
-                """);
-
-        BgpAst bgp = (BgpAst) ast.whereClause().patterns().getFirst();
-        TriplePatternAst triple = bgp.triples().getFirst();
-
-        assertInstanceOf(IriAst.class, simplePredicateTerm(triple));
-        assertEquals(":foo", ((IriAst) simplePredicateTerm(triple)).raw());
+        IriAst predicate = assertInstanceOf(IriAst.class, simplePredicateTerm(triple));
+        assertEquals(name, predicate.raw());
     }
 
     @Test

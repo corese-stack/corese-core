@@ -1,11 +1,8 @@
 package fr.inria.corese.core.next.query.impl.engine.solution;
 
 import fr.inria.corese.core.next.query.impl.engine.eval.Eval;
-import fr.inria.corese.core.next.query.impl.engine.eval.Stack;
-import fr.inria.corese.core.next.query.impl.engine.model.Graph;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
-import fr.inria.corese.core.next.query.impl.engine.spi.Results;
 
 import fr.inria.corese.core.next.query.impl.engine.model.BindingContext;
 import fr.inria.corese.core.next.query.impl.engine.model.ExpType;

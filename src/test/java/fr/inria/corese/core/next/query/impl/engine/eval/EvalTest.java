@@ -1,6 +1,5 @@
 package fr.inria.corese.core.next.query.impl.engine.eval;
 
-import fr.inria.corese.core.next.query.impl.engine.event.Event;
 import fr.inria.corese.core.next.query.impl.engine.event.ProcessVisitor;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 import fr.inria.corese.core.next.query.impl.engine.solution.Memory;
@@ -10,8 +9,6 @@ import fr.inria.corese.core.next.query.impl.engine.spi.Matcher;
 import fr.inria.corese.core.next.query.impl.engine.spi.Plugin;
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
 import fr.inria.corese.core.next.query.impl.engine.spi.Provider;
-import fr.inria.corese.core.next.query.impl.engine.spi.Result;
-import fr.inria.corese.core.next.query.impl.engine.spi.Results;
 import fr.inria.corese.core.next.query.impl.engine.spi.SPARQLEngine;
 
 import fr.inria.corese.core.next.query.impl.engine.model.BindingContext;

@@ -1,9 +1,5 @@
 package fr.inria.corese.core.next.query.impl.engine.solution;
 
-import fr.inria.corese.core.next.query.impl.engine.model.Graph;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
-import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
-import fr.inria.corese.core.next.query.impl.engine.spi.Result;
 
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
@@ -39,6 +35,32 @@ class MappingTest {
         mockTargetNode = mock(Node.class);
         mockQueryEdge = mock(Edge.class);
         mockTargetEdge = mock(Edge.class);
+    }
+
+    @Test
+    void joinBindsAnUnboundVariableFromTheOtherMapping() {
+        when(mockQueryNode.getLabel()).thenReturn("?x");
+        when(mockQueryNode.isVariable()).thenReturn(true);
+        Mapping unbound = Mapping.create(new Node[]{mockQueryNode}, new Node[]{null});
+        Mapping bound = Mapping.create(new Node[]{mockQueryNode}, new Node[]{mockTargetNode});
+
+        Mapping joined = unbound.join(bound);
+        assertNotNull(joined);
+        assertSame(mockTargetNode, joined.getNodeValue(mockQueryNode));
+        assertSame(mockTargetNode, bound.join(unbound).getNodeValue(mockQueryNode));
+    }
+
+    @Test
+    void minusRequiresASharedBoundVariable() {
+        when(mockQueryNode.getLabel()).thenReturn("?x");
+        when(mockQueryNode.isVariable()).thenReturn(true);
+        Mapping unbound = Mapping.create(new Node[]{mockQueryNode}, new Node[]{null});
+        Mapping bound = Mapping.create(new Node[]{mockQueryNode}, new Node[]{mockTargetNode});
+
+        assertFalse(unbound.compatible(bound));
+        assertFalse(bound.compatible(unbound));
+        bound.setSelectNodes(new Node[]{mockQueryNode});
+        assertFalse(unbound.compatible(bound));
     }
 
     @Nested

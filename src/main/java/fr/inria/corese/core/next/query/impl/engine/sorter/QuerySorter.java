@@ -27,7 +27,7 @@ public class QuerySorter implements ExpType {
     Compile compiler;
     private Producer prod;
 
-    //todo assign sorter here
+    // Assign sorter according to query plan profile
     public QuerySorter(Query q) {
         query = q;
         compiler = new Compile(q);
@@ -86,20 +86,11 @@ public class QuerySorter implements ExpType {
         Type type = exp.type();
         switch (type) {
 
-            case EDGE:
-            case PATH:
-            case XPATH:
-            case EVAL:
-            case NODE:
-            case GRAPHNODE:
+            case EDGE, PATH, XPATH, EVAL, NODE, GRAPHNODE:
                 break;
 
-            case FILTER:
+            case FILTER, BIND:
                 // compile inner exists {} if any
-                compile(exp.getFilter(), varList, option);
-                break;
-
-            case BIND:
                 compile(exp.getFilter(), varList, option);
                 break;
 
@@ -111,8 +102,8 @@ public class QuerySorter implements ExpType {
                     // lVar = intersection(select variables,lVar)
                     varList = getSelectVariables(q, varList);
                 }
+                // fall through - continue with subquery body
 
-            // continue with subquery body
             default:
 
                 if (type == Type.OPTIONAL || type == Type.UNION || type == Type.MINUS) {
@@ -126,7 +117,7 @@ public class QuerySorter implements ExpType {
 
                 // bind graph variable *after* exp sorting
                 if (exp.isGraph() && exp.getGraphName().isVariable()) {
-                    // GRAPH {GRAPHNODE NODE} {EXP}
+                    // Bind graph pattern node variable
                     Node gNode = exp.getGraphName();
                     varList.add(gNode.getLabel());
                 }
@@ -143,7 +134,7 @@ public class QuerySorter implements ExpType {
                 varList.clear(size);
 
         }
-        InScopeNodes(exp);
+        inScopeNodes(exp);
 
         return exp;
     }
@@ -180,8 +171,7 @@ public class QuerySorter implements ExpType {
                     setBind(getQuery(), exp);
                     break;
 
-                case Query.QP_BGP:
-                case Query.QP_DEFAULT:
+                case Query.QP_BGP, Query.QP_DEFAULT:
                     // sort statements in connected order
                     sort.sort(getQuery(), exp, lVar, lBind);
                     // move filters
@@ -193,6 +183,9 @@ public class QuerySorter implements ExpType {
                         exp = getQuery().getBgpGenerator().process(exp);
                     }
                     break;
+
+                default:
+                    break;
             }
             service(exp);
         }
@@ -202,7 +195,7 @@ public class QuerySorter implements ExpType {
      * Compute and record list of inscope variables
      * that may be bound to evaluate exp in an optimized way
      */
-    void InScopeNodes(Exp exp) {
+    void inScopeNodes(Exp exp) {
          if (exp.isOptional()) {
             // A optional B
             // variables bound by A
@@ -267,8 +260,7 @@ public class QuerySorter implements ExpType {
 
     void compile(List<Exp> list) {
         for (Exp ee : list) {
-            // use case: group by (exists{?x :p ?y} as ?b)
-            // use case: order by exists{?x :p ?y}
+            // Case: group by or order by expression containing exists pattern
             if (ee.getFilter() != null) {
                 compile(ee.getFilter());
             }
@@ -277,7 +269,8 @@ public class QuerySorter implements ExpType {
 
     /**
      * Move filter at place where variables are bound in exp
-      */
+     */
+    @SuppressWarnings({"java:S3776", "java:S127"})
     void sortFilter(Exp exp, VString varList) {
         int size = varList.size();
         List<String> filterVarList;
@@ -466,9 +459,9 @@ public class QuerySorter implements ExpType {
         }
 
         @Override
-        public boolean add(String var) {
-            if (!contains(var)) {
-                super.add(var);
+        public boolean add(String v) {
+            if (!contains(v)) {
+                super.add(v);
             }
             return true;
         }

@@ -26,7 +26,12 @@ public class QPGNodeCostModel extends AbstractCostModel {
     //    the more the better (less selectivity)
     //FN: filter, variables appeared in how many filters
     //G: graph
-    private static final int S = 0, P = 1, O = 2, G = 3, FF = 4, FV = 5;
+    private static final int S = 0;
+    private static final int P = 1;
+    private static final int O = 2;
+    private static final int G = 3;
+    private static final int FF = 4;
+    private static final int FV = 5;
     private static final int PARAMETER_LEN = 6;
     //list of vairables appeared in the expression
     List<String> variables = new ArrayList<>();
@@ -36,7 +41,6 @@ public class QPGNodeCostModel extends AbstractCostModel {
 
     public QPGNodeCostModel(QPGNode n, List<Exp> bindings) {
         this.node = n;
-        //todo with GNode
         Node gNode;
 
         if (n.getType() == ExpType.Type.EDGE) {
@@ -50,13 +54,11 @@ public class QPGNodeCostModel extends AbstractCostModel {
 
             // get the variables in the triple pattern
             n.getExp().getVariables(variables);
-        } else if (n.getType() == ExpType.Type.GRAPH) {
-            //obtain the graph node
-            if (n.getExp().size() > 0 && n.getExp().get(0).type() == ExpType.Type.GRAPHNODE) {
-                //GRAPH{GRAPHNODE{NODE{data:aliceFoaf } } AND...}
-                gNode = n.getExp().get(0).get(0).getNode();
-                this.pattern[G] = getNodeType(gNode, bindings);
-            }
+        } else if (n.getType() == ExpType.Type.GRAPH
+                && n.getExp().size() > 0
+                && n.getExp().get(0).type() == ExpType.Type.GRAPHNODE) {
+            gNode = n.getExp().get(0).get(0).getNode();
+            this.pattern[G] = getNodeType(gNode, bindings);
         }
     }
 
@@ -86,7 +88,10 @@ public class QPGNodeCostModel extends AbstractCostModel {
         if (n == null) {
             return NA;
         }
-        return n.isVariable() ? (isBound(bindings, n) ? LIST : UNBOUND) : BOUND;
+        if (!n.isVariable()) {
+            return BOUND;
+        }
+        return isBound(bindings, n) ? LIST : UNBOUND;
     }
 
     /**
@@ -105,7 +110,8 @@ public class QPGNodeCostModel extends AbstractCostModel {
     private void setFilterNumber(QPGraph graph) {
         List<QPGNode> nodes = graph.getAllNodes(ExpType.Type.FILTER);
 
-        int noOfFilter = 0, noOfVariable = 0;
+        int noOfFilter = 0;
+        int noOfVariable = 0;
 
         //1 get all variables in all filters
         List<String> variablesInFilters = new ArrayList<>();
@@ -115,18 +121,8 @@ public class QPGNodeCostModel extends AbstractCostModel {
             List<String> l = n.getExp().getFilter().getVariables();
             variablesInFilters.addAll(l);
 
-            for (String var1 : l) {
-                boolean flag = false;
-                for (String var2 : variables) {
-                    if (var1.equalsIgnoreCase(var2)) {
-                        noOfFilter++;
-                        flag = true;
-                        break;
-                    }
-                }
-                if (flag) {
-                    break;
-                }
+            if (hasMatchingVariable(l, variables)) {
+                noOfFilter++;
             }
         }
         this.pattern[FF] = noOfFilter;
@@ -141,6 +137,17 @@ public class QPGNodeCostModel extends AbstractCostModel {
         }
         this.pattern[FV] = noOfVariable;
 
+    }
+
+    private boolean hasMatchingVariable(List<String> filterVars, List<String> targetVars) {
+        for (String var1 : filterVars) {
+            for (String var2 : targetVars) {
+                if (var1.equalsIgnoreCase(var2)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -173,6 +180,7 @@ public class QPGNodeCostModel extends AbstractCostModel {
     }
 
     //order by selectivity asending(0-1) (more selective - less selective)
+    @SuppressWarnings("java:S3776")
     public static int compareModel(QPGNodeCostModel m1, QPGNodeCostModel m2, final int[][] bp, final IProducerQP ip) {
         //GRAPH
         //rule 1: GRAPH has more priority than EDGE
@@ -235,11 +243,10 @@ public class QPGNodeCostModel extends AbstractCostModel {
         return s.toString();
     }
 
-    public boolean isBound(List<Exp> bindings, Node var) {
+    public boolean isBound(List<Exp> bindings, Node targetNode) {
         for (Exp exp : bindings) {
-            if (var.getLabel().equalsIgnoreCase(exp.get(0).getNode().getLabel())) {
-                //todo in future (or not)??
-                //calculate the number of constants bound to this variable
+            if (targetNode.getLabel().equalsIgnoreCase(exp.get(0).getNode().getLabel())) {
+                // Calculate the number of constants bound to this variable if needed
                 return true;
             }
         }

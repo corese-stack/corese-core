@@ -16,7 +16,7 @@ import java.util.TreeMap;
  *
  */
 public class Visit {
-    int count = 0;
+    int nextVisitId = 0;
 
     ExpVisitedNode visitedNode;
     HashMap<Regex, Integer> ctable;
@@ -25,9 +25,9 @@ public class Visit {
     LTable ltable;
     ArrayList<Regex> regexList;
 
-    boolean isReverse,
-            // isCounting = false : new sparql semantics
-            isCounting;
+    boolean isReverse;
+    // isCounting = false: SPARQL semantics without path counting
+    boolean isCounting;
 
     Visit(boolean isRev, boolean isCount) {
         isCounting = isCount;
@@ -48,6 +48,8 @@ public class Visit {
         }
     }
 
+    // Traversal direction is metadata; equality must retain the Map contract.
+    @SuppressWarnings("java:S2160")
     class ExpVisitedNode extends HashMap<Regex, VisitedNode> {
         boolean isReverse;
 
@@ -58,7 +60,7 @@ public class Visit {
         void add(Regex exp, Node n) {
             VisitedNode t = get(exp);
             if (t == null) {
-                t = new VisitedNode(isReverse, count++);
+                t = new VisitedNode(isReverse, nextVisitId++);
                 put(exp, t);
             }
             t.add(n);
@@ -152,10 +154,8 @@ public class Visit {
                 for (int i = last; i >= 0; i--) {
                     if (count == min) {
                         node = list.get(i);
-                    } else {
-                        if (list.get(i).equals(node)) {
-                            return true;
-                        }
+                    } else if (list.get(i).equals(node)) {
+                        return true;
                     }
                     count++;
                 }
@@ -177,8 +177,7 @@ public class Visit {
 
     static class Compare implements Comparator<Node> {
 
-        // TODO: xsd:integer & xsd:decimal may be considered as same node
-        // in loop checking
+        // Use the node ordering consistently for loop detection.
         public int compare(Node o1, Node o2) {
             return o1.compare(o2);
         }
@@ -339,11 +338,7 @@ public class Visit {
     }
 
     void addDistinct(Node start, Node node) {
-        NodeTable t = tdistinct.get(start);
-        if (t == null) {
-            t = new NodeTable();
-            tdistinct.put(start, t);
-        }
+        NodeTable t = tdistinct.computeIfAbsent(start, key -> new NodeTable());
         t.put(node, node);
     }
 

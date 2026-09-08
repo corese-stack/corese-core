@@ -214,13 +214,12 @@ public class MappingSet {
             // generate values when at least one variable in-subscope is always
             // bound in map1, otherwise it would generate duplicates in map2
             // or impose irrelevant bindings
-            // map = select distinct map1 wrt exp inscope nodes
+            // Select distinct map1 with respect to expression in-scope nodes
             Mappings distinctMap = getMappings().distinct(nodeListInScope);
             distinctMap.setNodeList(nodeListInScope);
             // record original Mappings because union in exp may process it
             // more precisely. see Eval unionData()
-            // s p o {s q r} union {o q r}
-            // map node list = {r}
+            // Each UNION branch may need a different join variable.
             // whereas we can get s for first branch and o for second branch
             // this is why we record original Mappings for union in exp if any
             distinctMap.setJoinMappings(getMappings());

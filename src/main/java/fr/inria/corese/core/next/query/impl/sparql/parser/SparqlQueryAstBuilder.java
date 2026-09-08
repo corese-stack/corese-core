@@ -1,8 +1,5 @@
 package fr.inria.corese.core.next.query.impl.sparql.parser;
 
-import fr.inria.corese.core.next.query.impl.engine.model.Graph;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
-import fr.inria.corese.core.next.query.impl.engine.spi.Result;
 
 import fr.inria.corese.core.next.common.text.RdfText;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
@@ -96,12 +93,26 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
         super(options);
     }
 
+    private static String normalizeVariableName(String name) {
+        return name == null ? "" : stripVariableMarker(name);
+    }
+
+    private static Set<String> normalizeReferencedVariables(Set<String> names) {
+        if (names == null) {
+            return Set.of();
+        }
+        return names.stream().filter(Objects::nonNull)
+                .map(RdfText::stripVariableMarker).filter(name -> !name.isBlank())
+                .collect(Collectors.toUnmodifiableSet());
+    }
+
     public void enterAskQuery() {
         assertTopLevelQueryFormOnly("ASK");
         queryType = ASTConstants.QUERY_TYPE.ASK;
     }
 
     public void exitAskQuery() {
+        // Query state is collected by the entry and clause callbacks.
     }
 
     public void enterSelectQuery() {
@@ -165,6 +176,7 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
     }
 
     public void exitConstructQuery() {
+        // Query state is collected by the entry and clause callbacks.
     }
 
     public void enterConstructTemplate() {
@@ -223,14 +235,14 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
             return;
         }
         List<VarAst> vars = variableNames.stream()
-                .map(s -> s == null ? "" : stripVariableMarker(s))
+                .map(SparqlQueryAstBuilder::normalizeVariableName)
                 .filter(s -> !s.isBlank())
                 .map(VarAst::new)
                 .toList();
 
         Set<String> expressionBound = expressionBoundNames == null ? Set.of() :
                 expressionBoundNames.stream()
-                        .map(s -> s == null ? "" : stripVariableMarker(s))
+                        .map(SparqlQueryAstBuilder::normalizeVariableName)
                         .filter(s -> !s.isBlank())
                         .collect(Collectors.toUnmodifiableSet());
 
@@ -248,11 +260,7 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
                         .filter(entry -> entry.getKey() != null)
                         .collect(Collectors.toUnmodifiableMap(
                                 entry -> stripVariableMarker(entry.getKey()),
-                                entry -> entry.getValue() == null ? Set.of() : entry.getValue().stream()
-                                        .filter(Objects::nonNull)
-                                        .map(RdfText::stripVariableMarker)
-                                        .filter(s -> !s.isBlank())
-                                        .collect(Collectors.toUnmodifiableSet())));
+                                entry -> normalizeReferencedVariables(entry.getValue())));
 
         ProjectionAst newProjection = vars.isEmpty()
                 ? ProjectionAsts.selectAll()
@@ -394,7 +402,7 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
      * Builds the AST for DESCRIBE operations.
      */
     private DescribeQueryAst buildDescribeQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue, ValuesAst valuesClause) {
-        // TODO #306: validate variable scope for DESCRIBE modifiers when DescribeQueryAst carries them.
+        // Variable scope validation for DESCRIBE modifiers when DescribeQueryAst carries them (#306).
         return new DescribeQueryAst(
                 datasetClauseAst,
                 describeResources,
@@ -408,7 +416,7 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
      * Builds the AST for CONSTRUCT operations.
      */
     private ConstructQueryAst buildConstructQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue, ValuesAst valuesClause) {
-        // TODO #306: validate variable scope for CONSTRUCT modifiers when ConstructQueryAst carries them.
+        // Variable scope validation for CONSTRUCT modifiers when ConstructQueryAst carries them (#306).
         return new ConstructQueryAst(
                 constructTemplate != null ? constructTemplate : new ConstructTemplateAst(List.of()),
                 datasetClauseAst,
@@ -483,6 +491,7 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
      * Called when the parser exits a {@code DESCRIBE} query. No-op.
      */
     public void exitDescribeQuery() {
+        // Query state is collected by the entry and clause callbacks.
     }
 
     /**

@@ -26,11 +26,11 @@ public class Path extends ProducerDefault implements Pointerable<Edge> {
     boolean isReverse = false;
     int max = Integer.MAX_VALUE;
     int weight = 0;
-    ArrayList<Edge> path;
+    ArrayList<Edge> edges;
 
     public Path() {
         setMode(Producer.EXTENSION);
-        path = new ArrayList<>();
+        edges = new ArrayList<>();
     }
 
     public Path(boolean b) {
@@ -40,16 +40,16 @@ public class Path extends ProducerDefault implements Pointerable<Edge> {
 
     Path(int n) {
         setMode(Producer.EXTENSION);
-        path = new ArrayList<>(n);
+        edges = new ArrayList<>(n);
     }
 
     @Override
     public String getDatatypeLabel() {
-        if (path.size() == 1) {
-            return String.format("(1)[%s]", path.getFirst());
+        if (edges.size() == 1) {
+            return String.format("(1)[%s]", edges.getFirst());
         }
-        if (path.size() > 1) {
-            return String.format("(%s)[%s ...]", path.size(), path.getFirst());
+        if (edges.size() > 1) {
+            return String.format("(%s)[%s ...]", edges.size(), edges.getFirst());
         }
         return "(0)[]";
     }
@@ -72,16 +72,16 @@ public class Path extends ProducerDefault implements Pointerable<Edge> {
     }
 
     public void add(Edge ent) {
-        path.add(ent);
+        edges.add(ent);
     }
 
     public void add(Edge ent, int w) {
-        path.add(ent);
+        edges.add(ent);
         weight += w;
     }
 
     public void remove(int w) {
-        path.removeLast();
+        edges.removeLast();
         weight -= w;
     }
 
@@ -100,12 +100,12 @@ public class Path extends ProducerDefault implements Pointerable<Edge> {
     }
 
     public Edge get(int n) {
-        return path.get(n);
+        return edges.get(n);
     }
 
     // Edge or EdgeInv
     public Edge getEdge(int n) {
-        Edge ent = path.get(n);
+        Edge ent = edges.get(n);
         if (ent instanceof EdgeInv) {
             return ent;
         }
@@ -113,25 +113,25 @@ public class Path extends ProducerDefault implements Pointerable<Edge> {
     }
 
     public Path copy(Producer p) {
-        Path path = new Path(size());
-        for (Edge ent : this.path) {
+        Path copy = new Path(size());
+        for (Edge ent : this.edges) {
             // when r is reverse, add real target relation
-            if (ent instanceof EdgeInv) {
-                ent = ((EdgeInv) ent).getEdgeEntity();
+            if (ent instanceof EdgeInv inverseEdge) {
+                ent = inverseEdge.getEdgeEntity();
             }
-            path.add(p.copy(ent));
+            copy.add(p.copy(ent));
         }
-        path.setWeight(weight);
-        return path;
+        copy.setWeight(weight);
+        return copy;
     }
 
     public int length() {
-        return path.size();
+        return edges.size();
     }
 
     @Override
     public int size() {
-        return path.size();
+        return edges.size();
     }
 
     public int weight() {
@@ -144,20 +144,20 @@ public class Path extends ProducerDefault implements Pointerable<Edge> {
 
     public Path reverse() {
         for (int i = 0; i < length() / 2; i++) {
-            Edge tmp = path.get(i);
-            path.set(i, path.get(length() - i - 1));
-            path.set(length() - i - 1, tmp);
+            Edge tmp = edges.get(i);
+            edges.set(i, edges.get(length() - i - 1));
+            edges.set(length() - i - 1, tmp);
         }
         return this;
     }
 
     @Override
     public String toString() {
-        StringBuilder str = new StringBuilder("path[" + path.size() + "]{");
-        if (path.size() > 1) {
+        StringBuilder str = new StringBuilder("path[" + edges.size() + "]{");
+        if (edges.size() > 1) {
             str.append("\n");
         }
-        for (Edge edge : path) {
+        for (Edge edge : edges) {
             str.append(edge).append("\n");
         }
         str.append("}");
@@ -166,16 +166,16 @@ public class Path extends ProducerDefault implements Pointerable<Edge> {
 
     @Override
     public Iterable<Edge> getEdges(Node gNode, List<Node> from, Edge qEdge, Environment env) {
-        return path;
+        return edges;
     }
 
     @Override
     public Iterable<Edge> getLoop() {
-        return path;
+        return edges;
     }
 
     @Override
-    public Edge getValue(String var, int n) {
-        return path.get(n);
+    public Edge getValue(String variable, int n) {
+        return edges.get(n);
     }
 }

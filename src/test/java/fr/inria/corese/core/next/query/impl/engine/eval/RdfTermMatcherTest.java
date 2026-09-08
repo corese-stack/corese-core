@@ -4,7 +4,6 @@ import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import fr.inria.corese.core.next.query.impl.engine.spi.Matcher;
-import fr.inria.corese.core.next.query.impl.engine.eval.EnvironmentImpl;
 import fr.inria.corese.core.next.query.impl.engine.model.NodeImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

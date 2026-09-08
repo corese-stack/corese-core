@@ -16,7 +16,6 @@ public class QPGEdge {
     private final QPGNode n2;
     private final AbstractCostModel costModel;
     private double cost = -1;
-    //private boolean directed = false;
     private final List<String> variables;
     private int type;
 
@@ -58,7 +57,12 @@ public class QPGEdge {
      *
      */
     public QPGNode get(int in) {
-        return in == 0 ? n1 : (in == 1 ? n2 : null);
+        if (in == 0) {
+            return n1;
+        } else if (in == 1) {
+            return n2;
+        }
+        return null;
     }
 
     /**
