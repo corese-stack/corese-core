@@ -5,9 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
 
 class SimpleBNodeTest {
 
@@ -52,10 +49,16 @@ class SimpleBNodeTest {
         assertEquals("_:node1", node.toString());
     }
 
-    @ParameterizedTest
-    @NullAndEmptySource
-    @ValueSource(strings = {" ", "\t", "\n", "\r\n", " \t\n", "\u2003"})
-    void rejectsNullOrBlankIdentifier(String id) {
-        assertThrows(IllegalArgumentException.class, () -> new SimpleBNode(id));
+    @Test
+    void rejectsNullIdentifier() {
+        assertThrows(NullPointerException.class, () -> new SimpleBNode(null));
+    }
+
+    @Test
+    void supportsEmptyIdentifier() {
+        SimpleBNode node = new SimpleBNode("");
+        assertEquals("", node.getID());
+        assertEquals("", node.stringValue());
+        assertEquals("_:", node.toString());
     }
 }

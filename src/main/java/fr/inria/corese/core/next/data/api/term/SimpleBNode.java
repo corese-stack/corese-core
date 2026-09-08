@@ -18,13 +18,10 @@ public final class SimpleBNode extends AbstractBNode {
      * Creates a blank node with the supplied identifier.
      *
      * @param id the blank node identifier
-     * @throws IllegalArgumentException if the identifier is null or blank
+     * @throws NullPointerException if the identifier is null
      */
     public SimpleBNode(String id) {
-        if (id == null || id.isBlank()) {
-            throw new IllegalArgumentException("Blank node identifier must not be null or blank");
-        }
-        this.id = id;
+        this.id = java.util.Objects.requireNonNull(id, "Blank node identifier must not be null");
     }
 
     /**
