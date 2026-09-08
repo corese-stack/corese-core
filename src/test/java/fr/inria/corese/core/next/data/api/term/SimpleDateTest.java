@@ -79,18 +79,20 @@ class SimpleDateTest {
         SimpleDate first = new SimpleDate("2024-02-29Z");
         SimpleDate second = new SimpleDate("2024-02-29Z");
         SimpleLiteral generic = new SimpleLiteral("2024-02-29Z", XSDDatatype.DATE.getIRI());
+        Literal firstTerm = first;
+        Literal genericTerm = generic;
         assertEquals(first, first);
         assertEquals(first, second);
         assertEquals(second, first);
-        assertEquals(first, generic);
-        assertEquals(generic, first);
+        assertEquals(firstTerm, genericTerm);
+        assertEquals(genericTerm, firstTerm);
         assertEquals(first.hashCode(), second.hashCode());
         assertEquals(first.hashCode(), generic.hashCode());
         assertNotEquals(first, new SimpleDate("2024-03-01Z"));
         assertNotEquals(first, new SimpleDate("2024-02-29Z", XSDDatatype.STRING.getIRI()));
         assertNotEquals(first, new SimpleLiteral("2024-02-29Z", "en"));
-        assertNotEquals(first, null);
-        assertNotEquals(first, "2024-02-29Z");
+        assertNotEquals((Object) null, first);
+        assertNotEquals((Object) "2024-02-29Z", first);
     }
 
     @Test

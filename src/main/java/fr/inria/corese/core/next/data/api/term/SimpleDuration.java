@@ -1,6 +1,9 @@
 package fr.inria.corese.core.next.data.api.term;
 
 import java.io.Serial;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.time.Duration;
 import java.time.Period;
 import java.time.format.DateTimeParseException;
@@ -22,7 +25,22 @@ public final class SimpleDuration extends AbstractDuration {
     private static final long serialVersionUID = 1L;
 
     private final String label;
-    private transient final TemporalAmount temporalAmount;
+    // Serialized explicitly because TemporalAmount does not extend Serializable.
+    private transient TemporalAmount temporalAmount;
+
+    @Serial
+    private void writeObject(ObjectOutputStream output) throws IOException {
+        output.defaultWriteObject();
+        output.writeObject(label);
+        output.writeBoolean(temporalAmount instanceof Period);
+    }
+
+    @Serial
+    private void readObject(ObjectInputStream input) throws IOException, ClassNotFoundException {
+        input.defaultReadObject();
+        String lexicalValue = (String) input.readObject();
+        temporalAmount = input.readBoolean() ? Period.parse(lexicalValue) : parseTemporalAmount(lexicalValue);
+    }
 
     public SimpleDuration(String lexicalValue) {
         this(lexicalValue, XSDDatatype.DURATION.getIRI(), XSDDatatype.DURATION);

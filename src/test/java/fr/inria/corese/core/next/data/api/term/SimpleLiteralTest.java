@@ -136,9 +136,11 @@ class SimpleLiteralTest {
     void rejectsNullLabelInEveryConstructor() {
         assertThrows(NullPointerException.class, () -> new SimpleLiteral(null));
         assertThrows(NullPointerException.class, () -> new SimpleLiteral(null, "en"));
-        assertThrows(NullPointerException.class, () -> new SimpleLiteral(null, XSDDatatype.STRING.getIRI()));
+        IRI stringDatatype = XSDDatatype.STRING.getIRI();
+        assertThrows(NullPointerException.class, () -> new SimpleLiteral(null, stringDatatype));
+        CoreDatatype stringCoreDatatype = XSDDatatype.STRING;
         assertThrows(NullPointerException.class,
-                () -> new SimpleLiteral(null, XSDDatatype.STRING.getIRI(), XSDDatatype.STRING));
+                () -> new SimpleLiteral(null, stringDatatype, stringCoreDatatype));
     }
 
     @ParameterizedTest

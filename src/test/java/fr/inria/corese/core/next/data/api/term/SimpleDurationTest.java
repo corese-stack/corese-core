@@ -7,6 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.time.Period;
 import java.time.temporal.TemporalAmount;
 
@@ -19,6 +23,22 @@ import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
 import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 
 class SimpleDurationTest {
+
+    @Test
+    void serializationPreservesTemporalValues() throws Exception {
+        for (SimpleDuration original : new SimpleDuration[]{new SimpleDuration("PT1.25S"),
+                new SimpleDuration(Period.ofDays(2)), new SimpleDuration("P1Y2M")}) {
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            try (ObjectOutputStream output = new ObjectOutputStream(bytes)) {
+                output.writeObject(original);
+            }
+            try (ObjectInputStream input = new ObjectInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
+                SimpleDuration restored = (SimpleDuration) input.readObject();
+                assertEquals(original, restored);
+                assertEquals(original.temporalAmountValue(), restored.temporalAmountValue());
+            }
+        }
+    }
 
     @ParameterizedTest
     @ValueSource(strings = {"PT0S", "PT1H", "P2D", "-PT1.25S", "PT0.123456789S", "P1Y2M", "-P2M", "P1Y2M3DT4H5M6.7S"})
@@ -77,7 +97,8 @@ class SimpleDurationTest {
         SimpleDuration literal = new SimpleDuration("P1Y2M3DT4H5M6.7S");
         assertEquals("P1Y2M3DT4H5M6.7S", literal.getLabel());
         assertThrows(IncorrectOperationException.class, literal::temporalAmountValue);
-        assertThrows(IncorrectOperationException.class, () -> literal.compareTo(new SimpleDuration("PT1S")));
+        SimpleDuration oneSecond = new SimpleDuration("PT1S");
+        assertThrows(IncorrectOperationException.class, () -> literal.compareTo(oneSecond));
     }
 
     @Test
@@ -101,18 +122,20 @@ class SimpleDurationTest {
         SimpleDuration first = new SimpleDuration("PT1S");
         SimpleDuration second = new SimpleDuration("PT1S");
         SimpleLiteral generic = new SimpleLiteral("PT1S", XSDDatatype.DURATION.getIRI());
+        Literal firstTerm = first;
+        Literal genericTerm = generic;
         assertEquals(first, first);
         assertEquals(first, second);
         assertEquals(second, first);
-        assertEquals(first, generic);
-        assertEquals(generic, first);
+        assertEquals(firstTerm, genericTerm);
+        assertEquals(genericTerm, firstTerm);
         assertEquals(first.hashCode(), second.hashCode());
         assertEquals(first.hashCode(), generic.hashCode());
         assertNotEquals(first, new SimpleDuration("PT2S"));
         assertNotEquals(first, new SimpleLiteral("PT1S", XSDDatatype.STRING.getIRI()));
         assertNotEquals(first, new SimpleLiteral("PT1S", "en"));
-        assertNotEquals(first, null);
-        assertNotEquals(first, "PT1S");
+        assertNotEquals(first, (Object) null);
+        assertNotEquals(first, (Object) "PT1S");
     }
 
     @Test

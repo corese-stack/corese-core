@@ -26,6 +26,18 @@ import fr.inria.corese.core.next.data.api.term.*;
 
 class NativeValueFactoryTest extends ValueFactoryTest {
 
+    @Test
+    void formatsJavaTimesAsXmlLexicalForms() {
+        assertEquals("12:30:00", valueFactory.createLiteral(LocalTime.of(12, 30)).getLabel());
+        assertEquals("2024-02-29T12:30:00",
+                valueFactory.createLiteral(LocalDateTime.of(2024, 2, 29, 12, 30)).getLabel());
+        assertEquals("2024-02-29T12:30:00+01:00",
+                valueFactory.createLiteral(ZonedDateTime.of(2024, 2, 29, 12, 30, 0, 0,
+                        ZoneId.of("Europe/Paris"))).getLabel());
+        assertEquals("2024-02-29T12:30:00Z",
+                valueFactory.createLiteral(Instant.parse("2024-02-29T12:30:00Z")).getLabel());
+    }
+
     @BeforeEach
     @Override
     public void setUp() {
@@ -175,7 +187,9 @@ class NativeValueFactoryTest extends ValueFactoryTest {
     @Test
     void rejectsNullLiteralInputs() {
         assertThrows(NullPointerException.class, () -> valueFactory.createLiteral((String) null));
-        assertThrows(NullPointerException.class, () -> valueFactory.createLiteral(null, XSDDatatype.INT.getIRI()));
+        String nullLabel = null;
+        IRI integerDatatype = XSDDatatype.INT.getIRI();
+        assertThrows(NullPointerException.class, () -> valueFactory.createLiteral(nullLabel, integerDatatype));
         assertThrows(NullPointerException.class, () -> valueFactory.createLiteral("1", (IRI) null));
         assertThrows(NullPointerException.class, () -> valueFactory.createLiteral((BigInteger) null));
         assertThrows(NullPointerException.class, () -> valueFactory.createLiteral((BigDecimal) null));

@@ -3,6 +3,8 @@ package fr.inria.corese.core.next.data.api.factory;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalAmount;
@@ -37,6 +39,13 @@ import fr.inria.corese.core.next.data.api.term.SimpleTriple;
 
 /** Thread-safe factory for native RDF terms and statements. */
 public class NativeValueFactory implements ValueFactory {
+
+    private static final DateTimeFormatter XML_TIME = new DateTimeFormatterBuilder()
+            .append(DateTimeFormatter.ISO_LOCAL_TIME).optionalStart().appendOffsetId().optionalEnd()
+            .toFormatter();
+    private static final DateTimeFormatter XML_DATE_TIME = new DateTimeFormatterBuilder()
+            .append(DateTimeFormatter.ISO_LOCAL_DATE_TIME).optionalStart().appendOffsetId().optionalEnd()
+            .toFormatter();
 
     private static final SecureRandom secureRandom = new SecureRandom();
     private final AtomicLong nodeID = new AtomicLong(secureRandom.nextLong());
@@ -176,19 +185,20 @@ public class NativeValueFactory implements ValueFactory {
 
     @Override
     public Literal createLiteral(TemporalAccessor value) {
+        Objects.requireNonNull(value, "value");
         if (value.isSupported(ChronoField.HOUR_OF_DAY) && value.isSupported(ChronoField.MINUTE_OF_HOUR)
                 && value.isSupported(ChronoField.SECOND_OF_MINUTE)) {
             if (value.isSupported(ChronoField.YEAR) && value.isSupported(ChronoField.MONTH_OF_YEAR)
                     && value.isSupported(ChronoField.DAY_OF_MONTH)) {
-                return new SimpleDateTime(value.toString());
+                return new SimpleDateTime(XML_DATE_TIME.format(value));
             } else {
-                return new SimpleTime(value.toString());
+                return new SimpleTime(XML_TIME.format(value));
             }
         } else if (value.isSupported(ChronoField.YEAR) && value.isSupported(ChronoField.MONTH_OF_YEAR)
                 && value.isSupported(ChronoField.DAY_OF_MONTH)) {
-            return new SimpleDate(value.toString());
+            return new SimpleDate(DateTimeFormatter.ISO_DATE.format(value));
         } else {
-            return new SimpleDateTime(value.toString());
+            return new SimpleDateTime(DateTimeFormatter.ISO_INSTANT.format(value));
         }
     }
 

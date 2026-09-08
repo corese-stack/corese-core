@@ -51,8 +51,8 @@ class SimpleStatementTest {
         assertEquals(first.hashCode(), otherImplementation.hashCode());
         assertEquals(Objects.hash(subject, predicate, object, context), first.hashCode());
         assertEquals(1, new HashSet<>(List.of(first, second, otherImplementation)).size());
-        assertNotEquals(first, null);
-        assertNotEquals(first, "statement");
+        assertNotEquals((Object) null, first);
+        assertNotEquals((Object) "statement", first);
         assertNotEquals(first, new SimpleStatement(context, predicate, object, context));
         assertNotEquals(first, new SimpleStatement(subject, new SimpleIRI("urn:other"), object, context));
         assertNotEquals(first, new SimpleStatement(subject, predicate, new SimpleLiteral("other"), context));

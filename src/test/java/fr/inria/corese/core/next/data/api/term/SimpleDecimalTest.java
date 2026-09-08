@@ -52,19 +52,21 @@ class SimpleDecimalTest {
         SimpleDecimal first = new SimpleDecimal("1");
         SimpleDecimal second = new SimpleDecimal("1", XSDDatatype.DECIMAL.getIRI());
         SimpleLiteral generic = new SimpleLiteral("1", XSDDatatype.DECIMAL.getIRI());
+        Literal firstTerm = first;
+        Literal genericTerm = generic;
         assertEquals(first, first);
         assertEquals(first, second);
         assertEquals(second, first);
         assertEquals(first.hashCode(), second.hashCode());
-        assertEquals(first, generic);
-        assertEquals(generic, first);
+        assertEquals(firstTerm, genericTerm);
+        assertEquals(genericTerm, firstTerm);
         assertEquals(first.hashCode(), generic.hashCode());
         assertNotEquals(first, new SimpleDecimal("+01"));
         assertNotEquals(first, new SimpleDecimal("2"));
         assertNotEquals(first, new SimpleDecimal("1", XSDDatatype.STRING.getIRI()));
         assertNotEquals(first, new SimpleLiteral("1", "en"));
-        assertNotEquals(first, null);
-        assertNotEquals(first, "1");
+        assertNotEquals((Object) null, first);
+        assertNotEquals((Object) "1", first);
     }
 
     @Test
