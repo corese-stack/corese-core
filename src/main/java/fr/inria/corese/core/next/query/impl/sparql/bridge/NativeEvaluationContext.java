@@ -60,7 +60,7 @@ final class NativeEvaluationContext {
     }
 
     DatatypeValue constant(TermAst expression) {
-        return CoreseAstQueryBuilder.toNode(expression, termResolver()).getDatatypeValue();
+        return termResolver().toNode(expression).getDatatypeValue();
     }
 
     DatatypeValue required(TermAst expression) {

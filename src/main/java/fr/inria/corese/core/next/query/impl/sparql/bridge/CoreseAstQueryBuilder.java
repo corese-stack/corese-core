@@ -179,14 +179,6 @@ public final class CoreseAstQueryBuilder {
      * <p>This helper is package-visible because both the query builder and the
      * {@link WhereCompiler} need a single shared term-to-node conversion rule.</p>
      */
-    static Node toNode(TermAst term) {
-        return toNode(term, new SparqlTermResolver(null));
-    }
-
-    static Node toNode(TermAst term, SparqlTermResolver resolver) {
-        return resolver.toNode(term);
-    }
-
     static TermAst simplePredicate(PathAst path) {
         if (path instanceof PredicatePathAst(TermAst predicate)) {
             return predicate;
@@ -307,7 +299,7 @@ public final class CoreseAstQueryBuilder {
     private List<Node> toNodeList(Iterable<IriAst> iris, WhereCompiler compiler) {
         List<Node> nodes = new ArrayList<>();
         for (IriAst iri : iris) {
-            nodes.add(toNode(iri, compiler.termResolver()));
+            nodes.add(compiler.termResolver().toNode(iri));
         }
         return nodes;
     }
@@ -360,7 +352,7 @@ public final class CoreseAstQueryBuilder {
                 }
                 nodes.add(node);
             } else {
-                nodes.add(toNode(term, compiler.termResolver()));
+                nodes.add(compiler.termResolver().toNode(term));
             }
         }
         return nodes;
@@ -545,8 +537,8 @@ public final class CoreseAstQueryBuilder {
     private Node constructNode(Query query, TermAst term, WhereCompiler compiler) {
         if (term instanceof VarAst(String name)) {
             Node bound = visibleBodyNode(query, name);
-            return bound != null ? bound : toNode(term, compiler.termResolver());
+            return bound != null ? bound : compiler.termResolver().toNode(term);
         }
-        return toNode(term, compiler.termResolver());
+        return compiler.termResolver().toNode(term);
     }
 }
