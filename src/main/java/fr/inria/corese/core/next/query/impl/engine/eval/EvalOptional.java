@@ -80,14 +80,12 @@ public class EvalOptional {
 
         /*
          * Push bindings from map1 into rest when there is at least one variable
-         * in-subscope of rest that is always bound in map1 ?x p ?y optional {
-         * ?y q ?z } -> values ?y { y1 yn } {?x p ?y optional { ?y q ?z }}
-         * optional { ?z r ?t } -> if ?z is not bound in every map1, generate no
-         * values
+         * in-subscope of rest that is always bound in map1.
+         * For example, with query patterns like ?x p ?y optional(?y q ?z),
+         * if the variable is not bound in every map1, no values are generated.
          *
-         * set1.getJoinMappings() = Mappings to be considered by rest Either
-         * pushed into rest or stored in Memory to be used in eval(rest) eg when
-         * rest=service.
+         * set1.getJoinMappings(): Mappings to be considered by rest, either
+         * pushed into rest or stored in Memory to be used in eval(rest).
          */
         if (map != null && map.isEmpty()) {
             // Every Mapping fail filter, rest() will always fail: skip optional rest()
