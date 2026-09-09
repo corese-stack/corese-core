@@ -11,6 +11,7 @@ import java.util.TreeSet;
 
 import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
 import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
+import fr.inria.corese.core.next.data.api.term.IRI;
 
 /**
  * Abstract class representing a duration literal in RDF.
@@ -21,7 +22,16 @@ public abstract class AbstractDuration extends AbstractLiteral implements Compar
      * Constructor for AbstractDuration.
      */
     protected AbstractDuration() {
-        super(XSDDatatype.DURATION.getIRI());
+        this(XSDDatatype.DURATION.getIRI());
+    }
+
+    /**
+     * Constructor for AbstractDuration with explicit datatype.
+     *
+     * @param datatype the datatype IRI, or null for default duration
+     */
+    protected AbstractDuration(IRI datatype) {
+        super(datatype == null ? XSDDatatype.DURATION.getIRI() : datatype);
     }
 
     @Override

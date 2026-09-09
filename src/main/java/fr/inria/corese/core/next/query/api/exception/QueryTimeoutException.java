@@ -3,6 +3,7 @@ package fr.inria.corese.core.next.query.api.exception;
 /**
  * Thrown when a query evaluation exceeds its configured timeout limit.
  */
+@SuppressWarnings("java:S110")
 public class QueryTimeoutException extends QueryEvaluationException {
 
     /**

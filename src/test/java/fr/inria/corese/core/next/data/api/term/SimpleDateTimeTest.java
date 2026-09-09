@@ -15,7 +15,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import fr.inria.corese.core.next.data.api.exception.IncorrectOperationException;
-import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
 import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 
 class SimpleDateTimeTest {
@@ -50,13 +49,10 @@ class SimpleDateTimeTest {
     @Test
     void handlesDatatypeConstructors() {
         assertEquals(new SimpleDateTime("2024-02-29T12:30:45Z"), new SimpleDateTime("2024-02-29T12:30:45Z", null));
-        assertEquals(new SimpleDateTime("2024-02-29T12:30:45Z"), new SimpleDateTime("2024-02-29T12:30:45Z", null, null));
         IRI custom = new SimpleIRI("urn:custom:temporal");
         SimpleDateTime literal = new SimpleDateTime("2024-02-29T12:30:45Z", custom);
         assertEquals(custom, literal.getDatatype());
         assertEquals(XSDDatatype.DATETIME, literal.getCoreDatatype());
-        assertEquals(XSDDatatype.DATETIME, new SimpleDateTime("2024-02-29T12:30:45Z", custom, CoreDatatype.NONE).getCoreDatatype());
-        assertEquals(custom, new SimpleDateTime("2024-02-29T12:30:45Z", custom, XSDDatatype.STRING).getDatatype());
     }
 
     @Test
@@ -114,7 +110,6 @@ class SimpleDateTimeTest {
         assertEquals("lexicalValue", assertThrows(NullPointerException.class,
                 () -> new SimpleDateTime((String) null)).getMessage());
         assertThrows(NullPointerException.class, () -> new SimpleDateTime(null, null));
-        assertThrows(NullPointerException.class, () -> new SimpleDateTime(null, null, null));
     }
 
     @ParameterizedTest

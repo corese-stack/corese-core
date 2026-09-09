@@ -135,7 +135,6 @@ abstract class AbstractCoreseQuery<T> implements Query<T> {
         }
 
         @Override
-        @SuppressWarnings("NullableProblems")
         public Iterator<Binding> iterator() {
             return map.entrySet().stream()
                     .<Binding>map(e -> new CoreseBinding(e.getKey(), e.getValue()))

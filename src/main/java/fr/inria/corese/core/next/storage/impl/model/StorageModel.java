@@ -208,7 +208,6 @@ public final class StorageModel extends AbstractModel {
         return new FilteredModel(this, subject, predicate, object, contexts) {
 
             @Override
-            @SuppressWarnings("NullableProblems")
             public Iterator<Statement> iterator() {
                 return StorageModel.this.getFilterIterator(subject, predicate, object, contexts);
             }
@@ -245,7 +244,6 @@ public final class StorageModel extends AbstractModel {
     }
 
     @Override
-    @SuppressWarnings("NullableProblems")
     public Iterator<Statement> iterator() {
         return getFilterIterator(null, null, null);
     }

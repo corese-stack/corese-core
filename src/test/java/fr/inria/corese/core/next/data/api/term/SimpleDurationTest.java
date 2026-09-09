@@ -19,7 +19,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import fr.inria.corese.core.next.data.api.exception.IncorrectOperationException;
-import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
 import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 
 class SimpleDurationTest {
@@ -69,15 +68,14 @@ class SimpleDurationTest {
     }
 
     @Test
-    void retainsDurationDatatypeForAllConstructors() {
+    void handlesDatatypeConstructors() {
         SimpleDuration expected = new SimpleDuration("PT1S");
         assertEquals(expected, new SimpleDuration("PT1S", null));
-        assertEquals(expected, new SimpleDuration("PT1S", null, null));
         assertEquals(expected, new SimpleDuration("PT1S", XSDDatatype.DURATION.getIRI()));
-        assertEquals(expected, new SimpleDuration("PT1S", new SimpleIRI("urn:custom:duration")));
-        assertEquals(expected, new SimpleDuration("PT1S", XSDDatatype.STRING.getIRI(), CoreDatatype.NONE));
-        assertEquals(XSDDatatype.DURATION,
-                new SimpleDuration("PT1S", null, XSDDatatype.STRING).getCoreDatatype());
+        IRI custom = new SimpleIRI("urn:custom:duration");
+        SimpleDuration literal = new SimpleDuration("PT1S", custom);
+        assertEquals(custom, literal.getDatatype());
+        assertEquals(XSDDatatype.DURATION, literal.getCoreDatatype());
     }
 
     @ParameterizedTest
@@ -159,7 +157,6 @@ class SimpleDurationTest {
         assertEquals("lexicalValue", assertThrows(NullPointerException.class,
                 () -> new SimpleDuration((String) null)).getMessage());
         assertThrows(NullPointerException.class, () -> new SimpleDuration(null, null));
-        assertThrows(NullPointerException.class, () -> new SimpleDuration(null, null, null));
     }
 
     @ParameterizedTest

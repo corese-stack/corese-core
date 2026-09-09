@@ -172,10 +172,10 @@ public class RDFaParser extends AbstractRDFParser {
         }
     }
 
-    /*
-     *  The algorithm in <a href="https://www.w3.org/TR/rdfa-core/#s_sequence">W3C recommendation</a> is based on DOM processing, but this implementation is made in SAX.
+    /**
+     * The algorithm in <a href="https://www.w3.org/TR/rdfa-core/#s_sequence">W3C recommendation</a> is based on DOM processing, but this implementation is made in SAX.
      * To reconcile both approaches, the "local values" are stored in a pile of ProcessingContext. The IRI mapping are shared independently.
-     * All operations except the ones that create literals are done ine this function.
+     * All operations except the ones that create literals are done in this function.
      */
     @SuppressWarnings({"java:S3776", "java:S3398", "java:S125"})
     private void startProcessElement(String qName, Attributes attrs) {

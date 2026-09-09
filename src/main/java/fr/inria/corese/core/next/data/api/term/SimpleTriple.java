@@ -39,7 +39,6 @@ public record SimpleTriple(Resource subject, IRI predicate, Value object) implem
     }
 
     @Override
-    @SuppressWarnings("NullableProblems")
     public String toString() {
         return "<<(" + subject + " " + predicate + " " + object + ")>>";
     }

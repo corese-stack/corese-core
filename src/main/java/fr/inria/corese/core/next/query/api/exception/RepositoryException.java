@@ -7,6 +7,7 @@ import fr.inria.corese.core.next.query.api.repository.RepositoryConnection;
  * Thrown when an operation on a {@link Repository}
  * or {@link RepositoryConnection} fails.
  */
+@SuppressWarnings("java:S110")
 public class RepositoryException extends QueryException {
 
     /**

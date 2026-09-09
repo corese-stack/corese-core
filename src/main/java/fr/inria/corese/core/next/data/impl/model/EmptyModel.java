@@ -62,7 +62,6 @@ public class EmptyModel extends AbstractModel {
     // -- Statement operations: read-only and always empty --
 
     @Override
-    @SuppressWarnings("NullableProblems")
     public Iterator<Statement> iterator() {
         return emptySet.iterator();
     }

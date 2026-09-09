@@ -15,7 +15,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import fr.inria.corese.core.next.data.api.exception.IncorrectOperationException;
-import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
 import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 
 class SimpleTimeTest {
@@ -50,13 +49,10 @@ class SimpleTimeTest {
     @Test
     void handlesDatatypeConstructors() {
         assertEquals(new SimpleTime("12:30:45Z"), new SimpleTime("12:30:45Z", null));
-        assertEquals(new SimpleTime("12:30:45Z"), new SimpleTime("12:30:45Z", null, null));
         IRI custom = new SimpleIRI("urn:custom:temporal");
         SimpleTime literal = new SimpleTime("12:30:45Z", custom);
         assertEquals(custom, literal.getDatatype());
         assertEquals(XSDDatatype.TIME, literal.getCoreDatatype());
-        assertEquals(XSDDatatype.TIME, new SimpleTime("12:30:45Z", custom, CoreDatatype.NONE).getCoreDatatype());
-        assertEquals(custom, new SimpleTime("12:30:45Z", custom, XSDDatatype.STRING).getDatatype());
     }
 
     @Test
@@ -116,7 +112,6 @@ class SimpleTimeTest {
         assertEquals("lexicalValue", assertThrows(NullPointerException.class,
                 () -> new SimpleTime((String) null)).getMessage());
         assertThrows(NullPointerException.class, () -> new SimpleTime(null, null));
-        assertThrows(NullPointerException.class, () -> new SimpleTime(null, null, null));
     }
 
     @ParameterizedTest

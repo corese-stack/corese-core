@@ -58,7 +58,6 @@ public class PathMappingBuffer implements Iterable<Mapping>, Iterator<Mapping> {
 	}
 
 	@Override
-	@SuppressWarnings("NullableProblems")
 	public Iterator<Mapping> iterator() {
 		return this;
 	}

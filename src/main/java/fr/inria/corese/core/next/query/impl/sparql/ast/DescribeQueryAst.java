@@ -82,9 +82,7 @@ public record DescribeQueryAst(
         visitor.visit(this);
         this.prologue.accept(visitor);
         this.datasetClause.accept(visitor);
-        this.described.forEach(termAst -> {
-            termAst.accept(visitor);
-        });
+        this.described.forEach(termAst -> termAst.accept(visitor));
         this.whereClause.accept(visitor);
         this.valuesClause.accept(visitor);
         this.solutionModifier.accept(visitor);
