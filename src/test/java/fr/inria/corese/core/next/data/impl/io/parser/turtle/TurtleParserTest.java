@@ -6,7 +6,7 @@ import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.data.api.vocabulary.RDFS;
 import fr.inria.corese.core.next.data.impl.io.parser.support.ParserTestBase;
-import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
+import fr.inria.corese.core.next.data.Values;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class TurtleParserTest extends ParserTestBase {
 
-    private final ValueFactory factory = new CoreseValueFactory();
+    private final ValueFactory factory = Values.factory();
 
     @Test
     void testParseWithPrefixAndTriple() {

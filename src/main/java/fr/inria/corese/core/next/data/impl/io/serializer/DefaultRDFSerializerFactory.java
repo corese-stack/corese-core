@@ -26,7 +26,7 @@ import fr.inria.corese.core.next.data.impl.io.serializer.trig.TriGSerializer;
 import fr.inria.corese.core.next.data.impl.io.serializer.trig.TriGSerializerOptions;
 import fr.inria.corese.core.next.data.impl.io.serializer.turtle.TurtleSerializer;
 import fr.inria.corese.core.next.data.impl.io.serializer.turtle.TurtleSerializerOptions;
-import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
+import fr.inria.corese.core.next.data.Values;
 import fr.inria.corese.core.next.data.impl.model.LinkedHashModel;
 
 import java.util.Collections;
@@ -52,7 +52,7 @@ public class DefaultRDFSerializerFactory implements RDFSerializerFactory {
 
     private final Map<RDFFormat, BiFunction<Model, IOOptions, RDFSerializer>> registry;
     private final Map<RDFFormat, Function<Model, RDFSerializer>> defaultRegistry;
-    private final ValueFactory coreseValueFactory;
+    private final ValueFactory valueFactory;
 
     /**
      * Constructs a {@code RDFSerializerFactory} and populates its registry
@@ -60,7 +60,7 @@ public class DefaultRDFSerializerFactory implements RDFSerializerFactory {
      * Shared options are normalized before these constructors are invoked.
      */
     public DefaultRDFSerializerFactory() {
-        this.coreseValueFactory = new CoreseValueFactory();
+        this.valueFactory = Values.factory();
 
         Map<RDFFormat, BiFunction<Model, IOOptions, RDFSerializer>> tempRegistry = new HashMap<>();
         Map<RDFFormat, Function<Model, RDFSerializer>> tempDefaultRegistry = new HashMap<>();
@@ -89,7 +89,7 @@ public class DefaultRDFSerializerFactory implements RDFSerializerFactory {
                         specificConfig.getHashAlgorithm(),
                         specificConfig.getPermutationLimit(),
                         specificConfig.getDepthFactor(),
-                        coreseValueFactory
+                        valueFactory
                 );
                 return new RDFC10Serializer(model, specificConfig, rdfc10Canonicalizer);
             }
@@ -106,7 +106,7 @@ public class DefaultRDFSerializerFactory implements RDFSerializerFactory {
                     defaultConfig.getHashAlgorithm(),
                     defaultConfig.getPermutationLimit(),
                     defaultConfig.getDepthFactor(),
-                    coreseValueFactory
+                    valueFactory
             );
             return new RDFC10Serializer(model, defaultConfig, rdfc10Canonicalizer);
         });
@@ -194,7 +194,7 @@ public class DefaultRDFSerializerFactory implements RDFSerializerFactory {
         if (RDFFormat.NQUADS.equals(format)) {
             return new NQuadsSerializer(statements);
         }
-        return createSerializer(format, new LinkedHashModel(coreseValueFactory, statements));
+        return createSerializer(format, new LinkedHashModel(valueFactory, statements));
     }
 
     @Override
@@ -212,7 +212,7 @@ public class DefaultRDFSerializerFactory implements RDFSerializerFactory {
         if (RDFFormat.NQUADS.equals(format)) {
             return new NQuadsSerializer(statements, normalized);
         }
-        return createSerializer(format, new LinkedHashModel(coreseValueFactory, statements), normalized);
+        return createSerializer(format, new LinkedHashModel(valueFactory, statements), normalized);
     }
 
     private static RDFSerializationOptions normalizeOptions(

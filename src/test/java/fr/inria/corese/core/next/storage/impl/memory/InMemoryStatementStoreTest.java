@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.storage.impl.memory;
 import fr.inria.corese.core.next.data.api.term.*;
 import fr.inria.corese.core.next.data.api.model.*;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
-import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
+import fr.inria.corese.core.next.data.Values;
 import org.junit.jupiter.api.*;
 
 import java.util.*;
@@ -22,7 +22,7 @@ class InMemoryStatementStoreTest {
     @BeforeEach
     void setUp() {
         adapter = new InMemoryStatementStore();
-        valueFactory = new CoreseValueFactory();
+        valueFactory = Values.factory();
     }
 
     @Nested

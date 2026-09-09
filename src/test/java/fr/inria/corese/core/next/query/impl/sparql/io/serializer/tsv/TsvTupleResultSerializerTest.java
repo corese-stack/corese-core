@@ -2,7 +2,6 @@ package fr.inria.corese.core.next.query.impl.sparql.io.serializer.tsv;
 
 import fr.inria.corese.core.next.data.api.io.option.IOOptions;
 import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
-import fr.inria.corese.core.next.data.impl.adapter.literal.CoreseTyped;
 import fr.inria.corese.core.next.query.api.io.format.ResultFormat;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
 import fr.inria.corese.core.next.query.api.io.serializer.option.ResultSerializationOptions;
@@ -22,7 +21,7 @@ class TsvTupleResultSerializerTest extends AbstractResultSerializerTest {
     @Test
     void recognizesEquivalentStringDatatypeIris() {
         var datatype = getFactory().createIRI(XSDDatatype.STRING.getIRI().stringValue());
-        var literal = new CoreseTyped("value", datatype);
+        var literal = getFactory().createLiteral("value", datatype);
         var results = new MockQueryResults(
                 List.of("literal"),
                 List.of(Map.of("literal", literal)));

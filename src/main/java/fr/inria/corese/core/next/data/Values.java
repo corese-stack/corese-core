@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.data;
 
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
-import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
+import fr.inria.corese.core.next.data.api.factory.NativeValueFactory;
 
 /**
  * Public entry point for creating RDF terms and statements independently of a
@@ -13,7 +13,7 @@ import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
  */
 public final class Values {
 
-    private static final ValueFactory DEFAULT_FACTORY = new CoreseValueFactory();
+    private static final ValueFactory DEFAULT_FACTORY = new NativeValueFactory();
 
     private Values() {
     }

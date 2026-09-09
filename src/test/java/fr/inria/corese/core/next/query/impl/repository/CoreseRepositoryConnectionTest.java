@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.query.impl.repository;
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
-import fr.inria.corese.core.next.data.impl.adapter.CoreseValueFactory;
+import fr.inria.corese.core.next.data.Values;
 import fr.inria.corese.core.next.query.api.BooleanQuery;
 import fr.inria.corese.core.next.query.api.GraphQuery;
 import fr.inria.corese.core.next.query.api.TupleQuery;
@@ -47,7 +47,7 @@ class CoreseRepositoryConnectionTest {
 
     @BeforeEach
     void setUp() throws RepositoryException {
-        vf = new CoreseValueFactory();
+        vf = Values.factory();
         MemoryStorageManager storage = MemoryStorageManager.builder().build();
         repository = new CoreseRepository(storage);
 
