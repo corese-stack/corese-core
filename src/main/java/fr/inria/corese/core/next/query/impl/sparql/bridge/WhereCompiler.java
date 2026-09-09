@@ -11,8 +11,11 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.OptionalAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.PatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryPrologueAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ServiceAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.UnionAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.path.PathAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.path.PredicatePathAst;
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.ExpType.Type;
 import fr.inria.corese.core.next.query.impl.engine.model.Filter;
@@ -120,11 +123,20 @@ public final class WhereCompiler {
     }
 
     private Edge toEdge(TriplePatternAst triple) {
-        Node subject = CoreseAstQueryBuilder.toNode(triple.subject(), termResolver);
-        Node predicate = CoreseAstQueryBuilder.toNode(
-                CoreseAstQueryBuilder.simplePredicate(triple.predicate()), termResolver);
-        Node object = CoreseAstQueryBuilder.toNode(triple.object(), termResolver);
+        Node subject = termResolver.toNode(triple.subject());
+        Node predicate = termResolver.toNode(
+            simplePredicate(triple.predicate()));
+        Node object = termResolver.toNode(triple.object());
         return new AstBackedEdge(subject, predicate, object);
+    }
+
+    static TermAst simplePredicate(PathAst path) {
+        if (path instanceof PredicatePathAst(TermAst predicate)) {
+            return predicate;
+        }
+        throw new UnsupportedQueryFeatureException(
+                "Property path bridge compilation is not supported yet by the next pipeline for: "
+                        + path.getClass().getSimpleName());
     }
 
     private Exp compileFilter(FilterAst filter) {
@@ -165,7 +177,7 @@ public final class WhereCompiler {
      */
     private Exp compileBind(BindAst bind) {
         Filter filter = new AstBackedExpr(bind.expression(), this).getFilter();
-        Node variable = CoreseAstQueryBuilder.toNode(bind.variable(), termResolver);
+        Node variable = termResolver.toNode(bind.variable());
         Exp exp = Exp.create(Type.BIND);
         exp.setFilter(filter);
         exp.setFunctional(filter.isFunctional());
@@ -177,7 +189,7 @@ public final class WhereCompiler {
      * Compiles {@code SERVICE <endpoint> { ... }} into a KGRAM {@link Exp}.
      */
     private Exp compileService(ServiceAst service) {
-        Node endpoint = CoreseAstQueryBuilder.toNode(service.endpoint(), termResolver);
+        Node endpoint = termResolver.toNode(service.endpoint());
         Exp endpointNode = Exp.create(Type.NODE, endpoint);
         Query body = Query.create(compile(service.pattern()));
         body.setService(true);

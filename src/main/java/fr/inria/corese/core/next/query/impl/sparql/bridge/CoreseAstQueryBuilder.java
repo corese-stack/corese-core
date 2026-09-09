@@ -3,8 +3,6 @@ package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
 import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
-import fr.inria.corese.core.next.query.impl.sparql.ast.path.PathAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.path.PredicatePathAst;
 import fr.inria.corese.core.next.query.impl.engine.model.ExpType.Type;
 import fr.inria.corese.core.next.query.impl.engine.model.Filter;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
@@ -173,41 +171,6 @@ public final class CoreseAstQueryBuilder {
     }
 
     /**
-     * Converts a query term used as subject, predicate, object, or variable reference
-     * into a runtime {@link Node}.
-     *
-     * <p>This helper is package-visible because both the query builder and the
-     * {@link WhereCompiler} need a single shared term-to-node conversion rule.</p>
-     */
-    static Node toNode(TermAst term) {
-        return toNode(term, new SparqlTermResolver(null));
-    }
-
-    static Node toNode(TermAst term, SparqlTermResolver resolver) {
-        return switch (term) {
-            case VarAst(String name) -> NodeImpl.forVariable(name);
-            case IriAst(String raw) when raw.startsWith("_:") -> NodeImpl.forBlank(raw.substring(2));
-            case IriAst(String raw) -> NodeImpl.forIRI(resolver.resolveIri(raw));
-            case LiteralAst(String lexical, String lang, String datatype) -> NodeImpl.forLiteral(
-                    resolver.unquoteLexical(lexical),
-                    resolver.normalizeDatatypeIri(datatype),
-                    lang);
-            default -> throw new IllegalArgumentException(
-                    "A query term must be a variable, IRI or literal, got: "
-                            + term.getClass().getSimpleName());
-        };
-    }
-
-    static TermAst simplePredicate(PathAst path) {
-        if (path instanceof PredicatePathAst(TermAst predicate)) {
-            return predicate;
-        }
-        throw new UnsupportedQueryFeatureException(
-                "Property path bridge compilation is not supported yet by the next pipeline for: "
-                        + path.getClass().getSimpleName());
-    }
-
-    /**
      * Rejects unsupported clauses for {@code ASK} queries.
      *
      * <p>Planned roadmap items:
@@ -318,7 +281,7 @@ public final class CoreseAstQueryBuilder {
     private List<Node> toNodeList(Iterable<IriAst> iris, WhereCompiler compiler) {
         List<Node> nodes = new ArrayList<>();
         for (IriAst iri : iris) {
-            nodes.add(toNode(iri, compiler.termResolver()));
+            nodes.add(compiler.termResolver().toNode(iri));
         }
         return nodes;
     }
@@ -371,7 +334,7 @@ public final class CoreseAstQueryBuilder {
                 }
                 nodes.add(node);
             } else {
-                nodes.add(toNode(term, compiler.termResolver()));
+                nodes.add(compiler.termResolver().toNode(term));
             }
         }
         return nodes;
@@ -540,7 +503,8 @@ public final class CoreseAstQueryBuilder {
         Exp bgp = Exp.create(Type.BGP);
         for (TriplePatternAst triple : template.triplePatternAsts()) {
             Node subject = constructNode(query, triple.subject(), compiler);
-            Node predicate = constructNode(query, simplePredicate(triple.predicate()), compiler);
+            Node predicate = constructNode(
+                    query, WhereCompiler.simplePredicate(triple.predicate()), compiler);
             Node object = constructNode(query, triple.object(), compiler);
             bgp.add(new AstBackedEdge(subject, predicate, object));
         }
@@ -556,8 +520,8 @@ public final class CoreseAstQueryBuilder {
     private Node constructNode(Query query, TermAst term, WhereCompiler compiler) {
         if (term instanceof VarAst(String name)) {
             Node bound = visibleBodyNode(query, name);
-            return bound != null ? bound : toNode(term, compiler.termResolver());
+            return bound != null ? bound : compiler.termResolver().toNode(term);
         }
-        return toNode(term, compiler.termResolver());
+        return compiler.termResolver().toNode(term);
     }
 }

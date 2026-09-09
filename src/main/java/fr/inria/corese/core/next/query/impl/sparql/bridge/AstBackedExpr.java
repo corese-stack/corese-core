@@ -138,7 +138,7 @@ public final class AstBackedExpr implements Expr {
             SparqlTermResolver resolver = whereCompiler == null
                     ? new SparqlTermResolver(null)
                     : whereCompiler.termResolver();
-            return CoreseAstQueryBuilder.toNode(source, resolver).getDatatypeValue();
+            return resolver.toNode(source).getDatatypeValue();
         }
         return null;
     }

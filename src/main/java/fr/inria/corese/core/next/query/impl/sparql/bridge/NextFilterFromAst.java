@@ -1,6 +1,5 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
-
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 import fr.inria.corese.core.next.query.impl.engine.model.Expr;
 import fr.inria.corese.core.next.query.impl.engine.model.Filter;
@@ -10,9 +9,7 @@ import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.Varia
 import java.util.List;
 import java.util.Optional;
 
-/**
- * {@link Filter} view exposing native AST metadata through the Corese-next {@link Expr} API.
- */
+/** Filter view exposing native AST metadata through the Corese-next expression API. */
 public final class NextFilterFromAst implements Filter {
 
     private final AstBackedExpr owner;
