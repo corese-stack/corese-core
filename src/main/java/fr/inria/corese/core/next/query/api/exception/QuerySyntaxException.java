@@ -3,6 +3,7 @@ package fr.inria.corese.core.next.query.api.exception;
 /**
  * Thrown when a SPARQL query or update string contains invalid syntax.
  */
+@SuppressWarnings("java:S110")
 public class QuerySyntaxException extends QueryException {
 
     private final int line;

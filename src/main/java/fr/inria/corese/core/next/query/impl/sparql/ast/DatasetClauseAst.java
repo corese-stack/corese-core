@@ -20,11 +20,7 @@ public record DatasetClauseAst(Set<IriAst> graphs, Set<IriAst> namedGraphs) impl
     @Override
     public void accept(AstVisitor visitor) {
         visitor.visit(this);
-        this.graphs.forEach(iriAst -> {
-            iriAst.accept(visitor);
-        });
-        this.namedGraphs.forEach(iriAst -> {
-            iriAst.accept(visitor);
-        });
+        this.graphs.forEach(iriAst -> iriAst.accept(visitor));
+        this.namedGraphs.forEach(iriAst -> iriAst.accept(visitor));
     }
 }

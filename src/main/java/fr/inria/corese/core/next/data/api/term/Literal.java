@@ -22,6 +22,7 @@ public interface Literal extends Value {
 	/**
 	 * @return the lexical value of the literal
 	 */
+	@Override
 	String getLabel();
 
 	/**
@@ -52,6 +53,7 @@ public interface Literal extends Value {
 	/**
 	 * @return the value of the literal as an int if possible
 	 */
+	@Override
 	int intValue();
 
 	/**
@@ -77,6 +79,7 @@ public interface Literal extends Value {
 	/**
 	 * @return the value of the literal as a double if possible
 	 */
+	@Override
 	double doubleValue();
 
 	/**

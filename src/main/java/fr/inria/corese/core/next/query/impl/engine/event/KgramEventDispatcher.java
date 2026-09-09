@@ -17,7 +17,6 @@ public class KgramEventDispatcher implements Iterable<EventListener> {
     List<EventListener> observers = new ArrayList<>();
 
     @Override
-    @SuppressWarnings("NullableProblems")
     public Iterator<EventListener> iterator() {
         return observers.iterator();
     }

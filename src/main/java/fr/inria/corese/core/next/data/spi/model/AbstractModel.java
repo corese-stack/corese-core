@@ -263,7 +263,6 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
         }
 
         @Override
-        @SuppressWarnings("NullableProblems")
         public Iterator<V> iterator() {
             return new ValueSetIterator(AbstractModel.this.iterator());
         }
@@ -308,7 +307,6 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
         }
 
         @Override
-        @SuppressWarnings("NullableProblems")
         public Object[] toArray() {
             Iterator<Statement> iterator = AbstractModel.this.iterator();
             try {
@@ -323,7 +321,6 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
         }
 
         @Override
-        @SuppressWarnings("NullableProblems")
         public <T> T[] toArray(T[] array) {
             Iterator<Statement> iterator = AbstractModel.this.iterator();
             try {
@@ -371,7 +368,6 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
         }
 
         @Override
-        @SuppressWarnings("NullableProblems")
         public boolean retainAll(Collection<?> collection) {
             Iterator<V> iterator = iterator();
             try {
@@ -431,7 +427,6 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
     }
 
     @Override
-    @SuppressWarnings("NullableProblems")
     public Object[] toArray() {
         Iterator<Statement> iterator = iterator();
         try {
@@ -448,7 +443,6 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
     }
 
     @Override
-    @SuppressWarnings("NullableProblems")
     public <T> T[] toArray(T[] array) {
         Iterator<Statement> iterator = iterator();
         try {
@@ -523,7 +517,6 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
     }
 
     @Override
-    @SuppressWarnings("NullableProblems")
     public boolean retainAll(Collection<?> collection) {
         boolean modified = false;
 

@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import static fr.inria.corese.core.next.data.impl.io.parser.rdfxml.RDFXMLUtils.*;
 
@@ -21,6 +22,8 @@ import static fr.inria.corese.core.next.data.impl.io.parser.rdfxml.RDFXMLUtils.*
 public class RDFXMLStatementEmitter {
 
     private static final Logger logger = LoggerFactory.getLogger(RDFXMLStatementEmitter.class);
+
+    private static final Pattern CONTAINER_MEMBERSHIP_PATTERN = Pattern.compile("^_\\d+$");
 
     private final Model model;
     private final ValueFactory factory;
@@ -138,7 +141,7 @@ public class RDFXMLStatementEmitter {
                             "rdf:li cannot be used as property attribute. " +
                                     "It can only be used as property element inside containers.");
                 }
-                if (attrLocal.matches("^_\\d+$")) {
+                if (CONTAINER_MEMBERSHIP_PATTERN.matcher(attrLocal).matches()) {
                     throw new ParsingException(
                             "rdf:" + attrLocal + " cannot be used as property attribute. " +
                                     "Container membership properties can only be used as property elements.");

@@ -30,7 +30,6 @@ public interface StatementResult extends Closeable, Iterable<Statement> {
     Statement next();
 
     @Override
-    @SuppressWarnings("NullableProblems")
     default Iterator<Statement> iterator() {
         return new Iterator<>() {
             @Override

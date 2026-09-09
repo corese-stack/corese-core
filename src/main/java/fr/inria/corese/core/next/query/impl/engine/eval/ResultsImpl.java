@@ -22,7 +22,6 @@ public class ResultsImpl implements Results {
 	}
 
 	@Override
-	@SuppressWarnings("NullableProblems")
 	public Iterator<Result> iterator() {
 		Iterator<Mapping> it = maps.iterator();
 		return new Iterator<>() {

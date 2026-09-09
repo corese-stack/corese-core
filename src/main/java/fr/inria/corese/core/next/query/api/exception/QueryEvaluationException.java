@@ -3,6 +3,7 @@ package fr.inria.corese.core.next.query.api.exception;
 /**
  * Thrown when a syntactically valid query fails during evaluation (execution).
  */
+@SuppressWarnings("java:S110")
 public class QueryEvaluationException extends QueryException {
 
     /**

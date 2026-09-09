@@ -17,7 +17,7 @@ public record PrefixDeclarationAst(String prefix, IriAst namespace) implements V
             throw new IllegalArgumentException("prefix must be non-null");
         }
         prefix = stripTrailingColon(prefix);
-        namespace = Objects.requireNonNull(namespace, "namespace");
+        Objects.requireNonNull(namespace, "namespace");
         if(! namespace.raw().isEmpty()) {
             namespace = new IriAst(stripAngleBrackets(namespace.raw()));
         }

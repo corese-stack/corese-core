@@ -23,7 +23,7 @@ public final class SimpleTime extends AbstractTemporalPointLiteral {
     private final XMLGregorianCalendar calendar;
 
     public SimpleTime(String lexicalValue) {
-        this(lexicalValue, XSDDatatype.TIME.getIRI(), XSDDatatype.TIME);
+        this(lexicalValue, XSDDatatype.TIME.getIRI());
     }
 
     public SimpleTime(XMLGregorianCalendar calendar) {
@@ -33,11 +33,6 @@ public final class SimpleTime extends AbstractTemporalPointLiteral {
     }
 
     public SimpleTime(String lexicalValue, IRI datatype) {
-        this(lexicalValue, datatype, null);
-    }
-
-    @SuppressWarnings("java:S1172") // Kept for source compatibility with the temporal literal API.
-    public SimpleTime(String lexicalValue, IRI datatype, CoreDatatype coreDatatype) {
         super(datatype == null ? XSDDatatype.TIME.getIRI() : datatype);
         this.label = Objects.requireNonNull(lexicalValue, "lexicalValue");
         this.calendar = DatatypeFactory.newDefaultInstance().newXMLGregorianCalendar(lexicalValue);
