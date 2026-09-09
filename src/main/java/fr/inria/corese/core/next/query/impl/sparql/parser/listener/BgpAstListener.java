@@ -30,6 +30,11 @@ public class BgpAstListener extends AbstractSparqlAstListener {
     }
 
     @Override
+    public void enterGraphGraphPattern(SparqlParser.GraphGraphPatternContext ctx) {
+        builder().enterGraph(builder().termFromVarOrIriRef(ctx.varOrIri()));
+    }
+
+    @Override
     public void enterGroupGraphPattern(SparqlParser.GroupGraphPatternContext ctx) {
         builder().enterGroup();
     }

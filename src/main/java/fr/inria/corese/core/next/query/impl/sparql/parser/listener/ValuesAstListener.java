@@ -19,42 +19,38 @@ public class ValuesAstListener extends AbstractSparqlQueryAstListener {
     @Override
     public void exitValuesClause(SparqlParser.ValuesClauseContext ctx) {
         if(ctx.dataBlock() != null) {
-            processDataBlock(ctx.dataBlock());
+            queryBuilder().addValues(processDataBlock(ctx.dataBlock()));
         }
     }
 
     @Override
     public void exitInlineData(SparqlParser.InlineDataContext ctx) {
         if(ctx.dataBlock() != null) {
-            processDataBlock(ctx.dataBlock());
+            builder().addInlineValues(processDataBlock(ctx.dataBlock()));
         }
     }
 
-    private void processDataBlock(SparqlParser.DataBlockContext ctx) {
+    private ValuesAst processDataBlock(SparqlParser.DataBlockContext ctx) {
         if(ctx.inlineDataOneVar() != null) {
-            processInlineDataOneVar(ctx.inlineDataOneVar());
-        } else if (ctx.inlineDataFull() != null) {
-            processInlineDataFull(ctx.inlineDataFull());
+            return processInlineDataOneVar(ctx.inlineDataOneVar());
         }
+        if (ctx.inlineDataFull() != null) {
+            return processInlineDataFull(ctx.inlineDataFull());
+        }
+        throw new QuerySyntaxException("Missing data block in VALUES clause");
     }
 
-    private void processInlineDataOneVar(SparqlParser.InlineDataOneVarContext ctx) {
-        if(ctx.var_() != null) {
-            VarAst varAst = (VarAst) this.builder().termFromVar(ctx.var_());
-            if(!Objects.equals(varAst.name(), "()")) {
-                List<ValueMappingAst> mappingAstList = new ArrayList<>();
-                if(ctx.dataBlockValue() != null) {
-                    ctx.dataBlockValue().forEach(dataBlockValueContext -> {
-                        Map<VarAst, TermAst> valueMap = termAstFromDataBlockValues(List.of(varAst), List.of(dataBlockValueContext));
-                        // Each dataBlockValue is a solution
-                        mappingAstList.add(new ValueMappingAst(valueMap));
-                    });
-                    this.queryBuilder().addValues(mappingAstList);
-                }
-            }
-        } else if(ctx.var_() == null && ctx.dataBlockValue() != null) {
+    private ValuesAst processInlineDataOneVar(SparqlParser.InlineDataOneVarContext ctx) {
+        if (ctx.var_() == null) {
             throw new QuerySyntaxException("Missing variable for solution mapping in VALUES clause");
         }
+        VarAst variable = (VarAst) builder().termFromVar(ctx.var_());
+        List<VarAst> header = List.of(variable);
+        List<ValueMappingAst> rows = new ArrayList<>();
+        for (var value : ctx.dataBlockValue()) {
+            rows.add(new ValueMappingAst(termAstFromDataBlockValues(header, List.of(value))));
+        }
+        return new ValuesAst(header, rows);
     }
 
     /**
@@ -65,7 +61,7 @@ public class ValuesAstListener extends AbstractSparqlQueryAstListener {
         if(variables.size() != dataBlockValueList.size()) {
             throw new QuerySyntaxException("VALUE solutions should have a value for every variable and at least a variable for a solution.");
         }
-        Map<VarAst, TermAst> valuesList = new HashMap<>();
+        Map<VarAst, TermAst> valuesList = new LinkedHashMap<>();
         for(int varNum = 0; varNum < variables.size(); varNum++) {
             VarAst variable = variables.get(varNum);
             SparqlParser.DataBlockValueContext dataBlockValueContext = dataBlockValueList.get(varNum);
@@ -81,32 +77,18 @@ public class ValuesAstListener extends AbstractSparqlQueryAstListener {
                 valuesList.put(variable, null);
             }
         }
-        dataBlockValueList.forEach(dataBlockValueContext -> {
-        });
         return valuesList;
     }
 
-    private void processInlineDataFull(SparqlParser.InlineDataFullContext ctx) {
+    private ValuesAst processInlineDataFull(SparqlParser.InlineDataFullContext ctx) {
         List<VarAst> varList = new ArrayList<>();
-        if(ctx.var_() != null) {
-            ctx.var_().forEach(varContext -> {
-                VarAst varAst = (VarAst) this.builder().termFromVar(varContext);
-                if(!Objects.equals(varAst.name(), "()")) {
-                    varList.add(varAst);
-                }
-            });
+        for (var variable : ctx.var_()) {
+            varList.add((VarAst) builder().termFromVar(variable));
         }
-        if(!varList.isEmpty()) {
-            List<ValueMappingAst> valuesList = new ArrayList<>();
-            if(ctx.dataBlockValues() != null) { // Each dataBlockValues is a solution
-                ctx.dataBlockValues().forEach(dataBlockValuesContext -> { // Each dataBlockValue is a value for a variable in a solution
-                    if(dataBlockValuesContext.dataBlockValue() != null) {
-                        Map<VarAst, TermAst> valueList = termAstFromDataBlockValues(varList, dataBlockValuesContext.dataBlockValue());
-                        valuesList.add(new ValueMappingAst(valueList));
-                    }
-                });
-            }
-            this.queryBuilder().addValues(valuesList);
+        List<ValueMappingAst> valuesList = new ArrayList<>();
+        for (var row : ctx.dataBlockValues()) {
+            valuesList.add(new ValueMappingAst(termAstFromDataBlockValues(varList, row.dataBlockValue())));
         }
+        return new ValuesAst(varList, valuesList);
     }
 }

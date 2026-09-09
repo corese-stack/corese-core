@@ -14,11 +14,15 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.QueryPrologueAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /** Resolves SPARQL terms against one immutable query-prologue snapshot. */
 public final class SparqlTermResolver {
 
     private final PrefixHandler prefixes;
     private final String baseIri;
+    private final Map<String, Node> variables = new HashMap<>();
 
     public SparqlTermResolver(QueryPrologueAst prologue) {
         QueryPrologueAst effectivePrologue = prologue == null ? QueryPrologueAst.empty() : prologue;
@@ -51,7 +55,7 @@ public final class SparqlTermResolver {
 
     public Node toNode(TermAst term) {
         return switch (term) {
-            case VarAst(String name) -> NodeImpl.forVariable(name);
+            case VarAst(String name) -> variables.computeIfAbsent(name, NodeImpl::forVariable);
             case IriAst(String raw) when raw.startsWith(IOConstants.BLANK_NODE_PREFIX) ->
                     NodeImpl.forBlank(raw.substring(IOConstants.BLANK_NODE_PREFIX.length()));
             case IriAst(String raw) -> NodeImpl.forIRI(resolveIri(raw));
@@ -61,6 +65,18 @@ public final class SparqlTermResolver {
                     "A query term must be a variable, IRI or literal, got: "
                             + term.getClass().getSimpleName());
         };
+    }
+
+    /**
+     * Resolves a graph-pattern term. SPARQL blank-node labels in a basic graph
+     * pattern are existential variables, unlike blank nodes used as RDF values
+     * (for example in a CONSTRUCT template or a VALUES row).
+     */
+    public Node toPatternNode(TermAst term) {
+        if (term instanceof IriAst(String raw) && raw.startsWith(IOConstants.BLANK_NODE_PREFIX)) {
+            return variables.computeIfAbsent(raw, NodeImpl::forBlankVariable);
+        }
+        return toNode(term);
     }
 
     public String normalizeDatatypeIri(String datatype) {

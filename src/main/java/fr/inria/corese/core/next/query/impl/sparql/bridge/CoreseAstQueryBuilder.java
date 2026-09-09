@@ -61,6 +61,7 @@ public final class CoreseAstQueryBuilder {
                 askQueryAst.whereClause(),
                 askQueryAst.datasetClause(),
                 askQueryAst.solutionModifier(),
+                askQueryAst.valuesClause(),
                 compiler);
         applyOrderBy(query, askQueryAst.solutionModifier(), compiler);
         query.setAsk(true);
@@ -86,6 +87,7 @@ public final class CoreseAstQueryBuilder {
                 selectQueryAst.whereClause(),
                 selectQueryAst.datasetClause(),
                 selectQueryAst.solutionModifier(),
+                selectQueryAst.valuesClause(),
                 compiler);
         applyProjection(query, selectQueryAst.projection());
         query.setDistinct(selectQueryAst.solutionModifier().distinct());
@@ -113,6 +115,7 @@ public final class CoreseAstQueryBuilder {
                 describeQueryAst.whereClause(),
                 describeQueryAst.datasetClause(),
                 describeQueryAst.solutionModifier(),
+                describeQueryAst.valuesClause(),
                 compiler);
         applyOrderBy(query, describeQueryAst.solutionModifier(), compiler);
         List<Node> describedNodes = describeNodes(query, describeQueryAst, compiler);
@@ -140,6 +143,7 @@ public final class CoreseAstQueryBuilder {
                 constructQueryAst.whereClause(),
                 constructQueryAst.datasetClause(),
                 constructQueryAst.solutionModifier(),
+                constructQueryAst.valuesClause(),
                 compiler);
         applyOrderBy(query, constructQueryAst.solutionModifier(), compiler);
         Exp template = compileConstructTemplate(query, constructQueryAst.constructTemplate(), compiler);
@@ -175,17 +179,12 @@ public final class CoreseAstQueryBuilder {
      *
      * <p>Planned roadmap items:
      * <ul>
-     *   <li>Issue #388: inline {@code VALUES} requires a dedicated runtime mapping.</li>
      *   <li>Issue #388: {@code GROUP BY} / {@code HAVING} requires aggregate-aware ASK semantics.</li>
      *   <li>Issue #388: {@code REDUCED} support aligned with next-pipeline query-form policy.</li>
      * </ul>
      * </p>
      */
     private static void rejectUnsupportedAskClauses(AskQueryAst askQueryAst) {
-        if (!askQueryAst.valuesClause().mappings().isEmpty()) {
-            throw new UnsupportedQueryFeatureException(
-                    "Inline VALUES is not supported yet by the next pipeline for ASK");
-        }
         SolutionModifierAst mod = askQueryAst.solutionModifier();
         if (mod.hasGroupBy() || mod.hasHaving() || mod.distinct() || mod.reduced()) {
             throw new UnsupportedQueryFeatureException(
@@ -198,7 +197,6 @@ public final class CoreseAstQueryBuilder {
      *
      * <p>Planned roadmap items:
      * <ul>
-     *   <li>Issue #387: inline {@code VALUES} requires a dedicated runtime mapping.</li>
      *   <li>Issue #387: {@code SELECT} expressions and aliases need a runtime story and reuse in later clauses.</li>
      *   <li>Issue #387: {@code GROUP BY} / {@code HAVING} require aggregate semantics, not only AST field propagation.</li>
      *   <li>Issue #387: {@code REDUCED} support aligned with next-pipeline query-form policy.</li>
@@ -206,10 +204,6 @@ public final class CoreseAstQueryBuilder {
      * </p>
      */
     private static void rejectUnsupportedSelectClauses(SelectQueryAst selectQueryAst) {
-        if (!selectQueryAst.valuesClause().mappings().isEmpty()) {
-            throw new UnsupportedQueryFeatureException(
-                    "Inline VALUES is not supported yet by the next pipeline for SELECT");
-        }
         ProjectionAst projection = selectQueryAst.projection();
         if (!projection.expressionTerms().isEmpty() || !projection.expressionBoundVariables().isEmpty()) {
             throw new UnsupportedQueryFeatureException(
@@ -232,17 +226,12 @@ public final class CoreseAstQueryBuilder {
      *
      * <p>Planned roadmap items:
      * <ul>
-     *   <li>Issue #390: inline {@code VALUES} requires a dedicated runtime mapping.</li>
      *   <li>Issue #390: {@code GROUP BY} / {@code HAVING} requires aggregate-aware DESCRIBE semantics.</li>
      *   <li>Issue #390: {@code REDUCED} support aligned with next-pipeline query-form policy.</li>
      * </ul>
      * </p>
      */
     private static void rejectUnsupportedDescribeClauses(DescribeQueryAst describeQueryAst) {
-        if (!describeQueryAst.valuesClause().mappings().isEmpty()) {
-            throw new UnsupportedQueryFeatureException(
-                    "Inline VALUES is not supported yet by the next pipeline for DESCRIBE");
-        }
         SolutionModifierAst mod = describeQueryAst.solutionModifier();
         if (mod.hasGroupBy() || mod.hasHaving() || mod.distinct() || mod.reduced()) {
             throw new UnsupportedQueryFeatureException(
@@ -261,8 +250,14 @@ public final class CoreseAstQueryBuilder {
             GroupGraphPatternAst whereClause,
             DatasetClauseAst datasetClause,
             SolutionModifierAst solutionModifier,
+            ValuesAst valuesClause,
             WhereCompiler compiler) {
-        Query query = Query.create(compiler.compile(whereClause));
+        Exp body = compiler.compile(whereClause);
+        if (valuesClause.present()) {
+            body = Exp.create(Type.JOIN,
+                    body, compiler.compileValues(valuesClause));
+        }
+        Query query = Query.create(body);
         // Collect visible nodes once so later clauses (projection, ORDER BY, DESCRIBE)
         // can resolve variables against the compiled runtime body.
         query.collect();
@@ -476,17 +471,12 @@ public final class CoreseAstQueryBuilder {
      *
      * <p>Planned roadmap items:
      * <ul>
-     *   <li>Issue #389: inline {@code VALUES} requires a dedicated runtime mapping.</li>
      *   <li>Issue #389: {@code GROUP BY} / {@code HAVING} requires aggregate-aware CONSTRUCT semantics.</li>
      *   <li>Issue #389: {@code DISTINCT} / {@code REDUCED} defensive guards.</li>
      * </ul>
      * </p>
      */
     private static void rejectUnsupportedConstructClauses(ConstructQueryAst constructQueryAst) {
-        if (!constructQueryAst.valuesClause().mappings().isEmpty()) {
-            throw new UnsupportedQueryFeatureException(
-                    "Inline VALUES is not supported yet by the next pipeline for CONSTRUCT");
-        }
         SolutionModifierAst mod = constructQueryAst.solutionModifier();
         if (mod.hasGroupBy() || mod.hasHaving() || mod.distinct() || mod.reduced()) {
             throw new UnsupportedQueryFeatureException(
@@ -520,7 +510,7 @@ public final class CoreseAstQueryBuilder {
     private Node constructNode(Query query, TermAst term, WhereCompiler compiler) {
         if (term instanceof VarAst(String name)) {
             Node bound = visibleBodyNode(query, name);
-            return bound != null ? bound : compiler.termResolver().toNode(term);
+            return bound != null ? bound : NodeImpl.forVariable(name);
         }
         return compiler.termResolver().toNode(term);
     }

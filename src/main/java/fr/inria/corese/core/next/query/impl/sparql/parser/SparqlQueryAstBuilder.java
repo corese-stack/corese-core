@@ -38,15 +38,11 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
 
     // --- Internal stacks (scopes) ---
 
-    /**
-     * Final query AST result, set when the top-level SELECT finishes.
-     */
-    private QueryAst selectQueryResult;
+    /** Completed top-level SELECT, retained until its trailing VALUES clause is read. */
+    private SelectFrame completedTopLevelSelect;
 
-    /**
-     * VALUES clause (agglomerate all VALUES declarations in the query)
-     */
-    protected final List<ValueMappingAst> values = new ArrayList<>();
+    /** Query-level VALUES clause, distinct from VALUES tables inside WHERE. */
+    protected ValuesAst valuesClause = ValuesAst.none();
 
     /**
      * SELECT projection (* or explicit variables). Set by SelectQueryAstListener in enterSelectQuery.
@@ -131,41 +127,28 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
 
         // SELECT projection / ORDER BY scope: reported by SparqlQuerySemanticValidator (validate() collects all diagnostics).
 
-        /*
-         * Top-level SELECT keeps the dataset clause declared at query level.
-         * Nested SELECT subqueries use an empty dataset clause for now.
-         *
-         * Prologue is inherited from the enclosing query source context.
-         */
-        DatasetClauseAst datasetClauseAst = hasCurrentGroup()
-                ? DatasetClauseAst.none()
-                : new DatasetClauseAst(datasetDefaultGraphs, datasetNamedGraphs);
+        // The query-level VALUES clause is parsed after the top-level SELECT.
+        // Defer its AST construction until getResult() has all clauses.
+        if (!hasCurrentGroup()) {
+            completedTopLevelSelect = frame;
+            return;
+        }
 
         QueryPrologueAst prologueAst = new QueryPrologueAst(
                 List.copyOf(getPrefixDeclaration()),
                 new IriAst(getBaseUri())
         );
 
-        ValuesAst valuesClause = new ValuesAst(this.values);
-
         SelectQueryAst selectQueryAst = new SelectQueryAst(
                 frame.projection,
-                datasetClauseAst,
+                DatasetClauseAst.none(),
                 frame.whereClause,
                 buildSolutionModifier(frame),
                 prologueAst,
-                valuesClause
+                frame.valuesClause
         );
 
-        /*
-         * If we are still inside a parent group, this SELECT is a subquery.
-         * Otherwise it is the top-level SELECT result.
-         */
-        if (hasCurrentGroup()) {
-            currentGroup().add(new SubQueryAst(selectQueryAst));
-        } else {
-            selectQueryResult = selectQueryAst;
-        }
+        currentGroup().add(new SubQueryAst(selectQueryAst));
     }
 
     public void enterConstructQuery() {
@@ -272,8 +255,13 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
         else this.projection = newProjection;
     }
 
-    public void addValues(List<ValueMappingAst> mappings) {
-        this.values.addAll(mappings);
+    /** Adds the optional query-level {@code VALUES} clause to the active query. */
+    public void addValues(ValuesAst values) {
+        if (hasCurrentSelect()) {
+            getCurrentSelectFrame().valuesClause = values;
+        } else {
+            valuesClause = values;
+        }
     }
 
     /**
@@ -355,16 +343,16 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
      * @throws IllegalStateException    if no WHERE clause was set (exitGroup() not called for root) or unhandled query type
      */
     public QueryAst getResult() {
-        if (selectQueryResult != null) return selectQueryResult;
-        if (whereClause == null && this.queryType != ASTConstants.QUERY_TYPE.DESCRIBE) {
+        if (whereClause == null
+                && completedTopLevelSelect == null
+                && this.queryType != ASTConstants.QUERY_TYPE.DESCRIBE) {
             throw new IllegalStateException("No WHERE clause: did you call exitGroup() for the top-level GroupGraphPattern?");
         }
         DatasetClauseAst datasetClauseAst = new DatasetClauseAst(datasetDefaultGraphs, datasetNamedGraphs);
         QueryPrologueAst prologueAst = new QueryPrologueAst(List.copyOf(getPrefixDeclaration()), new IriAst(getBaseUri()));
-        ValuesAst valuesClause = new ValuesAst(this.values);
         return switch (this.queryType) {
             case ASK -> buildAskQueryAst(datasetClauseAst, prologueAst, valuesClause);
-            case CONSTRUCT -> buildConstructQueryAst(datasetClauseAst, prologueAst,valuesClause);
+            case CONSTRUCT -> buildConstructQueryAst(datasetClauseAst, prologueAst, valuesClause);
             case DESCRIBE -> buildDescribeQueryAst(datasetClauseAst, prologueAst, valuesClause);
             case SELECT -> buildSelectQueryAst(datasetClauseAst, prologueAst, valuesClause);
             default -> throw new QueryEvaluationException("Could not determine the type of query during parsing");
@@ -384,6 +372,16 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
      * Builds the AST for SELECT operations.
      */
     private SelectQueryAst buildSelectQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue, ValuesAst valuesClause) {
+        if (completedTopLevelSelect != null) {
+            SelectFrame frame = completedTopLevelSelect;
+            return new SelectQueryAst(
+                    frame.projection,
+                    datasetClauseAst,
+                    frame.whereClause,
+                    buildSolutionModifier(frame),
+                    prologue,
+                    valuesClause);
+        }
         if (hasCurrentSelect()) {
             SelectFrame frame = getCurrentSelectFrame();
             return new SelectQueryAst(

@@ -25,6 +25,7 @@ public interface AstVisitor {
     void visit(OrderConditionAst ast);
     void visit(PrefixDeclarationAst ast);
     void visit(ServiceAst ast);
+    void visit(GraphAst ast);
     void visit(GraphRefAst ast);
     void visit(PathAst ast);
     void visit(QuadsAst ast);

@@ -1,7 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
 
-import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.impl.sparql.parser.AbstractSparqlParserFeatureTest;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.FunctionCallAst;
@@ -189,15 +188,14 @@ class WhereCompilerTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
-    @DisplayName("Unsupported WHERE pattern kinds fail with UnsupportedQueryFeatureException")
-    void unsupportedPatternFailsWithTypedException() {
+    @DisplayName("Subqueries compile to runtime queries")
+    void subqueryCompilesToRuntimeQuery() {
         SubQueryAst subQuery = new SubQueryAst(new SelectQueryAst(group(bgp("s", "p", "o"))));
 
-        UnsupportedQueryFeatureException error = assertThrows(
-                UnsupportedQueryFeatureException.class,
-                () -> compiler.compile(subQuery));
+        Exp exp = compiler.compile(subQuery);
 
-        assertTrue(error.getMessage().contains("WHERE pattern"));
+        assertTrue(exp.isQuery());
+        assertNotNull(exp.getQuery());
     }
 
     @Test

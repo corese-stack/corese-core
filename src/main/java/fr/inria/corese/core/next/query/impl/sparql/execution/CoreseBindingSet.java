@@ -1,7 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.execution;
 
 
-import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.query.api.result.Binding;
 import fr.inria.corese.core.next.query.api.result.BindingSet;
@@ -9,9 +8,9 @@ import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
 import fr.inria.corese.core.next.query.impl.result.CoreseBinding;
 
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Adapts a KGRAM {@link Mapping} to the {@link BindingSet} API.
@@ -19,39 +18,46 @@ import java.util.Set;
 public final class CoreseBindingSet implements BindingSet {
 
     private final Mapping mapping;
+    private final Set<String> visibleNames;
 
     public CoreseBindingSet(Mapping mapping) {
+        this(mapping, mapping.getVariableNames());
+    }
+
+    CoreseBindingSet(Mapping mapping, Set<String> visibleNames) {
         this.mapping = Objects.requireNonNull(mapping, "mapping");
+        this.visibleNames = visibleNames.stream()
+                .filter(name -> mapping.getValue(name) != null)
+                .collect(Collectors.toUnmodifiableSet());
     }
 
     @Override
     public Set<String> getBindingNames() {
-        return this.mapping.getVariableNames();
+        return visibleNames;
     }
 
     @Override
     public boolean hasBinding(String name) {
-        return this.mapping.getValue(name) != null;
+        return visibleNames.contains(name) && this.mapping.getValue(name) != null;
     }
 
     @Override
     public Value getValue(String name) {
-        return this.mapping.getValue(name) instanceof Value value ? value : null;
+        return visibleNames.contains(name) && this.mapping.getValue(name) instanceof Value value ? value : null;
     }
 
     @Override
     public Iterator<Binding> iterator() {
-        return this.mapping.getMap().entrySet().stream()
-                .map(CoreseBindingSet::toBinding)
+        return visibleNames.stream()
+                .map(this::toBinding)
                 .iterator();
     }
 
-    private static Binding toBinding(
-            Map.Entry<String, DatatypeValue> entry) {
-        if (entry.getValue() instanceof Value value) {
-            return new CoreseBinding(entry.getKey(), value);
+    private Binding toBinding(String name) {
+        if (mapping.getValue(name) instanceof Value value) {
+            return new CoreseBinding(name, value);
         }
         throw new IllegalStateException(
-                "Query binding is not backed by an RDF value: " + entry.getKey());
+                "Query binding is not backed by an RDF value: " + name);
     }
 }

@@ -943,8 +943,11 @@ public class Exp extends PointerObject
                 break;
 
             case BIND:
-                // bind may not bind the variable (in case of error)
-                // hence variable cannot be considered as bound for filter
+                // A FILTER in the same group is evaluated after a preceding BIND
+                // when it references the BIND target. If the expression errors,
+                // the target remains unbound and the relocated filter rejects the
+                // solution, as required by SPARQL's error semantics.
+                share(getNode(), filterVar, expVar);
                 break;
 
             case EDGE, PATH:

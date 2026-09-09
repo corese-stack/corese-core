@@ -150,7 +150,12 @@ final class SparqlAntlrDispatcher extends SparqlParserBaseListener {
         for (var d : delegates) d.exitMinusGraphPattern(ctx);
     }
 
-    // ---------- SERVICE ----------
+    // ---------- GRAPH / SERVICE ----------
+
+    @Override
+    public void enterGraphGraphPattern(SparqlParser.GraphGraphPatternContext ctx) {
+        for (var delegate : delegates) delegate.enterGraphGraphPattern(ctx);
+    }
 
     @Override
     public void enterServiceGraphPattern(SparqlParser.ServiceGraphPatternContext ctx) {

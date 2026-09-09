@@ -50,12 +50,7 @@ public final class VariableScopeAnalyzer {
             return visibleVariables;
         }
 
-        valuesClause.mappings().forEach(valueMappingAst ->
-                valueMappingAst.values().keySet().forEach(varAst -> {
-                    if (varAst != null) {
-                        visibleVariables.add(varAst.name());
-                    }
-                }));
+        valuesClause.variables().forEach(variable -> visibleVariables.add(variable.name()));
 
         return visibleVariables;
     }
@@ -201,6 +196,9 @@ public final class VariableScopeAnalyzer {
             case BindAst(TermAst expression, VarAst variable) ->
                 visibleVariables.add(variable.name());
 
+            case ValuesAst values ->
+                visibleVariables.addAll(collectVisibleVariables(values));
+
             case FilterAst ignored -> {
                 // FILTER does not make a variable visible by itself.
             }
@@ -211,12 +209,18 @@ public final class VariableScopeAnalyzer {
                 addIfVariable(endpoint, visibleVariables);
             }
 
+            case GraphAst(TermAst name, GroupGraphPatternAst graphPattern) -> {
+                collectVisibleVariables(graphPattern, visibleVariables);
+                addIfVariable(name, visibleVariables);
+            }
+
             case SubQueryAst(SelectQueryAst select) -> {
 
                 ProjectionAst proj = select.projection();
 
                 if (proj.selectAll()) {
                     collectVisibleVariables(select.whereClause(), visibleVariables);
+                    visibleVariables.addAll(collectVisibleVariables(select.valuesClause()));
                 } else {
                     for (VarAst v : proj.variables()) {
                         visibleVariables.add(v.name());

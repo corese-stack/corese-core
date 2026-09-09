@@ -3,7 +3,8 @@ package fr.inria.corese.core.next.query.impl.sparql.ast;
 import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.AstVisitor;
 import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.VisitableAst;
 
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -13,9 +14,9 @@ import java.util.Map;
 public record ValueMappingAst(Map<VarAst, TermAst> values) implements VisitableAst {
 
     public ValueMappingAst {
-        if(values == null) {
-            values = new HashMap<>();
-        }
+        values = values == null
+                ? Map.of()
+                : Collections.unmodifiableMap(new LinkedHashMap<>(values));
     }
 
     @Override

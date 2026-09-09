@@ -220,14 +220,19 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
     @Override
     public TupleQuery prepareTupleQuery(String queryString)
             throws QuerySyntaxException, RepositoryException {
+        return prepareTupleQuery(queryString, null);
+    }
+
+    @Override
+    public TupleQuery prepareTupleQuery(String queryString, String baseIRI) {
         checkOpen();
         String source = requireSource(queryString, PARAM_QUERY_STRING);
-        QueryAst ast = parse(source);
+        QueryAst ast = parser.parse(source, baseIRI);
         if (!(ast instanceof SelectQueryAst)) {
             throw new QuerySyntaxException(
                     "Expected a SELECT query, got: " + ast.getClass().getSimpleName());
         }
-        CoreseTupleQuery q = new CoreseTupleQuery(source, executor, this::checkOpen);
+        CoreseTupleQuery q = new CoreseTupleQuery(source, executorFor(baseIRI), this::checkOpen);
         applyConnectionDataset(q);
         return q;
     }
@@ -235,14 +240,19 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
     @Override
     public GraphQuery prepareGraphQuery(String queryString)
             throws QuerySyntaxException, RepositoryException {
+        return prepareGraphQuery(queryString, null);
+    }
+
+    @Override
+    public GraphQuery prepareGraphQuery(String queryString, String baseIRI) {
         checkOpen();
         String source = requireSource(queryString, PARAM_QUERY_STRING);
-        QueryAst ast = parse(source);
+        QueryAst ast = parser.parse(source, baseIRI);
         if (!(ast instanceof ConstructQueryAst) && !(ast instanceof DescribeQueryAst)) {
             throw new QuerySyntaxException(
                     "Expected a CONSTRUCT or DESCRIBE query, got: " + ast.getClass().getSimpleName());
         }
-        CoreseGraphQuery q = new CoreseGraphQuery(source, executor, this::checkOpen);
+        CoreseGraphQuery q = new CoreseGraphQuery(source, executorFor(baseIRI), this::checkOpen);
         applyConnectionDataset(q);
         return q;
     }
@@ -250,14 +260,19 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
     @Override
     public BooleanQuery prepareBooleanQuery(String queryString)
             throws QuerySyntaxException, RepositoryException {
+        return prepareBooleanQuery(queryString, null);
+    }
+
+    @Override
+    public BooleanQuery prepareBooleanQuery(String queryString, String baseIRI) {
         checkOpen();
         String source = requireSource(queryString, PARAM_QUERY_STRING);
-        QueryAst ast = parse(source);
+        QueryAst ast = parser.parse(source, baseIRI);
         if (!(ast instanceof AskQueryAst)) {
             throw new QuerySyntaxException(
                     "Expected an ASK query, got: " + ast.getClass().getSimpleName());
         }
-        CoreseBooleanQuery q = new CoreseBooleanQuery(source, executor, this::checkOpen);
+        CoreseBooleanQuery q = new CoreseBooleanQuery(source, executorFor(baseIRI), this::checkOpen);
         applyConnectionDataset(q);
         return q;
     }
@@ -381,6 +396,10 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
      */
     private QueryAst parse(String queryString) throws QuerySyntaxException {
         return parser.parse(queryString);
+    }
+
+    private NextSparqlPipelineExecutor executorFor(String baseIRI) {
+        return baseIRI == null ? executor : new NextSparqlPipelineExecutor(storage, baseIRI);
     }
 
     private String requireSource(String source, String parameterName) {
