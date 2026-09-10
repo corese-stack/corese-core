@@ -94,6 +94,11 @@ public abstract class AbstractAstVisitor implements AstVisitor {
     }
 
     @Override
+    public void visit(GraphAst ast) {
+        // Traversal is performed by GraphAst.accept.
+    }
+
+    @Override
     public void visit(ServiceAst ast) {
 
     }

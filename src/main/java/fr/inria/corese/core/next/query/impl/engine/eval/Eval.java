@@ -22,6 +22,7 @@ import fr.inria.corese.core.next.query.impl.engine.spi.Plugin;
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
 import fr.inria.corese.core.next.query.impl.engine.spi.Provider;
 import fr.inria.corese.core.next.query.impl.engine.spi.SPARQLEngine;
+import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 
 import fr.inria.corese.core.next.data.Values;
 import fr.inria.corese.core.next.query.impl.engine.event.Event;
@@ -339,7 +340,7 @@ public final class Eval implements ExpType, Plugin {
                 }
                 if (valuesBinding(values.getNodeList(), m, -1)) {
                     eval(gNode, q, map);
-                    free(values.getNodeList());
+                    free(values.getNodeList(), m);
                 }
             }
             return;
@@ -933,7 +934,7 @@ public final class Eval implements ExpType, Plugin {
                         break;
 
                     case UNION:
-                        backtrack = union(p, graphNode, exp, map, n);
+                        backtrack = union(p, graphNode, exp, map, stack, n);
                         break;
 
                     case OPTIONAL:
@@ -1053,7 +1054,7 @@ public final class Eval implements ExpType, Plugin {
         return exp.isRecFederate();
     }
 
-    private int union(Producer p, Node graphNode, Exp exp, Mappings data, int n) throws SparqlException {
+    private int union(Producer p, Node graphNode, Exp exp, Mappings data, Stack stack, int n) throws SparqlException {
         int backtrack = n - 1;
         // join(A, union(B, C)) ; map = eval(A).distinct(inscopenodes())
 
@@ -1064,8 +1065,28 @@ public final class Eval implements ExpType, Plugin {
         Mappings map2 = unionBranch(p, graphNode, exp.rest(), exp, data);
 
         getVisitor().union(this, getGraphNode(graphNode), exp, map1, map2);
+        Mappings alternatives = new Mappings();
+        alternatives.add(map1);
+        alternatives.add(map2);
+        return evalUnionMappings(p, graphNode, stack, n, alternatives, backtrack);
+    }
 
-
+    /** Continues the enclosing query once for every solution of a UNION branch. */
+    private int evalUnionMappings(
+            Producer p, Node graphNode, Stack stack, int n, Mappings mappings, int backtrack) throws SparqlException {
+        Memory environment = getMemory();
+        for (Mapping mapping : mappings) {
+            if (stopped) {
+                return STOP;
+            }
+            if (environment.push(mapping, n, false)) {
+                backtrack = eval(p, graphNode, stack, n + 1);
+                environment.pop(mapping);
+                if (backtrack < n) {
+                    return backtrack;
+                }
+            }
+        }
         return backtrack;
     }
 
@@ -1223,7 +1244,16 @@ public final class Eval implements ExpType, Plugin {
 
         int backtrack = n - 1;
         Memory env = getMemory();
-        Node node = eval(graphNode, exp.getFilter(), env, p);
+        Node node;
+        try {
+            node = eval(graphNode, exp.getFilter(), env, p);
+        } catch (QueryEvaluationException error) {
+            // SPARQL Extend keeps the input solution when its expression errors;
+            // only the target variable is left unbound. Unsupported features and
+            // programming failures deliberately still propagate.
+            getVisitor().bind(this, getGraphNode(graphNode), exp, null);
+            return eval(p, graphNode, stack, map, n + 1);
+        }
 
         getVisitor().bind(this, getGraphNode(graphNode), exp, node == null ? null : node.getDatatypeValue());
 
@@ -1310,6 +1340,10 @@ public final class Eval implements ExpType, Plugin {
             env.setGraphNode(graphNode);
             DatatypeValue dt = eval(f, env, p);
             return isTrue(dt);
+        } catch (QueryEvaluationException error) {
+            // A SPARQL filter expression error makes that solution fail; it is
+            // not an engine failure and must not abort the whole query.
+            return false;
         } finally {
             env.setGraphNode(null);
         }
@@ -1474,7 +1508,7 @@ public final class Eval implements ExpType, Plugin {
             }
             if (valuesBinding(exp.getNodeList(), map, n)) {
                 backtrack = eval(p, graphNode, stack, n + 1);
-                free(exp.getNodeList());
+                free(exp.getNodeList(), map);
 
                 if (backtrack < n) {
                     return backtrack;
@@ -1504,23 +1538,20 @@ public final class Eval implements ExpType, Plugin {
     }
 
     void popBinding(List<Node> varList, Mapping map, int i) {
-        int j = 0;
-        for (Node qq : varList) {
-            Node mapNode = map.getNode(qq);
-            if (mapNode != null) {
-                if (j >= i) {
-                    return;
-                } else {
-                    j++;
-                }
-                getMemory().pop(qq);
+        for (int index = 0; index < i; index++) {
+            Node variable = varList.get(index);
+            if (map.getNode(variable) != null) {
+                getMemory().pop(variable);
             }
         }
     }
 
-    void free(List<Node> varList) {
+    /** Releases only bindings contributed by the current VALUES row. */
+    void free(List<Node> varList, Mapping map) {
         for (Node qNode : varList) {
-            getMemory().pop(qNode);
+            if (map.getNode(qNode) != null) {
+                getMemory().pop(qNode);
+            }
         }
     }
 

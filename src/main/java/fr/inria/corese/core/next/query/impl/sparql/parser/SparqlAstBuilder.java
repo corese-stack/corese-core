@@ -129,6 +129,14 @@ public abstract class SparqlAstBuilder {
      */
     protected final Deque<ServiceEntry> serviceStack = new ArrayDeque<>();
 
+    private record GraphEntry(int groupDepth, TermAst name) {}
+
+    private final Deque<GraphEntry> graphStack = new ArrayDeque<>();
+
+    public void enterGraph(TermAst name) {
+        graphStack.push(new GraphEntry(groupStack.size(), name));
+    }
+
     /*
      * having conditions
      */
@@ -367,7 +375,10 @@ public abstract class SparqlAstBuilder {
 
         List<PatternAst> popped = groupStack.pop();
         GroupGraphPatternAst group = new GroupGraphPatternAst(popped);
+        appendClosedGroup(group);
+    }
 
+    private void appendClosedGroup(GroupGraphPatternAst group) {
         if (!optionalGroupDepths.isEmpty() && groupStack.size() == optionalGroupDepths.peek()) {
             optionalGroupDepths.pop();
             currentGroup().add(new OptionalAst(group));
@@ -380,6 +391,9 @@ public abstract class SparqlAstBuilder {
         } else if (!serviceStack.isEmpty() && groupStack.size() == serviceStack.peek().groupDepth()) {
             ServiceEntry entry = serviceStack.pop();
             currentGroup().add(new ServiceAst(entry.endpoint(), entry.silent(), group));
+        } else if (!graphStack.isEmpty() && groupStack.size() == graphStack.peek().groupDepth()) {
+            GraphEntry entry = graphStack.pop();
+            currentGroup().add(new GraphAst(entry.name(), group));
         } else if (groupStack.isEmpty()) {
             if (hasCurrentSelect()) getCurrentSelectFrame().whereClause = group;
             else whereClause = group;
@@ -433,6 +447,17 @@ public abstract class SparqlAstBuilder {
         if (this.hasCurrentGroup()) {
             this.currentGroup().add(filter);
         }
+    }
+
+    /** Adds an inline {@code VALUES} table at its syntactic position in a group. */
+    public void addInlineValues(ValuesAst values) {
+        if (values == null) {
+            throw new IllegalArgumentException("values is null");
+        }
+        if (!hasCurrentGroup()) {
+            throw new IllegalStateException("addInlineValues() called outside of a group graph pattern");
+        }
+        currentGroup().add(values);
     }
 
     /**
@@ -838,5 +863,6 @@ public abstract class SparqlAstBuilder {
         protected GroupByAst groupBy = new GroupByAst(List.of());
         protected final List<OrderConditionAst> orderConditions = new ArrayList<>();
         protected final List<TermAst> havingConditions = new ArrayList<>();
+        protected ValuesAst valuesClause = ValuesAst.none();
     }
 }

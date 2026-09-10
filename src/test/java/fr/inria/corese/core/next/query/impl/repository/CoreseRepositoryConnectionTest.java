@@ -61,6 +61,53 @@ class CoreseRepositoryConnectionTest {
         repository.close();
     }
 
+    @Test
+    void documentBaseIsScopedToEachPreparedQuery() {
+        try (RepositoryConnection conn = repository.getConnection()) {
+            TupleQuery first = conn.prepareTupleQuery("SELECT ?x { VALUES ?x { <item> } }", "https://example.org/a/query.rq");
+            TupleQuery second = conn.prepareTupleQuery("SELECT ?x { VALUES ?x { <item> } }", "https://example.org/b/query.rq");
+            try (var secondResult = second.evaluate(); var firstResult = first.evaluate()) {
+                assertEquals("https://example.org/a/item", firstResult.next().getValue("x").stringValue());
+                assertEquals("https://example.org/b/item", secondResult.next().getValue("x").stringValue());
+            }
+        }
+    }
+
+    @Test
+    void explicitBaseOverridesDocumentBaseWithoutChangingLiterals() {
+        try (RepositoryConnection conn = repository.getConnection();
+             var result = conn.prepareTupleQuery("""
+                     # BASE <https://wrong.example/>
+                     BASE <https://other.example/>
+                     SELECT ?x ?text { VALUES (?x ?text) { (<item> "FROM <item>") } }
+                     """, "https://example.org/query.rq").evaluate()) {
+            var row = result.next();
+            assertEquals("https://other.example/item", row.getValue("x").stringValue());
+            assertEquals("FROM <item>", row.getValue("text").stringValue());
+        }
+    }
+
+    @Test
+    void documentBaseDoesNotLegalizeRelativeBaseDeclarations() {
+        try (RepositoryConnection conn = repository.getConnection()) {
+            assertThrows(QuerySyntaxException.class, () -> conn.prepareTupleQuery(
+                    "BASE <../data/> SELECT ?x { VALUES ?x { <item> } }", "https://example.org/tests/query.rq"));
+        }
+    }
+
+    @Test
+    void documentBaseAppliesToAskAndConstruct() {
+        try (RepositoryConnection conn = repository.getConnection()) {
+            assertTrue(conn.prepareBooleanQuery("ASK { <alice> <knows> <bob> }", "http://example.org/query.rq").evaluate());
+            try (var result = conn.prepareGraphQuery("CONSTRUCT { <alice> <knows> ?o } WHERE { VALUES ?o { <bob> } }",
+                    "http://example.org/query.rq").evaluate()) {
+                assertTrue(result.hasNext());
+                assertEquals(vf.createStatement(iri(ALICE), iri(KNOWS), iri(BOB)), result.next());
+                assertFalse(result.hasNext());
+            }
+        }
+    }
+
     // -------------------------------------------------------------------------
     // TupleQuery (SELECT)
     // -------------------------------------------------------------------------

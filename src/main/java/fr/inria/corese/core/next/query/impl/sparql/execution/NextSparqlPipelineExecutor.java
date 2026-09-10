@@ -15,6 +15,7 @@ import fr.inria.corese.core.next.query.api.result.BindingSet;
 import fr.inria.corese.core.next.query.api.result.GraphQueryResult;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 import fr.inria.corese.core.next.query.impl.sparql.parser.SparqlParser;
+import fr.inria.corese.core.next.query.impl.sparql.parser.SparqlParserOptions;
 import fr.inria.corese.core.next.query.impl.result.CoreseGraphQueryResult;
 import fr.inria.corese.core.next.query.impl.sparql.ast.AskQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ConstructQueryAst;
@@ -71,6 +72,12 @@ public final class NextSparqlPipelineExecutor {
      */
     public NextSparqlPipelineExecutor(StorageManager storage) {
         this(storage, new SparqlParser(), new CoreseAstQueryBuilder());
+    }
+
+    /** Creates an executor with a query-scoped source base IRI. */
+    public NextSparqlPipelineExecutor(StorageManager storage, String baseIRI) {
+        this(storage, new SparqlParser(new SparqlParserOptions.Builder().baseIRI(baseIRI).build()),
+                new CoreseAstQueryBuilder());
     }
 
     /**

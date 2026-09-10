@@ -220,14 +220,16 @@ class CoreseAstQueryBuilderDescribeTest {
     }
 
     @Test
-    @DisplayName("Inline VALUES is not supported yet -> UnsupportedQueryFeatureException")
-    void rejectsValuesClause() {
+    @DisplayName("Query-level VALUES is compiled as a runtime table")
+    void compilesValuesClause() {
         ValuesAst values = new ValuesAst(List.of(
                 new ValueMappingAst(Map.of(new VarAst("x"), new IriAst("http://example.org/v")))));
         DescribeQueryAst describe = new DescribeQueryAst(
                 DatasetClauseAst.none(), List.of(new VarAst("x")), whereBindingX(), null, null, values);
 
-        assertThrows(UnsupportedQueryFeatureException.class, () -> builder.toNextQuery(describe));
+        Query query = builder.toNextQuery(describe);
+        assertTrue(query.getBody().isJoin());
+        assertTrue(query.getBody().rest().isValues());
     }
 
     @Test

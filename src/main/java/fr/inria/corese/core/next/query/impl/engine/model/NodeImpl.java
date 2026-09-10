@@ -11,13 +11,19 @@ public final class NodeImpl implements Node {
 
     private DatatypeValue value;
     private final String variableName;
+    private final boolean blankVariable;
     private int index = -1;
     private String key = INITKEY;
     private Object payload;
 
     private NodeImpl(DatatypeValue value, String variableName) {
+        this(value, variableName, false);
+    }
+
+    private NodeImpl(DatatypeValue value, String variableName, boolean blankVariable) {
         this.value = value;
         this.variableName = variableName;
+        this.blankVariable = blankVariable;
     }
 
     /** Creates a constant node carrying a Corese-next RDF value. */
@@ -56,6 +62,11 @@ public final class NodeImpl implements Node {
     /** Creates a variable node with the given name. */
     public static NodeImpl forVariable(String name) {
         return new NodeImpl(null, Objects.requireNonNull(name, "name"));
+    }
+
+    /** Creates an existential BGP variable, excluded from SELECT * projection. */
+    public static NodeImpl forBlankVariable(String label) {
+        return new NodeImpl(null, Objects.requireNonNull(label, "label"), true);
     }
 
     @Override
@@ -123,10 +134,10 @@ public final class NodeImpl implements Node {
         return variableName != null;
     }
 
-    /** Returns whether this constant node represents an RDF blank node. */
+    /** Returns whether this node is an RDF blank node or an existential variable. */
     @Override
     public boolean isBlank() {
-        return value != null && value.isBNode();
+        return blankVariable || (value != null && value.isBNode());
     }
 
     @Override

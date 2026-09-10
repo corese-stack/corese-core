@@ -130,6 +130,24 @@ class NextSparqlPipelineExecutorTest {
     }
 
     @Test
+    @DisplayName("BIND in a UNION branch leaves references outside its group unbound")
+    void bindInUnionBranchDoesNotReceiveOuterBindings() {
+        String age = "http://example.org/age";
+        insert(iri(ALICE), iri(age), valueFactory.createLiteral(1));
+
+        TupleQueryResult result = executor.evaluateTuple("""
+                SELECT ?nextAge WHERE {
+                  ?person <http://example.org/age> ?age .
+                  { BIND(?age + 1 AS ?nextAge) } UNION { BIND(?age + 2 AS ?nextAge) }
+                }
+                """);
+
+        var rows = result.stream().toList();
+        assertEquals(2, rows.size());
+        assertTrue(rows.stream().noneMatch(binding -> binding.hasBinding("nextAge")));
+    }
+
+    @Test
     @DisplayName("ORDER BY uses numeric value order rather than lexical order")
     void orderByUsesNativeRdfValueOrder() {
         String rank = "http://example.org/rank";
@@ -225,6 +243,148 @@ class NextSparqlPipelineExecutorTest {
         assertTrue(executor.evaluateTuple("""
                 SELECT ?s WHERE { ?s ?p ?o . FILTER((1 / 0) || true) }
                 """).hasNext());
+    }
+
+    @Test
+    @DisplayName("Inline VALUES preserves row order, duplicates, and UNDEF bindings")
+    void inlineValuesPreservesBagSemanticsAndUndef() {
+        TupleQueryResult result = executor.evaluateTuple("""
+                SELECT ?person ?rank WHERE {
+                  VALUES (?person ?rank) {
+                    (<http://example.org/alice> 1)
+                    (<http://example.org/alice> 1)
+                    (<http://example.org/bob> UNDEF)
+                  }
+                }
+                """);
+
+        assertEquals(List.of("person", "rank"), result.getBindingNames());
+        var first = result.next();
+        assertEquals(ALICE, first.getValue("person").stringValue());
+        assertEquals(1, ((Literal) first.getValue("rank")).intValue());
+        var duplicate = result.next();
+        assertEquals(ALICE, duplicate.getValue("person").stringValue());
+        assertEquals(1, ((Literal) duplicate.getValue("rank")).intValue());
+        var unbound = result.next();
+        assertEquals(BOB, unbound.getValue("person").stringValue());
+        assertFalse(unbound.hasBinding("rank"));
+        assertFalse(result.hasNext());
+    }
+
+    @Test
+    @DisplayName("VALUES joins graph patterns at its position and rejects incompatible mappings")
+    void inlineValuesJoinsGraphPatterns() {
+        insert(iri(BOB), iri(KNOWS), iri(ALICE));
+
+        TupleQueryResult result = executor.evaluateTuple("""
+                SELECT ?person ?friend WHERE {
+                  VALUES ?person { <http://example.org/alice> <http://example.org/missing> }
+                  ?person <http://example.org/knows> ?friend .
+                }
+                """);
+
+        assertTrue(result.hasNext());
+        var binding = result.next();
+        assertEquals(ALICE, binding.getValue("person").stringValue());
+        assertEquals(BOB, binding.getValue("friend").stringValue());
+        assertFalse(result.hasNext());
+    }
+
+    @Test
+    @DisplayName("Query-level VALUES constrains the completed WHERE result")
+    void queryLevelValuesConstrainWhereResults() {
+        TupleQueryResult result = executor.evaluateTuple("""
+                SELECT ?person ?friend WHERE {
+                  ?person <http://example.org/knows> ?friend .
+                }
+                VALUES ?person { <http://example.org/alice> }
+                """);
+
+        assertTrue(result.hasNext());
+        assertEquals(ALICE, result.next().getValue("person").stringValue());
+        assertFalse(result.hasNext());
+    }
+
+    @Test
+    @DisplayName("Query-level VALUES constrains a semicolon-expanded basic graph pattern")
+    void queryLevelValuesConstrainSemicolonExpandedPattern() {
+        String title = "http://purl.org/dc/elements/1.1/title";
+        String price = "http://example.org/ns#price";
+        String secondBook = "http://example.org/book/book2";
+        insert(iri(ALICE), iri(title), valueFactory.createLiteral("first"));
+        insert(iri(ALICE), iri(price), valueFactory.createLiteral(1));
+        insert(iri(secondBook), iri(title), valueFactory.createLiteral("second"));
+        insert(iri(secondBook), iri(price), valueFactory.createLiteral(2));
+
+        TupleQueryResult result = executor.evaluateTuple("""
+                PREFIX dc: <http://purl.org/dc/elements/1.1/>
+                PREFIX : <http://example.org/book/>
+                PREFIX ns: <http://example.org/ns#>
+                SELECT ?book ?title ?price {
+                  ?book dc:title ?title ; ns:price ?price .
+                }
+                VALUES ?book { <http://example.org/alice> }
+                """);
+
+        assertTrue(result.hasNext());
+        assertEquals(ALICE, result.next().getValue("book").stringValue());
+        assertFalse(result.hasNext());
+    }
+
+    @Test
+    @DisplayName("BIND chains after VALUES and remains visible to following graph patterns")
+    void bindAfterValuesIsVisibleToFollowingPatterns() {
+        String rank = "http://example.org/rank";
+        insert(iri(ALICE), iri(rank), valueFactory.createLiteral(2));
+
+        TupleQueryResult result = executor.evaluateTuple("""
+                SELECT ?person ?nextRank WHERE {
+                  VALUES ?person { <http://example.org/alice> }
+                  ?person <http://example.org/rank> ?rank .
+                  BIND(?rank + 1 AS ?nextRank)
+                  VALUES ?nextRank { 3 }
+                }
+                """);
+
+        assertTrue(result.hasNext());
+        assertEquals(3, ((Literal) result.next().getValue("nextRank")).intValue());
+        assertFalse(result.hasNext());
+    }
+
+    @Test
+    @DisplayName("VALUES UNDEF leaves an incoming binding available to following operations")
+    void valuesUndefDoesNotClearIncomingBinding() {
+        String rank = "http://example.org/rank";
+        insert(iri(ALICE), iri(rank), valueFactory.createLiteral(2));
+
+        TupleQueryResult result = executor.evaluateTuple("""
+                SELECT ?nextRank WHERE {
+                  ?person <http://example.org/rank> ?rank .
+                  VALUES (?person ?rank) { (<http://example.org/alice> UNDEF) }
+                  BIND(?rank + 1 AS ?nextRank)
+                }
+                """);
+
+        assertTrue(result.hasNext());
+        assertEquals(3, ((Literal) result.next().getValue("nextRank")).intValue());
+        assertFalse(result.hasNext());
+    }
+
+    @Test
+    @DisplayName("BIND expression errors keep the input solution with an unbound target")
+    void bindExpressionErrorLeavesTargetUnbound() {
+        TupleQueryResult result = executor.evaluateTuple("""
+                SELECT ?person ?value WHERE {
+                  VALUES ?person { <http://example.org/alice> }
+                  BIND(1 / 0 AS ?value)
+                }
+                """);
+
+        assertTrue(result.hasNext());
+        var binding = result.next();
+        assertEquals(ALICE, binding.getValue("person").stringValue());
+        assertFalse(binding.hasBinding("value"));
+        assertFalse(result.hasNext());
     }
 
     @Test
@@ -558,4 +718,114 @@ class NextSparqlPipelineExecutorTest {
             @Override public Iterator<Binding> iterator()               { return List.of(b).iterator(); }
         };
     }
+    @Test
+    void valuesInsideGraphPreservesUnboundGraphRows() {
+        insertInGraph(iri(ALICE), iri(KNOWS), iri(BOB), iri("http://example.org/g1"));
+        insertInGraph(iri(ALICE), iri(KNOWS), iri(BOB), iri("http://example.org/g2"));
+        try (var result = executor.evaluateTuple("""
+                SELECT ?g ?t WHERE {
+                  GRAPH ?g {
+                    VALUES (?g ?t) { (UNDEF "foo") (<http://example.org/g1> "bar") }
+                  }
+                }
+                """)) {
+            assertEquals(List.of("http://example.org/g1:bar", "http://example.org/g1:foo", "http://example.org/g2:foo"),
+                    result.stream().map(row -> row.getValue("g").stringValue() + ":" + row.getValue("t").stringValue())
+                            .sorted().toList());
+        }
+    }
+
+    @Test
+    void trailingValuesDoesNotSupplyBindingsToWhere() {
+        try (var result = executor.evaluateTuple("SELECT ?x ?y { BIND(?x AS ?y) } VALUES ?x { 1 }")) {
+            assertTrue(result.hasNext());
+            var row = result.next();
+            assertEquals("1", row.getValue("x").stringValue());
+            assertFalse(row.hasBinding("y"));
+            assertEquals(Set.of("x"), row.getBindingNames());
+            var bindings = row.iterator();
+            assertTrue(bindings.hasNext());
+            assertEquals("x", bindings.next().name());
+            assertFalse(bindings.hasNext());
+            assertFalse(result.hasNext());
+        }
+    }
+
+    @Test
+    void unionPreservesRightBranchWhenLeftIsEmpty() {
+        try (var result = executor.evaluateTuple("SELECT ?x { { VALUES ?x {} } UNION { VALUES ?x { 1 1 } } }")) {
+            assertEquals(2, result.stream().count());
+        }
+    }
+
+    @Test
+    void selectStarDoesNotExposeExistentialBlankNodeVariables() {
+        try (var result = executor.evaluateTuple("SELECT * { [] <http://example.org/knows> ?friend }")) {
+            assertEquals(List.of("friend"), result.getBindingNames());
+            assertTrue(result.hasNext());
+            assertEquals(Set.of("friend"), result.next().getBindingNames());
+        }
+    }
+
+    @Test
+    void incompatibleValuesRowAfterUndefDoesNotPopIncomingBindings() {
+        try (var result = executor.evaluateTuple("""
+                SELECT ?x ?y ?z {
+                  VALUES (?x ?y ?z) { (1 2 3) }
+                  VALUES (?x ?y ?z) { (UNDEF 2 4) (UNDEF 2 3) }
+                }
+                """)) {
+            assertTrue(result.hasNext());
+            var row = result.next();
+            assertEquals("1", row.getValue("x").stringValue());
+            assertEquals("2", row.getValue("y").stringValue());
+            assertEquals("3", row.getValue("z").stringValue());
+            assertFalse(result.hasNext());
+        }
+    }
+
+    @Test
+    void graphNameIsNotAnInputBindingForItsInnerBind() {
+        insertInGraph(iri(ALICE), iri(KNOWS), iri(BOB), iri("http://example.org/g1"));
+        try (var result = executor.evaluateTuple("SELECT ?g ?copy { GRAPH ?g { BIND(?g AS ?copy) } }")) {
+            assertTrue(result.hasNext());
+            var row = result.next();
+            assertEquals("http://example.org/g1", row.getValue("g").stringValue());
+            assertFalse(row.hasBinding("copy"));
+            assertFalse(result.hasNext());
+        }
+    }
+
+    @Test
+    void nestedGroupFilterDoesNotSeeOuterBind() {
+        try (var result = executor.evaluateTuple("SELECT ?x { BIND(1 AS ?x) { FILTER(?x = 1) } }")) {
+            assertFalse(result.hasNext());
+        }
+    }
+
+    @Test
+    void graphWithValuesRequiresAnExistingNamedGraph() {
+        insertInGraph(iri(ALICE), iri(KNOWS), iri(BOB), iri("http://example.org/g1"));
+        assertTrue(executor.evaluateBoolean("ASK { GRAPH <http://example.org/g1> { VALUES ?x { 1 } } }"));
+        assertFalse(executor.evaluateBoolean("ASK { GRAPH <http://example.org/missing> { VALUES ?x { 1 } } }"));
+        assertFalse(executor.evaluateBoolean("""
+                ASK FROM NAMED <http://example.org/other>
+                { GRAPH <http://example.org/g1> { VALUES ?x { 1 } } }
+                """));
+    }
+
+    @Test
+    void valuesDistinguishesEmptyTableFromEmptySolution() {
+        assertFalse(executor.evaluateBoolean("ASK {} VALUES ?x {}"));
+        assertFalse(executor.evaluateBoolean("ASK { VALUES () {} }"));
+        assertTrue(executor.evaluateBoolean("ASK { VALUES () { () } }"));
+        try (var result = executor.evaluateTuple("SELECT * {} VALUES ?x {}")) {
+            assertEquals(List.of("x"), result.getBindingNames());
+            assertFalse(result.hasNext());
+        }
+        try (var result = executor.evaluateTuple("SELECT * { VALUES () { () () } }")) {
+            assertEquals(2, result.stream().count());
+        }
+    }
+
 }

@@ -1,6 +1,5 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
-import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.impl.sparql.parser.AbstractSparqlParserFeatureTest;
 import fr.inria.corese.core.next.query.impl.sparql.parser.SparqlParser;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
@@ -161,12 +160,14 @@ class CoreseAstQueryBuilderConstructTest extends AbstractSparqlParserFeatureTest
     }
 
     @Test
-    @DisplayName("Inline VALUES is not supported yet -> UnsupportedQueryFeatureException")
-    void rejectsValuesClause() {
+    @DisplayName("Query-level VALUES is compiled as a runtime table")
+    void compilesValuesClause() {
         ValuesAst values = new ValuesAst(List.of(new ValueMappingAst(Map.of(new VarAst("x"), new IriAst("http://example.org/v")))));
         ConstructQueryAst construct = new ConstructQueryAst(template(new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o"))), DatasetClauseAst.none(), whereSPO(), null, null, values);
 
-        assertThrows(UnsupportedQueryFeatureException.class, () -> builder.toNextQuery(construct));
+        Query query = builder.toNextQuery(construct);
+        assertTrue(query.getBody().isJoin());
+        assertTrue(query.getBody().rest().isValues());
     }
 
     @Test

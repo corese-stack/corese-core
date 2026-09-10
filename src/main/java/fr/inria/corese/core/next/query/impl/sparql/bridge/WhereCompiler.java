@@ -5,15 +5,21 @@ import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureExce
 import fr.inria.corese.core.next.query.impl.sparql.ast.BgpAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.BindAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.GraphAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.MinusAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.OptionalAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.PatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryPrologueAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ServiceAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.SubQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.UnionAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ValueMappingAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ValuesAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.path.PathAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.path.PredicatePathAst;
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
@@ -22,7 +28,11 @@ import fr.inria.corese.core.next.query.impl.engine.model.Filter;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
+import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -79,7 +89,12 @@ public final class WhereCompiler {
             case OptionalAst optional -> compileOptional(optional);
             case MinusAst minus -> compileMinus(minus);
             case BindAst bind -> compileBind(bind);
+            case ValuesAst values -> compileValues(values);
             case ServiceAst service -> compileService(service);
+            case GraphAst(TermAst name, GroupGraphPatternAst graphPattern) -> Exp.create(Type.GRAPH,
+                    Exp.create(Type.GRAPHNODE, Exp.create(Type.NODE, termResolver.toNode(name))),
+                    compile(graphPattern));
+            case SubQueryAst subQuery -> compileSubQuery(subQuery);
             case GroupGraphPatternAst group -> compileGroup(group);
             default -> throw new UnsupportedQueryFeatureException(
                     "WHERE pattern is not supported yet by the next pipeline: "
@@ -108,6 +123,11 @@ public final class WhereCompiler {
                     body = Exp.create(Type.AND);
                     body.add(minusExp);
                 }
+                case GroupGraphPatternAst nested -> {
+                    Exp joined = Exp.create(Type.JOIN, body, compile(nested));
+                    body = Exp.create(Type.AND);
+                    body.add(joined);
+                }
                 default -> body.add(compile(element));
             }
         }
@@ -123,10 +143,10 @@ public final class WhereCompiler {
     }
 
     private Edge toEdge(TriplePatternAst triple) {
-        Node subject = termResolver.toNode(triple.subject());
-        Node predicate = termResolver.toNode(
+        Node subject = termResolver.toPatternNode(triple.subject());
+        Node predicate = termResolver.toPatternNode(
             simplePredicate(triple.predicate()));
-        Node object = termResolver.toNode(triple.object());
+        Node object = termResolver.toPatternNode(triple.object());
         return new AstBackedEdge(subject, predicate, object);
     }
 
@@ -185,6 +205,30 @@ public final class WhereCompiler {
         return exp;
     }
 
+    /** Lowers a SPARQL inline-data table to the runtime's native VALUES expression. */
+    Exp compileValues(ValuesAst values) {
+        List<Node> variables = new ArrayList<>();
+        for (VarAst variable : values.variables()) {
+            variables.add(termResolver.toNode(variable));
+        }
+
+        Mappings mappings = new Mappings();
+        for (ValueMappingAst row : values.mappings()) {
+            List<Node> rowVariables = new ArrayList<>();
+            List<Node> rowValues = new ArrayList<>();
+            for (int index = 0; index < values.variables().size(); index++) {
+                VarAst variable = values.variables().get(index);
+                TermAst value = row.values().get(variable);
+                if (value != null) {
+                    rowVariables.add(variables.get(index));
+                    rowValues.add(termResolver.toNode(value));
+                }
+            }
+            mappings.add(Mapping.create(rowVariables, rowValues));
+        }
+        return Exp.createValues(variables, mappings);
+    }
+
     /**
      * Compiles {@code SERVICE <endpoint> { ... }} into a KGRAM {@link Exp}.
      */
@@ -197,5 +241,10 @@ public final class WhereCompiler {
         Exp exp = Exp.create(Type.SERVICE, endpointNode, body);
         exp.setSilent(service.silent());
         return exp;
+    }
+
+    /** Compiles a nested SELECT into the runtime query expression used by KGRAM. */
+    private Exp compileSubQuery(SubQueryAst subQuery) {
+        return new CoreseAstQueryBuilder(this).toNextQuery((SelectQueryAst) subQuery.query());
     }
 }

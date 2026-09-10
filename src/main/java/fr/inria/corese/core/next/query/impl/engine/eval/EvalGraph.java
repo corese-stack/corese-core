@@ -40,8 +40,10 @@ public class EvalGraph {
 
         if (graph == null) {
             res = graphNodes(p, exp, data);
-        } else {
+        } else if (p.isProducer(graph) || isNamedGraph(p, graphNode, graph)) {
             res = graph(p, graph, exp, data);
+        } else {
+            return backtrack;
         }
 
         if (res == null) {
@@ -83,6 +85,16 @@ public class EvalGraph {
             return true;
         }
         environment.pop(mapping);
+        return false;
+    }
+
+    private boolean isNamedGraph(Producer producer, Node graphNode, Node graph) {
+        for (Node candidate : producer.getGraphNodes(
+                graphNode, engine.getQuery().getFrom(graphNode), engine.getMemory())) {
+            if (candidate.same(graph)) {
+                return true;
+            }
+        }
         return false;
     }
 

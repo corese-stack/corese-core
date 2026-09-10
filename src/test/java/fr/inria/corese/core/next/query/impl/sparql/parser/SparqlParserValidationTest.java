@@ -158,6 +158,22 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
 
             assertEquals(BIND_SCOPE_MESSAGE, exception.getMessage());
         }
+
+        @Test
+        @DisplayName("Should reject BIND when its target is already introduced by inline VALUES")
+        void shouldRejectBindVariableAlreadyVisibleFromInlineValues() {
+            var parser = newParserDefault();
+            QueryValidationException exception = assertThrows(
+                    QueryValidationException.class,
+                    () -> parser.parse("""
+                            SELECT * WHERE {
+                              VALUES ?x { 1 }
+                              BIND(2 AS ?x)
+                            }
+                            """));
+
+            assertEquals(BIND_SCOPE_MESSAGE, exception.getMessage());
+        }
     }
 
     @Nested

@@ -142,7 +142,7 @@ public final class SparqlTermBuilder {
 
     public TermAst termFromNumericLiteralUnsigned(SparqlParser.NumericLiteralUnsignedContext ctx) {
         if (ctx.INTEGER() != null) {
-            return literal(ctx.getText(), null, XSD.xsdUnsignedInt.getIRI().stringValue());
+            return literal(ctx.getText(), null, XSD.xsdInteger.getIRI().stringValue());
         } else if (ctx.DECIMAL() != null) {
             return literal(ctx.getText(), null, XSD.xsdDecimal.getIRI().stringValue());
         } else if (ctx.DOUBLE() != null) {
@@ -154,7 +154,7 @@ public final class SparqlTermBuilder {
 
     public TermAst termFromNumericLiteralPositive(SparqlParser.NumericLiteralPositiveContext ctx) {
         if (ctx.INTEGER_POSITIVE() != null) {
-            return literal(ctx.getText(), null, XSD.xsdPositiveInteger.getIRI().stringValue());
+            return literal(ctx.getText(), null, XSD.xsdInteger.getIRI().stringValue());
         } else if (ctx.DECIMAL_POSITIVE() != null) {
             return literal(ctx.getText(), null, XSD.xsdDecimal.getIRI().stringValue());
         } else if (ctx.DOUBLE_POSITIVE() != null) {
@@ -166,7 +166,7 @@ public final class SparqlTermBuilder {
 
     public TermAst termFromNumericLiteralNegative(SparqlParser.NumericLiteralNegativeContext ctx) {
         if (ctx.INTEGER_NEGATIVE() != null) {
-            return literal(ctx.getText(), null, XSD.xsdNegativeInteger.getIRI().stringValue());
+            return literal(ctx.getText(), null, XSD.xsdInteger.getIRI().stringValue());
         } else if (ctx.DECIMAL_NEGATIVE() != null) {
             return literal(ctx.getText(), null, XSD.xsdDecimal.getIRI().stringValue());
         } else if (ctx.DOUBLE_NEGATIVE() != null) {

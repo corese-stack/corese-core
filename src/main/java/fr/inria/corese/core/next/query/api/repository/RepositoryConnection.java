@@ -197,6 +197,16 @@ public interface RepositoryConnection extends AutoCloseable {
             throws QuerySyntaxException, RepositoryException;
 
     /**
+     * Prepares a SELECT query using the source document's base IRI.
+     * An explicit SPARQL BASE declaration takes precedence.
+     *
+     * @param queryString query text, left unchanged
+     * @param baseIRI source base IRI, or {@code null} for the default
+     * @return the prepared query
+     */
+    TupleQuery prepareTupleQuery(String queryString, String baseIRI);
+
+    /**
      * Creates a prepared SPARQL CONSTRUCT or DESCRIBE query.
      *
      * @param queryString the textual query form
@@ -208,6 +218,15 @@ public interface RepositoryConnection extends AutoCloseable {
             throws QuerySyntaxException, RepositoryException;
 
     /**
+     * Prepares a CONSTRUCT or DESCRIBE query with a source document base IRI.
+     *
+     * @param queryString query text, left unchanged
+     * @param baseIRI source base IRI, overridden by an explicit BASE declaration
+     * @return the prepared query
+     */
+    GraphQuery prepareGraphQuery(String queryString, String baseIRI);
+
+    /**
      * Creates a prepared SPARQL ASK query.
      *
      * @param queryString the textual query form
@@ -217,6 +236,15 @@ public interface RepositoryConnection extends AutoCloseable {
      */
     BooleanQuery prepareBooleanQuery(String queryString)
             throws QuerySyntaxException, RepositoryException;
+
+    /**
+     * Prepares an ASK query with a source document base IRI.
+     *
+     * @param queryString query text, left unchanged
+     * @param baseIRI source base IRI, overridden by an explicit BASE declaration
+     * @return the prepared query
+     */
+    BooleanQuery prepareBooleanQuery(String queryString, String baseIRI);
 
     /**
      * Creates a prepared SPARQL update request.

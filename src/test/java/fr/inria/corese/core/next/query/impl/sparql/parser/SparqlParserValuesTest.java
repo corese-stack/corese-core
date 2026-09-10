@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.parser;
 
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
+import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,7 +18,7 @@ class SparqlParserValuesTest extends AbstractSparqlParserFeatureTest {
                 """;
         SparqlQueryAst ast = (SparqlQueryAst) parser.parse(inlineValueTest);
         assertNotNull(ast);
-        ValuesAst valuesAst = ast.valuesClause();
+        ValuesAst valuesAst = inlineValues(ast);
         assertNotNull(valuesAst);
         assertEquals(2, valuesAst.mappings().size());
         assertEquals(1, valuesAst.mappings().getFirst().values().keySet().size());
@@ -42,7 +43,7 @@ class SparqlParserValuesTest extends AbstractSparqlParserFeatureTest {
                 """;
         SparqlQueryAst ast = (SparqlQueryAst) parser.parse(inlineValueTest);
         assertNotNull(ast);
-        ValuesAst valuesAst = ast.valuesClause();
+        ValuesAst valuesAst = inlineValues(ast);
         assertNotNull(valuesAst);
         assertEquals(2, valuesAst.mappings().size());
         assertEquals(2, valuesAst.mappings().getFirst().values().keySet().size());
@@ -84,24 +85,24 @@ class SparqlParserValuesTest extends AbstractSparqlParserFeatureTest {
                """;
         SparqlQueryAst ast = (SparqlQueryAst) parser.parse(inlineValueTest);
         assertNotNull(ast);
-        ValuesAst valuesAst = ast.valuesClause();
-        assertNotNull(valuesAst);
-        assertEquals(2, valuesAst.mappings().size());
+        ValuesAst valuesAst = inlineValues(ast);
+        assertEquals(1, valuesAst.mappings().size());
         assertEquals(1, valuesAst.mappings().getFirst().values().keySet().size());
-        assertEquals(2, valuesAst.mappings().getLast().values().keySet().size());
         VarAst var1Key = new VarAst("var1");
         VarAst var2Key = new VarAst("var2");
         VarAst var3Key = new VarAst("var3");
         assertTrue(valuesAst.mappings().getFirst().values().containsKey(var1Key));
-        assertTrue(valuesAst.mappings().getLast().values().containsKey(var2Key));
-        assertTrue(valuesAst.mappings().getLast().values().containsKey(var3Key));
+        ValuesAst queryValues = ast.valuesClause();
+        assertEquals(1, queryValues.mappings().size());
+        assertTrue(queryValues.mappings().getFirst().values().containsKey(var2Key));
+        assertTrue(queryValues.mappings().getFirst().values().containsKey(var3Key));
 
         ValueMappingAst valueMappingAst1 = valuesAst.mappings().getFirst();
         assertInstanceOf(LiteralAst.class, valueMappingAst1.values().get(var1Key));
         LiteralAst literalAst1 = (LiteralAst) valueMappingAst1.values().get(var1Key);
         assertEquals("\"test1\"", literalAst1.lexical());
 
-        ValueMappingAst valueMappingAst2 = valuesAst.mappings().getLast();
+        ValueMappingAst valueMappingAst2 = queryValues.mappings().getFirst();
         assertInstanceOf(LiteralAst.class, valueMappingAst2.values().get(var2Key));
         LiteralAst literalAst2 = (LiteralAst) valueMappingAst2.values().get(var2Key);
         assertEquals("\"test2\"", literalAst2.lexical());
@@ -120,7 +121,7 @@ class SparqlParserValuesTest extends AbstractSparqlParserFeatureTest {
                 """;
         SparqlQueryAst ast = (SparqlQueryAst) parser.parse(inlineValueTest);
         assertNotNull(ast);
-        ValuesAst valuesAst = ast.valuesClause();
+        ValuesAst valuesAst = inlineValues(ast);
         assertNotNull(valuesAst);
         assertEquals(2, valuesAst.mappings().size());
         assertEquals(1, valuesAst.mappings().getFirst().values().keySet().size());
@@ -144,9 +145,10 @@ class SparqlParserValuesTest extends AbstractSparqlParserFeatureTest {
                 """;
         SparqlQueryAst ast = (SparqlQueryAst) parser.parse(inlineValueTest);
         assertNotNull(ast);
-        ValuesAst valuesAst = ast.valuesClause();
+        ValuesAst valuesAst = inlineValues(ast);
         assertNotNull(valuesAst);
-        assertEquals(0, valuesAst.mappings().size());
+        assertEquals(1, valuesAst.mappings().size());
+        assertTrue(valuesAst.mappings().getFirst().values().isEmpty());
     }
 
     @Test
@@ -158,10 +160,11 @@ class SparqlParserValuesTest extends AbstractSparqlParserFeatureTest {
                     VALUES () { ( "test" ) }
                 }
                 """;
-        SparqlQueryAst ast = (SparqlQueryAst) parser.parse(inlineValueTest);
-        assertNotNull(ast);
-        ValuesAst valuesAst = ast.valuesClause();
-        assertNotNull(valuesAst);
-        assertEquals(0, valuesAst.mappings().size());
+        assertThrows(QuerySyntaxException.class, () -> parser.parse(inlineValueTest));
+    }
+
+    private ValuesAst inlineValues(SparqlQueryAst query) {
+        SelectQueryAst select = assertInstanceOf(SelectQueryAst.class, query);
+        return assertInstanceOf(ValuesAst.class, select.whereClause().patterns().getLast());
     }
 }
