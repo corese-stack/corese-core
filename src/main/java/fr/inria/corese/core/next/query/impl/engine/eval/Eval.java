@@ -22,7 +22,7 @@ import fr.inria.corese.core.next.query.impl.engine.spi.Plugin;
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
 import fr.inria.corese.core.next.query.impl.engine.spi.Provider;
 import fr.inria.corese.core.next.query.impl.engine.spi.SPARQLEngine;
-import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
+import fr.inria.corese.core.next.query.api.exception.QueryTypeErrorException;
 
 import fr.inria.corese.core.next.data.Values;
 import fr.inria.corese.core.next.query.impl.engine.event.Event;
@@ -1247,7 +1247,7 @@ public final class Eval implements ExpType, Plugin {
         Node node;
         try {
             node = eval(graphNode, exp.getFilter(), env, p);
-        } catch (QueryEvaluationException error) {
+        } catch (QueryTypeErrorException error) {
             // SPARQL Extend keeps the input solution when its expression errors;
             // only the target variable is left unbound. Unsupported features and
             // programming failures deliberately still propagate.
@@ -1340,7 +1340,7 @@ public final class Eval implements ExpType, Plugin {
             env.setGraphNode(graphNode);
             DatatypeValue dt = eval(f, env, p);
             return isTrue(dt);
-        } catch (QueryEvaluationException error) {
+        } catch (QueryTypeErrorException error) {
             // A SPARQL filter expression error makes that solution fail; it is
             // not an engine failure and must not abort the whole query.
             return false;

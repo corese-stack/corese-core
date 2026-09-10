@@ -9,6 +9,7 @@ import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
 import fr.inria.corese.core.next.query.impl.engine.model.NodeImpl;
+import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.VariableScopeAnalyzer;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -89,7 +90,7 @@ public final class CoreseAstQueryBuilder {
                 selectQueryAst.solutionModifier(),
                 selectQueryAst.valuesClause(),
                 compiler);
-        applyProjection(query, selectQueryAst.projection());
+        applyProjection(query, selectQueryAst.projection(), compiler);
         query.setDistinct(selectQueryAst.solutionModifier().distinct());
         applyOrderBy(query, selectQueryAst.solutionModifier(), compiler);
         query.setAST(selectQueryAst);
@@ -197,7 +198,6 @@ public final class CoreseAstQueryBuilder {
      *
      * <p>Planned roadmap items:
      * <ul>
-     *   <li>Issue #387: {@code SELECT} expressions and aliases need a runtime story and reuse in later clauses.</li>
      *   <li>Issue #387: {@code GROUP BY} / {@code HAVING} require aggregate semantics, not only AST field propagation.</li>
      *   <li>Issue #387: {@code REDUCED} support aligned with next-pipeline query-form policy.</li>
      * </ul>
@@ -205,9 +205,10 @@ public final class CoreseAstQueryBuilder {
      */
     private static void rejectUnsupportedSelectClauses(SelectQueryAst selectQueryAst) {
         ProjectionAst projection = selectQueryAst.projection();
-        if (!projection.expressionTerms().isEmpty() || !projection.expressionBoundVariables().isEmpty()) {
+        if (projection.expressionTerms().values().stream().anyMatch(
+                new VariableScopeAnalyzer()::containsAggregate)) {
             throw new UnsupportedQueryFeatureException(
-                    "SELECT expressions and aliases are not supported yet by the next pipeline");
+                    "Aggregate projection expressions are not supported yet by the next pipeline");
         }
         SolutionModifierAst solutionModifier = selectQueryAst.solutionModifier();
         if (solutionModifier.reduced()) {
@@ -288,13 +289,20 @@ public final class CoreseAstQueryBuilder {
      * query body. An explicit projection reuses these same runtime nodes and fails
      * fast when a projected variable is not visible in the body.</p>
      */
-    private void applyProjection(Query query, ProjectionAst projection) {
+    private void applyProjection(Query query, ProjectionAst projection, WhereCompiler compiler) {
         List<Exp> selectExpressions;
         if (projection.selectAll()) {
             selectExpressions = toNodeExpressions(query.selectNodesFromPattern());
         } else {
             selectExpressions = new ArrayList<>();
             for (VarAst variable : projection.variables()) {
+                TermAst expression = projection.expressionTerms().get(variable.name());
+                if (expression != null) {
+                    Exp selected = Exp.create(Type.NODE, compiler.termResolver().toNode(variable));
+                    selected.setFilter(new AstBackedExpr(expression, compiler).getFilter());
+                    selectExpressions.add(selected);
+                    continue;
+                }
                 Node node = visibleBodyNode(query, variable.name());
                 if (node == null) {
                     throw new IllegalArgumentException(

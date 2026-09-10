@@ -623,7 +623,7 @@ builtInCall
     | CEIL L_PAREN expression R_PAREN
     | FLOOR L_PAREN expression R_PAREN
     | ROUND L_PAREN expression R_PAREN
-    | CONCAT L_PAREN expression (COMMA expression)* R_PAREN
+    | CONCAT (NIL | L_PAREN expression (COMMA expression)* R_PAREN)
     | subStringExpression
     | strReplaceExpression
     | STRLEN L_PAREN expression R_PAREN
@@ -651,7 +651,7 @@ builtInCall
     | SHA256 L_PAREN expression R_PAREN
     | SHA384 L_PAREN expression R_PAREN
     | SHA512 L_PAREN expression R_PAREN
-    | COALESCE L_PAREN expression (COMMA expression)* R_PAREN
+    | COALESCE (NIL | L_PAREN expression (COMMA expression)* R_PAREN)
     | IF L_PAREN expression COMMA expression COMMA expression R_PAREN
     | STRLANG L_PAREN expression COMMA expression R_PAREN
     | STRDT L_PAREN expression COMMA expression R_PAREN

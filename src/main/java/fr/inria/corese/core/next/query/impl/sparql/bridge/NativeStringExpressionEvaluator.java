@@ -3,6 +3,7 @@ package fr.inria.corese.core.next.query.impl.sparql.bridge;
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import fr.inria.corese.core.next.data.api.term.Literal;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
+import fr.inria.corese.core.next.query.api.exception.QueryTypeErrorException;
 import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BinaryConstraintAst;
@@ -49,8 +50,7 @@ final class NativeStringExpressionEvaluator {
             LiteralExpressionAst expression,
             NativeEvaluationContext context) {
         return switch (expression) {
-            case StrAst unary -> context.values().createLiteral(
-                    context.required(unary.argument()).stringValue());
+            case StrAst unary -> str(context.required(unary.argument()), context);
             case StrAfterAst binary -> after(binary, context);
             case StrBeforeAst binary -> before(binary, context);
             case StrLangAst binary -> stringWithLanguage(binary, context);
@@ -93,14 +93,14 @@ final class NativeStringExpressionEvaluator {
 
     static boolean regex(BinaryRegexAst expression, NativeEvaluationContext context) {
         String value = context.stringLiteral(expression.getString()).getLabel();
-        String pattern = context.stringLiteral(expression.getPattern()).getLabel();
+        String pattern = context.simpleString(expression.getPattern()).getLabel();
         return compilePattern(pattern, "").matcher(value).find();
     }
 
     static boolean regex(TrinaryRegexAst expression, NativeEvaluationContext context) {
         String value = context.stringLiteral(expression.getString()).getLabel();
-        String pattern = context.stringLiteral(expression.getPattern()).getLabel();
-        String flags = context.stringLiteral(expression.getFlags()).getLabel();
+        String pattern = context.simpleString(expression.getPattern()).getLabel();
+        String flags = context.simpleString(expression.getFlags()).getLabel();
         return compilePattern(pattern, flags).matcher(value).find();
     }
 
@@ -118,7 +118,8 @@ final class NativeStringExpressionEvaluator {
             NativeEvaluationContext context) {
         StringOperands operands = stringOperands(expression, context);
         int separator = operands.left().indexOf(operands.right());
-        String result = separator < 0 ? "" : operands.left().substring(0, separator);
+        if (separator < 0) return context.values().createLiteral("");
+        String result = operands.left().substring(0, separator);
         return stringLike(operands.source(), result, context);
     }
 
@@ -127,29 +128,35 @@ final class NativeStringExpressionEvaluator {
             NativeEvaluationContext context) {
         StringOperands operands = stringOperands(expression, context);
         int separator = operands.left().indexOf(operands.right());
-        String result = separator < 0
-                ? ""
-                : operands.left().substring(separator + operands.right().length());
+        if (separator < 0) return context.values().createLiteral("");
+        String result = operands.left().substring(separator + operands.right().length());
         return stringLike(operands.source(), result, context);
     }
 
     private static DatatypeValue stringWithLanguage(
             BinaryConstraintAst expression,
             NativeEvaluationContext context) {
-        String label = context.stringLiteral(expression.getLeftArgument()).getLabel();
-        String language = context.stringLiteral(expression.getRightArgument()).getLabel();
+        String label = context.simpleString(expression.getLeftArgument()).getLabel();
+        String language = context.simpleString(expression.getRightArgument()).getLabel();
         return context.values().createLiteral(label, language);
     }
 
     private static DatatypeValue stringWithDatatype(
             BinaryConstraintAst expression,
             NativeEvaluationContext context) {
-        String label = context.stringLiteral(expression.getLeftArgument()).getLabel();
+        String label = context.simpleString(expression.getLeftArgument()).getLabel();
         DatatypeValue datatype = context.required(expression.getRightArgument());
         if (!datatype.isIRI()) {
-            throw new QueryEvaluationException("STRDT expects an IRI as its second argument");
+            throw new QueryTypeErrorException("STRDT expects an IRI as its second argument");
         }
         return context.values().createLiteral(label, context.values().createIRI(datatype.stringValue()));
+    }
+
+    private static DatatypeValue str(DatatypeValue value, NativeEvaluationContext context) {
+        if (!value.isIRI() && !(value instanceof Literal)) {
+            throw new QueryTypeErrorException("STR expects an IRI or a literal");
+        }
+        return context.values().createLiteral(value.stringValue());
     }
 
     private static DatatypeValue language(TermAst expression, NativeEvaluationContext context) {
@@ -192,15 +199,21 @@ final class NativeStringExpressionEvaluator {
 
     private static DatatypeValue replace(ReplaceAst expression, NativeEvaluationContext context) {
         Literal source = context.stringLiteral(expression.getString());
-        String pattern = context.stringLiteral(expression.getPattern()).getLabel();
-        String replacement = context.stringLiteral(expression.getReplacement()).getLabel();
+        String pattern = context.simpleString(expression.getPattern()).getLabel();
+        String replacement = context.simpleString(expression.getReplacement()).getLabel();
         String flags = expression.hasFlags()
-                ? context.stringLiteral(expression.getFlags()).getLabel()
+                ? context.simpleString(expression.getFlags()).getLabel()
                 : "";
-        String result = compilePattern(pattern, flags)
-                .matcher(source.getLabel())
-                .replaceAll(replacement);
-        return stringLike(source, result, context);
+        Pattern compiled = compilePattern(pattern, flags);
+        if (compiled.matcher("").find()) {
+            throw new QueryTypeErrorException("REPLACE pattern must not match an empty string");
+        }
+        try {
+            String result = compiled.matcher(source.getLabel()).replaceAll(replacement);
+            return stringLike(source, result, context);
+        } catch (IndexOutOfBoundsException invalidGroup) {
+            throw new QueryTypeErrorException("Invalid replacement group", invalidGroup);
+        }
     }
 
     private static DatatypeValue substring(SubstrAst expression, NativeEvaluationContext context) {
@@ -216,48 +229,28 @@ final class NativeStringExpressionEvaluator {
     }
 
     private static String codePointSubstring(String value, double start, Double length) {
-        if (Double.isNaN(start) || start == Double.POSITIVE_INFINITY
-                || (length != null && Double.isNaN(length))) {
-            return "";
-        }
-        int codePointCount = value.codePointCount(0, value.length());
-        long roundedStart = xpathRound(start);
-        long firstPosition = Math.max(1L, roundedStart);
-        long endPosition = length == null
-                ? codePointCount + 1L
-                : saturatedAdd(roundedStart, xpathRound(length));
-        long exclusivePosition = Math.min(codePointCount + 1L, endPosition);
-        if (exclusivePosition <= firstPosition || firstPosition > codePointCount) {
-            return "";
-        }
-        int from = value.offsetByCodePoints(0, Math.toIntExact(firstPosition - 1L));
-        int to = value.offsetByCodePoints(0, Math.toIntExact(exclusivePosition - 1L));
+        double firstPosition = Math.max(1, xpathRound(start));
+        double endPosition = length == null ? Double.POSITIVE_INFINITY : xpathRound(start) + xpathRound(length);
+        if (Double.isNaN(firstPosition) || Double.isNaN(endPosition)) return "";
+        int count = value.codePointCount(0, value.length());
+        double exclusivePosition = Math.min(count + 1.0, endPosition);
+        if (exclusivePosition <= firstPosition || firstPosition > count) return "";
+        int from = value.offsetByCodePoints(0, (int) firstPosition - 1);
+        int to = value.offsetByCodePoints(0, (int) exclusivePosition - 1);
         return value.substring(from, to);
     }
 
-    private static long xpathRound(double value) {
-        if (value == Double.NEGATIVE_INFINITY) {
-            return Long.MIN_VALUE;
-        }
-        if (value == Double.POSITIVE_INFINITY) {
-            return Long.MAX_VALUE;
-        }
-        return (long) Math.floor(value + 0.5d);
-    }
-
-    private static long saturatedAdd(long left, long right) {
-        try {
-            return Math.addExact(left, right);
-        } catch (ArithmeticException overflow) {
-            return right < 0 ? Long.MIN_VALUE : Long.MAX_VALUE;
-        }
+    private static double xpathRound(double value) {
+        if (!Double.isFinite(value) || value == 0) return value;
+        double floor = Math.floor(value);
+        return value - floor >= 0.5 ? floor + 1 : floor;
     }
 
     private static DatatypeValue digest(
             String algorithm,
             TermAst expression,
             NativeEvaluationContext context) {
-        String value = context.stringLiteral(expression).getLabel();
+        String value = context.simpleString(expression).getLabel();
         try {
             MessageDigest digest = MessageDigest.getInstance(algorithm);
             byte[] bytes = digest.digest(value.getBytes(StandardCharsets.UTF_8));
@@ -268,10 +261,31 @@ final class NativeStringExpressionEvaluator {
     }
 
     private static Pattern compilePattern(String expression, String flags) {
-        return Pattern.compile(expression, regexOptions(flags));
+        int options = regexOptions(flags);
+        return Pattern.compile(flags.contains("x") ? removePatternWhitespace(expression) : expression, options);
+    }
+
+    private static String removePatternWhitespace(String expression) {
+        StringBuilder result = new StringBuilder();
+        boolean escaped = false;
+        int brackets = 0;
+        for (int index = 0; index < expression.length(); index++) {
+            char character = expression.charAt(index);
+            if (!escaped) {
+                if (character == '[') brackets++;
+                if (character == ']') brackets--;
+                if (brackets == 0 && " \t\r\n".indexOf(character) >= 0) continue;
+            }
+            result.append(character);
+            escaped = !escaped && character == '\\';
+        }
+        return result.toString();
     }
 
     private static int regexOptions(String flags) {
+        if (!flags.chars().allMatch(flag -> "imsx".indexOf(flag) >= 0)) {
+            throw new QueryTypeErrorException("Invalid regular expression flags");
+        }
         int options = 0;
         if (flags.contains("i")) {
             options |= Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
@@ -282,15 +296,13 @@ final class NativeStringExpressionEvaluator {
         if (flags.contains("s")) {
             options |= Pattern.DOTALL;
         }
-        if (flags.contains("x")) {
-            options |= Pattern.COMMENTS;
-        }
         return options;
     }
 
     private static String encodeForUri(String value) {
         return URLEncoder.encode(value, StandardCharsets.UTF_8)
                 .replace("+", "%20")
+                .replace("*", "%2A")
                 .replace("%7E", "~");
     }
 
@@ -309,7 +321,7 @@ final class NativeStringExpressionEvaluator {
         boolean compatible = rightLanguage == null
                 || leftLanguage != null && leftLanguage.equalsIgnoreCase(rightLanguage);
         if (!compatible) {
-            throw new QueryEvaluationException("String arguments have incompatible language tags");
+            throw new QueryTypeErrorException("String arguments have incompatible language tags");
         }
     }
 

@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query.impl.engine.solution;
 
+import fr.inria.corese.core.next.query.api.exception.QueryTypeErrorException;
+
 import fr.inria.corese.core.next.query.impl.engine.eval.Eval;
 import fr.inria.corese.core.next.query.impl.engine.eval.PointerObject;
 import fr.inria.corese.core.next.query.impl.engine.eval.Stack;
@@ -423,7 +425,7 @@ public class Memory extends PointerObject implements Environment {
                         if (!e.isAggregate()) {
 
 
-                            node = (Node) kgram.eval(f, this, p);
+                            node = evaluateExpressionNode(f, p);
                             kgram.getVisitor().select(kgram, f.getExp(), node == null ? null : node.getDatatypeValue());
                             // bind fun(?x) as ?y
                             boolean success = push(e.getNode(), node);
@@ -530,11 +532,20 @@ public class Memory extends PointerObject implements Environment {
             if (nodes[n] == null) {
                 Filter f = e.getFilter();
                 if (f != null && !e.isAggregate()) {
-                    nodes[n] = (Node) kgram.eval(f, this, p);
+                    nodes[n] = evaluateExpressionNode(f, p);
                 }
 
             }
             n++;
+        }
+    }
+
+    private Node evaluateExpressionNode(Filter filter, Producer producer) {
+        try {
+            return producer.getNode(kgram.eval(filter, this, producer));
+        } catch (QueryTypeErrorException error) {
+            // A scalar type error leaves a projected value or sorting key unbound.
+            return null;
         }
     }
 

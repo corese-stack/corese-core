@@ -8,6 +8,10 @@ import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import fr.inria.corese.core.next.data.api.term.Literal;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
+import fr.inria.corese.core.next.query.api.exception.QueryTypeErrorException;
+import fr.inria.corese.core.next.data.api.exception.IncorrectOperationException;
+import fr.inria.corese.core.next.data.api.exception.IncorrectFormatException;
+import fr.inria.corese.core.next.data.api.exception.InvalidDatatypeException;
 import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
@@ -45,8 +49,9 @@ final class NativeEvaluationContext {
             return NativeExpressionEvaluator.evaluateExpression(expression, this);
         } catch (QueryEvaluationException | UnsupportedQueryFeatureException failure) {
             throw failure;
-        } catch (RuntimeException failure) {
-            throw new QueryEvaluationException(
+        } catch (IllegalArgumentException | ArithmeticException | IncorrectOperationException
+                 | IncorrectFormatException | InvalidDatatypeException failure) {
+            throw new QueryTypeErrorException(
                     "Failed to evaluate SPARQL expression " + expression.getName(), failure);
         }
     }
@@ -69,7 +74,7 @@ final class NativeEvaluationContext {
 
     DatatypeValue required(DatatypeValue value) {
         if (value == null) {
-            throw new QueryEvaluationException("Expression references an unbound variable");
+            throw new QueryTypeErrorException("Expression references an unbound variable");
         }
         return value;
     }
@@ -79,7 +84,7 @@ final class NativeEvaluationContext {
         if (value instanceof Literal literal) {
             return literal;
         }
-        throw new QueryEvaluationException("Expected an RDF literal");
+        throw new QueryTypeErrorException("Expected an RDF literal");
     }
 
     Literal stringLiteral(TermAst expression) {
@@ -88,7 +93,15 @@ final class NativeEvaluationContext {
                 || literal.getCoreDatatype() == RDFDatatype.LANGSTRING) {
             return literal;
         }
-        throw new QueryEvaluationException("Expected a string RDF literal");
+        throw new QueryTypeErrorException("Expected a string RDF literal");
+    }
+
+    Literal simpleString(TermAst expression) {
+        Literal literal = stringLiteral(expression);
+        if (literal.getLanguage().isPresent()) {
+            throw new QueryTypeErrorException("Expected an untagged string literal");
+        }
+        return literal;
     }
 
     boolean effectiveBooleanValue(TermAst expression) {
@@ -98,20 +111,24 @@ final class NativeEvaluationContext {
     boolean effectiveBooleanValue(DatatypeValue value) {
         DatatypeValue boundValue = required(value);
         if (!(boundValue instanceof Literal literal)) {
-            throw new QueryEvaluationException("RDF term has no SPARQL effective boolean value");
+            throw new QueryTypeErrorException("RDF term has no SPARQL effective boolean value");
         }
         if (literal.getCoreDatatype() == XSDDatatype.BOOLEAN) {
-            return literal.booleanValue();
+            String lexical = NativeNumericValues.whitespaceCollapsed(literal.getLabel());
+            return lexical.equals("true") || lexical.equals("1");
         }
         if (literal.isNumber()) {
-            double number = literal.doubleValue();
-            return number != 0.0d && !Double.isNaN(number);
+            try {
+                return NativeNumericValues.booleanValue(literal);
+            } catch (QueryTypeErrorException invalidLexicalForm) {
+                return false;
+            }
         }
         if (literal.getCoreDatatype() == XSDDatatype.STRING
                 || literal.getCoreDatatype() == RDFDatatype.LANGSTRING) {
             return !literal.getLabel().isEmpty();
         }
-        throw new QueryEvaluationException("RDF literal has no SPARQL effective boolean value");
+        throw new QueryTypeErrorException("RDF literal has no SPARQL effective boolean value");
     }
 
     boolean exists(GroupGraphPatternAst pattern) {
@@ -124,6 +141,15 @@ final class NativeEvaluationContext {
         } catch (SparqlException exception) {
             throw new QueryEvaluationException("Failed to evaluate EXISTS graph pattern", exception);
         }
+    }
+
+    DatatypeValue blankNode(TermAst label) {
+        if (label == null) return values.createBNode();
+        String key = simpleString(label).getLabel();
+        if (environment == null || environment.getMap() == null) {
+            throw new QueryEvaluationException("BNODE(label) requires a solution evaluation context");
+        }
+        return environment.getMap().computeIfAbsent(key, ignored -> values.createBNode());
     }
 
     OffsetDateTime queryEvaluationTime() {
