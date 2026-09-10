@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.query.impl.sparql.bridge;
 import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import fr.inria.corese.core.next.data.api.term.Literal;
-import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
+import fr.inria.corese.core.next.query.api.exception.QueryTypeErrorException;
 
 import javax.xml.datatype.DatatypeConstants;
 
@@ -48,7 +48,7 @@ final class NativeValueComparison {
 
     private static int compareFloatingPoint(double left, double right) {
         if (Double.isNaN(left) || Double.isNaN(right)) {
-            throw new QueryEvaluationException("NaN is not order-comparable");
+            throw new QueryTypeErrorException("NaN is not order-comparable");
         }
         if (left < right) {
             return -1;
@@ -71,8 +71,8 @@ final class NativeValueComparison {
         };
     }
 
-    private static QueryEvaluationException incomparable() {
-        return new QueryEvaluationException(
+    private static QueryTypeErrorException incomparable() {
+        return new QueryTypeErrorException(
                 "RDF values are not order-comparable in a SPARQL expression");
     }
 }

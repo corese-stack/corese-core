@@ -139,7 +139,7 @@ public final class SparqlTermResolver {
         return namespace == null ? raw : namespace + unescapePName(raw.substring(colon + 1));
     }
 
-    private String resolveRelativeIri(String iri) {
+    String resolveRelativeIri(String iri) {
         if (IRIUtils.isAbsoluteIRI(baseIri) && !IRIUtils.isAbsoluteIRI(iri)) {
             return IRIUtils.resolveIRIAgainstBase(baseIri, iri);
         }

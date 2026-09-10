@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
 
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
-import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
+import fr.inria.corese.core.next.query.api.exception.QueryTypeErrorException;
 import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import fr.inria.corese.core.next.query.impl.engine.spi.Evaluator;
@@ -65,11 +65,8 @@ final class NativeExpressionEvaluator {
             case CoalesceAst coalesce -> coalesce(coalesce.arguments(), context);
             case IfAst(var condition, var thenExpr, var elseExpr) -> context.evaluate(
                     context.effectiveBooleanValue(condition) ? thenExpr : elseExpr);
-            case BnodeAst bnode -> bnode.getLabel() == null
-                    ? context.values().createBNode()
-                    : context.values().createBNode(context.required(bnode.getLabel()).stringValue());
-            case FunctionCallAst function -> throw new UnsupportedQueryFeatureException(
-                    "Extension function evaluation is not supported yet: " + function.getName());
+            case BnodeAst bnode -> context.blankNode(bnode.getLabel());
+            case FunctionCallAst function -> NativeCastExpressionEvaluator.evaluate(function, context);
             default -> throw new UnsupportedQueryFeatureException(
                     "Expression is not supported yet by the native evaluator: "
                             + expression.getClass().getSimpleName());
@@ -79,18 +76,18 @@ final class NativeExpressionEvaluator {
     private static DatatypeValue coalesce(
             List<TermAst> arguments,
             NativeEvaluationContext context) {
-        QueryEvaluationException lastFailure = null;
+        QueryTypeErrorException lastFailure = null;
         for (TermAst argument : arguments) {
             try {
                 DatatypeValue value = context.evaluate(argument);
                 if (value != null) {
                     return value;
                 }
-            } catch (QueryEvaluationException failure) {
+            } catch (QueryTypeErrorException failure) {
                 lastFailure = failure;
             }
         }
-        throw new QueryEvaluationException(
+        throw new QueryTypeErrorException(
                 "COALESCE has no bound, successfully evaluated argument",
                 lastFailure);
     }

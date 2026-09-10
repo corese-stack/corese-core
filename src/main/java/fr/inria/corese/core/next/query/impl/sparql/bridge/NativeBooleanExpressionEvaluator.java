@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
-import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
+import fr.inria.corese.core.next.query.api.exception.QueryTypeErrorException;
 import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
@@ -21,6 +21,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.InAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.IsBlankAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.IsIriAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.IsLiteralAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.IsNumericAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.LangMatchesAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.LowerOrEqualThanAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.LowerThanAst;
@@ -57,12 +58,13 @@ final class NativeBooleanExpressionEvaluator {
             case IsIriAst unary -> context.required(unary.argument()).isIRI();
             case IsBlankAst unary -> context.required(unary.argument()).isBNode();
             case IsLiteralAst unary -> context.required(unary.argument()).isLiteral();
+            case IsNumericAst unary -> NativeNumericExpressionEvaluator.isNumeric(context.required(unary.argument()));
             case StrStartsAst binary -> NativeStringExpressionEvaluator.startsWith(binary, context);
             case StrEndsAst binary -> NativeStringExpressionEvaluator.endsWith(binary, context);
             case ContainsAst binary -> NativeStringExpressionEvaluator.contains(binary, context);
             case LangMatchesAst binary -> languageMatches(
-                    context.stringLiteral(binary.getLeftArgument()).getLabel(),
-                    context.stringLiteral(binary.getRightArgument()).getLabel());
+                    context.simpleString(binary.getLeftArgument()).getLabel(),
+                    context.simpleString(binary.getRightArgument()).getLabel());
             case BinaryRegexAst regex -> NativeStringExpressionEvaluator.regex(regex, context);
             case TrinaryRegexAst regex -> NativeStringExpressionEvaluator.regex(regex, context);
             case InAst(var left, var candidates) -> in(context.required(left), candidates, context);
@@ -105,7 +107,7 @@ final class NativeBooleanExpressionEvaluator {
     private static BooleanResult booleanResult(TermAst expression, NativeEvaluationContext context) {
         try {
             return BooleanResult.value(context.effectiveBooleanValue(expression));
-        } catch (QueryEvaluationException failure) {
+        } catch (QueryTypeErrorException failure) {
             return BooleanResult.failure(failure);
         }
     }
@@ -114,14 +116,14 @@ final class NativeBooleanExpressionEvaluator {
             DatatypeValue left,
             List<TermAst> candidates,
             NativeEvaluationContext context) {
-        QueryEvaluationException failure = null;
+        QueryTypeErrorException failure = null;
         for (TermAst candidate : candidates) {
             try {
                 DatatypeValue right = context.required(candidate);
                 if (left.equalsWE(right)) {
                     return true;
                 }
-            } catch (QueryEvaluationException candidateFailure) {
+            } catch (QueryTypeErrorException candidateFailure) {
                 failure = candidateFailure;
             }
         }
@@ -158,13 +160,13 @@ final class NativeBooleanExpressionEvaluator {
                 "Boolean expression is not supported yet: " + expression.getClass().getSimpleName());
     }
 
-    private record BooleanResult(Boolean value, QueryEvaluationException failure) {
+    private record BooleanResult(Boolean value, QueryTypeErrorException failure) {
 
         static BooleanResult value(boolean value) {
             return new BooleanResult(value, null);
         }
 
-        static BooleanResult failure(QueryEvaluationException failure) {
+        static BooleanResult failure(QueryTypeErrorException failure) {
             return new BooleanResult(null, failure);
         }
 

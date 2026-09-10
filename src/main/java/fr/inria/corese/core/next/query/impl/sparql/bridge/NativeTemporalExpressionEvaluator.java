@@ -1,9 +1,11 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
+import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
+
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import fr.inria.corese.core.next.data.api.term.Literal;
 import fr.inria.corese.core.next.data.api.vocabulary.XSD;
-import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
+import fr.inria.corese.core.next.query.api.exception.QueryTypeErrorException;
 import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.NowAst;
@@ -44,10 +46,11 @@ final class NativeTemporalExpressionEvaluator {
 
     static XMLGregorianCalendar calendar(TermAst expression, NativeEvaluationContext context) {
         DatatypeValue value = context.required(expression);
-        if (value instanceof Literal literal) {
+        if (value instanceof Literal literal
+                && literal.getCoreDatatype() == XSDDatatype.DATETIME) {
             return literal.calendarValue();
         }
-        throw new QueryEvaluationException("Date/time function expects a calendar literal");
+        throw new QueryTypeErrorException("Date/time function expects a calendar literal");
     }
 
     static String timezoneLabel(XMLGregorianCalendar calendar) {
@@ -70,17 +73,14 @@ final class NativeTemporalExpressionEvaluator {
             NativeEvaluationContext context) {
         int minutes = calendar.getTimezone();
         if (minutes == DatatypeConstants.FIELD_UNDEFINED) {
-            throw new QueryEvaluationException(
+            throw new QueryTypeErrorException(
                     "TIMEZONE expects a date/time value with a timezone");
         }
         int absoluteMinutes = Math.abs(minutes);
         String sign = minutes < 0 ? "-" : "";
-        String lexical = minutes == 0
-                ? "PT0S"
-                : "%sPT%dH%dM".formatted(
-                        sign,
-                        absoluteMinutes / 60,
-                        absoluteMinutes % 60);
+        String hours = absoluteMinutes >= 60 ? absoluteMinutes / 60 + "H" : "";
+        String remainder = absoluteMinutes % 60 != 0 ? absoluteMinutes % 60 + "M" : "";
+        String lexical = minutes == 0 ? "PT0S" : sign + "PT" + hours + remainder;
         return context.values().createLiteral(lexical, XSD.xsdDayTimeDuration.getIRI());
     }
 }

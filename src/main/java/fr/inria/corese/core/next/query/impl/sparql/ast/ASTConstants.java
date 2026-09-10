@@ -243,6 +243,7 @@ public class ASTConstants {
          * {@code isLiteral(term)}: returns {@code true} if {@code term} is a literal.
          */
         IS_LITERAL,
+        IS_NUMERIC,
 
         /**
          * {@code sameterm(termA, termB)}: Returns {@code true} if termA and termB are the same RDF term (including their lang and datatypes)

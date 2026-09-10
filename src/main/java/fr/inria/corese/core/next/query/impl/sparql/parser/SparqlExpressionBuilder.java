@@ -71,6 +71,7 @@ public final class SparqlExpressionBuilder {
             case IS_IRI -> new IsIriAst(args);
             case IS_BLANK -> new IsBlankAst(args);
             case IS_LITERAL -> new IsLiteralAst(args);
+            case IS_NUMERIC -> new IsNumericAst(args);
             case STR -> new StrAst(args);
             case UCASE -> new UcaseAst(args);
             case LCASE -> new LcaseAst(args);
@@ -506,6 +507,7 @@ public final class SparqlExpressionBuilder {
         if (ctx.IS_URI() != null || ctx.IS_IRI() != null) return createConstraint(ASTConstants.FUNCTION_CALL.IS_IRI, args);
         if (ctx.IS_BLANK() != null) return createConstraint(ASTConstants.FUNCTION_CALL.IS_BLANK, args);
         if (ctx.IS_LITERAL() != null) return createConstraint(ASTConstants.FUNCTION_CALL.IS_LITERAL, args);
+        if (ctx.IS_NUMERIC() != null) return createConstraint(ASTConstants.FUNCTION_CALL.IS_NUMERIC, args);
         if (ctx.MD5() != null) return new Md5Ast(args);
         if (ctx.SHA1() != null) return new Sha1Ast(args);
         if (ctx.SHA256() != null) return new Sha256Ast(args);

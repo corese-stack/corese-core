@@ -1,9 +1,13 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
+import fr.inria.corese.core.next.data.api.exception.IncorrectOperationException;
+
+import java.math.BigInteger;
+
 import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import fr.inria.corese.core.next.data.api.term.Literal;
-import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
+import fr.inria.corese.core.next.query.api.exception.QueryTypeErrorException;
 import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.AbsAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.AddAst;
@@ -60,18 +64,28 @@ final class NativeNumericExpressionEvaluator {
             case StrLenAst unary -> stringLength(unary, context);
             case RandAst ignored -> context.values().createLiteral(
                     ThreadLocalRandom.current().nextDouble());
-            case YearAst unary -> context.values().createLiteral(calendar(unary.argument(), context).getYear());
-            case MonthAst unary -> context.values().createLiteral(calendar(unary.argument(), context).getMonth());
-            case DayAst unary -> context.values().createLiteral(calendar(unary.argument(), context).getDay());
-            case HoursAst unary -> context.values().createLiteral(calendar(unary.argument(), context).getHour());
-            case MinutesAst unary -> context.values().createLiteral(calendar(unary.argument(), context).getMinute());
+            case YearAst unary -> context.values().createLiteral(BigInteger.valueOf(calendar(unary.argument(), context).getYear()));
+            case MonthAst unary -> context.values().createLiteral(BigInteger.valueOf(calendar(unary.argument(), context).getMonth()));
+            case DayAst unary -> context.values().createLiteral(BigInteger.valueOf(calendar(unary.argument(), context).getDay()));
+            case HoursAst unary -> context.values().createLiteral(BigInteger.valueOf(calendar(unary.argument(), context).getHour()));
+            case MinutesAst unary -> context.values().createLiteral(BigInteger.valueOf(calendar(unary.argument(), context).getMinute()));
             case SecondsAst unary -> seconds(calendar(unary.argument(), context), context);
             default -> throw unsupported(expression);
         };
     }
 
     static double numericDouble(DatatypeValue value) {
-        return numericLiteral(value).literal().doubleValue();
+        return numericLiteral(value).doubleValue();
+    }
+
+    static boolean isNumeric(DatatypeValue value) {
+        if (!value.isNumber()) return false;
+        try {
+            numericDouble(value);
+            return true;
+        } catch (QueryTypeErrorException | IllegalArgumentException | IncorrectOperationException failure) {
+            return false;
+        }
     }
 
     private static DatatypeValue arithmetic(
@@ -155,7 +169,7 @@ final class NativeNumericExpressionEvaluator {
 
     private static DatatypeValue stringLength(StrLenAst expression, NativeEvaluationContext context) {
         String text = context.stringLiteral(expression.argument()).getLabel();
-        return context.values().createLiteral(text.codePointCount(0, text.length()));
+        return context.values().createLiteral(BigInteger.valueOf(text.codePointCount(0, text.length())));
     }
 
     private static XMLGregorianCalendar calendar(
@@ -176,8 +190,9 @@ final class NativeNumericExpressionEvaluator {
 
     private static NumericLiteral numericLiteral(DatatypeValue value) {
         if (!(value instanceof Literal literal) || !literal.isNumber()) {
-            throw new QueryEvaluationException("Expected a numeric RDF literal");
+            throw new QueryTypeErrorException("Expected a numeric RDF literal");
         }
+        literal = NativeNumericValues.normalized(literal);
         return new NumericLiteral(literal, NumericKind.of(literal));
     }
 
@@ -201,7 +216,7 @@ final class NativeNumericExpressionEvaluator {
 
         static NumericKind of(Literal literal) {
             if (!(literal.getCoreDatatype() instanceof XSDDatatype datatype)) {
-                throw new QueryEvaluationException("Expected an XML Schema numeric datatype");
+                throw new QueryTypeErrorException("Expected an XML Schema numeric datatype");
             }
             return switch (datatype) {
                 case DOUBLE -> DOUBLE;
@@ -234,7 +249,7 @@ final class NativeNumericExpressionEvaluator {
         }
 
         double doubleValue() {
-            return literal.doubleValue();
+            return kind == NumericKind.FLOAT ? literal.floatValue() : literal.doubleValue();
         }
     }
 
@@ -264,7 +279,10 @@ final class NativeNumericExpressionEvaluator {
         NEAREST {
             @Override
             double apply(double value) {
-                return Math.floor(value + 0.5d);
+                if (!Double.isFinite(value) || value == 0) return value;
+                if (value >= -0.5d && value < 0) return -0.0d;
+                double floor = Math.floor(value);
+                return value - floor >= 0.5d ? floor + 1 : floor;
             }
 
             @Override
