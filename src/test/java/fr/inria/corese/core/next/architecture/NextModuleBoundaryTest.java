@@ -88,6 +88,15 @@ class NextModuleBoundaryTest {
     }
 
     @Test
+    void queryEngineMustNotDependOnParserOrAst() throws IOException {
+        Path engineSources = NEXT_SOURCES.resolve("query/impl/engine");
+        assertNoReferences(
+                engineSources,
+                reference -> reference.startsWith("fr.inria.corese.core.next.query.impl.sparql.parser")
+                        || reference.startsWith("fr.inria.corese.core.next.query.impl.ast"));
+    }
+
+    @Test
     void dataModuleMustNotDependOnTheLegacyPipeline() throws IOException {
         Path dataSources = NEXT_SOURCES.resolve("data");
         assertNoReferences(
