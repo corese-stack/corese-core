@@ -49,6 +49,10 @@ public final class AstBackedExpr implements Expr {
         return Optional.of(source);
     }
 
+    WhereCompiler whereCompiler() {
+        return whereCompiler;
+    }
+
     @Override
     public Filter getFilter() {
         return filterView;

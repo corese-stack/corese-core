@@ -137,7 +137,7 @@ final class NativeEvaluationContext {
         }
         try {
             return environment.getEval().exists(
-                    producer, environment.getGraphNode(), whereCompiler.compile(pattern));
+                    producer, environment.getGraphNode(), environment, whereCompiler.compile(pattern));
         } catch (SparqlException exception) {
             throw new QueryEvaluationException("Failed to evaluate EXISTS graph pattern", exception);
         }

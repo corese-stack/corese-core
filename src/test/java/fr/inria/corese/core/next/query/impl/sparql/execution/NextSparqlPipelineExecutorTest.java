@@ -451,6 +451,142 @@ class NextSparqlPipelineExecutorTest {
     }
 
     @Test
+    @DisplayName("temporalProximity01: NOT EXISTS excludes only earlier examinations")
+    void temporalProximity01() {
+        String ex = "http://www.w3.org/2009/sparql/docs/tests/data-sparql11/negation#";
+        IRI type = iri("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+        IRI date = iri("http://purl.org/dc/elements/1.1/date");
+        for (String exam : List.of("examination1", "examination2")) {
+            insert(iri(ex + exam), type, iri(ex + "PhysicalExamination"));
+            insert(iri(ex + exam), iri(ex + "precedes"), iri(ex + "operation1"));
+        }
+        insert(iri(ex + "examination1"), date,
+                valueFactory.createLiteral("2010-01-10", XSDDatatype.DATE.getIRI()));
+        insert(iri(ex + "examination2"), date,
+                valueFactory.createLiteral("2010-01-02", XSDDatatype.DATE.getIRI()));
+        insert(iri(ex + "examination1"), iri(ex + "follows"), iri(ex + "examination2"));
+        insert(iri(ex + "examination2"), iri(ex + "precedes"), iri(ex + "examination1"));
+        insert(iri(ex + "operation1"), type, iri(ex + "SurgicalProcedure"));
+        insert(iri(ex + "operation1"), date,
+                valueFactory.createLiteral("2010-01-15", XSDDatatype.DATE.getIRI()));
+        insert(iri(ex + "operation1"), iri(ex + "follows"), iri(ex + "examination1"));
+        insert(iri(ex + "operation1"), iri(ex + "follows"), iri(ex + "examination2"));
+
+        try (var result = executor.evaluateTuple("""
+                PREFIX ex: <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/negation#>
+                PREFIX dc: <http://purl.org/dc/elements/1.1/>
+                SELECT ?exam ?date {
+                  ?exam a ex:PhysicalExamination; dc:date ?date; ex:precedes ex:operation1 .
+                  ?op a ex:SurgicalProcedure; dc:date ?opDT .
+                  FILTER NOT EXISTS {
+                    ?otherExam a ex:PhysicalExamination;
+                               ex:follows ?exam;
+                               ex:precedes ex:operation1
+                  }
+                }
+                """)) {
+            var rows = result.stream().toList();
+            assertEquals(1, rows.size());
+            assertEquals(ex + "examination1", rows.getFirst().getValue("exam").stringValue());
+            assertEquals(valueFactory.createLiteral("2010-01-10", XSDDatatype.DATE.getIRI()),
+                    rows.getFirst().getValue("date"));
+        }
+    }
+
+    @Test
+    @DisplayName("exists-graph-variable: EXISTS uses the outer graph binding")
+    void existsGraphVariable() {
+        String ex = "http://www.example.org/";
+        IRI graph = iri(ex + "exists-graph-variable.ttl");
+        // The W3C fixture is loaded as both default data and a named graph;
+        // its relative <> resolves to the fixture's graph IRI.
+        insert(iri(ex + "s1"), iri(ex + "p"), graph);
+        insert(iri(ex + "s2"), iri(ex + "p"), iri(ex + "o2"));
+        insertInGraph(iri(ex + "s1"), iri(ex + "p"), graph, graph);
+        insertInGraph(iri(ex + "s2"), iri(ex + "p"), iri(ex + "o2"), graph);
+        try (var result = executor.evaluateTuple("""
+                PREFIX : <http://www.example.org/>
+                SELECT ?s WHERE {
+                  ?s :p ?g .
+                  FILTER EXISTS { GRAPH ?g { ?s2 :p ?o2 } }
+                }
+                """)) {
+            assertEquals(List.of(ex + "s1"),
+                    result.stream().map(row -> row.getValue("s").stringValue()).toList());
+        }
+    }
+
+    @Test
+    @DisplayName("EXISTS waits for its GRAPH variable even after an unrelated BIND")
+    void existsGraphVariableWaitsForOuterBinding() {
+        String ex = "http://www.example.org/";
+        IRI graph = iri(ex + "g");
+        insert(iri(ex + "s1"), iri(ex + "p"), graph);
+        insert(iri(ex + "s2"), iri(ex + "p"), iri(ex + "missing"));
+        insertInGraph(iri(ex + "a"), iri(ex + "q"), iri(ex + "b"), graph);
+        try (var result = executor.evaluateTuple("""
+                PREFIX : <http://www.example.org/>
+                SELECT ?s {
+                  BIND(1 AS ?unrelated)
+                  ?s :p ?g .
+                  FILTER EXISTS { GRAPH ?g { ?s2 :q ?o2 } }
+                }
+                """)) {
+            assertEquals(List.of(ex + "s1"),
+                    result.stream().map(row -> row.getValue("s").stringValue()).toList());
+        }
+    }
+
+    @Test
+    @DisplayName("Default graph merge removes duplicate triples, preserving projected and named-graph rows")
+    void defaultGraphMergePreservesSolutionMultiplicity() {
+        IRI firstGraph = iri("http://example.org/g1");
+        IRI secondGraph = iri("http://example.org/g2");
+        insertInGraph(iri(ALICE), iri(KNOWS), iri(BOB), firstGraph);
+        insertInGraph(iri(ALICE), iri(KNOWS), iri(BOB), secondGraph);
+        insertInGraph(iri(ALICE), iri(KNOWS), iri("http://example.org/carol"), secondGraph);
+        Dataset dataset = Dataset.builder().defaultGraph(firstGraph).defaultGraph(secondGraph)
+                .namedGraph(firstGraph).namedGraph(secondGraph).build();
+        try (var result = executor.evaluateTuple(
+                "SELECT ?s { ?s <http://example.org/knows> ?o }", null, dataset, 0L)) {
+            assertEquals(List.of(ALICE, ALICE),
+                    result.stream().map(row -> row.getValue("s").stringValue()).toList());
+        }
+        try (var result = executor.evaluateTuple(
+                "SELECT ?g { GRAPH ?g { ?s <http://example.org/knows> ?o } }", null, dataset, 0L)) {
+            assertEquals(3, result.stream().count());
+        }
+    }
+
+    @Test
+    @DisplayName("EXISTS inside OPTIONAL filters within optional branch rather than being postponed")
+    void existsInsideOptionalFiltersLocally() {
+        IRI a = iri("http://example.org/a");
+        IRI b = iri("http://example.org/b");
+        IRI e = iri("http://example.org/e");
+        IRI d = iri("http://example.org/d");
+        IRI p = iri("http://example.org/p");
+        IRI r = iri("http://example.org/r");
+        insert(a, p, b);
+        insert(a, p, e);
+        insert(b, r, d);
+        try (var result = executor.evaluateTuple("""
+                PREFIX : <http://example.org/>
+                SELECT ?s ?o {
+                  VALUES ?s { :a }
+                  OPTIONAL {
+                    ?s :p ?o
+                    FILTER EXISTS { ?o :r ?z }
+                  }
+                }
+                """)) {
+            var rows = result.stream().toList();
+            assertEquals(1, rows.size());
+            assertEquals("http://example.org/b", rows.getFirst().getValue("o").stringValue());
+        }
+    }
+
+    @Test
     @DisplayName("ASK WHERE { ?s ?p ?o } returns true when data exists")
     void askSpoReturnsTrueWhenDataExists() {
         assertTrue(executor.evaluateBoolean("ASK WHERE { ?s ?p ?o }"));
