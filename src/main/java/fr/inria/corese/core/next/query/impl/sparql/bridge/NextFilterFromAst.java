@@ -4,16 +4,18 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 import fr.inria.corese.core.next.query.impl.engine.model.Expr;
 import fr.inria.corese.core.next.query.impl.engine.model.Filter;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BoundAst;
-import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.VariableScopeAnalyzer;
+import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.AbstractAstVisitor;
+import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /** Filter view exposing native AST metadata through the Corese-next expression API. */
 public final class NextFilterFromAst implements Filter {
 
     private final AstBackedExpr owner;
-    private final VariableScopeAnalyzer variables = new VariableScopeAnalyzer();
 
     NextFilterFromAst(AstBackedExpr owner) {
         this.owner = owner;
@@ -21,7 +23,24 @@ public final class NextFilterFromAst implements Filter {
 
     @Override
     public List<String> getVariables() {
-        return List.copyOf(variables.collectReferencedVariables(owner.sourceAst().orElseThrow()));
+        // Scheduling dependencies include variables inside EXISTS patterns (including
+        // GRAPH names and inner FILTERs) only if they are bound in the enclosing query scope.
+        // Purely local/existential variables of EXISTS must not be declared, so they do not
+        // cause postponement of the filter in OPTIONAL patterns (KGRAM Exp.optional/simpleBind).
+        Set<String> names = new LinkedHashSet<>();
+        Set<String> inScope = (owner.whereCompiler() != null)
+                ? owner.whereCompiler().inScopeVariables()
+                : Set.of();
+        boolean recExist = owner.isRecExist();
+        owner.sourceAst().orElseThrow().accept(new AbstractAstVisitor() {
+            @Override
+            public void visit(TermAst term) {
+                if (term instanceof VarAst(String name) && (!recExist || inScope.isEmpty() || inScope.contains(name))) {
+                    names.add(name);
+                }
+            }
+        });
+        return List.copyOf(names);
     }
 
     @Override

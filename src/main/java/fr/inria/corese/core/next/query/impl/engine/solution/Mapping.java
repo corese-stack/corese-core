@@ -582,17 +582,19 @@ public final class Mapping
     }
 
     boolean compatible(Mapping map, List<String> varList, boolean compatibleWithoutCommonVariable) {
-        boolean success = compatibleWithoutCommonVariable;
+        boolean sharedBoundVariable = false;
         for (String varString : varList) {
             Node val1 = getNodeValue(varString);
             Node val2 = map.getNodeValue(varString);
-            if (val1.match(val2)) {
-                success = true;
-            } else {
+            if (val1 == null || val2 == null) {
+                continue;
+            }
+            if (!val1.match(val2)) {
                 return false;
             }
+            sharedBoundVariable = true;
         }
-        return success;
+        return compatibleWithoutCommonVariable || sharedBoundVariable;
     }
 
     /**

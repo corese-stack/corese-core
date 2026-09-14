@@ -27,8 +27,10 @@ import fr.inria.corese.core.next.storage.api.StorageManager;
 import fr.inria.corese.core.next.storage.api.model.StatementPattern;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**
@@ -63,12 +65,20 @@ public final class StorageManagerProducer extends ProducerDefault {
 
         try (Stream<Statement> statements =
                      storage.queries().find(queryPattern.statementPattern())) {
+            // A default graph formed from several contexts is an RDF graph: the
+            // same triple must match once, even when stored in multiple contexts.
+            // Deduplicate triples here, before projection, to preserve solution bags.
+            Set<TripleKey> seen = new HashSet<>();
             return statements
+                    .filter(statement -> graphNode != null || seen.add(new TripleKey(
+                            statement.getSubject(), statement.getPredicate(), statement.getObject())))
                     .map(StorageManagerEdge::new)
                     .map(Edge.class::cast)
                     .toList();
         }
     }
+
+    private record TripleKey(Resource subject, IRI predicate, Value object) { }
 
     @Override
     public Iterable<Node> getGraphNodes(Node graphNode, List<Node> from, Environment environment) {

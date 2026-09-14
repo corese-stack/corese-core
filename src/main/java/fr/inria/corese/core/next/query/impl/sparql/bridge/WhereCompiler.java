@@ -32,8 +32,12 @@ import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Compiles the content of a SPARQL {@code WHERE} clause — a tree of
@@ -43,6 +47,9 @@ import java.util.Objects;
 public final class WhereCompiler {
 
     private final SparqlTermResolver termResolver;
+    private final Map<GroupGraphPatternAst, Exp> compiledPatternCache =
+            Collections.synchronizedMap(new IdentityHashMap<>());
+    private Set<String> inScopeVariables = Set.of();
 
     public WhereCompiler() {
         this(QueryPrologueAst.empty());
@@ -60,6 +67,10 @@ public final class WhereCompiler {
         return termResolver;
     }
 
+    Set<String> inScopeVariables() {
+        return inScopeVariables;
+    }
+
     /**
      * Compiles a full SPARQL {@code WHERE} clause into the runtime body carried by a
      * KGRAM {@link Query}.
@@ -70,7 +81,18 @@ public final class WhereCompiler {
      */
     public Exp compile(GroupGraphPatternAst where) {
         Objects.requireNonNull(where, "where");
-        return compileGroup(where);
+        if (inScopeVariables.isEmpty()) {
+            inScopeVariables = Set.copyOf(
+                    new fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.VariableScopeAnalyzer()
+                            .collectVisibleVariables(where));
+        }
+        Exp cached = compiledPatternCache.get(where);
+        if (cached != null) {
+            return cached;
+        }
+        Exp compiled = compileGroup(where);
+        compiledPatternCache.put(where, compiled);
+        return compiled;
     }
 
     /**

@@ -273,6 +273,17 @@ public class Memory extends PointerObject implements Environment {
     }
 
     /**
+     * Copy Mapping into this fresh Memory for EXISTS evaluation.
+     */
+    public void copy(Mapping map, Exp exp) {
+        if (map.hasBind()) {
+            copy(map.getBind(), exp);
+        }
+        share(getBind(), map.getBind());
+        push(map, -1);
+    }
+
+    /**
      * exists pattern
      * PRAGMA: when exists is in function, this memory is empty
      */

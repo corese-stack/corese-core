@@ -407,13 +407,34 @@ public final class Eval implements ExpType, Plugin {
      * Evaluates an EXISTS graph pattern against the bindings of the current solution.
      * The nested evaluation receives a fresh memory while copying every currently
      * bound query node, so correlated variables retain SPARQL EXISTS semantics.
-     */
     public boolean exists(Producer producer, Node graphNode, Exp pattern) throws SparqlException {
+        return exists(producer, graphNode, getMemory(), pattern);
+    }
+
+    /**
+     * Evaluates an EXISTS graph pattern against the bindings of the current solution.
+     * The nested evaluation receives a fresh memory while copying every currently
+     * bound query node from the active environment, so correlated variables retain
+     * SPARQL EXISTS semantics even when evaluated inside an OPTIONAL or aggregate context.
+     */
+    public boolean exists(Producer producer, Node graphNode, Environment env, Exp pattern) throws SparqlException {
         Memory nestedMemory = new Memory(match, evaluator);
         evaluator.init(nestedMemory);
         nestedMemory.init(getQuery());
-        nestedMemory.setAppxSearchEnv(getMemory().getAppxSearchEnv());
-        getMemory().copyInto(nestedMemory, pattern);
+        switch (env) {
+            case Mapping map -> {
+                nestedMemory.setAppxSearchEnv(getMemory().getAppxSearchEnv());
+                nestedMemory.copy(map, pattern);
+            }
+            case Memory mem -> {
+                nestedMemory.setAppxSearchEnv(mem.getAppxSearchEnv());
+                mem.copyInto(nestedMemory, pattern);
+            }
+            case null, default -> {
+                nestedMemory.setAppxSearchEnv(getMemory().getAppxSearchEnv());
+                getMemory().copyInto(nestedMemory, pattern);
+            }
+        }
 
         Eval nested = copy(nestedMemory, producer);
         Mappings mappings = nested.subEval(
