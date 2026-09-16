@@ -7,6 +7,7 @@ import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureExce
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import fr.inria.corese.core.next.query.impl.engine.spi.Evaluator;
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
+import fr.inria.corese.core.next.query.impl.sparql.ast.AggregateAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
@@ -67,6 +68,7 @@ final class NativeExpressionEvaluator {
                     context.effectiveBooleanValue(condition) ? thenExpr : elseExpr);
             case BnodeAst bnode -> context.blankNode(bnode.getLabel());
             case FunctionCallAst function -> NativeCastExpressionEvaluator.evaluate(function, context);
+            case AggregateAst aggregate -> NativeAggregateEvaluator.evaluate(aggregate, context);
             default -> throw new UnsupportedQueryFeatureException(
                     "Expression is not supported yet by the native evaluator: "
                             + expression.getClass().getSimpleName());

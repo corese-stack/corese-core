@@ -29,7 +29,7 @@ final class NativeEvaluationContext {
 
     private final ValueFactory values = Values.factory();
     private final Evaluator evaluator;
-    private final Environment environment;
+    private Environment environment;
     private final Producer producer;
     private final WhereCompiler whereCompiler;
 
@@ -158,6 +158,24 @@ final class NativeEvaluationContext {
 
     ValueFactory values() {
         return values;
+    }
+
+    Environment environment() {
+        return environment;
+    }
+
+    void setEnvironment(Environment newEnvironment) {
+        if (newEnvironment != null && this.environment != null && newEnvironment.getEval() == null) {
+            newEnvironment.setEval(this.environment.getEval());
+        }
+        this.environment = newEnvironment;
+    }
+
+    NativeEvaluationContext withEnvironment(Environment newEnvironment) {
+        if (newEnvironment != null && this.environment != null && newEnvironment.getEval() == null) {
+            newEnvironment.setEval(this.environment.getEval());
+        }
+        return new NativeEvaluationContext(evaluator, newEnvironment, producer, whereCompiler);
     }
 
     SparqlTermResolver termResolver() {

@@ -2,19 +2,41 @@ package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
 
 import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
-import fr.inria.corese.core.next.query.impl.sparql.ast.*;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ASTConstants;
+import fr.inria.corese.core.next.query.impl.sparql.ast.AskQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ConstraintAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ConstructQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ConstructTemplateAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.DatasetClauseAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.DescribeQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.GroupByAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.HavingAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.OrderConditionAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ProjectionAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.SolutionModifierAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ValuesAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.AndAst;
+import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.VariableScopeAnalyzer;
 import fr.inria.corese.core.next.query.impl.engine.model.ExpType.Type;
 import fr.inria.corese.core.next.query.impl.engine.model.Filter;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
 import fr.inria.corese.core.next.query.impl.engine.model.NodeImpl;
-import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.VariableScopeAnalyzer;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Builds KGRAM {@code Exp} / {@code Query} structures from Corese-next query AST nodes.
@@ -90,9 +112,14 @@ public final class CoreseAstQueryBuilder {
                 selectQueryAst.solutionModifier(),
                 selectQueryAst.valuesClause(),
                 compiler);
+        applyGroupBy(query, selectQueryAst.solutionModifier(), compiler);
         applyProjection(query, selectQueryAst.projection(), compiler);
         query.setDistinct(selectQueryAst.solutionModifier().distinct());
         applyOrderBy(query, selectQueryAst.solutionModifier(), compiler);
+        applyHaving(query, selectQueryAst.solutionModifier(), compiler);
+        if (query.getHaving() != null && !query.hasGroupBy()) {
+            query.setAggregate(true);
+        }
         query.setAST(selectQueryAst);
         return query;
     }
@@ -204,21 +231,9 @@ public final class CoreseAstQueryBuilder {
      * </p>
      */
     private static void rejectUnsupportedSelectClauses(SelectQueryAst selectQueryAst) {
-        ProjectionAst projection = selectQueryAst.projection();
-        if (projection.expressionTerms().values().stream().anyMatch(
-                new VariableScopeAnalyzer()::containsAggregate)) {
-            throw new UnsupportedQueryFeatureException(
-                    "Aggregate projection expressions are not supported yet by the next pipeline");
-        }
         SolutionModifierAst solutionModifier = selectQueryAst.solutionModifier();
         if (solutionModifier.reduced()) {
             throw new UnsupportedQueryFeatureException("REDUCED is not supported yet by the next pipeline for SELECT");
-        }
-        if (solutionModifier.hasGroupBy()) {
-            throw new UnsupportedQueryFeatureException("GROUP BY is not supported yet by the next pipeline for SELECT");
-        }
-        if (solutionModifier.hasHaving()) {
-            throw new UnsupportedQueryFeatureException("HAVING is not supported yet by the next pipeline for SELECT");
         }
     }
 
@@ -290,29 +305,89 @@ public final class CoreseAstQueryBuilder {
      * fast when a projected variable is not visible in the body.</p>
      */
     private void applyProjection(Query query, ProjectionAst projection, WhereCompiler compiler) {
-        List<Exp> selectExpressions;
-        if (projection.selectAll()) {
-            selectExpressions = toNodeExpressions(query.selectNodesFromPattern());
-        } else {
-            selectExpressions = new ArrayList<>();
-            for (VarAst variable : projection.variables()) {
-                TermAst expression = projection.expressionTerms().get(variable.name());
-                if (expression != null) {
-                    Exp selected = Exp.create(Type.NODE, compiler.termResolver().toNode(variable));
-                    selected.setFilter(new AstBackedExpr(expression, compiler).getFilter());
-                    selectExpressions.add(selected);
-                    continue;
-                }
-                Node node = visibleBodyNode(query, variable.name());
-                if (node == null) {
-                    throw new IllegalArgumentException(
-                            "Projected variable ?" + variable.name() + " is not visible in the compiled query body");
-                }
-                selectExpressions.add(Exp.create(Type.NODE, node));
-            }
-        }
+        List<Exp> selectExpressions = projection.selectAll()
+                ? toNodeExpressions(query.selectNodesFromPattern())
+                : buildExplicitProjection(query, projection, compiler);
+        markDependentAggregates(selectExpressions);
         query.setSelectFun(selectExpressions);
         query.setSelect(selectNodeList(selectExpressions));
+        query.setAggregate();
+    }
+
+    private List<Exp> buildExplicitProjection(Query query, ProjectionAst projection, WhereCompiler compiler) {
+        List<Exp> selectExpressions = new ArrayList<>();
+        for (VarAst variable : projection.variables()) {
+            TermAst expression = projection.expressionTerms().get(variable.name());
+            Exp exp = expression != null
+                    ? buildProjectedExpression(variable, expression, compiler)
+                    : buildProjectedVariable(query, variable);
+            selectExpressions.add(exp);
+        }
+        return selectExpressions;
+    }
+
+    private Exp buildProjectedExpression(VarAst variable, TermAst expression, WhereCompiler compiler) {
+        Exp selected = Exp.create(Type.NODE, compiler.termResolver().toNode(variable));
+        selected.setFilter(new AstBackedExpr(expression, compiler).getFilter());
+        if (new VariableScopeAnalyzer().containsAggregate(expression)) {
+            selected.setAggregate(true);
+        }
+        return selected;
+    }
+
+    private Exp buildProjectedVariable(Query query, VarAst variable) {
+        Node node = resolveProjectedNode(query, variable.name());
+        return Exp.create(Type.NODE, node);
+    }
+
+    private Node resolveProjectedNode(Query query, String name) {
+        Node node = visibleBodyNode(query, name);
+        if (node == null) {
+            node = groupByNode(query, name);
+        }
+        if (node == null) {
+            throw new IllegalArgumentException(
+                    "Projected variable ?" + name + " is not visible in the compiled query body");
+        }
+        return node;
+    }
+
+    private void markDependentAggregates(List<Exp> selectExpressions) {
+        boolean changed = true;
+        while (changed) {
+            changed = false;
+            for (Exp exp : selectExpressions) {
+                if (shouldMarkAsAggregate(exp, selectExpressions)) {
+                    exp.setAggregate(true);
+                    changed = true;
+                }
+            }
+        }
+    }
+
+    private boolean shouldMarkAsAggregate(Exp exp, List<Exp> selectExpressions) {
+        if (exp.isAggregate() || exp.getFilter() == null) {
+            return false;
+        }
+        List<String> vars = exp.getFilter().getVariables();
+        for (Exp other : selectExpressions) {
+            if (other.isAggregate() && vars.contains(other.getNode().getLabel())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Node groupByNode(Query query, String name) {
+        if (query.getGroupBy() == null) {
+            return null;
+        }
+        for (Exp exp : query.getGroupBy()) {
+            if (exp.getNode() != null && name.equals(exp.getNode().getLabel())) {
+                return exp.getNode();
+            }
+        }
+        return null;
     }
 
     /**
@@ -408,6 +483,79 @@ public final class CoreseAstQueryBuilder {
         query.setOrderBy(orderByExpressions);
     }
 
+    private void applyGroupBy(
+            Query query, SolutionModifierAst solutionModifier, WhereCompiler compiler) {
+        if (!solutionModifier.hasGroupBy()) {
+            return;
+        }
+        GroupByAst groupByAst = solutionModifier.groupBy();
+        List<Exp> groupByExpressions = new ArrayList<>();
+        Set<String> usedAliases = new HashSet<>();
+        int syntheticIndex = 0;
+        for (TermAst term : groupByAst.expressions()) {
+            Exp groupExp = toGroupByExpression(query, groupByAst, term, syntheticIndex++, usedAliases, compiler);
+            groupByExpressions.add(groupExp);
+        }
+        query.setGroupBy(groupByExpressions);
+    }
+
+    private Exp toGroupByExpression(
+            Query query,
+            GroupByAst groupByAst,
+            TermAst term,
+            int syntheticIndex,
+            Set<String> usedAliases,
+            WhereCompiler compiler) {
+        String alias = findGroupByAlias(groupByAst, term, usedAliases);
+        if (alias != null) {
+            usedAliases.add(alias);
+            Node node = compiler.termResolver().toNode(new VarAst(alias));
+            Exp exp = Exp.create(Type.NODE, node);
+            exp.setFilter(new AstBackedExpr(term, compiler).getFilter());
+            return exp;
+        }
+        if (term instanceof VarAst(String name)) {
+            Node node = visibleBodyNode(query, name);
+            if (node == null) {
+                node = compiler.termResolver().toNode(term);
+            }
+            return Exp.create(Type.NODE, node);
+        }
+        Node node = createSyntheticGroupByNode(syntheticIndex);
+        Exp exp = Exp.create(Type.NODE, node);
+        exp.setFilter(new AstBackedExpr(term, compiler).getFilter());
+        return exp;
+    }
+
+    private String findGroupByAlias(GroupByAst groupByAst, TermAst term, Set<String> usedAliases) {
+        for (Map.Entry<String, TermAst> entry : groupByAst.expressionTerms().entrySet()) {
+            if (!usedAliases.contains(entry.getKey()) && Objects.equals(entry.getValue(), term)) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
+    private Node createSyntheticGroupByNode(int syntheticIndex) {
+        return NodeImpl.forVariable("__group_by_" + syntheticIndex);
+    }
+
+    private void applyHaving(
+            Query query, SolutionModifierAst solutionModifier, WhereCompiler compiler) {
+        if (!solutionModifier.hasHaving()) {
+            return;
+        }
+        HavingAst havingAst = solutionModifier.having();
+        if (havingAst.isEmpty()) {
+            return;
+        }
+        TermAst condition = havingAst.conditions().size() == 1
+                ? havingAst.conditions().getFirst()
+                : new AndAst(havingAst.conditions());
+        Filter filter = new AstBackedExpr(condition, compiler).getFilter();
+        query.setHaving(Exp.create(Type.FILTER, filter));
+    }
+
     private Exp toOrderByExpression(
             Query query,
             OrderConditionAst orderCondition,
@@ -415,20 +563,57 @@ public final class CoreseAstQueryBuilder {
             WhereCompiler compiler) {
         TermAst expression = orderCondition.expression();
         if (expression instanceof VarAst(String name)) {
-            Exp selectExpression = query.getSelectExp(name);
-            Node node = selectExpression != null
-                    ? selectExpression.getNode()
-                    : visibleBodyNode(query, name);
-            if (node == null) {
-                throw new IllegalArgumentException(
-                        "ORDER BY variable ?" + name + " is not visible in the compiled query");
-            }
-            return Exp.create(Type.NODE, node);
+            return toOrderByVarExpression(query, name);
         }
+        return toOrderBySyntheticExpression(query, expression, syntheticIndex, compiler);
+    }
+
+    private Exp toOrderByVarExpression(Query query, String name) {
+        Exp selectExpression = query.getSelectExp(name);
+        Node node = selectExpression != null ? selectExpression.getNode() : resolveOrderByFallbackNode(query, name);
+        if (node == null) {
+            throw new IllegalArgumentException(
+                    "ORDER BY variable ?" + name + " is not visible in the compiled query");
+        }
+        Exp orderExp = Exp.create(Type.NODE, node);
+        if (selectExpression != null && selectExpression.isAggregate()) {
+            orderExp.setAggregate(true);
+        }
+        return orderExp;
+    }
+
+    private Node resolveOrderByFallbackNode(Query query, String name) {
+        Node groupNode = groupByNode(query, name);
+        return groupNode != null ? groupNode : visibleBodyNode(query, name);
+    }
+
+    private Exp toOrderBySyntheticExpression(
+            Query query,
+            TermAst expression,
+            int syntheticIndex,
+            WhereCompiler compiler) {
         Filter filter = new AstBackedExpr(expression, compiler).getFilter();
         Exp exp = Exp.create(Type.NODE, createSyntheticOrderNode(syntheticIndex));
         exp.setFilter(filter);
+        if (isOrderByAggregate(query, expression, filter)) {
+            exp.setAggregate(true);
+        }
         return exp;
+    }
+
+    private boolean isOrderByAggregate(Query query, TermAst expression, Filter filter) {
+        if (new VariableScopeAnalyzer().containsAggregate(expression)) {
+            return true;
+        }
+        if (filter != null) {
+            for (String varName : filter.getVariables()) {
+                Exp selExp = query.getSelectExp(varName);
+                if (selExp != null && selExp.isAggregate()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private Node createSyntheticOrderNode(int syntheticIndex) {
