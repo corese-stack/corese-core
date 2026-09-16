@@ -547,6 +547,9 @@ public class Memory extends PointerObject implements Environment {
                 }
 
             }
+            if (qNode != null && nodes[n] != null && mapping != null) {
+                mapping.setNode(qNode, nodes[n]);
+            }
             n++;
         }
     }

@@ -188,7 +188,7 @@ final class NativeNumericExpressionEvaluator {
         return context.values().createLiteral(seconds);
     }
 
-    private static NumericLiteral numericLiteral(DatatypeValue value) {
+    static NumericLiteral numericLiteral(DatatypeValue value) {
         if (!(value instanceof Literal literal) || !literal.isNumber()) {
             throw new QueryTypeErrorException("Expected a numeric RDF literal");
         }
@@ -201,14 +201,14 @@ final class NativeNumericExpressionEvaluator {
                 "Numeric expression is not supported yet: " + expression.getClass().getSimpleName());
     }
 
-    private enum Operation {
+    enum Operation {
         ADD,
         SUBTRACT,
         MULTIPLY,
         DIVIDE
     }
 
-    private enum NumericKind {
+    enum NumericKind {
         INTEGER,
         DECIMAL,
         FLOAT,
@@ -240,7 +240,7 @@ final class NativeNumericExpressionEvaluator {
         }
     }
 
-    private record NumericLiteral(Literal literal, NumericKind kind) {
+    record NumericLiteral(Literal literal, NumericKind kind) {
 
         BigDecimal decimalValue() {
             return kind == NumericKind.INTEGER

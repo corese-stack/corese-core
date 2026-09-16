@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.engine.solution;
 
+import fr.inria.corese.core.next.query.api.exception.QueryTypeErrorException;
 import fr.inria.corese.core.next.query.impl.engine.eval.Eval;
 import fr.inria.corese.core.next.query.impl.engine.eval.PointerObject;
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
@@ -634,7 +635,7 @@ public final class Mappings extends PointerObject
 
     public void aggregate(Query q, Evaluator evaluator, Memory memory, Producer p) {
         if (size() == 0) {
-            if (q.isAggregate()) {
+            if (q.isAggregate() && !q.hasGroupBy()) {
                 // SPARQL semantics requires that aggregate empty result set return one empty result
                 // and count() return 0
                 add(Mapping.fake(q));
@@ -716,7 +717,12 @@ public final class Mappings extends PointerObject
     }
 
     private void aggregateHaving(Evaluator eval, Exp exp, Memory memory, Producer p) {
-        boolean res = exp.getFilter().getExp().test(eval, memory.getBind(), memory, p);
+        boolean res = false;
+        try {
+            res = exp.getFilter().getExp().test(eval, memory.getBind(), memory, p);
+        } catch (QueryTypeErrorException ignored) {
+            res = false;
+        }
         Eval ev = memory.getEval();
         if (ev != null) {
             ev.getVisitor().having(ev, exp.getFilter().getExp(), res);
@@ -758,7 +764,11 @@ public final class Mappings extends PointerObject
     }
 
     Node eval(Filter f, Evaluator eval, Environment env, Producer p) {
-        return p.getNode(f.getExp().evalWE(eval, env.getBind(), env, p));
+        try {
+            return p.getNode(f.getExp().evalWE(eval, env.getBind(), env, p));
+        } catch (QueryTypeErrorException e) {
+            return null;
+        }
     }
 
     /**

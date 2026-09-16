@@ -5,6 +5,7 @@
 
 package fr.inria.corese.core.next.query.impl.engine.eval;
 
+import fr.inria.corese.core.next.query.api.exception.QueryTypeErrorException;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
@@ -108,7 +109,12 @@ public class CompleteSPARQL {
             }
             return true;
         }
-        Node result = eval.eval(null, filter, mapping, producer);
+        Node result;
+        try {
+            result = eval.eval(null, filter, mapping, producer);
+        } catch (QueryTypeErrorException error) {
+            return true;
+        }
         if (result == null) {
             return true;
         }
@@ -135,19 +141,33 @@ public class CompleteSPARQL {
     void orderGroup(List<Exp> lExp, Node[] nodes, Producer p, Mapping m) {
         int n = 0;
         for (Exp e : lExp) {
-            Node qNode = e.getNode();
-            if (qNode != null) {
-                nodes[n] = m.getNodeValue(qNode);
-            }
-            if (nodes[n] == null) {
-                Filter f = e.getFilter();
-                if (f != null && !e.isAggregate()) {
-                    nodes[n] = eval.eval(null, f, m, p);
-                }
-
-            }
+            nodes[n] = resolveOrderGroupNode(e, p, m);
             n++;
         }
+    }
+
+    private Node resolveOrderGroupNode(Exp e, Producer p, Mapping m) {
+        Node qNode = e.getNode();
+        Node node = qNode != null ? m.getNodeValue(qNode) : null;
+        if (node == null) {
+            node = evaluateOrderGroupFilter(e, p, m);
+        }
+        if (qNode != null && node != null) {
+            m.setNode(qNode, node);
+        }
+        return node;
+    }
+
+    private Node evaluateOrderGroupFilter(Exp e, Producer p, Mapping m) {
+        Filter f = e.getFilter();
+        if (f != null && !e.isAggregate()) {
+            try {
+                return eval.eval(null, f, m, p);
+            } catch (QueryTypeErrorException error) {
+                return null;
+            }
+        }
+        return null;
     }
 
 }
