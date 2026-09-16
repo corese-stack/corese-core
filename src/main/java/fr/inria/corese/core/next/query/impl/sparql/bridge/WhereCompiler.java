@@ -23,6 +23,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.path.PathAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.path.PredicatePathAst;
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
+import fr.inria.corese.core.next.query.impl.engine.path.PropertyPathEdge;
 import fr.inria.corese.core.next.query.impl.engine.model.ExpType.Type;
 import fr.inria.corese.core.next.query.impl.engine.model.Filter;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
@@ -166,9 +167,12 @@ public final class WhereCompiler {
 
     private Edge toEdge(TriplePatternAst triple) {
         Node subject = termResolver.toPatternNode(triple.subject());
-        Node predicate = termResolver.toPatternNode(
-            simplePredicate(triple.predicate()));
         Node object = termResolver.toPatternNode(triple.object());
+        if (!(triple.predicate() instanceof PredicatePathAst)) {
+            return new PropertyPathEdge(subject,
+                    new PropertyPathCompiler(termResolver).compile(triple.predicate()), object, null);
+        }
+        Node predicate = termResolver.toPatternNode(simplePredicate(triple.predicate()));
         return new AstBackedEdge(subject, predicate, object);
     }
 
