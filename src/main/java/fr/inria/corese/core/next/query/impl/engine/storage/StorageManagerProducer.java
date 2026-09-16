@@ -23,6 +23,8 @@ import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
 import fr.inria.corese.core.next.query.impl.engine.event.KgramEventDispatcher;
 import fr.inria.corese.core.next.query.impl.engine.path.Path;
+import fr.inria.corese.core.next.query.impl.engine.path.PropertyPathEdge;
+import fr.inria.corese.core.next.query.impl.engine.path.NativePropertyPathEvaluator;
 import fr.inria.corese.core.next.storage.api.StorageManager;
 import fr.inria.corese.core.next.storage.api.model.StatementPattern;
 
@@ -57,6 +59,9 @@ public final class StorageManagerProducer extends ProducerDefault {
     @Override
     public Iterable<Edge> getEdges(Node graphNode, List<Node> from, Edge queryEdge, Environment environment) {
         Objects.requireNonNull(queryEdge, "queryEdge");
+        if (queryEdge instanceof PropertyPathEdge path) {
+            return NativePropertyPathEvaluator.evaluate(this, graphNode, from, path, environment);
+        }
 
         StorageQueryPattern queryPattern = queryPattern(graphNode, from, queryEdge, environment);
         if (queryPattern.noMatch()) {
