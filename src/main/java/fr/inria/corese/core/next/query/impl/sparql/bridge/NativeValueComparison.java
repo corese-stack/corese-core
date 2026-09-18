@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
 import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
+import fr.inria.corese.core.next.data.api.literal.RDFDatatype;
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import fr.inria.corese.core.next.data.api.term.Literal;
 import fr.inria.corese.core.next.query.api.exception.QueryTypeErrorException;
@@ -11,6 +12,52 @@ import javax.xml.datatype.DatatypeConstants;
 final class NativeValueComparison {
 
     private NativeValueComparison() {
+    }
+
+    /**
+     * Evaluates value equality, retaining errors for unsupported literal pairs.
+     *
+     * @param left left operand
+     * @param right right operand
+     * @return whether the operands are equal
+     * @throws QueryTypeErrorException if literal values cannot be compared
+     */
+    static boolean valueEquals(DatatypeValue left, DatatypeValue right) {
+        if (left.sameTerm(right)) {
+            return true;
+        }
+        if (!(left instanceof Literal first) || !(right instanceof Literal second)) {
+            return false;
+        }
+        if (first.isNumber() && second.isNumber()) {
+            return first.equalsWE(second);
+        }
+        if (first.getCoreDatatype() == RDFDatatype.LANGSTRING
+                || second.getCoreDatatype() == RDFDatatype.LANGSTRING) {
+            return false;
+        }
+        if (isText(first) && isText(second)) {
+            return first.sameTerm(second);
+        }
+        if (first.getCoreDatatype() == XSDDatatype.BOOLEAN
+                && second.getCoreDatatype() == XSDDatatype.BOOLEAN) {
+            return first.booleanValue() == second.booleanValue();
+        }
+        if (isComparableCalendar(first, second)) {
+            return compareLiterals(first, second) == 0;
+        }
+        throw new QueryTypeErrorException("RDF literal values are not equality-comparable");
+    }
+
+    /**
+     * Identifies plain and language-tagged strings for RDF term equality.
+     *
+     * @param literal operand to classify
+     * @return whether the operand is a string
+     */
+    private static boolean isText(Literal literal) {
+        return literal.getCoreDatatype() == XSDDatatype.STRING
+                || literal.getCoreDatatype() == RDFDatatype.LANGSTRING;
     }
 
     static int compare(DatatypeValue left, DatatypeValue right) {
