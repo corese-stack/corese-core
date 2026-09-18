@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.architecture;
 
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,6 +16,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 /** Protects the dependency direction between the top-level {@code next} modules. */
 class NextModuleBoundaryTest {
@@ -24,6 +26,13 @@ class NextModuleBoundaryTest {
     private static final Pattern CORESE_TYPE_REFERENCE = Pattern.compile(
             "\\bfr\\.inria\\.corese\\.core(?:\\.[A-Za-z_$][A-Za-z0-9_$]*)+");
     private static final Pattern STATIC_IMPORT_PREFIX = Pattern.compile("^static\\s+");
+
+    // Exact source/type pairs only: see docs/next-engine-ast-boundary.md.
+    // Equality below also requires removing exceptions when their dependencies disappear.
+    private static final Set<String> EXISTING_ENGINE_AST_DEPENDENCIES = Set.of(
+            "model/Filter.java -> fr.inria.corese.core.next.query.impl.sparql.ast.TermAst",
+            "pattern/Exp.java -> fr.inria.corese.core.next.query.impl.sparql.ast.TermAst",
+            "pattern/Query.java -> fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst");
 
     @Test
     void sharedCodeMustNotDependOnDomainModules() throws IOException {
@@ -88,12 +97,75 @@ class NextModuleBoundaryTest {
     }
 
     @Test
-    void queryEngineMustNotDependOnParserOrAst() throws IOException {
+    void queryEngineMustNotAddParserOrAstDependencies() throws IOException {
         Path engineSources = NEXT_SOURCES.resolve("query/impl/engine");
-        assertNoReferences(
-                engineSources,
-                reference -> reference.startsWith("fr.inria.corese.core.next.query.impl.sparql.parser")
-                        || reference.startsWith("fr.inria.corese.core.next.query.impl.ast"));
+        assertEquals(EXISTING_ENGINE_AST_DEPENDENCIES, engineSyntaxDependencies(engineSources),
+                "Unexpected engine syntax dependency, or obsolete exception: "
+                        + "remove dependencies rather than expanding the exception list.");
+    }
+
+    @Test
+    void engineBoundaryFindsSyntaxReferencesBeyondExistingExceptions(@TempDir Path sources)
+            throws IOException {
+        Path filter = sources.resolve("model/Filter.java");
+        Files.createDirectories(filter.getParent());
+        Files.writeString(filter, """
+                import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
+                import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
+                import fr.inria.corese.core.next.query.impl.sparql.parser.SparqlParser;
+                import fr.inria.corese.core.next.query.impl.sparql.ast.*;
+                class Filter {
+                    fr.inria.corese.core.next.query.impl.sparql.ast.VarAst variable;
+                }
+                """);
+        Files.writeString(sources.resolve("NewOperator.java"),
+                "import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;");
+        Set<String> unexpected = engineSyntaxDependencies(sources);
+        unexpected.removeAll(EXISTING_ENGINE_AST_DEPENDENCIES);
+        assertEquals(Set.of(
+                "model/Filter.java -> fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst",
+                "model/Filter.java -> fr.inria.corese.core.next.query.impl.sparql.parser.SparqlParser",
+                "model/Filter.java -> fr.inria.corese.core.next.query.impl.sparql.ast.VarAst",
+                "model/Filter.java -> fr.inria.corese.core.next.query.impl.sparql.ast",
+                "NewOperator.java -> fr.inria.corese.core.next.query.impl.sparql.ast.TermAst"), unexpected);
+    }
+
+    /**
+     * Inventories syntax dependencies by source path and fully qualified reference.
+     *
+     * @param sources engine source root
+     * @return mutable set of dependency pairs, including references outside imports
+     * @throws IOException if sources cannot be read
+     */
+    private static Set<String> engineSyntaxDependencies(Path sources) throws IOException {
+        Set<String> dependencies = new LinkedHashSet<>();
+        try (Stream<Path> paths = Files.walk(sources)) {
+            for (Path source : paths.filter(path -> path.toString().endsWith(".java")).toList()) {
+                Matcher matcher = CORESE_TYPE_REFERENCE.matcher(Files.readString(source));
+                while (matcher.find()) {
+                    String reference = matcher.group();
+                    if (isQuerySyntaxReference(reference)) {
+                        dependencies.add(sources.relativize(source).toString().replace('\\', '/')
+                                + " -> " + reference);
+                    }
+                }
+            }
+        }
+        return dependencies;
+    }
+
+    /**
+     * Recognizes parser and AST packages, including the historical AST location.
+     *
+     * @param reference fully qualified source reference
+     * @return whether the reference crosses the engine/syntax boundary
+     */
+    private static boolean isQuerySyntaxReference(String reference) {
+        return List.of(
+                "fr.inria.corese.core.next.query.impl.sparql.parser",
+                "fr.inria.corese.core.next.query.impl.sparql.ast",
+                "fr.inria.corese.core.next.query.impl.ast").stream()
+                .anyMatch(prefix -> reference.equals(prefix) || reference.startsWith(prefix + "."));
     }
 
     @Test
