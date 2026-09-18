@@ -91,6 +91,36 @@ class NextSparqlPipelineExecutorTest {
     }
 
     @Test
+    @DisplayName("SELECT REDUCED executes and returns projected bindings")
+    void selectReducedExecutesAndReturnsBindings() {
+        try (var result = executor.evaluateTuple("""
+                SELECT REDUCED ?name WHERE {
+                  VALUES (?name ?id) { ("Alice" 1) ("Bob" 3) }
+                } ORDER BY ?name
+                """)) {
+            assertEquals(List.of("name"), result.getBindingNames());
+            assertTrue(result.hasNext());
+            assertEquals(valueFactory.createLiteral("Alice"), result.next().getValue("name"));
+            assertTrue(result.hasNext());
+            assertEquals(valueFactory.createLiteral("Bob"), result.next().getValue("name"));
+            assertFalse(result.hasNext());
+        }
+    }
+
+    @Test
+    @DisplayName("SELECT REDUCED * executes without error")
+    void selectReducedStarExecutes() {
+        try (var result = executor.evaluateTuple("""
+                SELECT REDUCED * WHERE { VALUES ?name { "Alice" } }
+                """)) {
+            assertEquals(List.of("name"), result.getBindingNames());
+            assertTrue(result.hasNext());
+            assertEquals(valueFactory.createLiteral("Alice"), result.next().getValue("name"));
+            assertFalse(result.hasNext());
+        }
+    }
+
+    @Test
     @DisplayName("FILTER evaluates native numeric expressions")
     void filterRunsThroughNativeExpressionEvaluator() {
         String age = "http://example.org/age";
