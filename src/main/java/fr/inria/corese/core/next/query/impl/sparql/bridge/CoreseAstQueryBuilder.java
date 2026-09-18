@@ -146,8 +146,7 @@ public final class CoreseAstQueryBuilder {
                 describeQueryAst.valuesClause(),
                 compiler);
         applyOrderBy(query, describeQueryAst.solutionModifier(), compiler);
-        List<Node> describedNodes = describeNodes(query, describeQueryAst, compiler);
-        lowerDescribeToConstructQuery(query, describedNodes);
+        DescribeQueryCompiler.compile(query, describeQueryAst, compiler);
         query.setAST(describeQueryAst);
         return query;
     }
@@ -363,78 +362,6 @@ public final class CoreseAstQueryBuilder {
             }
         }
         return null;
-    }
-
-    /**
-     * Resolves the resources of a {@code DESCRIBE} against the compiled body.
-     *
-     * <p>{@code DESCRIBE *} reuses the in-scope nodes of the body (like {@code SELECT *}).
-     * A described variable reuses its runtime node (so it is the one bound by the body) and
-     * fails fast when it is not visible; a described IRI becomes a fresh constant node.</p>
-     */
-    private List<Node> describeNodes(
-            Query query, DescribeQueryAst describeQueryAst, WhereCompiler compiler) {
-        if (describeQueryAst.isDescribeAll()) {
-            return query.selectNodesFromPattern();
-        }
-        List<Node> nodes = new ArrayList<>();
-        for (TermAst term : describeQueryAst.described()) {
-            if (term instanceof VarAst(String name)) {
-                Node node = visibleBodyNode(query, name);
-                if (node == null) {
-                    throw new IllegalArgumentException(
-                            "DESCRIBE variable ?" + name + " is not visible in the compiled query body");
-                }
-                nodes.add(node);
-            } else {
-                nodes.add(compiler.termResolver().toNode(term));
-            }
-        }
-        return nodes;
-    }
-
-    /**
-     * Lowers {@code DESCRIBE} to the construct-like shape expected by the current
-     * KGRAM-next runtime.
-     *
-     * <p>This keeps the current KGRAM contract, inherited from the historical pipeline:
-     * {@code DESCRIBE} is executed through the construct runtime path.</p>
-     */
-    private void lowerDescribeToConstructQuery(Query query, List<Node> describedNodes) {
-        Exp constructTemplate = Exp.create(Type.BGP);
-        int syntheticIndex = 0;
-        for (Node describedNode : describedNodes) {
-            DescribePattern describePattern = describePattern(describedNode, syntheticIndex++);
-            // KGRAM-next currently represents DESCRIBE with outgoing and incoming construct triples.
-            constructTemplate.add(describePattern.outgoing().getEdge());
-            constructTemplate.add(describePattern.incoming().getEdge());
-            query.getBody().add(Exp.create(Type.OPTIONAL, Exp.create(Type.AND), describePattern.optionalBody()));
-        }
-        query.setConstruct(constructTemplate);
-        query.setConstruct(true);
-        query.setConstructNodes(constructTemplate.getNodes());
-    }
-
-    private DescribePattern describePattern(Node describedNode, int index) {
-        Node outgoingPredicate = createSyntheticDescribeNode("p", index, 0);
-        Node outgoingValue = createSyntheticDescribeNode("v", index, 0);
-        Node incomingPredicate = createSyntheticDescribeNode("p", index, 1);
-        Node incomingValue = createSyntheticDescribeNode("v", index, 1);
-
-        Exp outgoing = Exp.create(Type.EDGE, new AstBackedEdge(describedNode, outgoingPredicate, outgoingValue));
-        Exp incoming = Exp.create(Type.EDGE, new AstBackedEdge(incomingValue, incomingPredicate, describedNode));
-        Exp outgoingBgp = Exp.create(Type.BGP);
-        outgoingBgp.add(outgoing);
-        Exp incomingBgp = Exp.create(Type.BGP);
-        incomingBgp.add(incoming);
-        return new DescribePattern(outgoing, incoming, Exp.create(Type.UNION, outgoingBgp, incomingBgp));
-    }
-
-    private Node createSyntheticDescribeNode(String role, int describedIndex, int directionIndex) {
-        return NodeImpl.forVariable("__describe_" + role + "_" + describedIndex + "_" + directionIndex);
-    }
-
-    private record DescribePattern(Exp outgoing, Exp incoming, Exp optionalBody) {
     }
 
     /**
