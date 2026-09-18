@@ -41,13 +41,22 @@ final class NativeBooleanExpressionEvaluator {
     private NativeBooleanExpressionEvaluator() {
     }
 
+    /**
+     * Evaluates a boolean expression without collapsing type errors to false.
+     *
+     * @param expression expression to evaluate
+     * @param context current evaluation context
+     * @return the boolean result
+     * @throws QueryTypeErrorException if the expression has an unsuppressed type error
+     * @throws UnsupportedQueryFeatureException if the expression is unsupported
+     */
     static DatatypeValue evaluate(BooleanExpressionAst expression, NativeEvaluationContext context) {
         boolean result = switch (expression) {
             case AndAst binary -> and(binary, context);
             case OrAst binary -> or(binary, context);
             case BooleanNotAst unary -> !context.effectiveBooleanValue(unary.argument());
-            case EqualsAst binary -> left(binary, context).equalsWE(right(binary, context));
-            case DifferentAst binary -> !left(binary, context).equalsWE(right(binary, context));
+            case EqualsAst binary -> NativeValueComparison.valueEquals(left(binary, context), right(binary, context));
+            case DifferentAst binary -> !NativeValueComparison.valueEquals(left(binary, context), right(binary, context));
             case LowerThanAst binary -> compare(binary, context) < 0;
             case LowerOrEqualThanAst binary -> compare(binary, context) <= 0;
             case GreaterThanAst binary -> compare(binary, context) > 0;
@@ -112,6 +121,15 @@ final class NativeBooleanExpressionEvaluator {
         }
     }
 
+    /**
+     * Tests membership using SPARQL value equality and deferred candidate errors.
+     *
+     * @param left value to locate
+     * @param candidates candidate expressions
+     * @param context current evaluation context
+     * @return whether any candidate compares equal
+     * @throws QueryTypeErrorException if no candidate matches and a comparison fails
+     */
     private static boolean in(
             DatatypeValue left,
             List<TermAst> candidates,
@@ -120,7 +138,7 @@ final class NativeBooleanExpressionEvaluator {
         for (TermAst candidate : candidates) {
             try {
                 DatatypeValue right = context.required(candidate);
-                if (left.equalsWE(right)) {
+                if (NativeValueComparison.valueEquals(left, right)) {
                     return true;
                 }
             } catch (QueryTypeErrorException candidateFailure) {

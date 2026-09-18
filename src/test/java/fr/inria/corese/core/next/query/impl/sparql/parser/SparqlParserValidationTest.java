@@ -382,6 +382,9 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
                             }
                             """),
                     Arguments.of(
+                            "Should defer unknown literal EBV errors to evaluation",
+                            "SELECT * WHERE { ?x ?p ?o . FILTER(IsIri(?s) || \"potato\"^^<http://ns.inria.fr/vegetable>) }"),
+                    Arguments.of(
                             "Should accept || operator with booleans",
                             """
                             SELECT * WHERE {
@@ -456,15 +459,6 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
                             }
                             """,
                             "NOW used in * should be resolvable to a numeric"),
-                    Arguments.of(
-                            "Should reject || operator with non booleans",
-                            """
-                            SELECT * WHERE {
-                              ?x ?p ?o .
-                              FILTER(IsIri(?s) || "potato"^^<http://ns.inria.fr/vegetable>)
-                            }
-                            """,
-                            "\"potato\"^^<http://ns.inria.fr/vegetable> used in || should be resolvable to a boolean"),
                     Arguments.of(
                             "Should reject && operator with non booleans",
                             """

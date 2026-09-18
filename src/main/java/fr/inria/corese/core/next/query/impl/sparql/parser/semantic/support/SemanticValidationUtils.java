@@ -59,6 +59,11 @@ public class SemanticValidationUtils {
     /**
      * Checks whether the given term is statically compatible with SPARQL
      * effective boolean value evaluation.
+     * Literal datatype and lexical errors are resolved at runtime so logical
+     * operators can apply the SPARQL error truth tables.
+     *
+     * @param termAst operand to inspect
+     * @return whether the operand can be evaluated for its effective boolean value
      */
     public static boolean isPotentialBooleanCompatible(TermAst termAst) {
         if (termAst instanceof BooleanExpressionAst
@@ -69,8 +74,8 @@ public class SemanticValidationUtils {
             return true;
         }
 
-        if (termAst instanceof LiteralAst literalAst) {
-            return isBooleanCompatible(literalAst);
+        if (termAst instanceof LiteralAst) {
+            return true;
         }
 
         if (termAst instanceof IfAst(TermAst condition, TermAst thenExpr, TermAst elseExpr)) {
