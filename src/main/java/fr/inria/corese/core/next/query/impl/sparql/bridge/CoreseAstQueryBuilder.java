@@ -72,7 +72,6 @@ public final class CoreseAstQueryBuilder {
                 compiler);
         SolutionModifierCompiler.applyOrderBy(query, askQueryAst.solutionModifier(), compiler);
         query.setAsk(true);
-        query.setAST(askQueryAst);
         return query;
     }
 
@@ -104,7 +103,6 @@ public final class CoreseAstQueryBuilder {
         if (query.getHaving() != null && !query.hasGroupBy()) {
             query.setAggregate(true);
         }
-        query.setAST(selectQueryAst);
         return query;
     }
 
@@ -131,7 +129,6 @@ public final class CoreseAstQueryBuilder {
                 compiler);
         SolutionModifierCompiler.applyOrderBy(query, describeQueryAst.solutionModifier(), compiler);
         DescribeQueryCompiler.compile(query, describeQueryAst, compiler);
-        query.setAST(describeQueryAst);
         return query;
     }
 
@@ -157,7 +154,6 @@ public final class CoreseAstQueryBuilder {
                 compiler);
         SolutionModifierCompiler.applyOrderBy(query, constructQueryAst.solutionModifier(), compiler);
         ConstructQueryCompiler.compile(query, constructQueryAst, compiler);
-        query.setAST(constructQueryAst);
         return query;
     }
 

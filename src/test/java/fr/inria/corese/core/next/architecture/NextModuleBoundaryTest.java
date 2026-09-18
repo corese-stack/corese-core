@@ -27,12 +27,9 @@ class NextModuleBoundaryTest {
             "\\bfr\\.inria\\.corese\\.core(?:\\.[A-Za-z_$][A-Za-z0-9_$]*)+");
     private static final Pattern STATIC_IMPORT_PREFIX = Pattern.compile("^static\\s+");
 
+    // Engine must not depend on parser or AST types: zero exceptions.
     // Exact source/type pairs only: see docs/next-engine-ast-boundary.md.
-    // Equality below also requires removing exceptions when their dependencies disappear.
-    private static final Set<String> EXISTING_ENGINE_AST_DEPENDENCIES = Set.of(
-            "model/Filter.java -> fr.inria.corese.core.next.query.impl.sparql.ast.TermAst",
-            "pattern/Exp.java -> fr.inria.corese.core.next.query.impl.sparql.ast.TermAst",
-            "pattern/Query.java -> fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst");
+    private static final Set<String> EXISTING_ENGINE_AST_DEPENDENCIES = Set.of();
 
     @Test
     void sharedCodeMustNotDependOnDomainModules() throws IOException {
@@ -105,7 +102,7 @@ class NextModuleBoundaryTest {
     }
 
     @Test
-    void engineBoundaryFindsSyntaxReferencesBeyondExistingExceptions(@TempDir Path sources)
+    void engineBoundaryDetectsForbiddenSyntaxReferences(@TempDir Path sources)
             throws IOException {
         Path filter = sources.resolve("model/Filter.java");
         Files.createDirectories(filter.getParent());
@@ -121,8 +118,8 @@ class NextModuleBoundaryTest {
         Files.writeString(sources.resolve("NewOperator.java"),
                 "import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;");
         Set<String> unexpected = engineSyntaxDependencies(sources);
-        unexpected.removeAll(EXISTING_ENGINE_AST_DEPENDENCIES);
         assertEquals(Set.of(
+                "model/Filter.java -> fr.inria.corese.core.next.query.impl.sparql.ast.TermAst",
                 "model/Filter.java -> fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst",
                 "model/Filter.java -> fr.inria.corese.core.next.query.impl.sparql.parser.SparqlParser",
                 "model/Filter.java -> fr.inria.corese.core.next.query.impl.sparql.ast.VarAst",

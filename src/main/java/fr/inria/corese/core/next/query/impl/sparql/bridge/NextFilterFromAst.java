@@ -53,7 +53,6 @@ public final class NextFilterFromAst implements Filter {
         return owner;
     }
 
-    @Override
     public TermAst getFilterExpression() {
         return owner.sourceAst().orElseThrow();
     }
@@ -83,7 +82,6 @@ public final class NextFilterFromAst implements Filter {
         return owner.isRecExist();
     }
 
-    @Override
     public Optional<TermAst> coreseNextSource() {
         return owner.sourceAst();
     }

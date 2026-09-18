@@ -14,7 +14,6 @@ import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.model.PointerType;
 import fr.inria.corese.core.next.query.impl.engine.model.Regex;
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
-import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -546,10 +545,6 @@ public class Exp extends PointerObject
         if (f.isRecAggregate()) {
             setAggregate(true);
         }
-    }
-
-    public TermAst getFilterExpression() {
-        return getFilter().getFilterExpression();
     }
 
     public void addFilter(Filter f) {
