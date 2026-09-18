@@ -12,7 +12,15 @@ import fr.inria.corese.core.next.storage.api.transaction.TransactionManager;
 
 import java.util.stream.Stream;
 
-/** WHERE's default graph is the store's unnamed graph, or WITH, never its union. */
+/**
+ * Scoped storage view for SPARQL update WHERE clauses.
+ *
+ * <p>Ensures that queries matching the default graph target the store's unnamed graph
+ * or the graph specified by the {@code WITH} clause, never the union graph.</p>
+ *
+ * @param storage      the underlying storage manager
+ * @param defaultGraph the effective default graph resource (or {@code null} for the unnamed default graph)
+ */
 record UpdateDatasetView(StorageManager storage, Resource defaultGraph) implements StorageManager, QueryOperations {
     @Override
     public Stream<Statement> find(StatementPattern pattern) {

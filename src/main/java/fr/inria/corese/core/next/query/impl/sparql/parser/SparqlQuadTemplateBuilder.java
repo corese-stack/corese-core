@@ -11,14 +11,27 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Quad-template lowering, including nested blank-node property lists and RDF lists. */
+/**
+ * Lowers ANTLR Quad contexts into AST quad templates, including nested blank-node property lists and RDF lists.
+ */
 final class SparqlQuadTemplateBuilder {
     private final SparqlAstBuilder terms;
 
+    /**
+     * Constructs a quad template builder using term construction helpers from the AST builder.
+     *
+     * @param terms the SPARQL AST builder providing term lowering
+     */
     SparqlQuadTemplateBuilder(SparqlAstBuilder terms) {
         this.terms = terms;
     }
 
+    /**
+     * Lowers a parse-tree quads context into a {@link QuadsAst}.
+     *
+     * @param context the ANTLR quads context
+     * @return the lowered {@link QuadsAst}
+     */
     QuadsAst quads(SparqlParser.QuadsContext context) {
         List<TriplePatternAst> defaults = new ArrayList<>();
         List<NamedGraphQuadsAst> named = new ArrayList<>();

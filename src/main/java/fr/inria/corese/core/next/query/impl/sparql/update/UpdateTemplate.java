@@ -21,17 +21,33 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Instantiates one solution, sharing fresh blank nodes across its quad templates. */
+/**
+ * Instantiates quad templates for a specific solution binding set.
+ * Shares fresh blank nodes across template triples within the same solution.
+ */
 final class UpdateTemplate {
     private final SparqlTermResolver resolver;
     private final BindingSet bindings;
     private final Map<String, BNode> blankNodes = new HashMap<>();
 
+    /**
+     * Constructs an update template instantiator.
+     *
+     * @param resolver the SPARQL term resolver
+     * @param bindings solution bindings to substitute into variables, or {@code null} if ground
+     */
     UpdateTemplate(SparqlTermResolver resolver, BindingSet bindings) {
         this.resolver = resolver;
         this.bindings = bindings;
     }
 
+    /**
+     * Instantiates quad templates into concrete statements.
+     *
+     * @param template     the quad pattern template to instantiate
+     * @param defaultGraph the fallback graph resource when not explicitly qualified in the template
+     * @return the list of instantiated statements
+     */
     List<Statement> instantiate(QuadsAst template, Resource defaultGraph) {
         List<Statement> statements = new ArrayList<>();
         append(template.defaultTriples(), defaultGraph, statements);

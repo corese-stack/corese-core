@@ -3,8 +3,16 @@ package fr.inria.corese.core.next.query.impl.sparql.parser.listener;
 import fr.inria.corese.core.next.generated.antlr.SparqlParser;
 import fr.inria.corese.core.next.query.impl.sparql.parser.SparqlUpdateAstBuilder;
 
-/** Reuses SELECT group construction for the update WHERE clause. */
+/**
+ * AST listener that reuses SELECT query group construction for the update WHERE clause.
+ */
 public final class ModifyUpdateAstListener extends AbstractSparqlUpdateAstListener {
+
+    /**
+     * Constructs a listener for modify update operations.
+     *
+     * @param builder the SPARQL update AST builder
+     */
     public ModifyUpdateAstListener(SparqlUpdateAstBuilder builder) {
         super(builder);
     }

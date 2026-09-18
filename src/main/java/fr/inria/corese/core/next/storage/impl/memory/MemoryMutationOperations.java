@@ -27,11 +27,25 @@ final class MemoryMutationOperations implements MutationOperations {
         this.adapter = adapter;
     }
 
+    /**
+     * Creates an empty named graph in the memory store.
+     *
+     * @param graph the named graph identifier (must not be {@code null})
+     * @return {@code true} if created, {@code false} if already present
+     * @throws NullPointerException if {@code graph} is {@code null}
+     */
     @Override
     public boolean createGraph(Resource graph) {
         return adapter.createGraph(graph);
     }
 
+    /**
+     * Drops a named graph and removes all of its contained statements.
+     *
+     * @param graph the named graph identifier (must not be {@code null})
+     * @return {@code true} if dropped, {@code false} if absent
+     * @throws NullPointerException if {@code graph} is {@code null}
+     */
     @Override
     public boolean dropGraph(Resource graph) {
         return adapter.dropGraph(graph);

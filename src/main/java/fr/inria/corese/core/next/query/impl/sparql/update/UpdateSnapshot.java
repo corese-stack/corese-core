@@ -10,14 +10,31 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-/** Savepoint for SILENT operations and backends without native transactions. */
+/**
+ * Savepoint snapshot for SILENT operations and non-transactional storage engines.
+ *
+ * @param statements list of all statements present at snapshot time
+ * @param graphs     set of all named graph contexts present at snapshot time
+ */
 record UpdateSnapshot(List<Statement> statements, Set<Resource> graphs) {
+
+    /**
+     * Captures a snapshot of the current state of statements and named graphs in storage.
+     *
+     * @param storage the storage manager to capture
+     * @return a new {@link UpdateSnapshot}
+     */
     static UpdateSnapshot capture(StorageManager storage) {
         try (Stream<Statement> stream = storage.queries().find(StatementPattern.matchAll())) {
             return new UpdateSnapshot(stream.toList(), Set.copyOf(storage.metadata().getContexts()));
         }
     }
 
+    /**
+     * Restores storage to the state captured in this snapshot.
+     *
+     * @param storage the storage manager to restore
+     */
     void restore(StorageManager storage) {
         Set<Statement> original = new HashSet<>(statements);
         try (Stream<Statement> current = storage.queries().find(StatementPattern.matchAll())) {

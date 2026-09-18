@@ -16,12 +16,28 @@ import java.util.Objects;
  */
 public interface MutationOperations {
 
-    /** Creates an empty named graph; returns false when it already exists. */
+    /**
+     * Creates an empty named graph in the storage.
+     *
+     * @param graph the named graph identifier (must not be {@code null})
+     * @return {@code true} if the graph was created, {@code false} if it already existed
+     * @throws NullPointerException          if {@code graph} is {@code null}
+     * @throws UnsupportedOperationException if named graph creation is not supported
+     * @throws StorageException              if the operation fails
+     */
     default boolean createGraph(Resource graph) {
         throw new UnsupportedOperationException("Named graph creation is not supported");
     }
 
-    /** Removes a named graph and its contents; returns false when absent. */
+    /**
+     * Removes a named graph and all of its contained statements.
+     *
+     * @param graph the named graph identifier (must not be {@code null})
+     * @return {@code true} if the graph was removed, {@code false} if it was absent
+     * @throws NullPointerException          if {@code graph} is {@code null}
+     * @throws UnsupportedOperationException if named graph removal is not supported
+     * @throws StorageException              if the operation fails
+     */
     default boolean dropGraph(Resource graph) {
         throw new UnsupportedOperationException("Named graph removal is not supported");
     }

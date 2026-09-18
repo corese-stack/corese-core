@@ -50,6 +50,12 @@ final class InMemoryStatementStore {
         }
     }
 
+    /**
+     * Begins a transaction by snapshotting committed statements and graphs.
+     *
+     * @return current database version for optimistic concurrency checks
+     * @throws IllegalStateException if a transaction is already active on this thread
+     */
     long begin() {
         synchronized (database) {
             if (transaction.get() != null) {
@@ -60,6 +66,12 @@ final class InMemoryStatementStore {
         }
     }
 
+    /**
+     * Commits the active transaction to shared database state if no conflict occurred.
+     *
+     * @param expectedVersion the database version captured at begin
+     * @throws IllegalStateException if concurrent modifications occurred or no transaction is active
+     */
     void commit(long expectedVersion) {
         synchronized (database) {
             if (database.version != expectedVersion) {
@@ -71,10 +83,20 @@ final class InMemoryStatementStore {
         }
     }
 
+    /**
+     * Rolls back and discards the active transaction on this thread.
+     */
     void rollback() {
         transaction.remove();
     }
 
+    /**
+     * Creates an empty named graph in the store.
+     *
+     * @param graph the named graph identifier (must not be null)
+     * @return true if the graph was created, false if it already existed
+     * @throws NullPointerException if graph is null
+     */
     public boolean createGraph(Resource graph) {
         synchronized (database) {
             boolean added = state().graphs().add(Objects.requireNonNull(graph, "graph"));
@@ -83,6 +105,13 @@ final class InMemoryStatementStore {
         }
     }
 
+    /**
+     * Drops a named graph and all statements contained in it.
+     *
+     * @param graph the named graph identifier (must not be null)
+     * @return true if the graph was removed, false if it did not exist
+     * @throws NullPointerException if graph is null
+     */
     public boolean dropGraph(Resource graph) {
         synchronized (database) {
             clearContext(Objects.requireNonNull(graph, "graph"));
@@ -99,10 +128,20 @@ final class InMemoryStatementStore {
         this(new Database());
     }
 
+    /**
+     * Constructs a statement store sharing the given database storage.
+     *
+     * @param database the shared in-memory database
+     */
     private InMemoryStatementStore(Database database) {
         this.database = database;
     }
 
+    /**
+     * Opens a new session sharing the committed state of this store.
+     *
+     * @return a new session-scoped {@link InMemoryStatementStore}
+     */
     InMemoryStatementStore openSession() {
         return new InMemoryStatementStore(database);
     }

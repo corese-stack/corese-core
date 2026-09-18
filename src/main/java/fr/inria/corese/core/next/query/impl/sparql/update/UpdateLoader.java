@@ -19,10 +19,22 @@ import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
 
-/** Parses LOAD fully before mutation; blank node labels are local to each load. */
+/**
+ * Evaluates SPARQL LOAD operations by parsing external RDF data before applying mutations.
+ * Blank node labels are kept local and fresh for each load invocation.
+ */
 final class UpdateLoader {
+
     private UpdateLoader() { }
 
+    /**
+     * Loads RDF data from the given source IRI into the destination graph.
+     *
+     * @param storage the storage manager to add statements to
+     * @param source  the IRI of the external RDF document to load
+     * @param target  the destination named graph, or {@code null} for the default graph
+     * @throws QueryEvaluationException if reading or parsing the source fails
+     */
     static void load(StorageManager storage, Resource source, Resource target) {
         Model model = read(source.stringValue());
         Map<BNode, BNode> blankNodes = new HashMap<>();

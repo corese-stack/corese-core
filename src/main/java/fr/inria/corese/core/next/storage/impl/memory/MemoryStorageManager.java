@@ -43,6 +43,12 @@ public final class MemoryStorageManager implements StorageManager {
         this.lifecycle = new MemoryLifecycleManager(adapter);
     }
 
+    /**
+     * Constructs a scoped session of MemoryStorageManager sharing storage lifecycle.
+     *
+     * @param adapter   the session statement store
+     * @param lifecycle the shared storage lifecycle
+     */
     private MemoryStorageManager(InMemoryStatementStore adapter, StorageLifecycle lifecycle) {
         this.adapter = adapter;
         this.queryOps = new MemoryQueryOperations(adapter);
@@ -52,6 +58,11 @@ public final class MemoryStorageManager implements StorageManager {
         this.lifecycle = lifecycle;
     }
 
+    /**
+     * Returns a new connection session with an isolated transaction snapshot.
+     *
+     * @return a connection-scoped {@link StorageManager}
+     */
     @Override
     public StorageManager openSession() {
         return new MemoryStorageManager(adapter.openSession(), lifecycle);

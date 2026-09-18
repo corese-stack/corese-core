@@ -11,7 +11,9 @@ import fr.inria.corese.core.next.storage.api.StorageManager;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-/** Prepared SPARQL 1.1 update request, with connection-owned transaction execution. */
+/**
+ * Prepared SPARQL 1.1 update request, with connection-owned transaction execution.
+ */
 public final class CoreseUpdate implements Update {
     private final String updateString;
     private final StorageManager storage;
@@ -19,10 +21,29 @@ public final class CoreseUpdate implements Update {
     private final Runnable executionGuard;
     private final Consumer<Runnable> transaction;
 
+    /**
+     * Constructs a prepared SPARQL update request with default transactional execution.
+     *
+     * @param updateString   the SPARQL update query string (must not be {@code null})
+     * @param storage        the storage manager to execute updates against (must not be {@code null})
+     * @param parser         the SPARQL parser (must not be {@code null})
+     * @param executionGuard guard runnable executed before update execution (must not be {@code null})
+     * @throws NullPointerException if any argument is {@code null}
+     */
     public CoreseUpdate(String updateString, StorageManager storage, SparqlParser parser, Runnable executionGuard) {
         this(updateString, storage, parser, executionGuard, action -> UpdateTransaction.execute(storage, action));
     }
 
+    /**
+     * Constructs a prepared SPARQL update request with a custom transaction coordinator.
+     *
+     * @param updateString   the SPARQL update query string (must not be {@code null})
+     * @param storage        the storage manager to execute updates against (must not be {@code null})
+     * @param parser         the SPARQL parser (must not be {@code null})
+     * @param executionGuard guard runnable executed before update execution (must not be {@code null})
+     * @param transaction    transaction coordinator accepting update execution runnable (must not be {@code null})
+     * @throws NullPointerException if any argument is {@code null}
+     */
     public CoreseUpdate(String updateString, StorageManager storage, SparqlParser parser,
             Runnable executionGuard, Consumer<Runnable> transaction) {
         this.updateString = Objects.requireNonNull(updateString, "updateString");
@@ -32,6 +53,11 @@ public final class CoreseUpdate implements Update {
         this.transaction = Objects.requireNonNull(transaction, "transaction");
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @throws QueryEvaluationException if update parsing or execution fails
+     */
     @Override
     public void execute() throws QueryEvaluationException {
         executionGuard.run();

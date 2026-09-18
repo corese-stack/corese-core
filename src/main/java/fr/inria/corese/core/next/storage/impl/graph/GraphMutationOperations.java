@@ -27,6 +27,13 @@ final class GraphMutationOperations implements MutationOperations {
         this.adapter = adapter;
     }
 
+    /**
+     * Creates an empty named graph in the underlying Corese graph.
+     *
+     * @param graph the named graph identifier (must not be {@code null})
+     * @return {@code true} if the graph was created, {@code false} if it already existed
+     * @throws NullPointerException if {@code graph} is {@code null}
+     */
     @Override
     public boolean createGraph(Resource graph) {
         Objects.requireNonNull(graph, "graph");
@@ -37,6 +44,13 @@ final class GraphMutationOperations implements MutationOperations {
         return true;
     }
 
+    /**
+     * Drops a named graph and clears all its statements.
+     *
+     * @param graph the named graph identifier (must not be {@code null})
+     * @return {@code true} if the graph was removed, {@code false} if it was absent
+     * @throws NullPointerException if {@code graph} is {@code null}
+     */
     @Override
     public boolean dropGraph(Resource graph) {
         Objects.requireNonNull(graph, "graph");

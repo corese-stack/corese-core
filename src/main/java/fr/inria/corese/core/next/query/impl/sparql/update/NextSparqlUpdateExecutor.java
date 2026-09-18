@@ -33,13 +33,21 @@ import fr.inria.corese.core.next.storage.api.StorageManager;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Executes update requests through the native query and storage pipelines. */
+/**
+ * Executes SPARQL 1.1 update requests through the native query and storage pipelines.
+ */
 public final class NextSparqlUpdateExecutor {
     private final StorageManager storage;
     private final QueryPrologueAst prologue;
     private final SparqlTermResolver resolver;
     private final UpdateGraphStore graphs;
 
+    /**
+     * Constructs an update executor with the given storage and query prologue.
+     *
+     * @param storage  the storage manager to execute mutations and queries against
+     * @param prologue the query prologue containing namespace prefixes and base IRI
+     */
     public NextSparqlUpdateExecutor(StorageManager storage, QueryPrologueAst prologue) {
         this.storage = storage;
         this.prologue = prologue;
@@ -47,6 +55,12 @@ public final class NextSparqlUpdateExecutor {
         this.graphs = new UpdateGraphStore(storage, resolver);
     }
 
+    /**
+     * Executes the series of update operations in the given request.
+     *
+     * @param request the SPARQL update request containing operations and prologues
+     * @throws QueryEvaluationException if any update operation fails
+     */
     public void execute(UpdateRequestAst request) {
         for (int index = 0; index < request.operations().size(); index++) {
             new NextSparqlUpdateExecutor(storage, request.operationPrologues().get(index))

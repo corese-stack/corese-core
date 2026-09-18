@@ -12,10 +12,20 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.path.PredicatePathAst;
 import java.util.HashSet;
 import java.util.Set;
 
-/** Enforces DATA groundness, DELETE blank-node restrictions, and INSERT DATA scope. */
+/**
+ * Enforces DATA groundness, DELETE blank-node restrictions, and INSERT DATA scope.
+ */
 final class UpdateTemplateValidator {
     private final Set<String> dataLabels = new HashSet<>();
 
+    /**
+     * Validates quad templates against SPARQL 1.1 syntactic restrictions.
+     *
+     * @param quads     the quad pattern to validate
+     * @param variables {@code true} if variables are permitted in this template
+     * @param blanks    {@code true} if blank nodes are permitted in this template
+     * @throws QuerySyntaxException if the template violates syntax rules
+     */
     void validate(QuadsAst quads, boolean variables, boolean blanks) {
         Set<String> labels = new HashSet<>();
         for (TriplePatternAst triple : quads.defaultTriples()) {
