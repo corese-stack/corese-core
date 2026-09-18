@@ -30,7 +30,6 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.UnaryMinusAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.UnaryPlusAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.YearAst;
 
-import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
@@ -64,12 +63,12 @@ final class NativeNumericExpressionEvaluator {
             case StrLenAst unary -> stringLength(unary, context);
             case RandAst ignored -> context.values().createLiteral(
                     ThreadLocalRandom.current().nextDouble());
-            case YearAst unary -> context.values().createLiteral(BigInteger.valueOf(calendar(unary.argument(), context).getYear()));
-            case MonthAst unary -> context.values().createLiteral(BigInteger.valueOf(calendar(unary.argument(), context).getMonth()));
-            case DayAst unary -> context.values().createLiteral(BigInteger.valueOf(calendar(unary.argument(), context).getDay()));
-            case HoursAst unary -> context.values().createLiteral(BigInteger.valueOf(calendar(unary.argument(), context).getHour()));
-            case MinutesAst unary -> context.values().createLiteral(BigInteger.valueOf(calendar(unary.argument(), context).getMinute()));
-            case SecondsAst unary -> seconds(calendar(unary.argument(), context), context);
+            case YearAst unary -> NativeTemporalExpressionEvaluator.evaluateComponent(unary, context);
+            case MonthAst unary -> NativeTemporalExpressionEvaluator.evaluateComponent(unary, context);
+            case DayAst unary -> NativeTemporalExpressionEvaluator.evaluateComponent(unary, context);
+            case HoursAst unary -> NativeTemporalExpressionEvaluator.evaluateComponent(unary, context);
+            case MinutesAst unary -> NativeTemporalExpressionEvaluator.evaluateComponent(unary, context);
+            case SecondsAst unary -> NativeTemporalExpressionEvaluator.evaluateComponent(unary, context);
             default -> throw unsupported(expression);
         };
     }
@@ -170,22 +169,6 @@ final class NativeNumericExpressionEvaluator {
     private static DatatypeValue stringLength(StrLenAst expression, NativeEvaluationContext context) {
         String text = context.stringLiteral(expression.argument()).getLabel();
         return context.values().createLiteral(BigInteger.valueOf(text.codePointCount(0, text.length())));
-    }
-
-    private static XMLGregorianCalendar calendar(
-            fr.inria.corese.core.next.query.impl.sparql.ast.TermAst expression,
-            NativeEvaluationContext context) {
-        return NativeTemporalExpressionEvaluator.calendar(expression, context);
-    }
-
-    private static DatatypeValue seconds(
-            XMLGregorianCalendar calendar,
-            NativeEvaluationContext context) {
-        BigDecimal seconds = BigDecimal.valueOf(calendar.getSecond());
-        if (calendar.getFractionalSecond() != null) {
-            seconds = seconds.add(calendar.getFractionalSecond());
-        }
-        return context.values().createLiteral(seconds);
     }
 
     static NumericLiteral numericLiteral(DatatypeValue value) {
