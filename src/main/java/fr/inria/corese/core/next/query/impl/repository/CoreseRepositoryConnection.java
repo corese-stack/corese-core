@@ -29,6 +29,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.UpdateRequestAst;
 import fr.inria.corese.core.next.query.impl.sparql.execution.NextSparqlPipelineExecutor;
+import fr.inria.corese.core.next.query.impl.sparql.update.UpdateTransaction;
 import fr.inria.corese.core.next.storage.api.StorageManager;
 import fr.inria.corese.core.next.storage.api.exception.StorageException;
 import fr.inria.corese.core.next.storage.api.model.StatementPattern;
@@ -287,7 +288,7 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
             throw new QuerySyntaxException(
                     "Expected a SPARQL UPDATE request, got: " + ast.getClass().getSimpleName());
         }
-        return new CoreseUpdate(source, storage, parser, this::checkOpen);
+        return new CoreseUpdate(source, storage, parser, this::checkOpen, this::executeUpdate);
     }
 
     @Override
@@ -358,6 +359,14 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
                     transaction = null;
                 }
             }
+        }
+    }
+
+    private void executeUpdate(Runnable action) {
+        if (isActive()) {
+            UpdateTransaction.executeWithSavepoint(storage, action);
+        } else {
+            UpdateTransaction.execute(storage, action);
         }
     }
 

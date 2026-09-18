@@ -3,53 +3,92 @@ package fr.inria.corese.core.next.storage.impl.memory;
 import fr.inria.corese.core.next.storage.api.transaction.IsolationLevel;
 import fr.inria.corese.core.next.storage.api.transaction.Transaction;
 import fr.inria.corese.core.next.storage.api.transaction.TransactionManager;
+import fr.inria.corese.core.next.storage.api.transaction.TransactionState;
 
-import java.util.Collections;
 import java.util.Set;
+import java.util.UUID;
 
-/**
- * transaction manager for {@link MemoryStorageManager}.
- */
+/** Optimistic serializable transactions with private snapshots and conflict detection. */
 final class MemoryTransactionManager implements TransactionManager {
+    private final InMemoryStatementStore store;
 
-    /**
-     * Always returns false as MemoryStorageManager does not support transactions.
-     *
-     * @return false
-     */
+    MemoryTransactionManager(InMemoryStatementStore store) {
+        this.store = store;
+    }
+
     @Override
     public boolean supportsTransactions() {
-        return false;
+        return true;
     }
 
-    /**
-     * Attempts to begin a transaction.
-     *
-     * @return never returns (always throws)
-     */
     @Override
     public Transaction beginTransaction() {
-        throw new UnsupportedOperationException("Transactions not supported by MemoryStorageManager");
+        return beginTransaction(IsolationLevel.SERIALIZABLE);
     }
 
-    /**
-     * Attempts to begin a transaction with a specific isolation level.
-     *
-     * @param level the requested isolation level (ignored)
-     * @return never returns (always throws)
-     */
     @Override
     public Transaction beginTransaction(IsolationLevel level) {
-        throw new UnsupportedOperationException("Transactions not supported by MemoryStorageManager");
+        if (!getSupportedIsolationLevels().contains(level)) {
+            throw new IllegalArgumentException("Unsupported isolation level: " + level);
+        }
+        return new SnapshotTransaction(store.begin());
     }
 
-    /**
-     * Returns the set of supported isolation levels.
-     *
-     * @return empty set
-     */
     @Override
     public Set<IsolationLevel> getSupportedIsolationLevels() {
-        return Collections.emptySet();
+        return Set.of(IsolationLevel.SERIALIZABLE);
+    }
+
+    private final class SnapshotTransaction implements Transaction {
+        private final String id = UUID.randomUUID().toString();
+        private final Thread owner = Thread.currentThread();
+        private final long version;
+        private TransactionState state = TransactionState.ACTIVE;
+
+        SnapshotTransaction(long version) {
+            this.version = version;
+        }
+
+        @Override
+        public String getId() {
+            return id;
+        }
+
+        @Override
+        public void commit() {
+            requireActive();
+            store.commit(version);
+            state = TransactionState.COMMITTED;
+        }
+
+        @Override
+        public void rollback() {
+            requireActive();
+            store.rollback();
+            state = TransactionState.ROLLED_BACK;
+        }
+
+        private void requireActive() {
+            if (Thread.currentThread() != owner || !isActive()) {
+                throw new IllegalStateException("Transaction is inactive or belongs to another thread");
+            }
+        }
+
+        @Override
+        public boolean isActive() {
+            return state == TransactionState.ACTIVE;
+        }
+
+        @Override
+        public TransactionState getState() {
+            return state;
+        }
+
+        @Override
+        public void close() {
+            if (isActive()) {
+                rollback();
+            }
+        }
     }
 }

@@ -7,22 +7,104 @@ import fr.inria.corese.core.next.data.api.term.Value;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+
 import java.util.stream.Collectors;
 
 /**
- * In-memory storage backend using {@link ConcurrentHashMap} for thread-safe operations.
+ * In-memory statement and graph store with optimistic, isolated transaction snapshots.
+ *
+ * <p>The transaction state is bound to the current thread. A transaction must
+ * therefore be started, used, and completed by the same thread (the normal
+ * repository-connection contract). Applications that transfer work between
+ * executor threads must keep the connection and transaction on one worker, or
+ * provide a higher-level transaction context.</p>
+ *
+ * <p>Beginning a transaction copies the committed statement and graph sets.
+ * This gives predictable snapshot isolation, but its memory cost is
+ * proportional to the dataset size. This backend is intended for tests and
+ * small to medium in-memory datasets; large persistent datasets should use a
+ * storage engine with native MVCC.</p>
  */
 final class InMemoryStatementStore {
 
-    private final Set<Statement> statements;
+    private final Database database;
+
+    private static final class Database {
+        private State committed = new State(new HashSet<>(), new HashSet<>());
+        private long version;
+    }
+    private final ThreadLocal<State> transaction = new ThreadLocal<>();
+
+    private record State(Set<Statement> statements, Set<Resource> graphs) { }
+
+    private State state() {
+        State local = transaction.get();
+        return local == null ? database.committed : local;
+    }
+
+    private void changed(boolean changed) {
+        if (changed && transaction.get() == null) {
+            database.version++;
+        }
+    }
+
+    long begin() {
+        synchronized (database) {
+            if (transaction.get() != null) {
+                throw new IllegalStateException("A transaction is already active on this thread");
+            }
+            transaction.set(new State(new HashSet<>(database.committed.statements()), new HashSet<>(database.committed.graphs())));
+            return database.version;
+        }
+    }
+
+    void commit(long expectedVersion) {
+        synchronized (database) {
+            if (database.version != expectedVersion) {
+                throw new IllegalStateException("Concurrent storage modification; transaction must be rolled back");
+            }
+            database.committed = Objects.requireNonNull(transaction.get(), "No active transaction");
+            transaction.remove();
+            database.version++;
+        }
+    }
+
+    void rollback() {
+        transaction.remove();
+    }
+
+    public boolean createGraph(Resource graph) {
+        synchronized (database) {
+            boolean added = state().graphs().add(Objects.requireNonNull(graph, "graph"));
+            changed(added);
+            return added;
+        }
+    }
+
+    public boolean dropGraph(Resource graph) {
+        synchronized (database) {
+            clearContext(Objects.requireNonNull(graph, "graph"));
+            boolean removed = state().graphs().remove(graph);
+            changed(removed);
+            return removed;
+        }
+    }
 
     /**
      * Constructs a new InMemoryStatementStore with an empty statement set.
      */
     public InMemoryStatementStore() {
-        this.statements = ConcurrentHashMap.newKeySet();
+        this(new Database());
+    }
+
+    private InMemoryStatementStore(Database database) {
+        this.database = database;
+    }
+
+    InMemoryStatementStore openSession() {
+        return new InMemoryStatementStore(database);
     }
 
     /**
@@ -32,7 +114,12 @@ final class InMemoryStatementStore {
      * @return true if the statement was added, false if it already existed
      */
     public boolean add(Statement stmt) {
-        return statements.add(stmt);
+        synchronized (database) {
+            boolean graphAdded = stmt.getContext() != null && state().graphs().add(stmt.getContext());
+            boolean added = state().statements().add(stmt);
+            changed(added || graphAdded);
+            return added;
+        }
     }
 
     /**
@@ -42,7 +129,11 @@ final class InMemoryStatementStore {
      * @return true if the statement was removed, false if it did not exist
      */
     public boolean remove(Statement stmt) {
-        return statements.remove(stmt);
+        synchronized (database) {
+            boolean removed = state().statements().remove(stmt);
+            changed(removed);
+            return removed;
+        }
     }
 
     /**
@@ -52,7 +143,9 @@ final class InMemoryStatementStore {
      * @return true if the statement exists
      */
     public boolean contains(Statement stmt) {
-        return statements.contains(stmt);
+        synchronized (database) {
+            return state().statements().contains(stmt);
+        }
     }
 
     /**
@@ -65,9 +158,11 @@ final class InMemoryStatementStore {
      * @return set of matching statements (never null, may be empty)
      */
     public Set<Statement> find(Resource s, IRI p, Value o, Resource[] contexts) {
-        return statements.stream()
-                .filter(stmt -> matches(stmt, s, p, o, contexts))
-                .collect(Collectors.toSet());
+        synchronized (database) {
+            return state().statements().stream()
+                    .filter(stmt -> matches(stmt, s, p, o, contexts))
+                    .collect(Collectors.toSet());
+        }
     }
 
     /**
@@ -76,14 +171,19 @@ final class InMemoryStatementStore {
      * @return statement count
      */
     public int size() {
-        return statements.size();
+        synchronized (database) {
+            return state().statements().size();
+        }
     }
 
     /**
      * Removes all statements from the store.
      */
     public void clear() {
-        statements.clear();
+        synchronized (database) {
+            changed(!state().statements().isEmpty());
+            state().statements().clear();
+        }
     }
 
     /**
@@ -92,7 +192,9 @@ final class InMemoryStatementStore {
      * @param context the context to clear (must not be null)
      */
     public void clearContext(Resource context) {
-        statements.removeIf(stmt -> context.equals(stmt.getContext()));
+        synchronized (database) {
+            changed(state().statements().removeIf(stmt -> context.equals(stmt.getContext())));
+        }
     }
 
     /**
@@ -101,9 +203,11 @@ final class InMemoryStatementStore {
      * @return set of all subjects (never null)
      */
     public Set<Resource> getSubjects() {
-        return statements.stream()
-                .map(Statement::getSubject)
-                .collect(Collectors.toSet());
+        synchronized (database) {
+            return state().statements().stream()
+                    .map(Statement::getSubject)
+                    .collect(Collectors.toSet());
+        }
     }
 
     /**
@@ -112,9 +216,11 @@ final class InMemoryStatementStore {
      * @return set of all predicates (never null)
      */
     public Set<IRI> getPredicates() {
-        return statements.stream()
-                .map(Statement::getPredicate)
-                .collect(Collectors.toSet());
+        synchronized (database) {
+            return state().statements().stream()
+                    .map(Statement::getPredicate)
+                    .collect(Collectors.toSet());
+        }
     }
 
     /**
@@ -123,9 +229,11 @@ final class InMemoryStatementStore {
      * @return set of all objects (never null)
      */
     public Set<Value> getObjects() {
-        return statements.stream()
-                .map(Statement::getObject)
-                .collect(Collectors.toSet());
+        synchronized (database) {
+            return state().statements().stream()
+                    .map(Statement::getObject)
+                    .collect(Collectors.toSet());
+        }
     }
 
     /**
@@ -134,10 +242,9 @@ final class InMemoryStatementStore {
      * @return set of all contexts (never null, excludes null contexts)
      */
     public Set<Resource> getContexts() {
-        return statements.stream()
-                .map(Statement::getContext)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+        synchronized (database) {
+            return Set.copyOf(state().graphs());
+        }
     }
 
     /**

@@ -5,13 +5,23 @@ import java.util.List;
 import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.AstVisitor;
 
 /**
- * Represents a series of update operations sharing a prologue
+ * Represents ordered update operations and their effective PREFIX/BASE snapshots
  */
-public record UpdateRequestAst(QueryPrologueAst prologue, List<UpdateRequestUnitAst> operations)
+public record UpdateRequestAst(QueryPrologueAst prologue, List<UpdateRequestUnitAst> operations,
+        List<QueryPrologueAst> operationPrologues)
         implements QueryAst {
+    public UpdateRequestAst(QueryPrologueAst prologue, List<UpdateRequestUnitAst> operations) {
+        this(prologue, operations, List.of());
+    }
+
     public UpdateRequestAst {
         prologue = prologue != null ? prologue : QueryPrologueAst.empty();
         operations = operations != null ? List.copyOf(operations) : List.of();
+        operationPrologues = operationPrologues == null || operationPrologues.isEmpty()
+                ? java.util.Collections.nCopies(operations.size(), prologue) : List.copyOf(operationPrologues);
+        if (operationPrologues.size() != operations.size()) {
+            throw new IllegalArgumentException("Each update operation requires its own prologue");
+        }
     }
 
     @Override

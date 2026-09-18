@@ -10,7 +10,6 @@ import fr.inria.corese.core.next.query.api.TupleQuery;
 import fr.inria.corese.core.next.query.api.Update;
 import fr.inria.corese.core.next.query.api.dataset.Dataset;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
-import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.RepositoryException;
 import fr.inria.corese.core.next.query.api.result.GraphQueryResult;
 import fr.inria.corese.core.next.data.api.model.Statement;
@@ -345,11 +344,10 @@ class CoreseRepositoryConnectionTest {
         @DisplayName("DELETE DATA rejects blank nodes")
         void deleteDataRejectsBlankNodes() {
             try (RepositoryConnection conn = repository.getConnection()) {
-                Update u = conn.prepareUpdate("""
+                assertThrows(QuerySyntaxException.class, () -> conn.prepareUpdate("""
                         PREFIX ex: <http://example.org/>
                         DELETE DATA { _:b ex:knows ex:bob }
-                        """);
-                assertThrows(QueryEvaluationException.class, u::execute);
+                        """));
             }
         }
 
@@ -557,12 +555,14 @@ class CoreseRepositoryConnectionTest {
         }
 
         @Test
-        @DisplayName("Memory repositories report that transactions are unsupported")
-        void transactionsAreReportedAsUnsupported() {
+        @DisplayName("Memory repositories support transactions")
+        void transactionsAreSupported() {
             try (RepositoryConnection conn = repository.getConnection()) {
-                assertFalse(conn.supportsTransactions());
+                assertTrue(conn.supportsTransactions());
                 assertFalse(conn.isActive());
-                assertThrows(RepositoryException.class, conn::begin);
+                conn.begin();
+                assertTrue(conn.isActive());
+                conn.rollback();
             }
         }
     }

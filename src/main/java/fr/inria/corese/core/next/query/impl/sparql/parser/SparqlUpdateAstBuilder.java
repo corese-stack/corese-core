@@ -2,31 +2,70 @@ package fr.inria.corese.core.next.query.impl.sparql.parser;
 
 
 import fr.inria.corese.core.next.generated.antlr.SparqlParser;
+import fr.inria.corese.core.next.common.text.RdfText;
+import fr.inria.corese.core.next.data.spi.term.IRIUtils;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
-import fr.inria.corese.core.next.query.impl.sparql.ast.*;
+import fr.inria.corese.core.next.query.impl.sparql.ast.AddRequestAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ClearRequestAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.CopyRequestAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.CreateRequestAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.DatasetClauseAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.DeleteDataRequestAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.DeleteWhereRequestAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.DropRequestAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.GraphRefAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.InsertDataRequestAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.LoadRequestAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ModifyRequestAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.MoveRequestAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.QuadsAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.QueryPrologueAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.UpdateRequestAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.UpdateRequestUnitAst;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.LinkedHashSet;
 
 /**
  * Builder for Update operations.
  */
-public class SparqlUpdateAstBuilder extends SparqlAstBuilder{
+public class SparqlUpdateAstBuilder extends SparqlQueryAstBuilder{
 
     /**
      * Update Query queue
      */
     private final List<UpdateRequestUnitAst> updateRequestAst = new ArrayList<>();
+    private final List<QueryPrologueAst> prologues = new ArrayList<>();
+    private final UpdateTemplateValidator templates = new UpdateTemplateValidator();
 
 
     SparqlUpdateAstBuilder(SparqlParserOptions options) {
         super(options);
     }
 
+    @Override
+    public void addPrefix(String prefix, String uri) {
+        String name = RdfText.stripTrailingColon(prefix);
+        prefixDeclarations.removeIf(declaration -> declaration.prefix().equals(name));
+        super.addPrefix(prefix, uri);
+    }
+
+    @Override
+    public void setBaseUri(String uri) {
+        String iri = RdfText.stripAngleBrackets(uri);
+        baseUri = IRIUtils.isAbsoluteIRI(iri) ? iri : IRIUtils.resolveIRIAgainstBase(baseUri, iri);
+    }
+
+    @Override
     public QueryAst getResult() {
         QueryPrologueAst prologueAst = new QueryPrologueAst(List.copyOf(getPrefixDeclaration()), new IriAst(getBaseUri()));
 
-        return new UpdateRequestAst(prologueAst, this.updateRequestAst);
+        return new UpdateRequestAst(prologueAst, this.updateRequestAst, prologues);
     }
 
     public LoadRequestAst loadToAst(SparqlParser.LoadContext ctx) {
@@ -82,7 +121,15 @@ public class SparqlUpdateAstBuilder extends SparqlAstBuilder{
     }
 
     public void addRequest(UpdateRequestUnitAst ast) {
+        switch (ast) {
+            case InsertDataRequestAst(QuadsAst data) -> templates.validate(data, false, true);
+            case DeleteDataRequestAst(QuadsAst data) -> templates.validate(data, false, false);
+            case DeleteWhereRequestAst(QuadsAst data) -> templates.validate(data, true, false);
+            case ModifyRequestAst modify -> templates.validate(modify.deleteTemplate(), true, false);
+            default -> { /* Graph management has no quad templates. */ }
+        }
         this.updateRequestAst.add(ast);
+        prologues.add(new QueryPrologueAst(getPrefixDeclaration(), new IriAst(getBaseUri())));
     }
 
     public AddRequestAst addToAst(SparqlParser.AddContext ctx) {
@@ -118,44 +165,27 @@ public class SparqlUpdateAstBuilder extends SparqlAstBuilder{
         return new DeleteWhereRequestAst(quadsFromQuads(ctx.quadPattern().quads()));
     }
 
-    private QuadsAst quadsFromQuads(SparqlParser.QuadsContext ctx) {
-        List<TriplePatternAst> defaultTriples = new ArrayList<>();
-        List<NamedGraphQuadsAst> namedGraphBlocks = new ArrayList<>();
-
-        for (SparqlParser.TriplesTemplateContext tt : ctx.triplesTemplate()) {
-            defaultTriples.addAll(triplesFromTriplesTemplate(tt));
-        }
-
-        for (SparqlParser.QuadsNotTriplesContext qnt : ctx.quadsNotTriples()) {
-            TermAst graph = termFromVarOrIriRef(qnt.varOrIri());
-            List<TriplePatternAst> graphTriples = new ArrayList<>();
-            if (qnt.triplesTemplate() != null) {
-                graphTriples.addAll(triplesFromTriplesTemplate(qnt.triplesTemplate()));
+    public ModifyRequestAst modifyToAst(SparqlParser.ModifyContext context) {
+        QuadsAst delete = context.deleteClause() == null ? new QuadsAst(null, null)
+                : quadsFromQuads(context.deleteClause().quadPattern().quads());
+        QuadsAst insert = context.insertClause() == null ? new QuadsAst(null, null)
+                : quadsFromQuads(context.insertClause().quadPattern().quads());
+        Set<IriAst> defaults = new LinkedHashSet<>();
+        Set<IriAst> named = new LinkedHashSet<>();
+        for (SparqlParser.UsingClauseContext using : context.usingClause()) {
+            IriAst iri = (IriAst) termFromIriRef(using.iriRef());
+            if (using.NAMED() == null) {
+                defaults.add(iri);
+            } else {
+                named.add(iri);
             }
-            namedGraphBlocks.add(new NamedGraphQuadsAst(graph, graphTriples));
         }
-
-        return new QuadsAst(defaultTriples, namedGraphBlocks);
+        IriAst with = context.iriRef() == null ? null : (IriAst) termFromIriRef(context.iriRef());
+        return new ModifyRequestAst(with, delete, insert, new DatasetClauseAst(defaults, named),
+                (SelectQueryAst) super.getResult());
     }
 
-    private List<TriplePatternAst> triplesFromTriplesTemplate(SparqlParser.TriplesTemplateContext ctx) {
-        List<TriplePatternAst> triples = new ArrayList<>();
-        SparqlParser.TriplesTemplateContext current = ctx;
-        while (current != null) {
-            SparqlParser.TriplesSameSubjectContext tss = current.triplesSameSubject();
-            if (tss != null && tss.varOrTerm() != null && tss.propertyListNotEmpty() != null) {
-                TermAst subject = termFromVarOrTerm(tss.varOrTerm());
-                var propertyList = tss.propertyListNotEmpty();
-                for (int verbIndex = 0; verbIndex < propertyList.verb().size(); verbIndex++) {
-                    TermAst predicate = termFromVerb(propertyList.verb(verbIndex));
-                    List<TermAst> objects = termListFromObjectList(propertyList.objectList(verbIndex));
-                    for (TermAst object : objects) {
-                        triples.add(new TriplePatternAst(subject, predicate, object));
-                    }
-                }
-            }
-            current = current.triplesTemplate();
-        }
-        return triples;
+    private QuadsAst quadsFromQuads(SparqlParser.QuadsContext context) {
+        return new SparqlQuadTemplateBuilder(this).quads(context);
     }
 }
