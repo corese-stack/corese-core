@@ -134,6 +134,11 @@ public final class NextSparqlPipelineExecutor {
                 evaluate(queryBuilder.toNextQuery(select), bindings, dataset, timeoutMillis));
     }
 
+    /** Evaluates an already parsed SELECT, also used by SPARQL Update WHERE clauses. */
+    public TupleQueryResult evaluateTuple(SelectQueryAst query) {
+        return new CoreseTupleQueryResult(evaluate(queryBuilder.toNextQuery(query), null, null, 0L));
+    }
+
     /**
      * Evaluates an ASK query through the next pipeline with no initial bindings,
      * no dataset override, and no timeout.

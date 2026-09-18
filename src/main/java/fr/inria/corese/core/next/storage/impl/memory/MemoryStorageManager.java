@@ -10,7 +10,14 @@ import fr.inria.corese.core.next.storage.api.transaction.TransactionManager;
 import java.util.Objects;
 
 /**
- * In-memory {@link StorageManager} implementation for testing and small datasets.
+ * In-memory {@link StorageManager} implementation for testing and small to
+ * medium datasets.
+ *
+ * <p>Transactions are local to the thread that starts them and use a private
+ * snapshot. A connection must not begin a transaction on one thread and
+ * commit it on another. Snapshot memory usage grows with the number of stored
+ * statements, so a persistent MVCC backend is preferable for very large
+ * datasets.</p>
  */
 public final class MemoryStorageManager implements StorageManager {
 
@@ -32,8 +39,22 @@ public final class MemoryStorageManager implements StorageManager {
         this.queryOps = new MemoryQueryOperations(adapter);
         this.mutationOps = new MemoryMutationOperations(adapter);
         this.metadataOps = new MemoryMetadataOperations(adapter);
-        this.txManager = new MemoryTransactionManager();
+        this.txManager = new MemoryTransactionManager(adapter);
         this.lifecycle = new MemoryLifecycleManager(adapter);
+    }
+
+    private MemoryStorageManager(InMemoryStatementStore adapter, StorageLifecycle lifecycle) {
+        this.adapter = adapter;
+        this.queryOps = new MemoryQueryOperations(adapter);
+        this.mutationOps = new MemoryMutationOperations(adapter);
+        this.metadataOps = new MemoryMetadataOperations(adapter);
+        this.txManager = new MemoryTransactionManager(adapter);
+        this.lifecycle = lifecycle;
+    }
+
+    @Override
+    public StorageManager openSession() {
+        return new MemoryStorageManager(adapter.openSession(), lifecycle);
     }
 
     @Override

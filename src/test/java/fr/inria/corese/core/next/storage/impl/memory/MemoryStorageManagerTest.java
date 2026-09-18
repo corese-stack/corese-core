@@ -127,16 +127,18 @@ class MemoryStorageManagerTest {
     class TransactionTests {
 
         @Test
-        @DisplayName("Should not support transactions")
-        void shouldNotSupportTransactions() {
-            assertFalse(storageManager.transactions().supportsTransactions());
+        @DisplayName("Should support transactions")
+        void shouldSupportTransactions() {
+            assertTrue(storageManager.transactions().supportsTransactions());
         }
 
         @Test
-        @DisplayName("Should throw when beginning transaction")
-        void shouldThrowWhenBeginningTransaction() {
+        @DisplayName("Should begin a transaction")
+        void shouldBeginTransaction() {
             TransactionManager txManager = storageManager.transactions();
-            assertThrows(UnsupportedOperationException.class, txManager::beginTransaction);
+            try (var transaction = txManager.beginTransaction()) {
+                assertTrue(transaction.isActive());
+            }
         }
     }
 

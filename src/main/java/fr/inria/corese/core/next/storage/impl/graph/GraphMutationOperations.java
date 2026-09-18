@@ -27,6 +27,27 @@ final class GraphMutationOperations implements MutationOperations {
         this.adapter = adapter;
     }
 
+    @Override
+    public boolean createGraph(Resource graph) {
+        Objects.requireNonNull(graph, "graph");
+        if (adapter.getContexts().contains(graph)) {
+            return false;
+        }
+        adapter.graph().addGraph(graph.stringValue(), graph.isBNode());
+        return true;
+    }
+
+    @Override
+    public boolean dropGraph(Resource graph) {
+        Objects.requireNonNull(graph, "graph");
+        if (!adapter.getContexts().contains(graph)) {
+            return false;
+        }
+        clear(graph);
+        adapter.graph().deleteGraph(graph.stringValue());
+        return true;
+    }
+
     /**
      * Inserts a statement into the Graph.
      *

@@ -16,6 +16,15 @@ import fr.inria.corese.core.next.storage.api.transaction.TransactionManager;
  */
 public interface StorageManager extends AutoCloseable {
 
+    /**
+     * Returns a connection-scoped view sharing committed data and lifecycle.
+     * Transactional backends override this to isolate concurrent connections,
+     * including connections used on the same thread. The repository owns the lifecycle.
+     */
+    default StorageManager openSession() {
+        return this;
+    }
+
     /** @return statement query operations */
     QueryOperations queries();
 

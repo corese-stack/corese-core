@@ -84,11 +84,15 @@ public final class CoreseRepository implements Repository {
     }
 
     @Override
+    @SuppressWarnings("java:S2095")
     public RepositoryConnection getConnection() throws RepositoryException {
         if (!isOpen()) {
             throw new RepositoryException("This repository is closed.");
         }
-        return new CoreseRepositoryConnection(this, storage);
+        // The session lifetime is owned by the returned RepositoryConnection.
+        // Closing it here would invalidate the connection before it is used;
+        // CoreseRepositoryConnection closes its transaction state on close.
+        return new CoreseRepositoryConnection(this, storage.openSession());
     }
 
     @Override

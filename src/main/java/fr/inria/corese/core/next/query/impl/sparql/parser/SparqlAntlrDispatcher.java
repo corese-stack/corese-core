@@ -25,6 +25,20 @@ final class SparqlAntlrDispatcher extends SparqlParserBaseListener {
                 : Collections.emptyList();
     }
 
+    @Override
+    public void enterModify(SparqlParser.ModifyContext context) {
+        for (var delegate : delegates) {
+            delegate.enterModify(context);
+        }
+    }
+
+    @Override
+    public void exitModify(SparqlParser.ModifyContext context) {
+        for (var delegate : delegates) {
+            delegate.exitModify(context);
+        }
+    }
+
     // ---------- QUERY ROOT ------------------
 
     @Override

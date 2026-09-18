@@ -5,5 +5,5 @@ import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.Visit
 /**
  * Root interface for all operations related to the SPARQL Update operations listed in <a href="https://www.w3.org/TR/sparql11-update/">SPARQL 1.1 Update</a>.
  */
-public sealed interface UpdateRequestUnitAst extends VisitableAst permits LoadRequestAst, ClearRequestAst, CreateRequestAst, DropRequestAst, AddRequestAst, CopyRequestAst, MoveRequestAst, InsertDataRequestAst, DeleteDataRequestAst, DeleteWhereRequestAst {
+public sealed interface UpdateRequestUnitAst extends VisitableAst permits ModifyRequestAst, LoadRequestAst, ClearRequestAst, CreateRequestAst, DropRequestAst, AddRequestAst, CopyRequestAst, MoveRequestAst, InsertDataRequestAst, DeleteDataRequestAst, DeleteWhereRequestAst {
 }

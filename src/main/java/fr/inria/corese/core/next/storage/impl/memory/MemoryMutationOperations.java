@@ -27,6 +27,16 @@ final class MemoryMutationOperations implements MutationOperations {
         this.adapter = adapter;
     }
 
+    @Override
+    public boolean createGraph(Resource graph) {
+        return adapter.createGraph(graph);
+    }
+
+    @Override
+    public boolean dropGraph(Resource graph) {
+        return adapter.dropGraph(graph);
+    }
+
     /**
      * Inserts a statement into the store.
      *
