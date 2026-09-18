@@ -103,7 +103,6 @@ public final class CoreseAstQueryBuilder {
      */
     public Query toNextQuery(SelectQueryAst selectQueryAst) {
         Objects.requireNonNull(selectQueryAst, "selectQueryAst");
-        rejectUnsupportedSelectClauses(selectQueryAst);
 
         WhereCompiler compiler = whereCompiler.withPrologue(selectQueryAst.prologue());
         Query query = createQuery(
@@ -114,6 +113,7 @@ public final class CoreseAstQueryBuilder {
                 compiler);
         applyGroupBy(query, selectQueryAst.solutionModifier(), compiler);
         applyProjection(query, selectQueryAst.projection(), compiler);
+        // Full deduplication or preserving cardinality is permitted by SELECT REDUCED.
         query.setDistinct(selectQueryAst.solutionModifier().distinct());
         applyOrderBy(query, selectQueryAst.solutionModifier(), compiler);
         applyHaving(query, selectQueryAst.solutionModifier(), compiler);
@@ -217,23 +217,6 @@ public final class CoreseAstQueryBuilder {
         if (mod.hasGroupBy() || mod.hasHaving() || mod.distinct() || mod.reduced()) {
             throw new UnsupportedQueryFeatureException(
                     "GROUP BY, HAVING, DISTINCT and REDUCED are not supported yet by the next pipeline for ASK");
-        }
-    }
-
-    /**
-     * Rejects unsupported clauses for {@code SELECT} queries.
-     *
-     * <p>Planned roadmap items:
-     * <ul>
-     *   <li>Issue #387: {@code GROUP BY} / {@code HAVING} require aggregate semantics, not only AST field propagation.</li>
-     *   <li>Issue #387: {@code REDUCED} support aligned with next-pipeline query-form policy.</li>
-     * </ul>
-     * </p>
-     */
-    private static void rejectUnsupportedSelectClauses(SelectQueryAst selectQueryAst) {
-        SolutionModifierAst solutionModifier = selectQueryAst.solutionModifier();
-        if (solutionModifier.reduced()) {
-            throw new UnsupportedQueryFeatureException("REDUCED is not supported yet by the next pipeline for SELECT");
         }
     }
 
