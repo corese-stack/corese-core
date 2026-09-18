@@ -4,8 +4,6 @@ package fr.inria.corese.core.next.query.impl.engine.pattern;
 import fr.inria.corese.core.next.query.impl.engine.model.ExpType;
 import fr.inria.corese.core.next.query.impl.engine.model.Filter;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
-import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.parser.SparqlParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -646,26 +644,6 @@ class QueryTest {
         void testIsTransformationTemplate() {
             boolean result = query.isTransformationTemplate();
             assertFalse(result, "Should not be transformation template by default");
-        }
-    }
-
-    @Nested
-    @DisplayName("AST Tests")
-    class ASTTests {
-
-        @Test
-        @DisplayName("Should set and get AST")
-        void testSetAndGetAST() {
-            QueryAst ast = new SparqlParser().parse("SELECT * WHERE { ?s ?p ?o }");
-            query.setAST(ast);
-            assertSame(ast, query.getAST(), "AST should match");
-        }
-
-        @Test
-        @DisplayName("Should get global AST")
-        void testGetGlobalAST() {
-            assertDoesNotThrow(() -> query.getGlobalAST(),
-                    "Getting global AST should not throw");
         }
     }
 

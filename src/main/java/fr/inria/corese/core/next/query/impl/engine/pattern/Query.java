@@ -11,7 +11,6 @@ import fr.inria.corese.core.next.query.impl.engine.spi.Matcher;
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
 import fr.inria.corese.core.next.query.impl.engine.filter.Compile;
 import fr.inria.corese.core.next.query.impl.engine.eval.Message;
-import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,7 +87,6 @@ public final class Query extends Exp {
     // SPIN graph
     Query query;
     Query outerQuery;
-    QueryAst ast;
     Object object;
 
     // current transformer if any
@@ -285,18 +283,6 @@ public final class Query extends Exp {
     @Override
     public void setObject(Object o) {
         object = o;
-    }
-
-    public QueryAst getGlobalAST() {
-        return getGlobalQuery().getAST();
-    }
-
-    public QueryAst getAST() {
-        return ast;
-    }
-
-    public void setAST(QueryAst o) {
-        ast = o;
     }
 
     public int getPlanProfile() {

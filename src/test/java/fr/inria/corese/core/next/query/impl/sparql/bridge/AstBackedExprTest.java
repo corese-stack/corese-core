@@ -66,7 +66,7 @@ class AstBackedExprTest {
         assertNotNull(boundExpr.getFilter());
         assertTrue(boundExpr.getFilter().isBound());
         assertEquals(List.of("y"), boundExpr.getFilter().getVariables());
-        assertEquals(boundAst, boundExpr.getFilter().getFilterExpression());
+        assertEquals(boundAst, ((NextFilterFromAst) boundExpr.getFilter()).getFilterExpression());
     }
 
     @Test

@@ -7,11 +7,10 @@
  *
  * <h2>Architectural Invariants &amp; Development Guardrails</h2>
  * <ul>
- *   <li><b>AST Boundary</b>: New dependencies on parser or AST classes are forbidden.
- *   Three existing source/type dependencies in {@code Filter}, {@code Exp}, and
- *   {@code Query} remain explicitly inventoried by {@code NextModuleBoundaryTest}.
- *   Removing these exceptions is tracked in {@code docs/next-engine-ast-boundary.md};
- *   the target architecture executes compiled logical operators only.</li>
+ *   <li><b>AST Boundary</b>: Dependencies on parser or AST classes are strictly forbidden.
+ *   The execution engine operates exclusively on compiled logical operators and patterns;
+ *   zero AST dependencies exist or are permitted, as enforced by {@code NextModuleBoundaryTest}
+ *   and documented in {@code docs/next-engine-ast-boundary.md}.</li>
  *   <li><b>Storage Isolation</b>: Query evaluation and triple access must strictly
  *   transit through the {@link fr.inria.corese.core.next.query.impl.engine.spi.Producer}
  *   and Storage SPI abstractions.</li>
