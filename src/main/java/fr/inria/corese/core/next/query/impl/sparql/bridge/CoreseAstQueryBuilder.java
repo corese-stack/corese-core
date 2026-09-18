@@ -203,14 +203,10 @@ public final class CoreseAstQueryBuilder {
     }
 
     /**
-     * Rejects unsupported clauses for {@code ASK} queries.
+     * Defensively rejects grouping and duplicate modifiers unsupported for {@code ASK}.
      *
-     * <p>Planned roadmap items:
-     * <ul>
-     *   <li>Issue #388: {@code GROUP BY} / {@code HAVING} requires aggregate-aware ASK semantics.</li>
-     *   <li>Issue #388: {@code REDUCED} support aligned with next-pipeline query-form policy.</li>
-     * </ul>
-     * </p>
+     * @param askQueryAst query whose modifiers are checked
+     * @throws UnsupportedQueryFeatureException if an unsupported modifier is present
      */
     private static void rejectUnsupportedAskClauses(AskQueryAst askQueryAst) {
         SolutionModifierAst mod = askQueryAst.solutionModifier();
@@ -221,14 +217,10 @@ public final class CoreseAstQueryBuilder {
     }
 
     /**
-     * Rejects unsupported clauses for {@code DESCRIBE} queries.
+     * Defensively rejects grouping and duplicate modifiers unsupported for {@code DESCRIBE}.
      *
-     * <p>Planned roadmap items:
-     * <ul>
-     *   <li>Issue #390: {@code GROUP BY} / {@code HAVING} requires aggregate-aware DESCRIBE semantics.</li>
-     *   <li>Issue #390: {@code REDUCED} support aligned with next-pipeline query-form policy.</li>
-     * </ul>
-     * </p>
+     * @param describeQueryAst query whose modifiers are checked
+     * @throws UnsupportedQueryFeatureException if an unsupported modifier is present
      */
     private static void rejectUnsupportedDescribeClauses(DescribeQueryAst describeQueryAst) {
         SolutionModifierAst mod = describeQueryAst.solutionModifier();
@@ -643,14 +635,10 @@ public final class CoreseAstQueryBuilder {
     }
 
     /**
-     * Rejects unsupported clauses for {@code CONSTRUCT} queries.
+     * Defensively rejects grouping and duplicate modifiers unsupported for {@code CONSTRUCT}.
      *
-     * <p>Planned roadmap items:
-     * <ul>
-     *   <li>Issue #389: {@code GROUP BY} / {@code HAVING} requires aggregate-aware CONSTRUCT semantics.</li>
-     *   <li>Issue #389: {@code DISTINCT} / {@code REDUCED} defensive guards.</li>
-     * </ul>
-     * </p>
+     * @param constructQueryAst query whose modifiers are checked
+     * @throws UnsupportedQueryFeatureException if an unsupported modifier is present
      */
     private static void rejectUnsupportedConstructClauses(ConstructQueryAst constructQueryAst) {
         SolutionModifierAst mod = constructQueryAst.solutionModifier();

@@ -13,6 +13,16 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.TimezoneAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.XsdDateTimeExpressionAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.XsdDayTimeDurationExpressionAst;
 
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.YearAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.MonthAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.DayAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.HoursAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.MinutesAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.SecondsAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.NumericExpressionAst;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
 
@@ -20,6 +30,44 @@ import javax.xml.datatype.XMLGregorianCalendar;
 final class NativeTemporalExpressionEvaluator {
 
     private NativeTemporalExpressionEvaluator() {
+    }
+
+    /**
+     * Extracts a date-time component as an integer or decimal for seconds.
+     *
+     * @param expression component extraction expression
+     * @param context current evaluation context
+     * @return the requested component with its SPARQL numeric datatype
+     * @throws QueryTypeErrorException if the operand is not a date-time literal
+     * @throws UnsupportedQueryFeatureException if the component is unsupported
+     */
+    static DatatypeValue evaluateComponent(
+            NumericExpressionAst expression, NativeEvaluationContext context) {
+        return switch (expression) {
+            case YearAst unary -> context.values().createLiteral(
+                    BigInteger.valueOf(calendar(unary.argument(), context).getYear()));
+            case MonthAst unary -> context.values().createLiteral(
+                    BigInteger.valueOf(calendar(unary.argument(), context).getMonth()));
+            case DayAst unary -> context.values().createLiteral(
+                    BigInteger.valueOf(calendar(unary.argument(), context).getDay()));
+            case HoursAst unary -> context.values().createLiteral(
+                    BigInteger.valueOf(calendar(unary.argument(), context).getHour()));
+            case MinutesAst unary -> context.values().createLiteral(
+                    BigInteger.valueOf(calendar(unary.argument(), context).getMinute()));
+            case SecondsAst unary -> seconds(calendar(unary.argument(), context), context);
+            default -> throw new UnsupportedQueryFeatureException(
+                    "Temporal component is not supported: " + expression.getClass().getSimpleName());
+        };
+    }
+
+    private static DatatypeValue seconds(
+            XMLGregorianCalendar calendar,
+            NativeEvaluationContext context) {
+        BigDecimal seconds = BigDecimal.valueOf(calendar.getSecond());
+        if (calendar.getFractionalSecond() != null) {
+            seconds = seconds.add(calendar.getFractionalSecond());
+        }
+        return context.values().createLiteral(seconds);
     }
 
     static DatatypeValue evaluateDateTime(
