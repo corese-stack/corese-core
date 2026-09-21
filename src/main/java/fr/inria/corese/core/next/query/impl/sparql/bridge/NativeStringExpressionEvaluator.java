@@ -260,30 +260,16 @@ final class NativeStringExpressionEvaluator {
         }
     }
 
+    @SuppressWarnings("MagicConstant")
     private static Pattern compilePattern(String expression, String flags) {
         int options = regexOptions(flags);
-        return Pattern.compile(flags.contains("x") ? removePatternWhitespace(expression) : expression, options);
+        String processed = flags.contains("q") ? Pattern.quote(expression) : expression;
+        return Pattern.compile(processed, options);
     }
 
-    private static String removePatternWhitespace(String expression) {
-        StringBuilder result = new StringBuilder();
-        boolean escaped = false;
-        int brackets = 0;
-        for (int index = 0; index < expression.length(); index++) {
-            char character = expression.charAt(index);
-            if (!escaped) {
-                if (character == '[') brackets++;
-                if (character == ']') brackets--;
-                if (brackets == 0 && " \t\r\n".indexOf(character) >= 0) continue;
-            }
-            result.append(character);
-            escaped = !escaped && character == '\\';
-        }
-        return result.toString();
-    }
-
+    /** @return a combination of {@link Pattern} flag constants */
     private static int regexOptions(String flags) {
-        if (!flags.chars().allMatch(flag -> "imsx".indexOf(flag) >= 0)) {
+        if (!flags.chars().allMatch(flag -> "imsxq".indexOf(flag) >= 0)) {
             throw new QueryTypeErrorException("Invalid regular expression flags");
         }
         int options = 0;
@@ -295,6 +281,9 @@ final class NativeStringExpressionEvaluator {
         }
         if (flags.contains("s")) {
             options |= Pattern.DOTALL;
+        }
+        if (flags.contains("x")) {
+            options |= Pattern.COMMENTS;
         }
         return options;
     }
