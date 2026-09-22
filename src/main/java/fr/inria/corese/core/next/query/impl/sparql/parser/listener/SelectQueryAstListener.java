@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.parser.listener;
 
 import fr.inria.corese.core.next.generated.antlr.SparqlParser;
+import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.impl.sparql.parser.SparqlAstBuilder;
 import fr.inria.corese.core.next.query.impl.sparql.parser.SparqlQueryAstBuilder;
 import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.VariableScopeAnalyzer;
@@ -8,6 +9,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -84,6 +86,7 @@ public class SelectQueryAstListener extends AbstractSparqlAstListener implements
             return;
         }
         List<String> allVars = new ArrayList<>();
+        Set<String> seenVars = new LinkedHashSet<>();
         List<String> expressionBoundVars = new ArrayList<>();
         Map<String, TermAst> expressionTerms = new LinkedHashMap<>();
         Map<String, Set<String>> expressionReferencedVariables = new LinkedHashMap<>();
@@ -91,13 +94,22 @@ public class SelectQueryAstListener extends AbstractSparqlAstListener implements
             if (selectVar.expression() != null) {
                 // (expr AS ?var) — introduces a new variable, not projected from WHERE
                 String varName = selectVar.var_().getText();
+                if (!seenVars.add(varName)) {
+                    throw new QuerySyntaxException(
+                        "Variable '" + varName + "' appears more than once in the SELECT clause.");
+                }
                 allVars.add(varName);
                 expressionBoundVars.add(varName);
                 TermAst expressionAst = builder().termFromExpression(selectVar.expression());
                 expressionTerms.put(varName, expressionAst);
                 expressionReferencedVariables.put(varName, variableScopeAnalyzer.collectReferencedVariables(expressionAst));
             } else if (selectVar.var_() != null) {
-                allVars.add(selectVar.var_().getText());
+                String varName = selectVar.var_().getText();
+                if (!seenVars.add(varName)) {
+                    throw new QuerySyntaxException(
+                        "Variable '" + varName + "' appears more than once in the SELECT clause.");
+                }
+                allVars.add(varName);
             }
         }
         queryBuilder().setProjectionVariables(allVars, expressionBoundVars, expressionTerms, expressionReferencedVariables);
