@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -60,6 +61,7 @@ class StorageManagerProducerTest {
         insert(iri(ALICE), iri(KNOWS), iri(BOB));
         insert(iri(ALICE), iri(KNOWS), iri(CAROL));
         insert(iri(BOB), iri(NAME), valueFactory.createLiteral("Bob"));
+        insert(iri(CAROL), iri(NAME), valueFactory.createLiteral("Carol"));
         insert(iri(CAROL), iri(NAME), valueFactory.createLiteral("Carol"), iri(GRAPH));
     }
 
@@ -263,16 +265,16 @@ class StorageManagerProducerTest {
 
     private static void assertContainsMapping(Mappings mappings, String subject, String predicate, String object) {
         assertTrue(mappings.getMappingList().stream().anyMatch(mapping ->
-                subject.equals(mapping.getValue("s").getLabel())
-                        && predicate.equals(mapping.getValue("p").getLabel())
-                        && object.equals(mapping.getValue("o").getLabel())));
+                subject.equals(Objects.requireNonNull(mapping.getValue("s")).getLabel())
+                        && predicate.equals(Objects.requireNonNull(mapping.getValue("p")).getLabel())
+                        && object.equals(Objects.requireNonNull(mapping.getValue("o")).getLabel())));
     }
 
     private static void assertContainsNameMapping(Mappings mappings, String subject, String object, String name) {
         assertTrue(mappings.getMappingList().stream().anyMatch(mapping ->
-                subject.equals(mapping.getValue("s").getLabel())
-                        && object.equals(mapping.getValue("o").getLabel())
-                        && name.equals(mapping.getValue("name").getLabel())));
+                subject.equals(Objects.requireNonNull(mapping.getValue("s")).getLabel())
+                        && object.equals(Objects.requireNonNull(mapping.getValue("o")).getLabel())
+                        && name.equals(Objects.requireNonNull(mapping.getValue("name")).getLabel())));
     }
 
     private void insert(Resource subject, IRI predicate, Value object, Resource... contexts) {

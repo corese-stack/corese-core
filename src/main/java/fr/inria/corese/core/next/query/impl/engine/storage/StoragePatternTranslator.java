@@ -10,6 +10,7 @@ import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import fr.inria.corese.core.next.storage.api.model.StatementPattern;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -51,6 +52,16 @@ final class StoragePatternTranslator {
 
         static ContextSelection allContexts() {
             return of(List.of());
+        }
+
+        /**
+         * Selects only the default graph (null context).
+         *
+         * <p>The storage layer recognises a {@code null} element in the contexts array as the
+         * default-graph sentinel: it matches only statements whose stored context is {@code null}.</p>
+         */
+        static ContextSelection defaultContext() {
+            return new ContextSelection(Collections.singletonList(null), false);
         }
 
         static ContextSelection emptyResult() {
@@ -178,9 +189,13 @@ final class StoragePatternTranslator {
 
     static ContextSelection selectDatasetContexts(List<Node> activeGraphs, Environment environment) {
         if (activeGraphs == null || activeGraphs.isEmpty()) {
-            return isExplicitDataset(environment)
-                    ? ContextSelection.emptyResult()
-                    : ContextSelection.allContexts();
+            if (isExplicitDataset(environment)) {
+                // Explicit FROM with no graphs → empty default graph
+                return ContextSelection.emptyResult();
+            }
+            // No FROM clause: the default graph is strictly the null/default context.
+            // Named-graph triples must not bleed into default-graph triple patterns.
+            return ContextSelection.defaultContext();
         }
 
         List<Resource> contexts = new ArrayList<>();

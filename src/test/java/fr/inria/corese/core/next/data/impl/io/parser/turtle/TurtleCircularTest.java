@@ -277,10 +277,7 @@ class TurtleCircularTest extends ParserTestBase {
         Model deserializedModel = performRoundTrip(originalModel);
 
         // Then: The deserialized model should preserve all data
-        assertEquals(originalModel.size(), deserializedModel.size(),
-                "Model sizes should be equal after round-trip");
-        assertEquals(originalModel, deserializedModel,
-                "Original and deserialized models should be equivalent");
+        assertModelsIsomorphic(originalModel, deserializedModel);
     }
 
     @Test
@@ -340,11 +337,8 @@ class TurtleCircularTest extends ParserTestBase {
         Model deserializedModel = performRoundTrip(originalModel);
 
         // Then: Blank node structure should be preserved (though IDs may differ)
-        assertEquals(originalModel.size(), deserializedModel.size(),
-                "Model sizes should be equal after round-trip");
         // Note: Blank node equality is based on structure, not IDs
-        assertEquals(originalModel, deserializedModel,
-                "Original and deserialized models should be structurally equivalent");
+        assertModelsIsomorphic(originalModel, deserializedModel);
     }
 
     @Test

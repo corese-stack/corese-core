@@ -164,7 +164,7 @@ public class TurtleListener extends TurtleBaseListener {
         if (ctx.BlankNode() != null) {
             String blankNodeText = ctx.BlankNode().getText();
             if (blankNodeText.startsWith(ParserConstants.BLANK_NODE_PREFIX)) {
-                return delegate.factory.createBNode(blankNodeText.substring(2));
+                return delegate.scopedBlankNode(blankNodeText.substring(2));
             } else if (blankNodeText.equals(ParserConstants.EMPTY_SQUARE_BRACKET)) {
                 return delegate.factory.createBNode();
             } else {
@@ -201,7 +201,7 @@ public class TurtleListener extends TurtleBaseListener {
         if (ctx.BlankNode() != null) {
             String blankNodeText = ctx.BlankNode().getText();
             if (blankNodeText.startsWith(ParserConstants.BLANK_NODE_PREFIX)) {
-                return delegate.factory.createBNode(blankNodeText.substring(2));
+                return delegate.scopedBlankNode(blankNodeText.substring(2));
             } else if (blankNodeText.equals(ParserConstants.EMPTY_SQUARE_BRACKET)) {
                 return delegate.factory.createBNode();
             } else {
