@@ -38,6 +38,7 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /** Evaluates SPARQL expressions that produce string literals. */
@@ -209,7 +210,8 @@ final class NativeStringExpressionEvaluator {
             throw new QueryTypeErrorException("REPLACE pattern must not match an empty string");
         }
         try {
-            String result = compiled.matcher(source.getLabel()).replaceAll(replacement);
+            String result = compiled.matcher(source.getLabel()).replaceAll(
+                    flags.contains("q") ? Matcher.quoteReplacement(replacement) : replacement);
             return stringLike(source, result, context);
         } catch (IndexOutOfBoundsException invalidGroup) {
             throw new QueryTypeErrorException("Invalid replacement group", invalidGroup);
@@ -263,8 +265,36 @@ final class NativeStringExpressionEvaluator {
     @SuppressWarnings("MagicConstant")
     private static Pattern compilePattern(String expression, String flags) {
         int options = regexOptions(flags);
-        String processed = flags.contains("q") ? Pattern.quote(expression) : expression;
+        String processed = expression;
+        if (flags.contains("q")) {
+            processed = Pattern.quote(expression);
+        } else if (flags.contains("x")) {
+            processed = removePatternWhitespace(expression);
+        }
         return Pattern.compile(processed, options);
+    }
+
+    /** XPath x ignores XML whitespace outside character classes, but does not introduce comments. */
+    private static String removePatternWhitespace(String expression) {
+        StringBuilder result = new StringBuilder(expression.length());
+        boolean escaped = false;
+        int brackets = 0;
+        for (int index = 0; index < expression.length(); index++) {
+            char character = expression.charAt(index);
+            if (brackets == 0 && " \t\r\n".indexOf(character) >= 0) {
+                continue;
+            }
+            if (!escaped) {
+                if (character == '[') {
+                    brackets++;
+                } else if (character == ']' && brackets > 0) {
+                    brackets--;
+                }
+            }
+            result.append(character);
+            escaped = !escaped && character == '\\';
+        }
+        return result.toString();
     }
 
     /** @return a combination of {@link Pattern} flag constants */
@@ -281,9 +311,6 @@ final class NativeStringExpressionEvaluator {
         }
         if (flags.contains("s")) {
             options |= Pattern.DOTALL;
-        }
-        if (flags.contains("x")) {
-            options |= Pattern.COMMENTS;
         }
         return options;
     }

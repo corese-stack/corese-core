@@ -14,6 +14,23 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class SparqlTermResolverTest {
 
     @Test
+    void decodesSparqlEscapesExactlyOnce() {
+        SparqlTermResolver resolver = new SparqlTermResolver(null);
+
+        assertEquals("\t\n\r\b\f\"'\\", resolver.unquoteLexical("\"\\t\\n\\r\\b\\f\\\"\\'\\\\\""));
+        assertEquals("\\n", resolver.unquoteLexical("\"\\\\n\""));
+        assertEquals("a\nb", resolver.unquoteLexical("\"\"\"a\\nb\"\"\""));
+        assertEquals("a\tb", resolver.unquoteLexical("'''a\\tb'''"));
+    }
+
+    @Test
+    void preservesUnknownEscapesAndTrailingBackslash() {
+        assertEquals("\\d", SparqlTermResolver.processSparqlEscapes("\\d"));
+        assertEquals("end\\", SparqlTermResolver.processSparqlEscapes("end\\"));
+        assertEquals("", SparqlTermResolver.processSparqlEscapes(""));
+    }
+
+    @Test
     void resolvesTermsFromItsOwnPrologue() {
         QueryPrologueAst prologue = new QueryPrologueAst(
                 List.of(new PrefixDeclarationAst("ex:", new IriAst("http://example.org/"))),

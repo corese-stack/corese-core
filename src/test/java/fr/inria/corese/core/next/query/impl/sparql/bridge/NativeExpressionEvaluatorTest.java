@@ -65,9 +65,42 @@ class NativeExpressionEvaluatorTest {
     }
 
     @Test
-    @DisplayName("REGEX with x flag ignores # comments until end of line")
-    void xFlagIgnoresHashComments() {
-        assertTrue(ask("REGEX(\"ac\", \"a # match a\\nc\", \"x\")"));
+    @DisplayName("REGEX with x flag preserves hashes and whitespace in classes")
+    void xFlagPreservesHashesAndClassWhitespace() {
+        assertFalse(ask("REGEX(\"a\", \"a#b\", \"x\")"));
+        assertTrue(ask("REGEX(\"a#b\", \" a # b \", \"x\")"));
+        assertTrue(ask("REGEX(\"#\", \"[#]\", \"x\")"));
+        assertTrue(ask("REGEX(\" \", \"[ a]\", \"x\")"));
+        assertTrue(ask("REGEX(\"\\n\\t\\r\", \"^[ \\n\\t\\r]+$\", \"x\")"));
+        assertFalse(ask("REGEX(\"ac\", \"a[ ]c\", \"x\")"));
+    }
+
+    @Test
+    void xFlagRespectsEscapedBrackets() {
+        assertTrue(ask("REGEX(\"[a]\", \"\\\\[ a \\\\]\", \"x\")"));
+        assertTrue(ask("REGEX(\"] \", \"^[\\\\] ]+$\", \"x\")"));
+    }
+
+    @Test
+    void qFlagOverridesOtherPatternFlags() {
+        assertTrue(ask("REGEX(\" A#b \", \" a#b \", \"qxims\")"));
+        assertFalse(ask("REGEX(\"ab\", \" a b \", \"qx\")"));
+        assertFalse(ask("REGEX(\"a\\nb\", \"a.b\", \"qs\")"));
+        assertFalse(ask("REGEX(\"a\\nb\", \"^b$\", \"qm\")"));
+    }
+
+    @Test
+    void qFlagQuotesReplacement() {
+        assertTrue(ask("REPLACE(\"a/b\", \"/\", \"$0\", \"q\") = \"a$0b\""));
+        assertTrue(ask("REPLACE(\"a/b\", \"/\", \"$\", \"q\") = \"a$b\""));
+        assertTrue(ask("REPLACE(\"a/b\", \"/\", \"\\\\\", \"q\") = \"a\\\\b\""));
+        assertTrue(ask("REPLACE(\"a/b\", \"/\", \"$0\") = \"a/b\""));
+    }
+
+    @Test
+    void xFlagAlsoAppliesToReplace() {
+        assertTrue(ask("REPLACE(\"a b\", \"[ ]\", \"-\", \"x\") = \"a-b\""));
+        assertTrue(ask("REPLACE(\"a#b\", \"#\", \"-\", \"x\") = \"a-b\""));
     }
 
     @Test
