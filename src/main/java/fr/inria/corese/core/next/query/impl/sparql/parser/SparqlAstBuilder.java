@@ -67,6 +67,28 @@ public abstract class SparqlAstBuilder {
     private final Set<String> blankNodeLabels = new HashSet<>();
 
     /**
+     * Monotonically increasing counter used to assign unique BGP scope IDs.
+     * Incremented at each {@link #enterGroup()} and after each BGP-breaking
+     * pattern (OPTIONAL, UNION, GRAPH, SERVICE, MINUS, or nested plain group) closes.
+     */
+    private int bgpScopeCounter = 0;
+
+    /**
+     * Parallel to {@link #groupStack}: the current BGP scope ID for the group at the
+     * corresponding depth. Pushed in {@link #enterGroup()}, popped in {@link #exitGroup()},
+     * and renewed (via {@link #renewBgpScope()}) whenever a BGP-breaking inner pattern
+     * closes inside the current group.
+     * <p>FILTER does NOT renew the scope; all other sub-patterns do.
+     */
+    private final Deque<Integer> bgpScopeIdStack = new ArrayDeque<>();
+
+    /**
+     * Maps each labeled blank node to the BGP scope ID in which it was first encountered.
+     * A blank node label must not appear in more than one basic graph pattern.
+     */
+    private final Map<String, Integer> blankNodeLabelToBgpScope = new HashMap<>();
+
+    /**
      * Stack of currently open SELECT operations (top-level SELECT and nested SELECT subqueries).
      */
     protected final Deque<SelectFrame> selectStack = new ArrayDeque<>();
@@ -345,6 +367,7 @@ public abstract class SparqlAstBuilder {
      */
     public void enterGroup() {
         groupStack.push(new ArrayList<>());
+        bgpScopeIdStack.push(++bgpScopeCounter);
         if (selectWhereGroupFollows && hasCurrentSelect()) {
             selectWhereGroupDepths.push(groupStack.size());
             selectWhereGroupFollows = false;
@@ -369,11 +392,13 @@ public abstract class SparqlAstBuilder {
                 && depthBeforePop == selectWhereGroupDepths.peek()) {
             selectWhereGroupDepths.pop();
             List<PatternAst> popped = groupStack.pop();
+            bgpScopeIdStack.pop();
             getCurrentSelectFrame().whereClause = new GroupGraphPatternAst(popped);
             return;
         }
 
         List<PatternAst> popped = groupStack.pop();
+        bgpScopeIdStack.pop();
         GroupGraphPatternAst group = new GroupGraphPatternAst(popped);
         appendClosedGroup(group);
     }
@@ -382,23 +407,41 @@ public abstract class SparqlAstBuilder {
         if (!optionalGroupDepths.isEmpty() && groupStack.size() == optionalGroupDepths.peek()) {
             optionalGroupDepths.pop();
             currentGroup().add(new OptionalAst(group));
+            renewBgpScope();
         } else if (!minusGroupDepths.isEmpty() && groupStack.size() == minusGroupDepths.peek()) {
             minusGroupDepths.pop();
             currentGroup().add(new MinusAst(group));
+            renewBgpScope();
         } else if (!existsGroupDepths.isEmpty() && groupStack.size() == existsGroupDepths.peek()) {
             existsGroupDepths.pop();
             capturedExistsStack.push(group);
+            renewBgpScope();
         } else if (!serviceStack.isEmpty() && groupStack.size() == serviceStack.peek().groupDepth()) {
             ServiceEntry entry = serviceStack.pop();
             currentGroup().add(new ServiceAst(entry.endpoint(), entry.silent(), group));
+            renewBgpScope();
         } else if (!graphStack.isEmpty() && groupStack.size() == graphStack.peek().groupDepth()) {
             GraphEntry entry = graphStack.pop();
             currentGroup().add(new GraphAst(entry.name(), group));
+            renewBgpScope();
         } else if (groupStack.isEmpty()) {
             if (hasCurrentSelect()) getCurrentSelectFrame().whereClause = group;
             else whereClause = group;
         } else {
             currentGroup().add(group);
+            renewBgpScope();
+        }
+    }
+
+    /**
+     * Renews the BGP scope ID for the current (outer) group after a BGP-breaking pattern
+     * (OPTIONAL, UNION branch, GRAPH, SERVICE, MINUS, EXISTS, or plain nested group) has closed.
+     * Any subsequent triple patterns in the outer group belong to a fresh BGP.
+     */
+    private void renewBgpScope() {
+        if (!bgpScopeIdStack.isEmpty()) {
+            bgpScopeIdStack.pop();
+            bgpScopeIdStack.push(++bgpScopeCounter);
         }
     }
 
@@ -655,7 +698,18 @@ public abstract class SparqlAstBuilder {
             return newAnonymousBlankNode();
         }
         String label = ctx.getText();
-        blankNodeLabels.add(label);
+        int currentScope = bgpScopeIdStack.isEmpty() ? 0 : bgpScopeIdStack.peek();
+        Integer registeredScope = blankNodeLabelToBgpScope.get(label);
+        if (registeredScope != null) {
+            if (!registeredScope.equals(currentScope)) {
+                throw new QuerySyntaxException(
+                    "Blank node label '" + label + "' is used in more than one basic graph pattern, " +
+                    "which is not permitted by the SPARQL specification.");
+            }
+        } else {
+            blankNodeLabelToBgpScope.put(label, currentScope);
+            blankNodeLabels.add(label);
+        }
         return this.iri(label);
     }
 
