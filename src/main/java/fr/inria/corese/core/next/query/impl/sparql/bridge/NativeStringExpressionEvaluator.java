@@ -38,6 +38,7 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /** Evaluates SPARQL expressions that produce string literals. */
@@ -209,7 +210,8 @@ final class NativeStringExpressionEvaluator {
             throw new QueryTypeErrorException("REPLACE pattern must not match an empty string");
         }
         try {
-            String result = compiled.matcher(source.getLabel()).replaceAll(replacement);
+            String result = compiled.matcher(source.getLabel()).replaceAll(
+                    flags.contains("q") ? Matcher.quoteReplacement(replacement) : replacement);
             return stringLike(source, result, context);
         } catch (IndexOutOfBoundsException invalidGroup) {
             throw new QueryTypeErrorException("Invalid replacement group", invalidGroup);
@@ -260,21 +262,34 @@ final class NativeStringExpressionEvaluator {
         }
     }
 
+    @SuppressWarnings("MagicConstant")
     private static Pattern compilePattern(String expression, String flags) {
         int options = regexOptions(flags);
-        return Pattern.compile(flags.contains("x") ? removePatternWhitespace(expression) : expression, options);
+        String processed = expression;
+        if (flags.contains("q")) {
+            processed = Pattern.quote(expression);
+        } else if (flags.contains("x")) {
+            processed = removePatternWhitespace(expression);
+        }
+        return Pattern.compile(processed, options);
     }
 
+    /** XPath x ignores XML whitespace outside character classes, but does not introduce comments. */
     private static String removePatternWhitespace(String expression) {
-        StringBuilder result = new StringBuilder();
+        StringBuilder result = new StringBuilder(expression.length());
         boolean escaped = false;
         int brackets = 0;
         for (int index = 0; index < expression.length(); index++) {
             char character = expression.charAt(index);
+            if (brackets == 0 && " \t\r\n".indexOf(character) >= 0) {
+                continue;
+            }
             if (!escaped) {
-                if (character == '[') brackets++;
-                if (character == ']') brackets--;
-                if (brackets == 0 && " \t\r\n".indexOf(character) >= 0) continue;
+                if (character == '[') {
+                    brackets++;
+                } else if (character == ']' && brackets > 0) {
+                    brackets--;
+                }
             }
             result.append(character);
             escaped = !escaped && character == '\\';
@@ -282,8 +297,9 @@ final class NativeStringExpressionEvaluator {
         return result.toString();
     }
 
+    /** @return a combination of {@link Pattern} flag constants */
     private static int regexOptions(String flags) {
-        if (!flags.chars().allMatch(flag -> "imsx".indexOf(flag) >= 0)) {
+        if (!flags.chars().allMatch(flag -> "imsxq".indexOf(flag) >= 0)) {
             throw new QueryTypeErrorException("Invalid regular expression flags");
         }
         int options = 0;

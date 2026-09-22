@@ -16,6 +16,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /** Resolves SPARQL terms against one immutable query-prologue snapshot. */
 public final class SparqlTermResolver {
@@ -98,10 +99,35 @@ public final class SparqlTermResolver {
             return lexical;
         }
         String unquotedTriple = stripTripleQuotes(lexical);
-        if (unquotedTriple != null) {
-            return unquotedTriple;
+        return processSparqlEscapes(Objects.requireNonNullElseGet(unquotedTriple, () -> stripSingleQuotes(lexical)));
+    }
+
+    static String processSparqlEscapes(String s) {
+        if (s.indexOf('\\') < 0) {
+            return s;
         }
-        return stripSingleQuotes(lexical);
+        StringBuilder sb = new StringBuilder(s.length());
+        int i = 0;
+        while (i < s.length()) {
+            if (s.charAt(i) == '\\' && i + 1 < s.length()) {
+                i++;
+                switch (s.charAt(i)) {
+                    case 't' -> sb.append('\t');
+                    case 'n' -> sb.append('\n');
+                    case 'r' -> sb.append('\r');
+                    case 'b' -> sb.append('\b');
+                    case 'f' -> sb.append('\f');
+                    case '"' -> sb.append('"');
+                    case '\'' -> sb.append('\'');
+                    case '\\' -> sb.append('\\');
+                    default -> { sb.append('\\'); sb.append(s.charAt(i)); }
+                }
+            } else {
+                sb.append(s.charAt(i));
+            }
+            i++;
+        }
+        return sb.toString();
     }
 
     private static String stripTripleQuotes(String lexical) {
