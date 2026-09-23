@@ -63,6 +63,27 @@ class UpdateDatasetViewTest {
 
 
     @Test
+    @DisplayName("null context is redirected to the WITH graph without changing triple terms")
+    void nullContextIsRedirectedToDefaultGraph() {
+        IRI subject = FACTORY.createIRI(EX + "s");
+        IRI predicate = FACTORY.createIRI(EX + "p");
+        IRI object = FACTORY.createIRI(EX + "o");
+        StatementPattern pattern = StatementPattern.of(subject, predicate, object, (Resource) null);
+
+        try (var statements = view.find(pattern)) {
+            assertEquals(0, statements.count());
+        }
+
+        ArgumentCaptor<StatementPattern> captor = ArgumentCaptor.forClass(StatementPattern.class);
+        verify(queryOps).find(captor.capture());
+        StatementPattern forwarded = captor.getValue();
+        assertArrayEquals(new Resource[]{defaultGraph}, forwarded.getContexts());
+        assertEquals(subject, forwarded.getSubject());
+        assertEquals(predicate, forwarded.getPredicate());
+        assertEquals(object, forwarded.getObject());
+    }
+
+    @Test
     @DisplayName("pattern with a named context is passed through unchanged")
     void namedContextIsPassedThroughUnchanged() {
         IRI namedGraph = FACTORY.createIRI(EX + "named");

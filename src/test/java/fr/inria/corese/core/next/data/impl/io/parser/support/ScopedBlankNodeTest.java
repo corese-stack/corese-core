@@ -46,7 +46,7 @@ class ScopedBlankNodeTest {
         AbstractTurtleTriGListener l = listener();
         BNode b1 = l.scopedBlankNode("a");
         BNode b2 = l.scopedBlankNode("b");
-        assertNotSame(b1, b2,
+        assertNotEquals(b1, b2,
                 "different labels must map to distinct BNode instances");
     }
 
@@ -55,7 +55,7 @@ class ScopedBlankNodeTest {
     void separateListenersProduceDistinctBNodesForSameLabel() {
         BNode fromFirst = listener().scopedBlankNode("x");
         BNode fromSecond = listener().scopedBlankNode("x");
-        assertNotSame(fromFirst, fromSecond,
+        assertNotEquals(fromFirst, fromSecond,
                 "blank nodes from separate parse sessions must be distinct even when labels match");
     }
 }

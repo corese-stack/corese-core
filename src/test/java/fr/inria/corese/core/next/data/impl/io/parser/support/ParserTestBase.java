@@ -4,15 +4,14 @@ import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.next.data.Values;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.model.Model;
-import fr.inria.corese.core.next.data.api.model.Statement;
-import fr.inria.corese.core.next.data.api.term.BNode;
+import fr.inria.corese.core.next.data.impl.io.serializer.rdfc10.RDFC10Canonicalizer;
+import fr.inria.corese.core.next.data.impl.io.serializer.rdfc10.RDFC10SerializerOptions;
 import fr.inria.corese.core.next.storage.Storages;
 import fr.inria.corese.core.next.storage.api.config.StorageConfig;
 import fr.inria.corese.core.next.storage.impl.model.StorageModel;
 import org.junit.jupiter.api.BeforeEach;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Base class for parser and circular (round-trip) integration tests.
@@ -27,24 +26,17 @@ public abstract class ParserTestBase {
     }
 
     /**
-     * Asserts that two models are graph-isomorphic: same size, all non-bnode triples
-     * match exactly, and bnode-involving triples are accounted for by size equality.
-     *
-     * <p>Use this instead of {@code assertEquals(model1, model2)} when models may
-     * contain blank nodes, since re-parsed blank nodes receive fresh IDs that differ
-     * from the originals even when the graph structure is identical.</p>
+     * Compares canonical RDF datasets, preserving triples, graph contexts and blank-node
+     * structure while allowing blank-node identifiers to differ after parsing.
      */
     protected void assertModelsIsomorphic(Model original, Model deserialized) {
         assertEquals(original.size(), deserialized.size(), "Model sizes must match");
-        for (Statement stmt : original) {
-            boolean subjectIsBNode = stmt.getSubject() instanceof BNode;
-            boolean objectIsBNode = stmt.getObject() instanceof BNode;
-            if (!subjectIsBNode && !objectIsBNode) {
-                assertTrue(
-                        deserialized.contains(stmt.getSubject(), stmt.getPredicate(), stmt.getObject()),
-                        "Non-bnode triple missing from deserialized model: " + stmt);
-            }
-        }
+        RDFC10SerializerOptions options = RDFC10SerializerOptions.defaultConfig();
+        RDFC10Canonicalizer canonicalizer = new RDFC10Canonicalizer(
+                options.getHashAlgorithm(), options.getPermutationLimit(),
+                options.getDepthFactor(), Values.factory());
+        assertEquals(canonicalizer.canonicalize(original), canonicalizer.canonicalize(deserialized),
+                "Models must preserve RDF dataset structure, including graph contexts");
     }
 
     /**

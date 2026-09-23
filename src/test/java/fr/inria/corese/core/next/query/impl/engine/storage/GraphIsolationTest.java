@@ -108,7 +108,7 @@ class GraphIsolationTest {
             model.add(iri("s1"), iri("p"), iri("o1"), iri("g1"));
             model.add(iri("s2"), iri("p"), iri("o2"), iri("g2"));
         });
-        assertEquals(2, graphs.size(),
+        assertEquals(List.of(EX + "g1", EX + "g2"), graphs.stream().sorted().toList(),
                 "GRAPH ?g must bind to exactly the 2 named-graph IRIs");
     }
 

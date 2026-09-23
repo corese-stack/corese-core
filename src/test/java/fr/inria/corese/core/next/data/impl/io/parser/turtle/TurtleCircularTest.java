@@ -337,7 +337,6 @@ class TurtleCircularTest extends ParserTestBase {
         Model deserializedModel = performRoundTrip(originalModel);
 
         // Then: Blank node structure should be preserved (though IDs may differ)
-        // Note: Blank node equality is based on structure, not IDs
         assertModelsIsomorphic(originalModel, deserializedModel);
     }
 
