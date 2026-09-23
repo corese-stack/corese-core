@@ -14,6 +14,8 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.QueryPrologueAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 
+import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -206,8 +208,14 @@ public final class SparqlTermResolver {
         if (escape == 'u' || escape == 'U') {
             int length = escape == 'u' ? 4 : 8;
             if (escapeIndex + 1 + length <= value.length()) {
-                result.appendCodePoint(Integer.parseInt(
-                        value.substring(escapeIndex + 1, escapeIndex + 1 + length), 16));
+                int codePoint = Integer.parseInt(
+                        value.substring(escapeIndex + 1, escapeIndex + 1 + length), 16);
+                if (codePoint >= 0xD800 && codePoint <= 0xDFFF) {
+                    throw new QuerySyntaxException(
+                            "Surrogate code point U+" + Integer.toHexString(codePoint).toUpperCase()
+                            + " is not a valid Unicode scalar value in a SPARQL escape sequence");
+                }
+                result.appendCodePoint(codePoint);
                 return escapeIndex + 1 + length;
             }
         }

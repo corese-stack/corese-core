@@ -46,6 +46,11 @@ final class NativeValueComparison {
         if (isComparableCalendar(first, second)) {
             return compareLiterals(first, second) == 0;
         }
+        // Two calendar-type literals with different XSD types (e.g., xsd:date vs xsd:dateTime)
+        // are observably different RDF terms — different datatype IRIs imply they cannot be equal.
+        if (isCalendarType(first) && isCalendarType(second)) {
+            return false;
+        }
         throw new QueryTypeErrorException("RDF literal values are not equality-comparable");
     }
 
@@ -113,6 +118,13 @@ final class NativeValueComparison {
             return false;
         }
         return left.getCoreDatatype() instanceof XSDDatatype datatype && switch (datatype) {
+            case DATE, DATETIME, TIME -> true;
+            default -> false;
+        };
+    }
+
+    private static boolean isCalendarType(Literal literal) {
+        return literal.getCoreDatatype() instanceof XSDDatatype datatype && switch (datatype) {
             case DATE, DATETIME, TIME -> true;
             default -> false;
         };

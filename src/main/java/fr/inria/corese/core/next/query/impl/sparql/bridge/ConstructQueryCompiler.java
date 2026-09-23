@@ -76,15 +76,18 @@ final class ConstructQueryCompiler {
     /**
      * Resolves a template term to a runtime {@link Node}. A variable reuses the body node when it is
      * bound by the {@code WHERE}; otherwise it stays a fresh node (an unbound template variable is
-     * valid SPARQL and simply skips its triple at instantiation, so this does not throw). IRIs, blank
-     * nodes and literals become fresh constant nodes.
+     * valid SPARQL and simply skips its triple at instantiation, so this does not throw). Blank node
+     * labels become existential (blank-variable) nodes that generate a fresh blank node per solution,
+     * as required by the SPARQL specification. IRIs and literals become fresh constant nodes.
      */
     private static Node constructNode(Query query, TermAst term, WhereCompiler compiler) {
         if (term instanceof VarAst(String name)) {
             Node bound = visibleBodyNode(query, name);
             return bound != null ? bound : NodeImpl.forVariable(name);
         }
-        return compiler.termResolver().toNode(term);
+        // toPatternNode treats blank-node labels as existential variables (fresh per solution),
+        // while toNode would create constant blank nodes shared across all solutions.
+        return compiler.termResolver().toPatternNode(term);
     }
 
     private static Node visibleBodyNode(Query query, String name) {

@@ -38,12 +38,15 @@ import fr.inria.corese.core.next.query.impl.engine.storage.StorageManagerProduce
 import fr.inria.corese.core.next.storage.api.StorageManager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Internal orchestrator for the Corese-next SPARQL query path.
@@ -296,6 +299,9 @@ public final class NextSparqlPipelineExecutor {
      * Triples where any component is unbound or cannot be converted to a valid
      * RDF term are silently skipped, matching standard SPARQL CONSTRUCT semantics.</p>
      */
+    /** Counter for generating unique blank node labels in CONSTRUCT output. */
+    private static final AtomicLong CONSTRUCT_BNODE_COUNTER = new AtomicLong();
+
     private List<Statement> buildConstructStatements(Query kgramQuery, Mappings mappings) {
         List<Edge> templateEdges = new ArrayList<>();
         Exp constructTemplate = kgramQuery.getConstruct();
@@ -308,10 +314,12 @@ public final class NextSparqlPipelineExecutor {
         List<Statement> statements = new ArrayList<>();
 
         for (Mapping mapping : mappings) {
+            // Fresh blank node map per solution: blank-variable label → constant blank node
+            Map<String, Node> blankNodeMap = new HashMap<>();
             for (Edge templateEdge : templateEdges) {
-                Node subjectNode   = resolveTemplateNode(templateEdge.getNode(0), mapping);
-                Node predicateNode = resolveTemplateNode(templateEdge.getProperty(), mapping);
-                Node objectNode    = resolveTemplateNode(templateEdge.getNode(1), mapping);
+                Node subjectNode   = resolveTemplateNode(templateEdge.getNode(0), mapping, blankNodeMap);
+                Node predicateNode = resolveTemplateNode(templateEdge.getProperty(), mapping, blankNodeMap);
+                Node objectNode    = resolveTemplateNode(templateEdge.getNode(1), mapping, blankNodeMap);
 
                 if (subjectNode == null || predicateNode == null || objectNode == null) {
                     continue;
@@ -330,16 +338,27 @@ public final class NextSparqlPipelineExecutor {
     }
 
     /**
-     * Resolves a CONSTRUCT template node: if the node is a variable, look it up in
-     * the current mapping; if it is already a constant, return it directly.
+     * Resolves a CONSTRUCT template node:
+     * <ul>
+     *   <li>Blank-variable nodes (existential blank nodes like {@code _:b0}) are
+     *       resolved to a per-solution constant blank node, so that every occurrence
+     *       of the same label within one solution maps to the same blank node.</li>
+     *   <li>Regular variable nodes are looked up in the current mapping.</li>
+     *   <li>Constant nodes are returned as-is.</li>
+     * </ul>
      *
-     * @return the bound or constant node, or {@code null} when a variable is unbound
+     * @return the resolved node, or {@code null} when a regular variable is unbound
      */
-    private Node resolveTemplateNode(Node templateNode, Mapping mapping) {
+    private Node resolveTemplateNode(Node templateNode, Mapping mapping, Map<String, Node> blankNodeMap) {
         if (templateNode == null) {
             return null;
         }
         if (templateNode.isVariable()) {
+            if (templateNode.isBlank()) {
+                // Existential blank node: fresh blank per solution, same label → same node
+                return blankNodeMap.computeIfAbsent(templateNode.getLabel(),
+                        label -> NodeImpl.forBlank("cb" + CONSTRUCT_BNODE_COUNTER.getAndIncrement()));
+            }
             return mapping.getNode(templateNode);
         }
         return templateNode;

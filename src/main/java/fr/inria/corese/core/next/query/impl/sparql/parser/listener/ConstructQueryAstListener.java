@@ -68,11 +68,71 @@ public class ConstructQueryAstListener extends AbstractSparqlAstListener impleme
         if (!inConstructTriples && !inConstructWhere) {
             return;
         }
-        if (ctx.varOrTerm() == null || ctx.propertyListNotEmpty() == null) {
-            return;
+        if (ctx.varOrTerm() != null && ctx.propertyListNotEmpty() != null) {
+            TermAst subject = queryBuilder().termFromVarOrTerm(ctx.varOrTerm());
+            addConstructProperties(subject, ctx.propertyListNotEmpty(), inConstructWhere);
+        } else if (ctx.triplesNode() != null) {
+            TermAst subject = subjectFromTriplesNode(ctx.triplesNode(), inConstructWhere);
+            if (ctx.propertyList() != null && ctx.propertyList().propertyListNotEmpty() != null) {
+                addConstructProperties(subject, ctx.propertyList().propertyListNotEmpty(), inConstructWhere);
+            }
         }
-        TermAst subject = queryBuilder().termFromVarOrTerm(ctx.varOrTerm());
-        var propertyList = ctx.propertyListNotEmpty();
+    }
+
+    /**
+     * Expands a {@code triplesNode} into the CONSTRUCT template (and optionally the WHERE BGP),
+     * returning the head term (an anonymous blank node for blank node property lists).
+     */
+    private TermAst subjectFromTriplesNode(SparqlParser.TriplesNodeContext ctx, boolean inConstructWhere) {
+        if (ctx.blankNodePropertyList() != null) {
+            TermAst blankNode = queryBuilder().newAnonymousBlankNode();
+            var inner = ctx.blankNodePropertyList().propertyListNotEmpty();
+            if (inner != null) {
+                addConstructProperties(blankNode, inner, inConstructWhere);
+            }
+            return blankNode;
+        }
+        if (ctx.collection() != null) {
+            return subjectFromCollection(ctx.collection(), inConstructWhere);
+        }
+        return queryBuilder().iri(ctx.getText());
+    }
+
+    /**
+     * Expands an RDF collection {@code (e1 e2 ...)} into rdf:first/rdf:rest chains
+     * in the CONSTRUCT template and returns the head blank node.
+     */
+    private TermAst subjectFromCollection(SparqlParser.CollectionContext ctx, boolean inConstructWhere) {
+        var nodes = ctx.graphNode();
+        if (nodes.isEmpty()) {
+            return queryBuilder().iri("<http://www.w3.org/1999/02/22-rdf-syntax-ns#nil>");
+        }
+        TermAst first = queryBuilder().iri("<http://www.w3.org/1999/02/22-rdf-syntax-ns#first>");
+        TermAst rest = queryBuilder().iri("<http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>");
+        TermAst nil = queryBuilder().iri("<http://www.w3.org/1999/02/22-rdf-syntax-ns#nil>");
+        TermAst head = queryBuilder().newAnonymousBlankNode();
+        TermAst current = head;
+        for (int i = 0; i < nodes.size(); i++) {
+            TermAst element = queryBuilder().termFromGraphNode(nodes.get(i));
+            queryBuilder().addConstructTriple(current, first, element);
+            if (inConstructWhere) queryBuilder().addTriple(current, first, element);
+            if (i == nodes.size() - 1) {
+                queryBuilder().addConstructTriple(current, rest, nil);
+                if (inConstructWhere) queryBuilder().addTriple(current, rest, nil);
+            } else {
+                TermAst next = queryBuilder().newAnonymousBlankNode();
+                queryBuilder().addConstructTriple(current, rest, next);
+                if (inConstructWhere) queryBuilder().addTriple(current, rest, next);
+                current = next;
+            }
+        }
+        return head;
+    }
+
+    private void addConstructProperties(
+            TermAst subject,
+            SparqlParser.PropertyListNotEmptyContext propertyList,
+            boolean inConstructWhere) {
         for (int verbIndex = 0; verbIndex < propertyList.verb().size(); verbIndex++) {
             TermAst predicate = queryBuilder().termFromVerb(propertyList.verb(verbIndex));
             List<TermAst> objects = queryBuilder().termListFromObjectList(propertyList.objectList(verbIndex));
