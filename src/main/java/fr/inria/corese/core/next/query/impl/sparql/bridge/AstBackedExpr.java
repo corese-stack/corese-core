@@ -22,12 +22,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 /** Immutable KGRAM expression backed directly by a Corese-next AST term. */
 public final class AstBackedExpr implements Expr {
 
     private final TermAst source;
     private final WhereCompiler whereCompiler;
+    /**
+     * Snapshot of the enclosing group's in-scope variables, captured at filter
+     * creation time so that {@link NextFilterFromAst#getVariables()} reports the
+     * correct scheduling dependencies even after {@code WhereCompiler} has moved
+     * to a different scope (e.g., after returning from a MINUS body).
+     */
+    private final Set<String> capturedInScope;
     private final NextFilterFromAst filterView;
     private int index = ExprType.UNBOUND;
     private int subtype = ExprType.GLOBAL;
@@ -41,6 +49,9 @@ public final class AstBackedExpr implements Expr {
     AstBackedExpr(TermAst source, WhereCompiler whereCompiler) {
         this.source = Objects.requireNonNull(source, "source");
         this.whereCompiler = whereCompiler;
+        this.capturedInScope = (whereCompiler != null)
+                ? Set.copyOf(whereCompiler.inScopeVariables())
+                : Set.of();
         this.operator = operator(source);
         this.filterView = new NextFilterFromAst(this);
     }
@@ -51,6 +62,11 @@ public final class AstBackedExpr implements Expr {
 
     WhereCompiler whereCompiler() {
         return whereCompiler;
+    }
+
+    /** Returns the in-scope variables as they were when this expression was compiled. */
+    Set<String> capturedInScope() {
+        return capturedInScope;
     }
 
     @Override
