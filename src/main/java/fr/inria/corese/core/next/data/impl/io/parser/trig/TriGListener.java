@@ -533,7 +533,7 @@ public class TriGListener extends TriGBaseListener {
         }
 
         public Resource createBNode(String id) {
-            return factory.createBNode(id);
+            return scopedBlankNode(id);
         }
 
         public IRI createIRI(String iri) {

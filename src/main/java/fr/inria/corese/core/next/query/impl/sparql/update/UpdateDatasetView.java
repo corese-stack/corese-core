@@ -24,11 +24,20 @@ import java.util.stream.Stream;
 record UpdateDatasetView(StorageManager storage, Resource defaultGraph) implements StorageManager, QueryOperations {
     @Override
     public Stream<Statement> find(StatementPattern pattern) {
-        if (pattern.getContexts().length == 0) {
+        if (isDefaultGraphPattern(pattern)) {
             return storage.queries().find(StatementPattern.of(pattern.getSubject(), pattern.getPredicate(),
                     pattern.getObject(), defaultGraph));
         }
         return storage.queries().find(pattern);
+    }
+
+    /**
+     * Returns {@code true} when the pattern targets the default graph.
+     */
+    private static boolean isDefaultGraphPattern(StatementPattern pattern) {
+        Resource[] contexts = pattern.getContexts();
+        return contexts.length == 0
+                || (contexts.length == 1 && contexts[0] == null);
     }
 
     @Override

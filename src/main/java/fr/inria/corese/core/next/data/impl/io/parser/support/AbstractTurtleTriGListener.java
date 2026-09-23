@@ -1,14 +1,17 @@
 package fr.inria.corese.core.next.data.impl.io.parser.support;
 
-import fr.inria.corese.core.next.data.api.term.*;
-import fr.inria.corese.core.next.data.api.model.*;
+import fr.inria.corese.core.next.common.text.RdfText;
+import fr.inria.corese.core.next.data.api.exception.ParsingException;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
+import fr.inria.corese.core.next.data.api.model.Model;
+import fr.inria.corese.core.next.data.api.term.*;
+import fr.inria.corese.core.next.data.api.vocabulary.RDF;
 import fr.inria.corese.core.next.data.impl.namespace.PrefixHandler;
 import fr.inria.corese.core.next.data.spi.term.IRIUtils;
-import fr.inria.corese.core.next.data.api.vocabulary.RDF;
-import fr.inria.corese.core.next.data.api.exception.ParsingException;
-import fr.inria.corese.core.next.common.text.RdfText;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static fr.inria.corese.core.next.data.spi.term.IRIUtils.isAbsoluteIRI;
 import static fr.inria.corese.core.next.data.spi.term.IRIUtils.normalizeURI;
@@ -31,6 +34,11 @@ public abstract class AbstractTurtleTriGListener {
     public IRI currentPredicate;
 
     /**
+     * Per-document blank-node scope.
+     */
+    private final Map<String, BNode> blankNodeScope = new HashMap<>();
+
+    /**
      * Constructs a parser listener with the specified model, factory and base URI.
      *
      * @param model   RDF model to populate with parsed statements
@@ -44,6 +52,20 @@ public abstract class AbstractTurtleTriGListener {
         this.prefixHandler = new PrefixHandler(true);
 
         initializeBasePrefix();
+    }
+
+    /**
+     * Returns the blank node for the given Turtle/TriG label, creating a fresh one on first use.
+     *
+     * <p>Using this method instead of {@code factory.createBNode(label)} ensures that blank-node
+     * labels are scoped to this parse session: the same label always maps to the same blank node
+     * within one document, but maps to a <em>different</em> blank node in every other document.</p>
+     *
+     * @param label the raw blank-node label (without the {@code _:} prefix)
+     * @return the document-scoped blank node for {@code label}
+     */
+    public BNode scopedBlankNode(String label) {
+        return blankNodeScope.computeIfAbsent(label, k -> factory.createBNode());
     }
 
     /**
