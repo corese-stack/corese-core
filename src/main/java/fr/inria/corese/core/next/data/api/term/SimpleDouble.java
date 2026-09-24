@@ -41,7 +41,7 @@ public final class SimpleDouble extends AbstractNumber {
     public SimpleDouble(String lexicalValue, IRI datatype, CoreDatatype coreDatatype) {
         super(datatype == null ? XSDDatatype.DOUBLE.getIRI() : datatype);
         this.label = Objects.requireNonNull(lexicalValue, "lexicalValue");
-        this.value = parseXsdDouble(this.label);
+        this.value = parseXsdDouble(lexicalValue);
         CoreDatatype resolved = coreDatatype != null ? coreDatatype : CoreDatatypes.from(this.datatype);
         this.coreDatatype = (resolved == XSDDatatype.FLOAT || resolved == XSDDatatype.DOUBLE) ? resolved : XSDDatatype.DOUBLE;
     }
@@ -55,7 +55,7 @@ public final class SimpleDouble extends AbstractNumber {
         };
     }
 
-@Override
+    @Override
     public String getLabel() {
         return label;
     }
