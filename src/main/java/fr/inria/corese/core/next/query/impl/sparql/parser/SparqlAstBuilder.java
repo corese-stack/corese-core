@@ -66,6 +66,22 @@ public abstract class SparqlAstBuilder {
      */
     private final Set<String> blankNodeLabels = new HashSet<>();
 
+    /** Unique IDs for basic graph patterns, including those in nested groups. */
+    private int bgpScopeCounter;
+
+    /**
+     * Current BGP scope at each group depth. FILTER preserves the enclosing scope,
+     * including when its expression contains EXISTS or NOT EXISTS. Other graph
+     * patterns, BIND, and inline VALUES end the preceding BGP.
+     */
+    private final Deque<Integer> bgpScopeIdStack = new ArrayDeque<>();
+
+    /**
+     * First BGP using each explicit label. Shared across subqueries and update
+     * WHERE clauses, but excludes CONSTRUCT and update templates.
+     */
+    private final Map<String, Integer> blankNodeLabelToBgpScope = new HashMap<>();
+
     /**
      * Stack of currently open SELECT operations (top-level SELECT and nested SELECT subqueries).
      */
@@ -345,6 +361,7 @@ public abstract class SparqlAstBuilder {
      */
     public void enterGroup() {
         groupStack.push(new ArrayList<>());
+        bgpScopeIdStack.push(++bgpScopeCounter);
         if (selectWhereGroupFollows && hasCurrentSelect()) {
             selectWhereGroupDepths.push(groupStack.size());
             selectWhereGroupFollows = false;
@@ -369,11 +386,13 @@ public abstract class SparqlAstBuilder {
                 && depthBeforePop == selectWhereGroupDepths.peek()) {
             selectWhereGroupDepths.pop();
             List<PatternAst> popped = groupStack.pop();
+            bgpScopeIdStack.pop();
             getCurrentSelectFrame().whereClause = new GroupGraphPatternAst(popped);
             return;
         }
 
         List<PatternAst> popped = groupStack.pop();
+        bgpScopeIdStack.pop();
         GroupGraphPatternAst group = new GroupGraphPatternAst(popped);
         appendClosedGroup(group);
     }
@@ -388,6 +407,8 @@ public abstract class SparqlAstBuilder {
         } else if (!existsGroupDepths.isEmpty() && groupStack.size() == existsGroupDepths.peek()) {
             existsGroupDepths.pop();
             capturedExistsStack.push(group);
+            // An expression's graph pattern does not end the enclosing BGP.
+            return;
         } else if (!serviceStack.isEmpty() && groupStack.size() == serviceStack.peek().groupDepth()) {
             ServiceEntry entry = serviceStack.pop();
             currentGroup().add(new ServiceAst(entry.endpoint(), entry.silent(), group));
@@ -397,8 +418,18 @@ public abstract class SparqlAstBuilder {
         } else if (groupStack.isEmpty()) {
             if (hasCurrentSelect()) getCurrentSelectFrame().whereClause = group;
             else whereClause = group;
+            return;
         } else {
             currentGroup().add(group);
+        }
+        renewBgpScope();
+    }
+
+    /** Starts a fresh BGP after a non-FILTER graph pattern in the current group. */
+    private void renewBgpScope() {
+        if (!bgpScopeIdStack.isEmpty()) {
+            bgpScopeIdStack.pop();
+            bgpScopeIdStack.push(++bgpScopeCounter);
         }
     }
 
@@ -458,6 +489,7 @@ public abstract class SparqlAstBuilder {
             throw new IllegalStateException("addInlineValues() called outside of a group graph pattern");
         }
         currentGroup().add(values);
+        renewBgpScope();
     }
 
     /**
@@ -483,6 +515,7 @@ public abstract class SparqlAstBuilder {
                     "Variable ?" + name + " used in BIND is already declared in the same group graph pattern");
         }
         group.add(bind);
+        renewBgpScope();
     }
 
     // --- Optional ---
@@ -656,6 +689,18 @@ public abstract class SparqlAstBuilder {
         }
         String label = ctx.getText();
         blankNodeLabels.add(label);
+        // Templates are built outside graph-pattern groups. Their labels are
+        // independent of WHERE labels; update-template restrictions are checked
+        // separately by UpdateTemplateValidator. CONSTRUCT WHERE opens a group
+        // explicitly, so its abbreviated WHERE still participates in this check.
+        if (!bgpScopeIdStack.isEmpty()) {
+            Integer currentScope = bgpScopeIdStack.peek();
+            Integer registeredScope = blankNodeLabelToBgpScope.putIfAbsent(label, currentScope);
+            if (registeredScope != null && !registeredScope.equals(currentScope)) {
+                throw new QuerySyntaxException(
+                        "Blank node label '" + label + "' is used in more than one basic graph pattern");
+            }
+        }
         return this.iri(label);
     }
 

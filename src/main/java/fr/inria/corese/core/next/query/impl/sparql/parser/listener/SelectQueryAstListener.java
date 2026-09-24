@@ -1,6 +1,8 @@
 package fr.inria.corese.core.next.query.impl.sparql.parser.listener;
 
+import fr.inria.corese.core.next.common.text.RdfText;
 import fr.inria.corese.core.next.generated.antlr.SparqlParser;
+import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.impl.sparql.parser.SparqlAstBuilder;
 import fr.inria.corese.core.next.query.impl.sparql.parser.SparqlQueryAstBuilder;
 import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.VariableScopeAnalyzer;
@@ -8,6 +10,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -83,23 +86,29 @@ public class SelectQueryAstListener extends AbstractSparqlAstListener implements
             queryBuilder().setProjectionAll();
             return;
         }
-        List<String> allVars = new ArrayList<>();
+        Set<String> projectedVariables = new LinkedHashSet<>();
         List<String> expressionBoundVars = new ArrayList<>();
         Map<String, TermAst> expressionTerms = new LinkedHashMap<>();
         Map<String, Set<String>> expressionReferencedVariables = new LinkedHashMap<>();
         for (SparqlParser.SelectVarContext selectVar : ctx.selectVar()) {
             if (selectVar.expression() != null) {
                 // (expr AS ?var) — introduces a new variable, not projected from WHERE
-                String varName = selectVar.var_().getText();
-                allVars.add(varName);
+                String varName = RdfText.stripVariableMarker(selectVar.var_().getText());
+                if (!projectedVariables.add(varName)) {
+                    throw new QuerySyntaxException(
+                        "Variable ?" + varName + " introduced by SELECT expression is already projected");
+                }
                 expressionBoundVars.add(varName);
                 TermAst expressionAst = builder().termFromExpression(selectVar.expression());
                 expressionTerms.put(varName, expressionAst);
                 expressionReferencedVariables.put(varName, variableScopeAnalyzer.collectReferencedVariables(expressionAst));
             } else if (selectVar.var_() != null) {
-                allVars.add(selectVar.var_().getText());
+                String varName = RdfText.stripVariableMarker(selectVar.var_().getText());
+                // SPARQL 1.1 section 18.2.4.4 accumulates plain variables in a set.
+                // A later plain reference to an earlier alias is also permitted.
+                projectedVariables.add(varName);
             }
         }
-        queryBuilder().setProjectionVariables(allVars, expressionBoundVars, expressionTerms, expressionReferencedVariables);
+        queryBuilder().setProjectionVariables(new ArrayList<>(projectedVariables), expressionBoundVars, expressionTerms, expressionReferencedVariables);
     }
 }
