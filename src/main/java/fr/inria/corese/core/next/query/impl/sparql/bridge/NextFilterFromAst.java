@@ -24,13 +24,13 @@ public final class NextFilterFromAst implements Filter {
     @Override
     public List<String> getVariables() {
         // Scheduling dependencies include variables inside EXISTS patterns (including
-        // GRAPH names and inner FILTERs) only if they are bound in the enclosing query scope.
+        // GRAPH names and inner FILTERs) only if they are bound in the enclosing group scope.
+        // The scope is captured at filter creation time so that nested scopes (e.g. inside
+        // a MINUS body) are used rather than the outer WHERE scope.
         // Purely local/existential variables of EXISTS must not be declared, so they do not
         // cause postponement of the filter in OPTIONAL patterns (KGRAM Exp.optional/simpleBind).
         Set<String> names = new LinkedHashSet<>();
-        Set<String> inScope = (owner.whereCompiler() != null)
-                ? owner.whereCompiler().inScopeVariables()
-                : Set.of();
+        Set<String> inScope = owner.capturedInScope();
         boolean recExist = owner.isRecExist();
         owner.sourceAst().orElseThrow().accept(new AbstractAstVisitor() {
             @Override

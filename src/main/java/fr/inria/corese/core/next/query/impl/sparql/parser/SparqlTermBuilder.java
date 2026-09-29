@@ -4,6 +4,7 @@ import fr.inria.corese.core.next.data.api.vocabulary.RDF;
 import fr.inria.corese.core.next.data.api.vocabulary.XSD;
 import fr.inria.corese.core.next.generated.antlr.SparqlParser;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
+import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
@@ -91,7 +92,48 @@ public final class SparqlTermBuilder {
      */
     public LiteralAst literal(String lexical, String lang, String datatype) {
         if (lexical == null) throw new IllegalArgumentException("Literal lexical is null");
+        validateNoSurrogateUchars(lexical);
         return new LiteralAst(lexical, lang, datatype);
+    }
+
+    /**
+     * Scans a raw literal lexical form (including surrounding quotes) for
+     * escape sequences that encode Unicode surrogate code points (U+D800–U+DFFF),
+     * which are illegal in SPARQL and XML.
+     *
+     * @throws QuerySyntaxException if a surrogate code point is found
+     */
+    private static void validateNoSurrogateUchars(String lexical) {
+        int i = 0;
+        while (i < lexical.length()) {
+            char c = lexical.charAt(i);
+            if (c == '\\' && i + 1 < lexical.length()) {
+                char next = lexical.charAt(i + 1);
+                if (next == '\\') {
+                    i += 2;
+                    continue;
+                }
+                int hexLen = 0;
+                if (next == 'u') hexLen = 4;
+                else if (next == 'U') hexLen = 8;
+                if (hexLen > 0 && i + 2 + hexLen <= lexical.length()) {
+                    String hex = lexical.substring(i + 2, i + 2 + hexLen);
+                    try {
+                        int codePoint = Integer.parseInt(hex, 16);
+                        if (codePoint >= 0xD800 && codePoint <= 0xDFFF) {
+                            throw new QuerySyntaxException(
+                                    "Surrogate code point U+" + hex.toUpperCase()
+                                    + " is not a valid Unicode scalar value in a SPARQL escape sequence");
+                        }
+                    } catch (NumberFormatException ignored) {
+                        // Not a valid hex sequence; ANTLR grammar ensures this won't happen for UCHAR
+                    }
+                    i += 2 + hexLen;
+                    continue;
+                }
+            }
+            i++;
+        }
     }
 
     // --- ANTLR-context converters ---
@@ -235,8 +277,8 @@ public final class SparqlTermBuilder {
             return blankNodeResolver.apply(ctx.blankNode());
         }
         if (ctx.NIL() != null) {
-            return iri("()");
-        } // NIL = () in SPARQL
+            return iri("<" + RDF.nil.getIRI().stringValue() + ">");
+        } // NIL = rdf:nil
         return iri(ctx.getText());
     }
 

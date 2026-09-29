@@ -32,6 +32,8 @@ import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 
+import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.VariableScopeAnalyzer;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.IdentityHashMap;
@@ -141,7 +143,16 @@ public final class WhereCompiler {
                 }
                 case MinusAst(GroupGraphPatternAst pattern) -> {
                     Exp left = body;
+                    // Use MINUS body scope so EXISTS filters inside see local variables
+                    // (e.g. ?x from "?s1 :member ?x" inside the MINUS body) and are
+                    // scheduled after those variables are bound, not before.
+                    Set<String> outerScope = inScopeVariables;
+                    if (!outerScope.isEmpty()) {
+                        inScopeVariables = Set.copyOf(
+                                new VariableScopeAnalyzer().collectVisibleVariables(pattern));
+                    }
                     Exp right = compile(pattern);
+                    inScopeVariables = outerScope;
                     Exp minusExp = Exp.create(Type.MINUS, left, right);
                     body = Exp.create(Type.AND);
                     body.add(minusExp);

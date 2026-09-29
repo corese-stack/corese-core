@@ -38,8 +38,12 @@ import fr.inria.corese.core.next.query.impl.engine.storage.StorageManagerProduce
 import fr.inria.corese.core.next.storage.api.StorageManager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
@@ -307,11 +311,22 @@ public final class NextSparqlPipelineExecutor {
         ValueFactory factory = Values.factory();
         List<Statement> statements = new ArrayList<>();
 
+        // Reserve every solution’s labels before instantiation, including later solutions.
+        Set<String> usedBlankLabels = new HashSet<>();
         for (Mapping mapping : mappings) {
+            for (Node node : mapping.getNodes()) {
+                if (node != null && node.isBlank()) {
+                    usedBlankLabels.add(node.getLabel());
+                }
+            }
+        }
+        for (Mapping mapping : mappings) {
+            // Fresh blank node map per solution: blank-variable label → constant blank node
+            Map<String, Node> blankNodeMap = new HashMap<>();
             for (Edge templateEdge : templateEdges) {
-                Node subjectNode   = resolveTemplateNode(templateEdge.getNode(0), mapping);
-                Node predicateNode = resolveTemplateNode(templateEdge.getProperty(), mapping);
-                Node objectNode    = resolveTemplateNode(templateEdge.getNode(1), mapping);
+                Node subjectNode   = resolveTemplateNode(templateEdge.getNode(0), mapping, blankNodeMap, usedBlankLabels);
+                Node predicateNode = resolveTemplateNode(templateEdge.getProperty(), mapping, blankNodeMap, usedBlankLabels);
+                Node objectNode    = resolveTemplateNode(templateEdge.getNode(1), mapping, blankNodeMap, usedBlankLabels);
 
                 if (subjectNode == null || predicateNode == null || objectNode == null) {
                     continue;
@@ -330,16 +345,35 @@ public final class NextSparqlPipelineExecutor {
     }
 
     /**
-     * Resolves a CONSTRUCT template node: if the node is a variable, look it up in
-     * the current mapping; if it is already a constant, return it directly.
+     * Resolves a CONSTRUCT template node:
+     * <ul>
+     *   <li>Blank-variable nodes (existential blank nodes like {@code _:b0}) are
+     *       resolved to a per-solution constant blank node, so that every occurrence
+     *       of the same label within one solution maps to the same blank node.</li>
+     *   <li>Regular variable nodes are looked up in the current mapping.</li>
+     *   <li>Constant nodes are returned as-is.</li>
+     * </ul>
      *
-     * @return the bound or constant node, or {@code null} when a variable is unbound
+     * @return the resolved node, or {@code null} when a regular variable is unbound
      */
-    private Node resolveTemplateNode(Node templateNode, Mapping mapping) {
+    private Node resolveTemplateNode(
+            Node templateNode, Mapping mapping,
+            Map<String, Node> blankNodeMap, Set<String> usedBlankLabels) {
         if (templateNode == null) {
             return null;
         }
         if (templateNode.isVariable()) {
+            if (templateNode.isBlank()) {
+                // Existential blank node: fresh blank per solution, same label → same node
+                return blankNodeMap.computeIfAbsent(templateNode.getLabel(),
+                        label -> {
+                            Node blank;
+                            do {
+                                blank = NodeImpl.forValue(Values.factory().createBNode());
+                            } while (!usedBlankLabels.add(blank.getLabel()));
+                            return blank;
+                        });
+            }
             return mapping.getNode(templateNode);
         }
         return templateNode;
