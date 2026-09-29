@@ -84,16 +84,17 @@ public final class WhereCompiler {
      */
     public Exp compile(GroupGraphPatternAst where) {
         Objects.requireNonNull(where, "where");
-        if (inScopeVariables.isEmpty()) {
-            inScopeVariables = Set.copyOf(
-                    new fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.VariableScopeAnalyzer()
-                            .collectVisibleVariables(where));
-        }
         Exp cached = compiledPatternCache.get(where);
         if (cached != null) {
             return cached;
         }
-        Exp compiled = compileGroup(where);
+        GroupGraphPatternAst simplified = new AstSimplifier().simplify(where);
+        if (inScopeVariables.isEmpty()) {
+            inScopeVariables = Set.copyOf(
+                    new fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.VariableScopeAnalyzer()
+                            .collectVisibleVariables(simplified));
+        }
+        Exp compiled = compileGroup(simplified);
         compiledPatternCache.put(where, compiled);
         return compiled;
     }
@@ -158,7 +159,8 @@ public final class WhereCompiler {
                     body.add(minusExp);
                 }
                 case GroupGraphPatternAst nested -> {
-                    Exp joined = Exp.create(Type.JOIN, body, compile(nested));
+                    Exp compiledNested = compile(nested);
+                    Exp joined = Exp.create(Type.JOIN, body, compiledNested);
                     body = Exp.create(Type.AND);
                     body.add(joined);
                 }
