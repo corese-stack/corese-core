@@ -111,6 +111,65 @@ class NextSparqlPipelineAggregateExecutorTest extends PipelineTestSupport {
     }
 
     @Test
+    @DisplayName("Issue #264: MIN uses SPARQL ORDER BY ordering where IRIs precede literals")
+    void minAggregateUsesSparqlOrderWhereIrisPrecedeLiterals() {
+        try (var result = executor.evaluateTuple("""
+                SELECT (MIN(?x) AS ?a) WHERE {
+                    VALUES ?x { 3 <x:1> 4 <x:2> }
+                }
+                """)) {
+            assertTrue(result.hasNext());
+            var row = result.next();
+            assertEquals("x:1", row.getValue("a").stringValue());
+            assertFalse(result.hasNext());
+        }
+    }
+
+    @Test
+    @DisplayName("Issue #17 & #161: Subquery with GROUP BY evaluates consistently regardless of pattern position")
+    void subqueryWithGroupByEvaluatesConsistently() {
+        String nsP = "http://ns.inria.fr/test/p";
+        String nsQ = "http://ns.inria.fr/test/q";
+        String a = "http://ns.inria.fr/test/a";
+        String b = "http://ns.inria.fr/test/b";
+        String c = "http://ns.inria.fr/test/c";
+        String d = "http://ns.inria.fr/test/d";
+
+        insert(iri(a), iri(nsP), iri(b));
+        insert(iri(c), iri(nsQ), iri(d));
+
+        String queryBefore = """
+                PREFIX ns: <http://ns.inria.fr/test/>
+                SELECT * WHERE {
+                    ?x ns:p ?y
+                    {
+                        SELECT ?x (COUNT(*) AS ?c) WHERE {
+                            ?x ns:q ?z
+                        } GROUP BY ?x
+                    }
+                }
+                """;
+
+        String queryAfter = """
+                PREFIX ns: <http://ns.inria.fr/test/>
+                SELECT * WHERE {
+                    {
+                        SELECT ?x (COUNT(*) AS ?c) WHERE {
+                            ?x ns:q ?z
+                        } GROUP BY ?x
+                    }
+                    ?x ns:p ?y
+                }
+                """;
+
+        try (var resBefore = executor.evaluateTuple(queryBefore);
+             var resAfter = executor.evaluateTuple(queryAfter)) {
+            assertFalse(resBefore.hasNext(), "Expected 0 results for queryBefore");
+            assertFalse(resAfter.hasNext(), "Expected 0 results for queryAfter");
+        }
+    }
+
+    @Test
     @DisplayName("GROUP_CONCAT aggregates strings with custom separator")
     void groupConcatAggregate() {
         String tag = "http://example.org/tag";
