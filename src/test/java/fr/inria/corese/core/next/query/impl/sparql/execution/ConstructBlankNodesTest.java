@@ -158,4 +158,66 @@ class ConstructBlankNodesTest extends PipelineTestSupport {
         assertNotNull(stmts.getFirst().getSubject());
         assertNotNull(stmts.getFirst().getObject());
     }
+
+    @Test
+    void generatedBlankNodesDoNotAliasDatasetNodes() {
+        for (int i = 0; i < 32; i++) {
+            insert(valueFactory.createBNode("cb" + i), iri(KNOWS), iri(BOB));
+        }
+        var statements = collect("CONSTRUCT { _:b <http://example.org/link> ?s } WHERE { ?s ?p ?o }");
+        for (Statement statement : statements) {
+            assertNotEquals(statement.getSubject(), statement.getObject());
+        }
+        assertEquals(statements.size(), statements.stream().map(Statement::getSubject).distinct().count());
+    }
+
+    @Test
+    void expandsNestedCollections() {
+        var statements = collect("CONSTRUCT { ((<http://example.org/a>)) <http://example.org/p> <http://example.org/o> } WHERE {}");
+        assertEquals(5, statements.size());
+        var firstValues = statements.stream()
+                .filter(s -> s.getPredicate().stringValue().endsWith("#first"))
+                .map(Statement::getObject).toList();
+        assertEquals(2, firstValues.size());
+        assertTrue(firstValues.contains(iri("http://example.org/a")));
+        assertEquals(1, firstValues.stream().filter(BNode.class::isInstance).count());
+    }
+
+    @Test
+    void expandsNestedPropertyListsInObjectPosition() {
+        var statements = collect("CONSTRUCT { <http://example.org/s> <http://example.org/p> [ <http://example.org/q> [ <http://example.org/r> 1 ] ] } WHERE {}");
+        assertEquals(3, statements.size());
+        var outer = statements.stream().filter(s -> s.getSubject().equals(iri("http://example.org/s"))).findFirst().orElseThrow();
+        var middle = statements.stream().filter(s -> s.getSubject().equals(outer.getObject())).findFirst().orElseThrow();
+        assertInstanceOf(BNode.class, middle.getObject());
+        assertTrue(statements.stream().anyMatch(s -> s.getSubject().equals(middle.getObject())));
+    }
+
+    @Test
+    void decodesUnicodeIriInTemplateAndWhere() {
+        var statements = collect("CONSTRUCT { ?s <http://example.org/\\u0041> ?o } WHERE { ?s <http://example.org/\\u006bnows> ?o }");
+        assertEquals(2, statements.size());
+        assertTrue(statements.stream().allMatch(s -> s.getPredicate().equals(iri("http://example.org/A"))));
+    }
+
+    @Test
+    void preservesEscapedBackslashBeforeSurrogateText() {
+        var statements = collect("CONSTRUCT { <http://example.org/s> <http://example.org/p> \"\\\\uD800\" } WHERE {}");
+        assertEquals(1, statements.size());
+        assertEquals("\\uD800", statements.getFirst().getObject().stringValue());
+    }
+
+    @Test
+    void decodesPrologueBeforeResolvingRelativeIris() {
+        for (String query : List.of(
+                "BASE <\\u0068ttp://example.org/> CONSTRUCT { <s> <p> <o> } WHERE {}",
+                "PREFIX ex: <\\u0068ttp://example.org/> CONSTRUCT { ex:s ex:p ex:o } WHERE {}",
+                "BASE <http://example.org/\\u0041/> PREFIX ex: <../> CONSTRUCT { ex:s ex:p ex:o } WHERE {}")) {
+            var statements = collect(query);
+            assertEquals(1, statements.size(), query);
+            assertEquals(iri("http://example.org/s"), statements.getFirst().getSubject(), query);
+            assertEquals(iri("http://example.org/p"), statements.getFirst().getPredicate(), query);
+            assertEquals(iri("http://example.org/o"), statements.getFirst().getObject(), query);
+        }
+    }
 }

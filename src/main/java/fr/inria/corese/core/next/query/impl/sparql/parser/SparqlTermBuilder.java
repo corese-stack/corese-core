@@ -109,6 +109,10 @@ public final class SparqlTermBuilder {
             char c = lexical.charAt(i);
             if (c == '\\' && i + 1 < lexical.length()) {
                 char next = lexical.charAt(i + 1);
+                if (next == '\\') {
+                    i += 2;
+                    continue;
+                }
                 int hexLen = 0;
                 if (next == 'u') hexLen = 4;
                 else if (next == 'U') hexLen = 8;

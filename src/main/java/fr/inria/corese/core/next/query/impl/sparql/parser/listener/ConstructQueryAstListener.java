@@ -6,8 +6,6 @@ import fr.inria.corese.core.next.query.impl.sparql.parser.SparqlQueryAstBuilder;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 import org.antlr.v4.runtime.RuleContext;
 
-import java.util.List;
-
 /**
  * SPARQL CONSTRUCT query feature: sets query type, collects the CONSTRUCT template
  * (triples to instantiate from WHERE bindings) and delegates the WHERE clause to {@link BgpAstListener}.
@@ -72,7 +70,7 @@ public class ConstructQueryAstListener extends AbstractSparqlAstListener impleme
             TermAst subject = queryBuilder().termFromVarOrTerm(ctx.varOrTerm());
             addConstructProperties(subject, ctx.propertyListNotEmpty(), inConstructWhere);
         } else if (ctx.triplesNode() != null) {
-            TermAst subject = subjectFromTriplesNode(ctx.triplesNode(), inConstructWhere);
+            TermAst subject = expandTriplesNode(ctx.triplesNode(), inConstructWhere);
             if (ctx.propertyList() != null && ctx.propertyList().propertyListNotEmpty() != null) {
                 addConstructProperties(subject, ctx.propertyList().propertyListNotEmpty(), inConstructWhere);
             }
@@ -83,7 +81,7 @@ public class ConstructQueryAstListener extends AbstractSparqlAstListener impleme
      * Expands a {@code triplesNode} into the CONSTRUCT template (and optionally the WHERE BGP),
      * returning the head term (an anonymous blank node for blank node property lists).
      */
-    private TermAst subjectFromTriplesNode(SparqlParser.TriplesNodeContext ctx, boolean inConstructWhere) {
+    private TermAst expandTriplesNode(SparqlParser.TriplesNodeContext ctx, boolean inConstructWhere) {
         if (ctx.blankNodePropertyList() != null) {
             TermAst blankNode = queryBuilder().newAnonymousBlankNode();
             var inner = ctx.blankNodePropertyList().propertyListNotEmpty();
@@ -93,7 +91,7 @@ public class ConstructQueryAstListener extends AbstractSparqlAstListener impleme
             return blankNode;
         }
         if (ctx.collection() != null) {
-            return subjectFromCollection(ctx.collection(), inConstructWhere);
+            return expandCollection(ctx.collection(), inConstructWhere);
         }
         return queryBuilder().iri(ctx.getText());
     }
@@ -102,7 +100,7 @@ public class ConstructQueryAstListener extends AbstractSparqlAstListener impleme
      * Expands an RDF collection {@code (e1 e2 ...)} into rdf:first/rdf:rest chains
      * in the CONSTRUCT template and returns the head blank node.
      */
-    private TermAst subjectFromCollection(SparqlParser.CollectionContext ctx, boolean inConstructWhere) {
+    private TermAst expandCollection(SparqlParser.CollectionContext ctx, boolean inConstructWhere) {
         var nodes = ctx.graphNode();
         if (nodes.isEmpty()) {
             return queryBuilder().iri("<http://www.w3.org/1999/02/22-rdf-syntax-ns#nil>");
@@ -113,7 +111,7 @@ public class ConstructQueryAstListener extends AbstractSparqlAstListener impleme
         TermAst head = queryBuilder().newAnonymousBlankNode();
         TermAst current = head;
         for (int i = 0; i < nodes.size(); i++) {
-            TermAst element = queryBuilder().termFromGraphNode(nodes.get(i));
+            TermAst element = termFromConstructGraphNode(nodes.get(i), inConstructWhere);
             queryBuilder().addConstructTriple(current, first, element);
             if (inConstructWhere) queryBuilder().addTriple(current, first, element);
             if (i == nodes.size() - 1) {
@@ -129,14 +127,21 @@ public class ConstructQueryAstListener extends AbstractSparqlAstListener impleme
         return head;
     }
 
+    private TermAst termFromConstructGraphNode(SparqlParser.GraphNodeContext ctx, boolean inConstructWhere) {
+        if (ctx.triplesNode() != null) {
+            return expandTriplesNode(ctx.triplesNode(), inConstructWhere);
+        }
+        return queryBuilder().termFromVarOrTerm(ctx.varOrTerm());
+    }
+
     private void addConstructProperties(
             TermAst subject,
             SparqlParser.PropertyListNotEmptyContext propertyList,
             boolean inConstructWhere) {
         for (int verbIndex = 0; verbIndex < propertyList.verb().size(); verbIndex++) {
             TermAst predicate = queryBuilder().termFromVerb(propertyList.verb(verbIndex));
-            List<TermAst> objects = queryBuilder().termListFromObjectList(propertyList.objectList(verbIndex));
-            for (TermAst object : objects) {
+            for (var objectContext : propertyList.objectList(verbIndex).object_()) {
+                TermAst object = termFromConstructGraphNode(objectContext.graphNode(), inConstructWhere);
                 queryBuilder().addConstructTriple(subject, predicate, object);
                 if (inConstructWhere) {
                     queryBuilder().addTriple(subject, predicate, object);

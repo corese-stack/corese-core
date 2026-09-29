@@ -14,7 +14,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.QueryPrologueAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 
-import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
+import fr.inria.corese.core.next.query.impl.sparql.parser.SparqlIriEscapes;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,7 +42,7 @@ public final class SparqlTermResolver {
             return null;
         }
         if (raw.startsWith("<") && raw.endsWith(">")) {
-            return resolveRelativeIri(RdfText.stripAngleBrackets(raw));
+            return resolveRelativeIri(SparqlIriEscapes.decode(RdfText.stripAngleBrackets(raw)));
         }
         if (raw.startsWith(IOConstants.BLANK_NODE_PREFIX)) {
             return raw;
@@ -87,7 +87,7 @@ public final class SparqlTermResolver {
             return null;
         }
         if (datatype.startsWith("<") && datatype.endsWith(">")) {
-            return resolveRelativeIri(RdfText.stripAngleBrackets(datatype));
+            return resolveRelativeIri(SparqlIriEscapes.decode(RdfText.stripAngleBrackets(datatype)));
         }
         if (datatype.contains("://")
                 || (IRIUtils.isAbsoluteIRI(datatype) && !prefixes.hasPrefix(prefix(datatype)))) {
@@ -164,7 +164,7 @@ public final class SparqlTermResolver {
             return raw;
         }
         String namespace = prefixes.getNamespace(raw.substring(0, colon));
-        return namespace == null ? raw : namespace + unescapePName(raw.substring(colon + 1));
+        return namespace == null ? raw : namespace + SparqlIriEscapes.decode(raw.substring(colon + 1));
     }
 
     String resolveRelativeIri(String iri) {
@@ -185,41 +185,4 @@ public final class SparqlTermResolver {
         return colon < 0 ? iri : iri.substring(0, colon);
     }
 
-    private static String unescapePName(String local) {
-        if (local == null || !local.contains("\\")) {
-            return local;
-        }
-        StringBuilder result = new StringBuilder(local.length());
-        int index = 0;
-        while (index < local.length()) {
-            char character = local.charAt(index);
-            if (character == '\\' && index + 1 < local.length()) {
-                index = appendEscaped(result, local, index + 1);
-            } else {
-                result.append(character);
-                index++;
-            }
-        }
-        return result.toString();
-    }
-
-    private static int appendEscaped(StringBuilder result, String value, int escapeIndex) {
-        char escape = value.charAt(escapeIndex);
-        if (escape == 'u' || escape == 'U') {
-            int length = escape == 'u' ? 4 : 8;
-            if (escapeIndex + 1 + length <= value.length()) {
-                int codePoint = Integer.parseInt(
-                        value.substring(escapeIndex + 1, escapeIndex + 1 + length), 16);
-                if (codePoint >= 0xD800 && codePoint <= 0xDFFF) {
-                    throw new QuerySyntaxException(
-                            "Surrogate code point U+" + Integer.toHexString(codePoint).toUpperCase()
-                            + " is not a valid Unicode scalar value in a SPARQL escape sequence");
-                }
-                result.appendCodePoint(codePoint);
-                return escapeIndex + 1 + length;
-            }
-        }
-        result.append(escape);
-        return escapeIndex + 1;
-    }
 }

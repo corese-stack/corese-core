@@ -39,14 +39,15 @@ import fr.inria.corese.core.next.storage.api.StorageManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Internal orchestrator for the Corese-next SPARQL query path.
@@ -299,9 +300,6 @@ public final class NextSparqlPipelineExecutor {
      * Triples where any component is unbound or cannot be converted to a valid
      * RDF term are silently skipped, matching standard SPARQL CONSTRUCT semantics.</p>
      */
-    /** Counter for generating unique blank node labels in CONSTRUCT output. */
-    private static final AtomicLong CONSTRUCT_BNODE_COUNTER = new AtomicLong();
-
     private List<Statement> buildConstructStatements(Query kgramQuery, Mappings mappings) {
         List<Edge> templateEdges = new ArrayList<>();
         Exp constructTemplate = kgramQuery.getConstruct();
@@ -313,13 +311,22 @@ public final class NextSparqlPipelineExecutor {
         ValueFactory factory = Values.factory();
         List<Statement> statements = new ArrayList<>();
 
+        // Reserve every solution’s labels before instantiation, including later solutions.
+        Set<String> usedBlankLabels = new HashSet<>();
+        for (Mapping mapping : mappings) {
+            for (Node node : mapping.getNodes()) {
+                if (node != null && node.isBlank()) {
+                    usedBlankLabels.add(node.getLabel());
+                }
+            }
+        }
         for (Mapping mapping : mappings) {
             // Fresh blank node map per solution: blank-variable label → constant blank node
             Map<String, Node> blankNodeMap = new HashMap<>();
             for (Edge templateEdge : templateEdges) {
-                Node subjectNode   = resolveTemplateNode(templateEdge.getNode(0), mapping, blankNodeMap);
-                Node predicateNode = resolveTemplateNode(templateEdge.getProperty(), mapping, blankNodeMap);
-                Node objectNode    = resolveTemplateNode(templateEdge.getNode(1), mapping, blankNodeMap);
+                Node subjectNode   = resolveTemplateNode(templateEdge.getNode(0), mapping, blankNodeMap, usedBlankLabels);
+                Node predicateNode = resolveTemplateNode(templateEdge.getProperty(), mapping, blankNodeMap, usedBlankLabels);
+                Node objectNode    = resolveTemplateNode(templateEdge.getNode(1), mapping, blankNodeMap, usedBlankLabels);
 
                 if (subjectNode == null || predicateNode == null || objectNode == null) {
                     continue;
@@ -349,7 +356,9 @@ public final class NextSparqlPipelineExecutor {
      *
      * @return the resolved node, or {@code null} when a regular variable is unbound
      */
-    private Node resolveTemplateNode(Node templateNode, Mapping mapping, Map<String, Node> blankNodeMap) {
+    private Node resolveTemplateNode(
+            Node templateNode, Mapping mapping,
+            Map<String, Node> blankNodeMap, Set<String> usedBlankLabels) {
         if (templateNode == null) {
             return null;
         }
@@ -357,7 +366,13 @@ public final class NextSparqlPipelineExecutor {
             if (templateNode.isBlank()) {
                 // Existential blank node: fresh blank per solution, same label → same node
                 return blankNodeMap.computeIfAbsent(templateNode.getLabel(),
-                        label -> NodeImpl.forBlank("cb" + CONSTRUCT_BNODE_COUNTER.getAndIncrement()));
+                        label -> {
+                            Node blank;
+                            do {
+                                blank = NodeImpl.forValue(Values.factory().createBNode());
+                            } while (!usedBlankLabels.add(blank.getLabel()));
+                            return blank;
+                        });
             }
             return mapping.getNode(templateNode);
         }
