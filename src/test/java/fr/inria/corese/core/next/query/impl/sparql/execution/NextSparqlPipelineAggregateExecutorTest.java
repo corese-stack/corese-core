@@ -248,7 +248,8 @@ class NextSparqlPipelineAggregateExecutorTest extends PipelineTestSupport {
             var row = result.next();
             assertEquals("0", row.getValue("count").stringValue());
             assertEquals("0", row.getValue("sum").stringValue());
-            assertFalse(row.hasBinding("avg"));
+            assertEquals("0", row.getValue("avg").stringValue());
+            assertEquals(XSDDatatype.INTEGER.getIRI(), ((Literal) row.getValue("avg")).getDatatype());
             assertEquals("", row.getValue("gc").stringValue());
             assertFalse(result.hasNext());
         }

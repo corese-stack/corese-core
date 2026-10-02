@@ -146,7 +146,8 @@ final class NativeAggregateEvaluator {
         }
 
         if (!hasMappings) {
-            throw new QueryTypeErrorException("AVG is undefined for empty group");
+            // SPARQL 1.1 §18.5.1.4 defines AVG of the empty multiset as integer zero.
+            return context.values().createLiteral(BigInteger.ZERO);
         }
         if (!accumulator.hasValues()) {
             throw new QueryTypeErrorException("AVG is undefined when all values are unbound");
