@@ -25,6 +25,8 @@ public class RDFaProcessingContext {
     private Resource typedResource = null;
     private Set<RDFaIncompleteStatement> incompleteStatements = null;
     private Map<IRI, List<Value>> listMappings = new HashMap<>();
+    /** Separate list scope when descendants describe the current object. */
+    private Map<IRI, List<Value>> childListMappings;
     private String currentLanguage = null;
     private Value currentPropertyValue = null;
     private String defaultVocabulary = null;
@@ -186,6 +188,14 @@ public class RDFaProcessingContext {
      */
     public void setListMappings(Map<IRI, List<Value>> listMappings) {
         this.listMappings = listMappings;
+    }
+
+    public Map<IRI, List<Value>> getChildListMappings() {
+        return childListMappings != null ? childListMappings : listMappings;
+    }
+
+    public void setChildListMappings(Map<IRI, List<Value>> childListMappings) {
+        this.childListMappings = childListMappings;
     }
 
     /**

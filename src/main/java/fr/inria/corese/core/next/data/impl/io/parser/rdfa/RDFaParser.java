@@ -183,38 +183,40 @@ public class RDFaParser extends AbstractRDFParser {
         // 1 First, the local values are initialized
         RDFaProcessingContext processingContext;
         if (!this.processingContexts.isEmpty()) { // Not a root element
-            processingContext = new RDFaProcessingContext(currentProcessingContext().getEvaluationContext());
-            processingContext.setNamespaceDeclarations(currentProcessingContext().getNamespaceDeclarations());
-            processingContext.setRootElement(false);
+            RDFaProcessingContext parent = currentProcessingContext();
+            RDFaEvaluationContext childContext = new RDFaEvaluationContext(parent.getEvaluationContext());
             // 13. Next, all elements that are children of the current element are processed using the rules described here, using a new evaluation context, initialized as follows:
             // If the skip element flag is 'true' then the new evaluation context is a copy of the current context that was passed in to this level of processing, with the language and list of IRI mappings values replaced with the local values;
             if (this.currentProcessingContext().isSkipElement()) {
-                processingContext.setEvaluationContext(new RDFaEvaluationContext(currentProcessingContext().getEvaluationContext()));
-                processingContext.getEvaluationContext().setLanguage(this.currentProcessingContext().getCurrentLanguage());
+                childContext.setLanguage(parent.getCurrentLanguage());
                 // Otherwise, the values are:
             } else {
                 Resource oldParentSubject = currentProcessingContext().getEvaluationContext().getParentSubjectResource();
                 // the base is set to the base value of the current evaluation context;
-                processingContext.setEvaluationContext(new RDFaEvaluationContext(currentProcessingContext().getEvaluationContext()));
                 // the parent subject is set to the value of new subject, if non-null, or the value of the parent subject of the current evaluation context;
-                processingContext.getEvaluationContext().setParentSubjectResource(this.currentProcessingContext().getNewSubject());
+                childContext.setParentSubjectResource(parent.getNewSubject() != null
+                        ? parent.getNewSubject() : oldParentSubject);
                 // the parent object is set to value of current object resource, if non-null, or the value of new subject, if non-null, or the value of the parent subject of the current evaluation context;
                 if (this.currentProcessingContext().getCurrentObjectResource() != null) {
-                    processingContext.getEvaluationContext().setParentObjectResource(this.currentProcessingContext().getCurrentObjectResource());
+                    childContext.setParentObjectResource(parent.getCurrentObjectResource());
                 } else if (this.currentProcessingContext().getNewSubject() != null) {
-                    processingContext.getEvaluationContext().setParentObjectResource(this.currentProcessingContext().getNewSubject());
+                    childContext.setParentObjectResource(parent.getNewSubject());
                 } else {
-                    processingContext.getEvaluationContext().setParentObjectResource(oldParentSubject);
+                    childContext.setParentObjectResource(oldParentSubject);
                 }
                 // the list of incomplete triples is set to the local list of incomplete triples;
-                processingContext.getEvaluationContext().setIncompleteStatements(this.currentProcessingContext().getIncompleteStatements());
+                childContext.setIncompleteStatements(parent.getIncompleteStatements());
                 // the list mapping is set to the local list mapping;
-                processingContext.getEvaluationContext().setListMappings(this.currentProcessingContext().getListMappings());
+                childContext.setListMappings(parent.getChildListMappings());
                 // language is set to the value of current language.
-                processingContext.getEvaluationContext().setLanguage(this.currentProcessingContext().getCurrentLanguage());
+                childContext.setLanguage(parent.getCurrentLanguage());
                 // the default vocabulary is set to the value of the local default vocabulary.
-                processingContext.getEvaluationContext().setDefaultVocabulary(this.currentProcessingContext().getDefaultVocabulary());
+                childContext.setDefaultVocabulary(parent.getDefaultVocabulary());
             }
+            // Initialize local references only after the incoming context is complete.
+            processingContext = new RDFaProcessingContext(childContext);
+            processingContext.setNamespaceDeclarations(parent.getNamespaceDeclarations());
+            processingContext.setRootElement(false);
         } else {
             // This is the start of the document
             RDFaEvaluationContext startingContext = getNewContext(getValueFactory().createIRI(this.baseIri));
@@ -472,12 +474,12 @@ public class RDFaParser extends AbstractRDFParser {
             }
         }
 
-        // 8. If in any of the previous steps a new subject was set to a non-null value different from the parent subject;
-        Resource parentSubj = currentProcessingContext().getEvaluationContext().getParentSubjectResource();
-        if (this.currentProcessingContext().getNewSubject() != null && !this.currentProcessingContext().getNewSubject().equals(parentSubj)) {
+        // 8. A subject different from the incoming parent object starts a local list scope.
+        Resource parentObject = currentProcessingContext().getEvaluationContext().getParentObjectResource();
+        if (this.currentProcessingContext().getNewSubject() != null && !this.currentProcessingContext().getNewSubject().equals(parentObject)) {
             Map<IRI, List<Value>> freshListMappings = new HashMap<>();
             this.currentProcessingContext().setListMappings(freshListMappings);
-            this.currentProcessingContext().getEvaluationContext().setListMappings(freshListMappings);
+            // Preserve the incoming map for incomplete relations and step 14 ownership.
         }
 
         // 9. If in any of the previous steps a current object resource was set to a non-null value, it is now used to generate triples and add entries to the local list mapping:
@@ -562,6 +564,14 @@ public class RDFaParser extends AbstractRDFParser {
                     this.getModel().add(this.currentProcessingContext().getNewSubject(), incompleteStatement.getPredicate(), currentProcessingContext().getEvaluationContext().getParentSubjectResource());
                 }
             }
+        }
+
+        // 13. Descendants of a relation describe its object. Share one scope
+        // between those descendants, distinct from this element's subject lists.
+        RDFaProcessingContext context = currentProcessingContext();
+        if (!context.isSkipElement() && context.getCurrentObjectResource() != null
+                && !context.getCurrentObjectResource().equals(context.getNewSubject())) {
+            context.setChildListMappings(new HashMap<>());
         }
     }
 
@@ -691,35 +701,39 @@ public class RDFaParser extends AbstractRDFParser {
         }
 
         // 14. Finally, if there is one or more mapping in the local list mapping, list triples are generated as follows:
-        Resource parentSubj = currentProcessingContext().getEvaluationContext().getParentSubjectResource();
-        boolean isListOwner = this.currentProcessingContext().isRootElement()
-                || parentSubj == null
-                || (this.currentProcessingContext().getNewSubject() != null && !this.currentProcessingContext().getNewSubject().equals(parentSubj));
-
-        if (isListOwner) {
-            for (Map.Entry<IRI, List<Value>> listMapping : this.currentProcessingContext().getListMappings().entrySet()) {
-                IRI propertyIRI = listMapping.getKey();
-                List<Value> propertyList = listMapping.getValue();
-
-                if (propertyList.isEmpty()) {
-                    getModel().add(this.currentProcessingContext().getNewSubject(), propertyIRI, RDF.nil.getIRI());
-                } else {
-                    List<BNode> bnodes = new ArrayList<>();
-                    for (int i = 0; i < propertyList.size(); i++) {
-                        bnodes.add(getValueFactory().createBNode());
-                    }
-                    for (int i = 0; i < propertyList.size(); i++) {
-                        BNode elementNode = bnodes.get(i);
-                        Resource nextElementNode = (i < propertyList.size() - 1) ? bnodes.get(i + 1) : RDF.nil.getIRI();
-                        getModel().add(elementNode, RDF.first.getIRI(), propertyList.get(i));
-                        getModel().add(elementNode, RDF.rest.getIRI(), nextElementNode);
-                    }
-                    getModel().add(this.currentProcessingContext().getNewSubject(), propertyIRI, bnodes.getFirst());
-                }
-            }
+        RDFaProcessingContext context = currentProcessingContext();
+        if (context.getListMappings() != context.getEvaluationContext().getListMappings()) {
+            emitListMappings(context.getNewSubject(), context.getListMappings());
+        }
+        if (context.getChildListMappings() != context.getListMappings()) {
+            emitListMappings(context.getCurrentObjectResource(), context.getChildListMappings());
         }
 
         this.processingContexts.pop();
+    }
+
+    /** Emit each owned list scope once, after all descendants have contributed. */
+    private void emitListMappings(Resource subject, Map<IRI, List<Value>> mappings) {
+        for (Map.Entry<IRI, List<Value>> listMapping : mappings.entrySet()) {
+            IRI propertyIRI = listMapping.getKey();
+            List<Value> propertyList = listMapping.getValue();
+
+            if (propertyList.isEmpty()) {
+                getModel().add(subject, propertyIRI, RDF.nil.getIRI());
+            } else {
+                List<BNode> bnodes = new ArrayList<>();
+                for (int i = 0; i < propertyList.size(); i++) {
+                    bnodes.add(getValueFactory().createBNode());
+                }
+                for (int i = 0; i < propertyList.size(); i++) {
+                    BNode elementNode = bnodes.get(i);
+                    Resource nextElementNode = (i < propertyList.size() - 1) ? bnodes.get(i + 1) : RDF.nil.getIRI();
+                    getModel().add(elementNode, RDF.first.getIRI(), propertyList.get(i));
+                    getModel().add(elementNode, RDF.rest.getIRI(), nextElementNode);
+                }
+                getModel().add(subject, propertyIRI, bnodes.getFirst());
+            }
+        }
     }
 
     /**
@@ -828,7 +842,7 @@ public class RDFaParser extends AbstractRDFParser {
             throw new ParsingException("Expecting namespace prefix declaration to end with \":\", got " + prefixRaw + " in declaration " + declaration);
         }
         String prefix = prefixRaw.replaceAll(":$", "").trim();
-        if ((prefix.isEmpty() && !isHtmlDocument()) || prefix.startsWith("_")) {
+        if (prefix.isEmpty() || prefix.startsWith("_")) {
             return;
         }
         if (namespaceString == null || namespaceString.trim().isEmpty()) {

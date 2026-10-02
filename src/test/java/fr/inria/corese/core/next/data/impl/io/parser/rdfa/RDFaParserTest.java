@@ -58,6 +58,116 @@ class RDFaParserTest extends ParserTestBase {
     }
 
     @Test
+    void descendantsShareOneListOnTheParentObject() {
+        assertRdfaLists("""
+                <div about="ex:subject" rel="ex:link" resource="ex:object">
+                  <span property="ex:items" inlist="">A</span>
+                  <span property="ex:items" inlist="">B</span>
+                </div>
+                """, "ex:subject ex:link ex:object . ex:object ex:items (\"A\" \"B\") .");
+    }
+
+    @Test
+    void listSubjectAndRelationObjectKeepSeparateCollections() {
+        assertRdfaLists("""
+                <div about="ex:subject">
+                  <span property="ex:items" inlist="">S1</span>
+                  <div rel="ex:link" resource="ex:object">
+                    <span property="ex:items" inlist="">O1</span>
+                    <span property="ex:items" inlist="">O2</span>
+                  </div>
+                  <span property="ex:items" inlist="">S2</span>
+                </div>
+                """, """
+                ex:subject ex:link ex:object ; ex:items ("S1" "S2") .
+                ex:object ex:items ("O1" "O2") .
+                """);
+    }
+
+    @Test
+    void transparentWrappersAndRepeatedSubjectPreserveListOrder() {
+        assertRdfaLists("""
+                <div about="ex:subject" rel="ex:link" resource="ex:object">
+                  <section><span property="ex:items" inlist="">A</span></section>
+                  <section about="ex:object"><span property="ex:items" inlist="">B</span></section>
+                  <span property="ex:items" inlist="">A</span>
+                </div>
+                """, "ex:subject ex:link ex:object . ex:object ex:items (\"A\" \"B\" \"A\") .");
+    }
+
+    @Test
+    void nestedSubjectDoesNotConsumeTheInheritedList() {
+        assertRdfaLists("""
+                <div about="ex:subject">
+                  <span property="ex:items" inlist="">A</span>
+                  <section about="ex:other"><span property="ex:items" inlist="">B</span></section>
+                  <span property="ex:items" inlist="">C</span>
+                  <span property="ex:otherItems" inlist="">D</span>
+                </div>
+                """, """
+                ex:subject ex:items ("A" "C") ; ex:otherItems ("D") .
+                ex:other ex:items ("B") .
+                """);
+    }
+
+    @Test
+    void incompleteListRelationCollectsDescendantsAndKeepsEmptyLists() {
+        assertRdfaLists("""
+                <div about="ex:subject">
+                  <div rel="ex:items" inlist="">
+                    <span about="ex:first"></span>
+                    <section><span about="ex:second"></span></section>
+                  </div>
+                  <span rel="ex:empty" inlist=""></span>
+                </div>
+                """, "ex:subject ex:items (ex:first ex:second) ; ex:empty rdf:nil .");
+    }
+
+    @Test
+    void listRelationAndObjectPropertiesHaveDifferentOwners() {
+        assertRdfaLists("""
+                <div about="ex:subject" rel="ex:items" resource="ex:object" inlist="">
+                  <span property="ex:items" inlist="">A</span>
+                  <span property="ex:items" inlist="">B</span>
+                </div>
+                """, "ex:subject ex:items (ex:object) . ex:object ex:items (\"A\" \"B\") .");
+    }
+
+    private void assertRdfaLists(String body, String expectedTurtle) {
+        String document = "<html xmlns=\"http://www.w3.org/1999/xhtml\" prefix=\"ex: http://example.org/\"><body>"
+                + body + "</body></html>";
+        Model actual = createTestModel();
+        RDFParser parser = parserFactory.createRDFParser(RDFFormat.RDFA, actual, valueFactory);
+        parser.parse(new ByteArrayInputStream(document.getBytes(java.nio.charset.StandardCharsets.UTF_8)),
+                "http://example.org/document");
+        Model expected = createTestModel();
+        RDFParser turtle = parserFactory.createRDFParser(RDFFormat.TURTLE, expected, valueFactory);
+        turtle.parse(new ByteArrayInputStream((defaultTurtlePrefixes + expectedTurtle)
+                .getBytes(java.nio.charset.StandardCharsets.UTF_8)), "http://example.org/document");
+        assertModelsIsomorphic(expected, actual);
+    }
+
+    @Test
+    void emptyPrefixDeclarationCannotOverrideTheDefaultRdfaPrefix() {
+        String xhtml = """
+                <html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.1">
+                  <body about="http://example.org/person" prefix=": http://xmlns.com/foaf/0.1/">
+                    <span property=":name">Ivan Herman</span>
+                  </body>
+                </html>
+                """;
+        Model model = createTestModel();
+        RDFParser parser = parserFactory.createRDFParser(RDFFormat.RDFA, model, valueFactory);
+        parser.parse(new ByteArrayInputStream(xhtml.getBytes(java.nio.charset.StandardCharsets.UTF_8)),
+                "http://example.org/document");
+        IRI subject = valueFactory.createIRI("http://example.org/person");
+        Literal name = valueFactory.createLiteral("Ivan Herman");
+        assertEquals(1, model.size());
+        assertTrue(model.contains(subject, valueFactory.createIRI("http://www.w3.org/1999/xhtml/vocab#name"), name));
+        assertFalse(model.contains(subject, valueFactory.createIRI("http://xmlns.com/foaf/0.1/name"), name));
+    }
+
+    @Test
     void parseCurrentSubjectCreatorHead() {
         String currentSubjectXHTML = """
                 <html xmlns="http://www.w3.org/1999/xhtml">
