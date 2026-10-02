@@ -88,13 +88,12 @@ public final class WhereCompiler {
         if (cached != null) {
             return cached;
         }
-        GroupGraphPatternAst simplified = new AstSimplifier().simplify(where);
         if (inScopeVariables.isEmpty()) {
             inScopeVariables = Set.copyOf(
                     new fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.VariableScopeAnalyzer()
-                            .collectVisibleVariables(simplified));
+                            .collectVisibleVariables(where));
         }
-        Exp compiled = compileGroup(simplified);
+        Exp compiled = compileGroup(where);
         compiledPatternCache.put(where, compiled);
         return compiled;
     }
@@ -159,8 +158,10 @@ public final class WhereCompiler {
                     body.add(minusExp);
                 }
                 case GroupGraphPatternAst nested -> {
-                    Exp compiledNested = compile(nested);
-                    Exp joined = Exp.create(Type.JOIN, body, compiledNested);
+                    // Preserve the group boundary until filters have been scoped. In
+                    // OPTIONAL { { P FILTER(...) } }, the filter belongs to the
+                    // inner group, not to the OPTIONAL left-join condition.
+                    Exp joined = Exp.create(Type.JOIN, body, compile(nested));
                     body = Exp.create(Type.AND);
                     body.add(joined);
                 }

@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import fr.inria.corese.core.next.data.api.term.BNode;
 import fr.inria.corese.core.next.data.api.term.IRI;
@@ -63,31 +65,22 @@ class NextSparqlPipelineScopeExecutorTest extends PipelineTestSupport {
     }
 
     /**
-     * dawg-optional-filter-005-simplified (W3C SPARQL 1.0 / SPARQL 1.1 simplified semantics):
-     * In {@code OPTIONAL { { BGP . FILTER(?outerVar = x) } }}, the inner {@code { }} is
-     * transparent — it does not create an evaluation-scope barrier for outer variables.
-     * The FILTER is postponed and evaluated at merge time (when both the left solution
-     * carrying {@code ?outerVar} and the right solution carrying the BGP bindings are
-     * available), giving the correct result: only the row where the FILTER passes
-     * receives the optional binding.
-     *
-     * <p>This is the "simplified" reading chosen by Corese, aligned with the
-     * SPARQL 1.1 algebra where an inner group graph pattern with no structural
-     * sub-patterns (OPTIONAL/MINUS/UNION) flattens into its parent.</p>
+     * Regression for dawg-optional-filter-005-not-simplified: nested filters
+     * retain their group scope before algebra simplification (SPARQL 1.1 §18.2.2).
      */
     @Test
-    @DisplayName("FILTER referencing outer variable inside nested OPTIONAL group — simplified semantics (issue #613)")
-    void filterReferencingOuterVarInNestedOptionalGroupIsSimplified() {
+    @DisplayName("FILTER referencing outer variable inside nested OPTIONAL group — preserved group scope (issue #613)")
+    void filterReferencingOuterVarInNestedOptionalGroupKeepsItsScope() {
         IRI dcTitle = iri("http://purl.org/dc/elements/1.1/title");
-        IRI xPrice  = iri("http://example.org/ns#price");
-        IRI book1   = iri("http://example.org/books#book1");
-        IRI book2   = iri("http://example.org/books#book2");
-        IRI book3   = iri("http://example.org/books#book3");
+        IRI xPrice = iri("http://example.org/ns#price");
+        IRI book1 = iri("http://example.org/books#book1");
+        IRI book2 = iri("http://example.org/books#book2");
+        IRI book3 = iri("http://example.org/books#book3");
 
         insert(book1, dcTitle, valueFactory.createLiteral("TITLE 1"));
-        insert(book1, xPrice,  valueFactory.createLiteral(10));
+        insert(book1, xPrice, valueFactory.createLiteral(10));
         insert(book2, dcTitle, valueFactory.createLiteral("TITLE 2"));
-        insert(book2, xPrice,  valueFactory.createLiteral(20));
+        insert(book2, xPrice, valueFactory.createLiteral(20));
         insert(book3, dcTitle, valueFactory.createLiteral("TITLE 3"));
 
         try (var result = executor.evaluateTuple("""
@@ -104,17 +97,77 @@ class NextSparqlPipelineScopeExecutorTest extends PipelineTestSupport {
                 """)) {
             var rows = result.stream().toList();
             assertEquals(3, rows.size(), "All three titles must appear");
-            // Only TITLE 2 passes the filter — it alone gets a price binding
-            long withPrice = rows.stream().filter(r -> r.getValue("price") != null).count();
-            assertEquals(1, withPrice, "Exactly one row (TITLE 2) should have a price binding");
-            var title2Row = rows.stream()
-                    .filter(r -> "TITLE 2".equals(r.getValue("title").stringValue()))
+            assertEquals(Set.of("TITLE 1", "TITLE 2", "TITLE 3"),
+                    rows.stream().map(r -> r.getValue("title").stringValue())
+                            .collect(Collectors.toSet()));
+            rows.forEach(row -> assertNull(row.getValue("price"),
+                    "The nested filter cannot use ?title from the outer group"));
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "{ ?s ?p ?o FILTER(?x = 1) } ?a ?b ?c",
+            "?a ?b ?c { ?s ?p ?o FILTER(?x = 1) }",
+            "{ { ?s ?p ?o FILTER(?x = 1) } ?a ?b ?c }"
+    })
+    void nestedOptionalFilterKeepsItsScopeAcrossSiblingPatterns(String pattern) {
+        try (var result = executor.evaluateTuple("""
+                SELECT * WHERE {
+                  VALUES ?x { 1 }
+                  OPTIONAL { %s }
+                }
+                """.formatted(pattern))) {
+            var rows = result.stream().toList();
+            assertEquals(1, rows.size());
+            assertEquals("1", rows.get(0).getValue("x").stringValue());
+            for (String variable : List.of("s", "p", "o", "a", "b", "c")) {
+                assertNull(rows.get(0).getValue(variable),
+                        "The nested filter cannot use the outer binding of ?x");
+            }
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "{ ?s ?p ?o FILTER(?x = 1) }",
+            "{ { ?s ?p ?o FILTER(?x = 1) } }"
+    })
+    void nestedOptionalWrappersPreserveFilterScope(String pattern) {
+        try (var result = executor.evaluateTuple("""
+                SELECT * WHERE {
+                  VALUES ?x { 1 2 }
+                  OPTIONAL { %s }
+                }
+                """.formatted(pattern))) {
+            var rows = result.stream().toList();
+            assertEquals(2, rows.size());
+            for (var row : rows) {
+                assertNull(row.getValue("s"));
+                assertNull(row.getValue("p"));
+                assertNull(row.getValue("o"));
+            }
+        }
+    }
+
+    @Test
+    void directOptionalFilterCanUseOuterBindings() {
+        try (var result = executor.evaluateTuple("""
+                SELECT * WHERE {
+                  VALUES ?x { 1 2 }
+                  OPTIONAL { ?s ?p ?o FILTER(?x = 1) }
+                }
+                """)) {
+            var rows = result.stream().toList();
+            assertEquals(2, rows.size());
+            var matching = rows.stream().filter(r -> "1".equals(r.getValue("x").stringValue()))
                     .findFirst().orElseThrow();
-            assertEquals("20", title2Row.getValue("price").stringValue());
-            rows.stream()
-                    .filter(r -> !"TITLE 2".equals(r.getValue("title").stringValue()))
-                    .forEach(r -> assertNull(r.getValue("price"),
-                            "Titles other than TITLE 2 must not bind ?price"));
+            assertEquals(iri(ALICE), matching.getValue("s"));
+            assertEquals(iri(KNOWS), matching.getValue("p"));
+            assertEquals(iri(BOB), matching.getValue("o"));
+            var nonMatching = rows.stream().filter(r -> "2".equals(r.getValue("x").stringValue()))
+                    .findFirst().orElseThrow();
+            assertNull(nonMatching.getValue("s"));
         }
     }
 
