@@ -1,6 +1,5 @@
 package fr.inria.corese.core.next.data.impl.io.parser.support;
 
-import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.next.data.Values;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.model.Model;
@@ -40,21 +39,13 @@ public abstract class ParserTestBase {
     }
 
     /**
-     * Creates a test model using the production Graph backend.
+     * Creates a test model using the default native memory backend.
      *
-     * @return a new Model instance backed by Graph storage
+     * @return a new Model instance backed by memory storage
      */
     protected Model createTestModel() {
-        Graph graph = Graph.create();
-
-        StorageConfig config = StorageConfig.builder()
-                .property("type", "graph")
-                .property("graph", graph)
-                .property("valueFactory", valueFactory)
-                .build();
-
         return StorageModel.builder()
-                .storage(Storages.create(config))
+                .storage(Storages.create())
                 .valueFactory(valueFactory)
                 .build();
     }

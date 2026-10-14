@@ -1,6 +1,5 @@
 package fr.inria.corese.core.next.query.impl.repository;
 
-import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.next.data.Values;
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Resource;
@@ -10,7 +9,6 @@ import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.api.repository.Repository;
 import fr.inria.corese.core.next.query.api.repository.RepositoryConnection;
 import fr.inria.corese.core.next.storage.api.StorageManager;
-import fr.inria.corese.core.next.storage.impl.graph.GraphStorageManager;
 import fr.inria.corese.core.next.storage.impl.memory.MemoryStorageManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -238,21 +236,7 @@ class CoreseUpdateExecutionTest {
         assertEquals(0, connection.size());
     }
 
-    @Test
-    void legacyGraphBackendSupportsUpdatesAndFailureRecovery() {
-        StorageManager legacy = GraphStorageManager.builder().graph(Graph.create()).valueFactory(Values.factory()).build();
-        try (Repository repo = Repositories.create(legacy); var conn = repo.getConnection()) {
-            conn.prepareUpdate(PREFIX + "CREATE GRAPH ex:g; INSERT DATA { GRAPH ex:g { ex:s ex:p ex:o } }").execute();
-            assertEquals(1, conn.size());
-            var failingUpdate = conn.prepareUpdate(PREFIX +
-                    "CLEAR ALL; DROP GRAPH ex:g; COPY GRAPH ex:missing TO DEFAULT");
-            assertThrows(QueryEvaluationException.class, failingUpdate::execute);
-            assertEquals(1, conn.size());
-            assertTrue(legacy.metadata().getContexts().contains(iri("g")));
-            conn.prepareUpdate(PREFIX + "DROP ALL").execute();
-            assertEquals(0, conn.size());
-        }
-    }
+
 
     @Test
     void eachOperationRetainsItsPrefixAndBaseScope() {

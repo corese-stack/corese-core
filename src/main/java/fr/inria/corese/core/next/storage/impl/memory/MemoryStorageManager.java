@@ -1,129 +1,158 @@
 package fr.inria.corese.core.next.storage.impl.memory;
 
 import fr.inria.corese.core.next.storage.api.StorageManager;
+import fr.inria.corese.core.next.storage.api.config.StorageConfig;
 import fr.inria.corese.core.next.storage.api.lifecycle.StorageLifecycle;
 import fr.inria.corese.core.next.storage.api.operations.MetadataOperations;
 import fr.inria.corese.core.next.storage.api.operations.MutationOperations;
 import fr.inria.corese.core.next.storage.api.operations.QueryOperations;
 import fr.inria.corese.core.next.storage.api.transaction.TransactionManager;
 
-import java.util.Objects;
-
 /**
- * In-memory {@link StorageManager} implementation for testing and small to
- * medium datasets.
+ * Native indexed memory backend. Sessions share committed data, but own transactions. Transactions and lazy reads
+ * capture graph partitions, which are copied on the first mutation while shared. A read captures its version when
+ * {@code find()} is called, without materializing matches. Consumers must close returned streams, including after
+ * partial traversal, to release snapshot ownership.
  *
- * <p>Transactions are local to the thread that starts them and use a private
- * snapshot. A connection must not begin a transaction on one thread and
- * commit it on another. Snapshot memory usage grows with the number of stored
- * statements, so a persistent MVCC backend is preferable for very large
- * datasets.</p>
+ * <p>
+ * Closing a session rolls back its active transaction. Closing the owning manager also shuts down the database. Already
+ * captured read streams retain their own partition ownership until they are closed or exhausted.
+ * </p>
  */
 public final class MemoryStorageManager implements StorageManager {
-
-    private final InMemoryStatementStore adapter;
-    private final QueryOperations queryOps;
-    private final MutationOperations mutationOps;
-    private final MetadataOperations metadataOps;
-    private final TransactionManager txManager;
-    private final StorageLifecycle lifecycle;
-
     /**
-     * Constructs a new MemoryStorageManager.
-     *
-     * @param builder the builder with configuration
+     * Session-scoped operation facade.
      */
-    private MemoryStorageManager(Builder builder) {
-        Objects.requireNonNull(builder, "Builder cannot be null");
-        this.adapter = new InMemoryStatementStore();
-        this.queryOps = new MemoryQueryOperations(adapter);
-        this.mutationOps = new MemoryMutationOperations(adapter);
-        this.metadataOps = new MemoryMetadataOperations(adapter);
-        this.txManager = new MemoryTransactionManager(adapter);
-        this.lifecycle = new MemoryLifecycleManager(adapter);
-    }
-
+    private final IndexedStatementStore store;
     /**
-     * Constructs a scoped session of MemoryStorageManager sharing storage lifecycle.
-     *
-     * @param adapter   the session statement store
-     * @param lifecycle the shared storage lifecycle
+     * Owning manager flag or transaction thread, according to the enclosing class.
      */
-    private MemoryStorageManager(InMemoryStatementStore adapter, StorageLifecycle lifecycle) {
-        this.adapter = adapter;
-        this.queryOps = new MemoryQueryOperations(adapter);
-        this.mutationOps = new MemoryMutationOperations(adapter);
-        this.metadataOps = new MemoryMetadataOperations(adapter);
-        this.txManager = new MemoryTransactionManager(adapter);
-        this.lifecycle = lifecycle;
-    }
+    private final boolean owner;
 
     /**
-     * Returns a new connection session with an isolated transaction snapshot.
+     * Creates and initializes an owned backend. Normally use Storages.create(config).
      *
-     * @return a connection-scoped {@link StorageManager}
+     * @param config storage configuration selecting this backend
      */
-    @Override
-    public StorageManager openSession() {
-        return new MemoryStorageManager(adapter.openSession(), lifecycle);
-    }
-
-    @Override
-    public QueryOperations queries() {
-        return queryOps;
-    }
-
-    @Override
-    public MutationOperations mutations() {
-        return mutationOps;
-    }
-
-    @Override
-    public MetadataOperations metadata() {
-        return metadataOps;
-    }
-
-    @Override
-    public TransactionManager transactions() {
-        return txManager;
-    }
-
-    @Override
-    public StorageLifecycle lifecycle() {
-        return lifecycle;
+    public MemoryStorageManager(final StorageConfig config) {
+        store = new IndexedStatementStore();
+        owner = true;
+        store.lifecycle().initialize(config);
     }
 
     /**
-     * Returns a new builder for MemoryStorageManager.
+     * Creates a non-owning session facade sharing the supplied operation store.
      *
-     * @return a new builder instance
+     * @param store session-scoped operations sharing the owning database
+     */
+    private MemoryStorageManager(final IndexedStatementStore store) {
+        this.store = store;
+        owner = false;
+    }
+
+    /**
+     * Builder for MemoryStorageManager instances.
+     */
+    public static final class Builder {
+        private StorageConfig config = StorageConfig.memory();
+
+        public Builder config(StorageConfig config) {
+            this.config = config;
+            return this;
+        }
+
+        public MemoryStorageManager build() {
+            return new MemoryStorageManager(config);
+        }
+    }
+
+    /**
+     * Creates a builder for MemoryStorageManager.
+     *
+     * @return a new builder
      */
     public static Builder builder() {
         return new Builder();
     }
 
     /**
-     * Builder for {@link MemoryStorageManager}.
+     * {@inheritDoc}
+     *
+     * @return a new session sharing the database
      */
-    public static final class Builder {
-
-
-        public Builder() {
-            // No configuration needed for MemoryStorageManager
-        }
-
-        /**
-         * Builds a new MemoryStorageManager instance.
-         *
-         * @return a new MemoryStorageManager
-         */
-        public MemoryStorageManager build() {
-            return new MemoryStorageManager(this);
-        }
+    @Override
+    public StorageManager openSession() {
+        return new MemoryStorageManager(store.openSession());
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the session query operations
+     */
     @Override
-    public String toString() {
-        return "MemoryStorageManager{size=" + adapter.size() + "}";
+    public QueryOperations queries() {
+        return store;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return the session mutation operations
+     */
+    @Override
+    public MutationOperations mutations() {
+        return store;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return the session metadata operations
+     */
+    @Override
+    public MetadataOperations metadata() {
+        return store;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return the session transaction controller
+     */
+    @Override
+    public TransactionManager transactions() {
+        return store;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return the shared database lifecycle controller
+     */
+    @Override
+    public StorageLifecycle lifecycle() {
+        return store.lifecycle();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return true when the session is open and the database is running
+     */
+    @Override
+    public boolean isOpen() {
+        return store.isOpen();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public synchronized void close() {
+        store.closeSession();
+        if (owner && lifecycle().getState() == fr.inria.corese.core.next.storage.api.lifecycle.LifecycleState.RUNNING) {
+            lifecycle().shutdown();
+        }
     }
 }

@@ -145,13 +145,9 @@ public class MappingSet {
     }
 
     List<String> intersectionOfUnion(MappingSet model) {
-        ArrayList<String> commonVars = new ArrayList<>();
-        for (String v : getUnion().keySet()) {
-            if (model.getUnion().containsKey(v)) {
-                commonVars.add(v);
-            }
-        }
-        return commonVars;
+        return getUnion().keySet().stream()
+                .filter(model.getUnion()::containsKey)
+                .toList();
     }
 
     boolean inIntersection(List<String> vars) {

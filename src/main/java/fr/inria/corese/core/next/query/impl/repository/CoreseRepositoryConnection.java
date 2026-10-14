@@ -229,11 +229,11 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
         checkOpen();
         String source = requireSource(queryString, PARAM_QUERY_STRING);
         QueryAst ast = parser.parse(source, baseIRI);
-        if (!(ast instanceof SelectQueryAst)) {
+        if (!(ast instanceof SelectQueryAst select)) {
             throw new QuerySyntaxException(
                     "Expected a SELECT query, got: " + ast.getClass().getSimpleName());
         }
-        CoreseTupleQuery q = new CoreseTupleQuery(source, executorFor(baseIRI), this::checkOpen);
+        CoreseTupleQuery q = new CoreseTupleQuery(source, select, executorFor(baseIRI), this::checkOpen);
         applyConnectionDataset(q);
         return q;
     }
@@ -253,7 +253,7 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
             throw new QuerySyntaxException(
                     "Expected a CONSTRUCT or DESCRIBE query, got: " + ast.getClass().getSimpleName());
         }
-        CoreseGraphQuery q = new CoreseGraphQuery(source, executorFor(baseIRI), this::checkOpen);
+        CoreseGraphQuery q = new CoreseGraphQuery(source, ast, executorFor(baseIRI), this::checkOpen);
         applyConnectionDataset(q);
         return q;
     }
@@ -269,11 +269,11 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
         checkOpen();
         String source = requireSource(queryString, PARAM_QUERY_STRING);
         QueryAst ast = parser.parse(source, baseIRI);
-        if (!(ast instanceof AskQueryAst)) {
+        if (!(ast instanceof AskQueryAst ask)) {
             throw new QuerySyntaxException(
                     "Expected an ASK query, got: " + ast.getClass().getSimpleName());
         }
-        CoreseBooleanQuery q = new CoreseBooleanQuery(source, executorFor(baseIRI), this::checkOpen);
+        CoreseBooleanQuery q = new CoreseBooleanQuery(source, ask, executorFor(baseIRI), this::checkOpen);
         applyConnectionDataset(q);
         return q;
     }

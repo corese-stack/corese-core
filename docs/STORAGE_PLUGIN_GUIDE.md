@@ -69,12 +69,9 @@ multiple providers support a configuration, Corese selects the highest
 priority; equal priorities are ordered by plugin name. Names must be unique and
 non-blank.
 
-The built-in providers are:
+The built-in provider is:
 
-- `memory`: the default in-memory backend for tests and small datasets;
-- `graph`: a compatibility adapter around the legacy Corese `Graph` backend,
-  requiring `graph` and `valueFactory` configuration properties.
+- `memory`: the default native in-memory backend with SPO/POS/OSP indexes,
+  graph partitions, atomic `addAll` and session-scoped serializable snapshots.
 
-See `GraphStoragePlugin` and `MemoryStoragePlugin` for complete provider
-implementations, and `docs/source/next_storage.md` for the public storage
-contract.
+See `MemoryStoragePlugin` for the complete provider implementation, and `docs/source/next_storage.md` for the public storage contract.

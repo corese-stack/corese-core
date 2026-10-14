@@ -119,9 +119,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
         if (option instanceof BaseIRIOptions baseIRIOptions
                 && option instanceof LineEndingOptions lineEndingOptions
                 && baseIRIOptions.getBaseIRI() != null) {
-            writer.write(String.format("@base <%s> .%s",
-                    baseIRIOptions.getBaseIRI(),
-                    lineEndingOptions.getLineEnding()));
+            writer.write("@base <" + baseIRIOptions.getBaseIRI() + "> ." + lineEndingOptions.getLineEnding());
         }
 
         Set<String> actuallyUsedNamespaces = Set.of();
@@ -359,7 +357,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
         if (prefixed != null) {
             writer.write(prefixed);
         } else {
-            writer.write(String.format("<%s>", escapeIRIString(iri.stringValue())));
+            writer.write("<" + escapeIRIString(iri.stringValue()) + ">");
         }
     }
 

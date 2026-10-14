@@ -75,7 +75,7 @@ Download the latest `.jar` file from:
 
 Corese supports pluggable storage backends.
 Create your own storage implementation (PostgreSQL, Redis, etc.)
-or use built-in backends (`graph`, `memory`).
+or use the default native backend (`memory`).
 
 **- [Storage Backend Plugin Guide](docs/STORAGE_PLUGIN_GUIDE.md)**
 

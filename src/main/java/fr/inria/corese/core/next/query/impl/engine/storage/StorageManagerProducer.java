@@ -17,12 +17,20 @@ import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import fr.inria.corese.core.next.storage.api.StorageManager;
+import fr.inria.corese.core.next.storage.api.operations.StatementSpliterator;
+import fr.inria.corese.core.next.storage.api.model.StatementPattern;
+import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.Spliterators;
 import java.util.stream.Stream;
 
 /**
@@ -36,6 +44,8 @@ import java.util.stream.Stream;
 public final class StorageManagerProducer extends ProducerDefault {
 
     private final StorageManager storage;
+    private final Set<EdgeCursor> cursors = Collections.newSetFromMap(new IdentityHashMap<>());
+    private boolean closed;
 
     /**
      * Creates a KGRAM producer backed by the given storage manager.
@@ -59,19 +69,181 @@ public final class StorageManagerProducer extends ProducerDefault {
             return List.of();
         }
 
-        try (Stream<Statement> statements =
-                     storage.queries().find(queryPattern.statementPattern())) {
-            // A default graph formed from several contexts is an RDF graph: the
-            // same triple must match once, even when stored in multiple contexts.
-            // Deduplicate triples here, before projection, to preserve solution bags.
-            Set<TripleKey> seen = new HashSet<>();
-            return statements
-                    .filter(statement -> graphNode != null || seen.add(new TripleKey(
-                            statement.getSubject(), statement.getPredicate(), statement.getObject())))
-                    .map(StorageManagerEdge::new)
-                    .map(Edge.class::cast)
-                    .toList();
+        StatementPattern pattern = queryPattern.statementPattern();
+        // Statements within one explicitly selected RDF graph already form a set.
+        boolean deduplicate = graphNode == null && pattern.getContexts().length != 1;
+        return new EdgeIterable(pattern, deduplicate);
+    }
+
+    /** Repeatable sequential iterable; each iteration owns one storage snapshot. */
+    private final class EdgeIterable implements Iterable<Edge>, AutoCloseable {
+        private final StatementPattern pattern;
+        private final boolean deduplicate;
+        private EdgeCursor cursor;
+
+        private EdgeIterable(StatementPattern pattern, boolean deduplicate) {
+            this.pattern = pattern;
+            this.deduplicate = deduplicate;
         }
+
+        @Override
+        public Iterator<Edge> iterator() {
+            close();
+            synchronized (cursors) {
+                checkInterrupted();
+                if (closed) {
+                    throw new QueryEvaluationException("Query producer is closed");
+                }
+                cursor = new EdgeCursor(storage.queries().find(pattern), deduplicate);
+                cursors.add(cursor);
+                return cursor;
+            }
+        }
+
+        @Override
+        public void close() {
+            if (cursor != null) {
+                cursor.close();
+                cursor = null;
+            }
+        }
+    }
+
+    private final class EdgeCursor implements Iterator<Edge>, AutoCloseable {
+        private Stream<Statement> stream;
+        private Iterator<Statement> statements;
+        private final Set<TripleKey> seen;
+        private Statement next;
+
+        // Release the owned snapshot before rethrowing a traversal setup failure unchanged.
+        @SuppressWarnings("java:S1181")
+        private EdgeCursor(Stream<Statement> stream, boolean deduplicate) {
+            this.stream = stream;
+            try {
+                var source = stream.spliterator();
+                // Read-version metadata, never a separate live metadata lookup:
+                // a writer may change the graph registry while this cursor is open.
+                boolean distinct = !deduplicate || source instanceof StatementSpliterator traversal
+                        && traversal.hasDistinctTriples();
+                this.seen = deduplicate && !distinct ? new HashSet<>() : null;
+                statements = Spliterators.iterator(source);
+            } catch (RuntimeException | Error failure) {
+                stream.close();
+                throw failure;
+            }
+        }
+
+        // Error is rethrown unchanged after releasing the snapshot, as for RuntimeException.
+        @Override
+        @SuppressWarnings("java:S1181")
+        public synchronized boolean hasNext() {
+            if (stream == null) {
+                return false;
+            }
+            try {
+                checkInterrupted();
+                if (next != null) {
+                    return true;
+                }
+                while (statements.hasNext()) {
+                    checkInterrupted();
+                    Statement candidate = statements.next();
+                    // The merged default graph must match each RDF triple once.
+                    if (seen == null || seen.add(new TripleKey(candidate.getSubject(),
+                            candidate.getPredicate(), candidate.getObject()))) {
+                        next = candidate;
+                        return true;
+                    }
+                }
+                close();
+                return false;
+            } catch (RuntimeException | Error failure) {
+                close();
+                throw failure;
+            }
+        }
+
+        // Edge adaptation failure must also release the snapshot before propagation.
+        @Override
+        @SuppressWarnings("java:S1181")
+        public synchronized Edge next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            Statement statement = next;
+            next = null;
+            try {
+                return new StorageManagerEdge(statement);
+            } catch (RuntimeException | Error failure) {
+                close();
+                throw failure;
+            }
+        }
+
+        @Override
+        public synchronized void close() {
+            Stream<Statement> current = stream;
+            stream = null;
+            statements = null;
+            next = null;
+            if (seen != null) {
+                seen.clear();
+            }
+            if (current != null) {
+                try {
+                    current.close();
+                } finally {
+                    synchronized (cursors) {
+                        cursors.remove(this);
+                    }
+                }
+            }
+        }
+    }
+
+    private static void checkInterrupted() {
+        if (Thread.currentThread().isInterrupted()) {
+            throw new QueryEvaluationException("Query evaluation was interrupted");
+        }
+    }
+
+    @Override
+    public boolean evaluatesBGPWithEdges() {
+        return true;
+    }
+
+    @Override
+    public void closeEdges(Iterable<Edge> edges) {
+        if (edges instanceof StorageManagerProducer.EdgeIterable iterable) {
+            iterable.close();
+        }
+    }
+
+    /** Closes remaining cursors on completion, failure or cancellation. */
+    private void closeCursors(boolean terminal) {
+        List<EdgeCursor> pending;
+        synchronized (cursors) {
+            closed |= terminal;
+            pending = new ArrayList<>(cursors);
+            cursors.clear();
+        }
+        // Never acquire a cursor monitor while holding the registry monitor:
+        // timeout cancellation may run concurrently with cursor traversal.
+        RuntimeException failure = null;
+        for (EdgeCursor cursor : pending) {
+            try {
+                cursor.close();
+            } catch (RuntimeException exception) {
+                if (failure == null) failure = exception;
+                else failure.addSuppressed(exception);
+            }
+        }
+        if (failure != null) throw failure;
+    }
+
+    @Override
+    public void close() {
+        closeCursors(true);
     }
 
     private record TripleKey(Resource subject, IRI predicate, Value object) { }
@@ -110,12 +282,12 @@ public final class StorageManagerProducer extends ProducerDefault {
 
     @Override
     public void start(Query query) {
-        // No per-query storage state is required.
+        // Cursors are registered when their iterators are opened.
     }
 
     @Override
     public void finish(Query query) {
-        // No per-query storage state is required.
+        closeCursors(false);
     }
 
     @Override
@@ -205,13 +377,18 @@ public final class StorageManagerProducer extends ProducerDefault {
         List<StorageBindingSet> results = new ArrayList<>();
         for (StorageBindingSet binding : inputBindings) {
             Environment joinedEnvironment = new StorageBindingEnvironment(environment, binding);
-            for (Edge candidate : getEdges(graphNode, from, queryEdge, joinedEnvironment)) {
-                StorageBindingSet next = binding.copy();
-                if (next.bind(queryEdge.getNode(0), candidate.getNode(0))
-                        && next.bind(queryEdge.getNode(1), candidate.getNode(1))
-                        && next.bind(queryEdge.getEdgeVariable(), candidate.getEdgeNode())) {
-                    results.add(next);
+            Iterable<Edge> edges = getEdges(graphNode, from, queryEdge, joinedEnvironment);
+            try {
+                for (Edge candidate : edges) {
+                    StorageBindingSet next = binding.copy();
+                    if (next.bind(queryEdge.getNode(0), candidate.getNode(0))
+                            && next.bind(queryEdge.getNode(1), candidate.getNode(1))
+                            && next.bind(queryEdge.getEdgeVariable(), candidate.getEdgeNode())) {
+                        results.add(next);
+                    }
                 }
+            } finally {
+                closeEdges(edges);
             }
         }
         return results;

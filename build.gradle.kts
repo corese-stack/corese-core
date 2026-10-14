@@ -344,3 +344,16 @@ tasks.named("generateGrammarSource") {
 tasks.named("javaccSparqlCorese") {
     dependsOn("createGeneratedDirs")
 }
+
+// Standalone storage measurements use the existing test runtime, without timing JUnit.
+tasks.register("storageBenchmarkClasspath") {
+    group = "verification"
+    description = "Writes the standalone storage benchmark runtime classpath."
+    dependsOn(tasks.testClasses)
+    doLast {
+        layout.buildDirectory.file("benchmarks/classpath.txt").get().asFile.apply {
+            parentFile.mkdirs()
+            writeText(sourceSets.test.get().runtimeClasspath.asPath)
+        }
+    }
+}

@@ -62,8 +62,6 @@ class FilteredModelTest extends ParserTestBase {
 
     @Test
     void testAddMatchingStatement() {
-        baseModel.add(subjectFilter, predicateFilter, objectFilter);
-
         assertTrue(filteredModel.add(subjectFilter, predicateFilter, objectFilter));
         assertTrue(baseModel.contains(subjectFilter, predicateFilter, objectFilter));
     }

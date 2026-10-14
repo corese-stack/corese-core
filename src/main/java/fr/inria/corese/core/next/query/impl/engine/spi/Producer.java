@@ -76,6 +76,16 @@ public interface Producer {
      */
     Iterable<Edge> getEdges(Node gNode, List<Node> from, Edge qEdge, Environment env);
 
+    /** Whether KGRAM should evaluate BGP edges incrementally using its regular stack. */
+    default boolean evaluatesBGPWithEdges() {
+        return false;
+    }
+
+    /** Releases an edge traversal, including when KGRAM leaves it before exhaustion. */
+    default void closeEdges(Iterable<Edge> edges) {
+        // Most producers return in-memory collections without owned resources.
+    }
+
     Mappings getMappings(Node gNode, List<Node> from, Exp exp, Environment env) throws SparqlException;
 
     /*

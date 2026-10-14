@@ -51,16 +51,16 @@ public class Visit {
     // Traversal direction is metadata; equality must retain the Map contract.
     @SuppressWarnings("java:S2160")
     class ExpVisitedNode extends HashMap<Regex, VisitedNode> {
-        boolean isReverse;
+        boolean reverse;
 
         ExpVisitedNode(boolean b) {
-            isReverse = b;
+            reverse = b;
         }
 
         void add(Regex exp, Node n) {
             VisitedNode t = get(exp);
             if (t == null) {
-                t = new VisitedNode(isReverse, nextVisitId++);
+                t = new VisitedNode(reverse, nextVisitId++);
                 put(exp, t);
             }
             t.add(n);

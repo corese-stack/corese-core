@@ -239,12 +239,10 @@ public class RDFC10Canonicalizer {
             return hash("");
         }
 
-        List<String> nquads = new ArrayList<>();
-        for (Statement quad : quads) {
-            nquads.add(serializeQuad(quad, blankNode));
-        }
-
-        Collections.sort(nquads);
+        List<String> nquads = quads.stream()
+                .map(quad -> serializeQuad(quad, blankNode))
+                .sorted()
+                .toList();
         return hash(String.join("\n", nquads) + "\n");
     }
 

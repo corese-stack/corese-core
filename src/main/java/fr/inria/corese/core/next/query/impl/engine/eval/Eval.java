@@ -209,19 +209,24 @@ public final class Eval implements ExpType, Plugin {
         initMemory(q);
         share(m);
         getProducer().start(q);
-        getVisitor().init(q);
-        share(getVisitor());
-        getVisitor().before(q);
-        Mappings map = eval(graphNode, q, m, null);
-        getVisitor().orderby(map);
-        getVisitor().after(map);
-
-        getProducer().finish(q);
-        if (hasEvent) {
-            send(Event.END, q, map);
+        try {
+            getVisitor().init(q);
+            share(getVisitor());
+            getVisitor().before(q);
+            Mappings map = eval(graphNode, q, m, null);
+            getVisitor().orderby(map);
+            getVisitor().after(map);
+            if (hasEvent) {
+                send(Event.END, q, map);
+            }
+            return map;
+        } finally {
+            try {
+                getProducer().finish(q);
+            } finally {
+                clean();
+            }
         }
-        clean();
-        return map;
     }
 
     // share global variables and ProcessVisitor
@@ -714,6 +719,11 @@ public final class Eval implements ExpType, Plugin {
     // partial init (for global query and subqueries)
     public void start(Query q) {
         limit = q.getLimitOffset();
+        // ASK only needs its first solution after OFFSET. Keep the requested
+        // Query modifiers intact, and evaluate fully when sorting/grouping needs it.
+        if (q.isAsk() && !q.isOrderBy() && !q.hasGroupBy() && !q.isAggregate()) {
+            limit = (int) Math.min(limit, (long) q.getOffset() + 1);
+        }
         starter(q);
     }
 
@@ -938,7 +948,9 @@ public final class Eval implements ExpType, Plugin {
                         break;
 
                     case BGP:
-                        backtrack = bgp(p, graphNode, exp, stack, n);
+                        backtrack = p.evaluatesBGPWithEdges()
+                                ? and(p, graphNode, exp, stack, map, n)
+                                : bgp(p, graphNode, exp, stack, n);
                         break;
 
                     case SERVICE:
@@ -1636,54 +1648,58 @@ public final class Eval implements ExpType, Plugin {
             entities = p.getEdges(graphNode, graphNodeList, qEdge, env);
         }
 
-        for (Edge entity : entities) {
+        try {
+            for (Edge entity : entities) {
 
-            if (stopped) {
-                return STOP;
-            }
-
-            if (entity != null) {
-                nbEdge++;
-                if (hasListener && !listener.listen(exp, qEdge, entity)) {
-                    continue;
+                if (stopped) {
+                    return STOP;
                 }
 
-                graph = entity.getGraph();
-                boolean bmatch = match(qEdge, entity, graphNode, graph, env);
+                if (entity != null) {
+                    nbEdge++;
+                    if (hasListener && !listener.listen(exp, qEdge, entity)) {
+                        continue;
+                    }
 
-                if (matchNBNode) {
-                    bmatch &= (qEdge.nbNode() == entity.nbNode());
-                }
+                    graph = entity.getGraph();
+                    boolean bmatch = match(qEdge, entity, graphNode, graph, env);
 
-                if (bmatch) {
-                    if (hasCandidate) {
-                        DatatypeValue dt = getVisitor().candidate(this, getGraphNode(graphNode), qEdge, entity);
-                        if (dt != null) {
-                            bmatch = dt.isTrue();
+                    if (matchNBNode) {
+                        bmatch &= (qEdge.nbNode() == entity.nbNode());
+                    }
+
+                    if (bmatch) {
+                        if (hasCandidate) {
+                            DatatypeValue dt = getVisitor().candidate(this, getGraphNode(graphNode), qEdge, entity);
+                            if (dt != null) {
+                                bmatch = dt.isTrue();
+                            }
+                        }
+
+                        bmatch &= push(p, qEdge, entity, n);
+                    }
+
+                    if (isEvent) {
+                        send(evENUM, exp, entity, bmatch);
+                    }
+
+                    if (bmatch) {
+                        isSuccess = true;
+                        backtrack = eval(p, graphNode, stack, n + 1);
+
+                        env.pop(qEdge);
+                        if (hasGraphNode) {
+                            env.pop(graphNode);
+                        }
+
+                        if (backtrack < n) {
+                            return backtrack;
                         }
                     }
-
-                    bmatch &= push(p, qEdge, entity, n);
-                }
-
-                if (isEvent) {
-                    send(evENUM, exp, entity, bmatch);
-                }
-
-                if (bmatch) {
-                    isSuccess = true;
-                    backtrack = eval(p, graphNode, stack, n + 1);
-
-                    env.pop(qEdge);
-                    if (hasGraphNode) {
-                        env.pop(graphNode);
-                    }
-
-                    if (backtrack < n) {
-                        return backtrack;
-                    }
                 }
             }
+        } finally {
+            p.closeEdges(entities);
         }
 
         if (!isSuccess && optim) {

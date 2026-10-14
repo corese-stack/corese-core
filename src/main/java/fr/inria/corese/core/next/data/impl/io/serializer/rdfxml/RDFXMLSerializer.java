@@ -338,7 +338,7 @@ public class RDFXMLSerializer implements RDFSerializer {
         }
 
         writer.write(currentIndent);
-        writer.write(String.format("<%s", elementName));
+        writer.write("<" + elementName);
 
         if (object.isIRI()) {
             writer.write(String.format(" %s=\"%s\"/>", SerializationConstants.RDF_RESOURCE_ATTRIBUTE, escapeXmlAttribute(object.stringValue())));
@@ -371,7 +371,7 @@ public class RDFXMLSerializer implements RDFSerializer {
 
             writer.write(escapeXmlContent(literal.stringValue()));
 
-            writer.write(String.format("</%s>", elementName));
+            writer.write("</" + elementName + ">");
             if(this.config instanceof LineEndingOptions lineEndingOptions) {
                 writer.write(lineEndingOptions.getLineEnding());
             }
