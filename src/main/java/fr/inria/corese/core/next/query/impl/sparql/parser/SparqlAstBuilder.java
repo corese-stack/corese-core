@@ -56,6 +56,11 @@ public abstract class SparqlAstBuilder {
      */
     protected final Deque<List<TriplePatternAst>> bgpStack = new ArrayDeque<>();
 
+    // TriplesBlock is right-recursive: exit callbacks arrive in reverse source order.
+    // Reserve each block's position on entry instead of appending it on exit.
+    private record BgpPosition(List<PatternAst> group, int index) { }
+    private final Deque<BgpPosition> bgpPositions = new ArrayDeque<>();
+
     /**
      * Counter for anonymous blank nodes created while expanding {@code [ ... ]} and {@code ( ... )} subjects.
      */
@@ -332,6 +337,9 @@ public abstract class SparqlAstBuilder {
      */
     public void enterBgp() {
         bgpStack.push(new ArrayList<>());
+        List<PatternAst> group = currentGroup();
+        bgpPositions.push(new BgpPosition(group, group.size()));
+        group.add(new BgpAst(List.of()));
     }
 
     /**
@@ -340,9 +348,9 @@ public abstract class SparqlAstBuilder {
      */
     public void exitBgp() {
         List<TriplePatternAst> triples = bgpStack.pop();
-        if (!triples.isEmpty()) {
-            currentGroup().add(new BgpAst(List.copyOf(triples)));
-        }
+        BgpPosition position = bgpPositions.pop();
+        if (triples.isEmpty()) position.group().remove(position.index());
+        else position.group().set(position.index(), new BgpAst(triples));
     }
 
     /**
@@ -757,36 +765,19 @@ public abstract class SparqlAstBuilder {
         int verbSimpleIdx = 0;
 
         for (SparqlParser.ObjectListPathContext objectList : objectLists) {
-            PathAst predicate = predicateFromPropertyListPath(
-                    verbPaths, verbSimples, verbPathIdx, verbSimpleIdx);
-            if (verbPathIdx < verbPaths.size()
+            boolean useVerbPath = verbPathIdx < verbPaths.size()
                     && (verbSimpleIdx >= verbSimples.size()
                     || verbPaths.get(verbPathIdx).getStart().getTokenIndex()
-                    < verbSimples.get(verbSimpleIdx).getStart().getTokenIndex())) {
-                verbPathIdx++;
-            } else {
-                verbSimpleIdx++;
-            }
+                    < verbSimples.get(verbSimpleIdx).getStart().getTokenIndex());
+
+            PathAst predicate = useVerbPath
+                    ? pathFromVerbPath(verbPaths.get(verbPathIdx++))
+                    : new PredicatePathAst(terms.termFromVerbSimple(verbSimples.get(verbSimpleIdx++)));
 
             for (TermAst object : termListFromObjectListPath(objectList)) {
                 addTriple(subject, predicate, object);
             }
         }
-    }
-
-    private PathAst predicateFromPropertyListPath(
-            List<SparqlParser.VerbPathContext> verbPaths,
-            List<SparqlParser.VerbSimpleContext> verbSimples,
-            int verbPathIdx,
-            int verbSimpleIdx) {
-        boolean useVerbPath = verbPathIdx < verbPaths.size()
-                && (verbSimpleIdx >= verbSimples.size()
-                || verbPaths.get(verbPathIdx).getStart().getTokenIndex()
-                < verbSimples.get(verbSimpleIdx).getStart().getTokenIndex());
-        if (useVerbPath) {
-            return pathFromVerbPath(verbPaths.get(verbPathIdx));
-        }
-        return new PredicatePathAst(terms.termFromVerbSimple(verbSimples.get(verbSimpleIdx)));
     }
 
     /**

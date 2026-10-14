@@ -34,7 +34,8 @@ public final class SparqlTermBuilder {
     /**
      * Constructs a {@code SparqlTermBuilder} with a blank-node resolver callback.
      *
-     * @param options           parser options (base IRI, etc.)
+     * @param options           parser options validated for non-null configuration
+     *                          (reserved for future term resolution extensions)
      * @param blankNodeResolver callback that handles {@code BlankNodeContext} and
      *                          updates the mutable blank-node label set held by
      *                          {@link SparqlAstBuilder}
@@ -105,34 +106,43 @@ public final class SparqlTermBuilder {
      */
     private static void validateNoSurrogateUchars(String lexical) {
         int i = 0;
-        while (i < lexical.length()) {
-            char c = lexical.charAt(i);
-            if (c == '\\' && i + 1 < lexical.length()) {
-                char next = lexical.charAt(i + 1);
-                if (next == '\\') {
-                    i += 2;
-                    continue;
-                }
-                int hexLen = 0;
-                if (next == 'u') hexLen = 4;
-                else if (next == 'U') hexLen = 8;
-                if (hexLen > 0 && i + 2 + hexLen <= lexical.length()) {
-                    String hex = lexical.substring(i + 2, i + 2 + hexLen);
-                    try {
-                        int codePoint = Integer.parseInt(hex, 16);
-                        if (codePoint >= 0xD800 && codePoint <= 0xDFFF) {
-                            throw new QuerySyntaxException(
-                                    "Surrogate code point U+" + hex.toUpperCase()
-                                    + " is not a valid Unicode scalar value in a SPARQL escape sequence");
-                        }
-                    } catch (NumberFormatException ignored) {
-                        // Not a valid hex sequence; ANTLR grammar ensures this won't happen for UCHAR
-                    }
-                    i += 2 + hexLen;
-                    continue;
-                }
+        int len = lexical.length();
+        while (i < len) {
+            i += checkEscapeAt(lexical, i, len);
+        }
+    }
+
+    private static int checkEscapeAt(String lexical, int i, int len) {
+        if (lexical.charAt(i) != '\\' || i + 1 >= len) {
+            return 1;
+        }
+        char next = lexical.charAt(i + 1);
+        if (next == '\\') {
+            return 2;
+        }
+        int hexLen = 0;
+        if (next == 'u') {
+            hexLen = 4;
+        } else if (next == 'U') {
+            hexLen = 8;
+        }
+        if (hexLen > 0 && i + 2 + hexLen <= len) {
+            checkSurrogateHex(lexical.substring(i + 2, i + 2 + hexLen));
+            return 2 + hexLen;
+        }
+        return 1;
+    }
+
+    private static void checkSurrogateHex(String hex) {
+        try {
+            int codePoint = Integer.parseInt(hex, 16);
+            if (codePoint >= 0xD800 && codePoint <= 0xDFFF) {
+                throw new QuerySyntaxException(
+                        "Surrogate code point U+" + hex.toUpperCase()
+                        + " is not a valid Unicode scalar value in a SPARQL escape sequence");
             }
-            i++;
+        } catch (NumberFormatException ignored) {
+            // Not a valid hex sequence; ANTLR grammar ensures this won't happen for UCHAR
         }
     }
 

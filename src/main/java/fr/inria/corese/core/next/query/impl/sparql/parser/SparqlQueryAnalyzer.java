@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Performs SPARQL syntax, AST, and semantic analysis and returns the
@@ -190,13 +191,10 @@ final class SparqlQueryAnalyzer {
 
     private Set<String> blankNodeLabels(CommonTokenStream tokens) {
         tokens.fill();
-        Set<String> labels = new LinkedHashSet<>();
-        for (Token token : tokens.getTokens()) {
-            if (token.getType() == SparqlLexer.BLANK_NODE_LABEL) {
-                labels.add(token.getText());
-            }
-        }
-        return labels;
+        return tokens.getTokens().stream()
+                .filter(token -> token.getType() == SparqlLexer.BLANK_NODE_LABEL)
+                .map(Token::getText)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     private QueryDiagnostic toSyntaxDiagnostic(QuerySyntaxException exception) {
