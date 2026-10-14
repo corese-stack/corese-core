@@ -44,10 +44,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Internal orchestrator for the Corese-next SPARQL query path.
@@ -63,6 +61,10 @@ import java.util.concurrent.TimeoutException;
  * as their runtime implementations become available.</p>
  */
 public final class NextSparqlPipelineExecutor {
+
+    private static final int QUERY_RUNNING = 0;
+    private static final int QUERY_COMPLETED = 1;
+    private static final int QUERY_TIMED_OUT = 2;
 
     private final StorageManager storage;
     private final SparqlParser parser;
@@ -134,13 +136,17 @@ public final class NextSparqlPipelineExecutor {
             throw new IllegalArgumentException("Tuple evaluation requires a SELECT query, got: "
                     + ast.getClass().getSimpleName());
         }
-        return new CoreseTupleQueryResult(
-                evaluate(queryBuilder.toNextQuery(select), bindings, dataset, timeoutMillis));
+        return evaluateTuple(select, bindings, dataset, timeoutMillis);
     }
 
     /** Evaluates an already parsed SELECT, also used by SPARQL Update WHERE clauses. */
     public TupleQueryResult evaluateTuple(SelectQueryAst query) {
-        return new CoreseTupleQueryResult(evaluate(queryBuilder.toNextQuery(query), null, null, 0L));
+        return evaluateTuple(query, null, null, 0L);
+    }
+
+    /** Evaluates a parsed SELECT with current options and a fresh runtime query. */
+    public TupleQueryResult evaluateTuple(SelectQueryAst query, BindingSet bindings, Dataset dataset, long timeoutMillis) {
+        return new CoreseTupleQueryResult(evaluate(queryBuilder.toNextQuery(query), bindings, dataset, timeoutMillis));
     }
 
     /**
@@ -174,7 +180,12 @@ public final class NextSparqlPipelineExecutor {
             throw new IllegalArgumentException("Boolean evaluation requires an ASK query, got: "
                     + ast.getClass().getSimpleName());
         }
-        return evaluate(queryBuilder.toNextQuery(ask), bindings, dataset, timeoutMillis).size() > 0;
+        return evaluateBoolean(ask, bindings, dataset, timeoutMillis);
+    }
+
+    /** Evaluates a parsed ASK with current options and a fresh runtime query. */
+    public boolean evaluateBoolean(AskQueryAst query, BindingSet bindings, Dataset dataset, long timeoutMillis) {
+        return evaluate(queryBuilder.toNextQuery(query), bindings, dataset, timeoutMillis).size() > 0;
     }
 
     /**
@@ -208,7 +219,12 @@ public final class NextSparqlPipelineExecutor {
      * @throws QueryTimeoutException    when the evaluation exceeds {@code timeoutMillis}
      */
     public GraphQueryResult evaluateGraph(String sparql, BindingSet bindings, Dataset dataset, long timeoutMillis) {
-        QueryAst ast = parser.parse(sparql);
+        return evaluateGraph(parser.parse(sparql), bindings, dataset, timeoutMillis);
+    }
+
+    /** Evaluates a parsed CONSTRUCT or DESCRIBE with a fresh runtime query and template. */
+    public GraphQueryResult evaluateGraph(QueryAst ast, BindingSet bindings, Dataset dataset, long timeoutMillis) {
+        Objects.requireNonNull(ast, "ast");
         Query kgramQuery = switch (ast) {
             case ConstructQueryAst construct -> queryBuilder.toNextQuery(construct);
             case DescribeQueryAst describe -> queryBuilder.toNextQuery(describe);
@@ -226,8 +242,9 @@ public final class NextSparqlPipelineExecutor {
     // -------------------------------------------------------------------------
 
     private Mappings evaluate(Query kgramQuery, BindingSet bindings, Dataset dataset, long timeoutMillis) {
+        StorageManagerProducer producer = new StorageManagerProducer(storage);
         Eval eval = Eval.create(
-                new StorageManagerProducer(storage),
+                producer,
                 new SparqlKgramEvaluator(),
                 new RdfTermMatcher());
 
@@ -238,7 +255,7 @@ public final class NextSparqlPipelineExecutor {
         Mapping initialMapping = buildInitialMapping(bindings);
 
         if (timeoutMillis > 0) {
-            return evaluateWithTimeout(eval, kgramQuery, initialMapping, timeoutMillis);
+            return evaluateWithTimeout(eval, producer, kgramQuery, initialMapping, timeoutMillis);
         }
         return evaluateCore(eval, kgramQuery, initialMapping);
     }
@@ -253,37 +270,84 @@ public final class NextSparqlPipelineExecutor {
     }
 
     /**
-     * Runs {@code eval.query()} with a cooperative timeout.
+     * Runs {@code eval.query()} with a cooperative timeout on the caller thread.
      *
-     * <p>The evaluation runs in a request-scoped virtual thread. At the deadline,
-     * {@link Eval#finish()} cooperatively stops KGRAM and the task is interrupted.
-     * No process-wide scheduler or mutable global timeout state is retained.</p>
+     * <p>Evaluation runs on the current thread so active storage transactions maintain
+     * single-thread ownership. A request-scoped virtual thread watchdog cooperatively terminates
+     * evaluation and interrupts the caller if {@code timeoutMillis} elapses. Completion
+     * and expiration compete for one atomic terminal state; the timer cannot publish
+     * an expiration separately from claiming it. Elapsed time is measured from entry,
+     * including watchdog scheduling delay.</p>
      */
-    private Mappings evaluateWithTimeout(Eval eval, Query kgramQuery, Mapping initialMapping, long timeoutMillis) {
-        FutureTask<Mappings> evaluation = new FutureTask<>(
-                () -> evaluateCore(eval, kgramQuery, initialMapping));
-        Thread thread = Thread.ofVirtual().name("sparql-query").start(evaluation);
+    private Mappings evaluateWithTimeout(Eval eval, StorageManagerProducer producer, Query kgramQuery, Mapping initialMapping, long timeoutMillis) {
+        Thread caller = Thread.currentThread();
+        boolean interruptedOnEntry = caller.isInterrupted();
+        long started = System.nanoTime();
+        long budget = TimeUnit.MILLISECONDS.toNanos(timeoutMillis);
+        AtomicInteger outcome = new AtomicInteger(QUERY_RUNNING);
+        Thread watchdog = Thread.ofVirtual().name("sparql-timeout-watchdog").start(() -> {
+            try {
+                long remaining = budget - (System.nanoTime() - started);
+                if (remaining > 0) {
+                    TimeUnit.NANOSECONDS.sleep(remaining);
+                }
+                if (outcome.compareAndSet(QUERY_RUNNING, QUERY_TIMED_OUT)) {
+                    caller.interrupt();
+                    eval.finish();
+                    producer.close();
+                }
+            } catch (InterruptedException ignored) {
+                Thread.currentThread().interrupt();
+            }
+        });
+
         try {
-            return evaluation.get(timeoutMillis, TimeUnit.MILLISECONDS);
-        } catch (TimeoutException exception) {
-            eval.finish();
-            evaluation.cancel(true);
-            throw new QueryTimeoutException(timeoutMillis);
-        } catch (InterruptedException exception) {
-            eval.finish();
-            evaluation.cancel(true);
-            Thread.currentThread().interrupt();
-            throw new QueryEvaluationException("Query evaluation was interrupted", exception);
-        } catch (ExecutionException exception) {
-            Throwable cause = exception.getCause();
-            if (cause instanceof QueryEvaluationException queryFailure) {
-                throw queryFailure;
+            Mappings mappings = evaluateCore(eval, kgramQuery, initialMapping);
+            if (!outcome.compareAndSet(QUERY_RUNNING, QUERY_COMPLETED)
+                    || System.nanoTime() - started >= budget) {
+                throw new QueryTimeoutException(timeoutMillis);
             }
-            throw new QueryEvaluationException("Query evaluation failed", cause);
+            return mappings;
+        } catch (RuntimeException exception) {
+            if (!outcome.compareAndSet(QUERY_RUNNING, QUERY_COMPLETED)
+                    && outcome.get() == QUERY_TIMED_OUT
+                    && !(exception instanceof QueryTimeoutException)) {
+                throw new QueryTimeoutException(timeoutMillis);
+            }
+            throw exception;
         } finally {
-            if (thread.isAlive() && evaluation.isCancelled()) {
-                thread.interrupt();
+            outcome.compareAndSet(QUERY_RUNNING, QUERY_COMPLETED);
+            finishWatchdog(watchdog, outcome.get() == QUERY_TIMED_OUT, interruptedOnEntry);
+        }
+    }
+
+    /**
+     * Cancels a pending timer, or waits for timeout interruption and resource cleanup to finish.
+     * A timeout's interruption is consumed only after the watchdog terminates, so it cannot
+     * interrupt a later query. An interruption already present on entry remains set.
+     *
+     * @param watchdog request-scoped timeout thread
+     * @param timedOut whether expiration won the atomic outcome transition
+     * @param interruptedOnEntry whether the caller entered evaluation interrupted
+     */
+    @SuppressWarnings("java:S2142") // Consume watchdog interruption after joining; restore the caller's entry status.
+    private static void finishWatchdog(Thread watchdog, boolean timedOut, boolean interruptedOnEntry) {
+        if (!timedOut) {
+            watchdog.interrupt();
+            return;
+        }
+        boolean joined = false;
+        while (!joined) {
+            try {
+                watchdog.join();
+                joined = true;
+            } catch (InterruptedException interruption) {
+                // The watchdog interrupts this caller; finish waiting before consuming that signal.
             }
+        }
+        Thread.interrupted();
+        if (interruptedOnEntry) {
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -301,17 +365,24 @@ public final class NextSparqlPipelineExecutor {
      * RDF term are silently skipped, matching standard SPARQL CONSTRUCT semantics.</p>
      */
     private List<Statement> buildConstructStatements(Query kgramQuery, Mappings mappings) {
-        List<Edge> templateEdges = new ArrayList<>();
         Exp constructTemplate = kgramQuery.getConstruct();
         if (constructTemplate == null) {
             return List.of();
         }
+        List<Edge> templateEdges = new ArrayList<>();
         constructTemplate.getEdgeList(templateEdges);
 
         ValueFactory factory = Values.factory();
         List<Statement> statements = new ArrayList<>();
+        Set<String> usedBlankLabels = collectUsedBlankLabels(mappings);
 
-        // Reserve every solution’s labels before instantiation, including later solutions.
+        for (Mapping mapping : mappings) {
+            instantiateTemplateMapping(templateEdges, mapping, usedBlankLabels, factory, statements);
+        }
+        return statements;
+    }
+
+    private Set<String> collectUsedBlankLabels(Mappings mappings) {
         Set<String> usedBlankLabels = new HashSet<>();
         for (Mapping mapping : mappings) {
             for (Node node : mapping.getNodes()) {
@@ -320,28 +391,33 @@ public final class NextSparqlPipelineExecutor {
                 }
             }
         }
-        for (Mapping mapping : mappings) {
-            // Fresh blank node map per solution: blank-variable label → constant blank node
-            Map<String, Node> blankNodeMap = new HashMap<>();
-            for (Edge templateEdge : templateEdges) {
-                Node subjectNode   = resolveTemplateNode(templateEdge.getNode(0), mapping, blankNodeMap, usedBlankLabels);
-                Node predicateNode = resolveTemplateNode(templateEdge.getProperty(), mapping, blankNodeMap, usedBlankLabels);
-                Node objectNode    = resolveTemplateNode(templateEdge.getNode(1), mapping, blankNodeMap, usedBlankLabels);
+        return usedBlankLabels;
+    }
 
-                if (subjectNode == null || predicateNode == null || objectNode == null) {
-                    continue;
-                }
+    private void instantiateTemplateMapping(
+            List<Edge> templateEdges,
+            Mapping mapping,
+            Set<String> usedBlankLabels,
+            ValueFactory factory,
+            List<Statement> statements) {
+        Map<String, Node> blankNodeMap = new HashMap<>();
+        for (Edge templateEdge : templateEdges) {
+            Node subjectNode = resolveTemplateNode(templateEdge.getNode(0), mapping, blankNodeMap, usedBlankLabels);
+            Node predicateNode = resolveTemplateNode(templateEdge.getProperty(), mapping, blankNodeMap, usedBlankLabels);
+            Node objectNode = resolveTemplateNode(templateEdge.getNode(1), mapping, blankNodeMap, usedBlankLabels);
 
-                Value subject   = kgramNodeToApiValue(subjectNode);
-                Value predicate = kgramNodeToApiValue(predicateNode);
-                Value object    = kgramNodeToApiValue(objectNode);
+            if (subjectNode == null || predicateNode == null || objectNode == null) {
+                continue;
+            }
 
-                if (subject instanceof Resource s && predicate instanceof IRI p && object != null) {
-                    statements.add(factory.createStatement(s, p, object));
-                }
+            Value subject = kgramNodeToApiValue(subjectNode);
+            Value predicate = kgramNodeToApiValue(predicateNode);
+            Value object = kgramNodeToApiValue(objectNode);
+
+            if (subject instanceof Resource s && predicate instanceof IRI p && object != null) {
+                statements.add(factory.createStatement(s, p, object));
             }
         }
-        return statements;
     }
 
     /**
@@ -408,6 +484,8 @@ public final class NextSparqlPipelineExecutor {
         kgramQuery.setDatasetSpecified(true);
     }
 
+    /** Translates dataset IRIs in encounter order into KGRAM's mutable dataset list. */
+    @SuppressWarnings("java:S9391") // Keep the existing list allocation without a stream pipeline for this iterable.
     private List<Node> irisToKgramNodes(Iterable<IRI> iris) {
         List<Node> nodes = new ArrayList<>();
         for (IRI iri : iris) {
