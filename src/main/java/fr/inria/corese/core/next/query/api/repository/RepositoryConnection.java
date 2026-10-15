@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.query.api.repository;
 
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.model.Statement;
+import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.term.Value;
@@ -13,6 +14,17 @@ import fr.inria.corese.core.next.query.api.dataset.Dataset;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.api.exception.RepositoryException;
 import fr.inria.corese.core.next.query.api.result.StatementResult;
+
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.OutputStream;
+import java.io.Writer;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * A connection to a Corese {@link Repository}, providing access to query
@@ -73,6 +85,144 @@ public interface RepositoryConnection extends AutoCloseable {
      * @throws RepositoryException if the operation fails or the connection is closed
      */
     void add(Iterable<? extends Statement> statements) throws RepositoryException;
+
+    /**
+     * Loads a file using its extension as the format hint and its URI as the base
+     * IRI. The file opened by this method is closed before returning.
+     *
+     * @param source RDF file
+     * @throws IllegalArgumentException if the extension is ambiguous or not recognized
+     * @throws RepositoryException if the file cannot be read
+     * @throws fr.inria.corese.core.next.data.api.exception.ParsingException if parsing fails
+     */
+    default void load(Path source) {
+        Objects.requireNonNull(source, "source");
+        load(source, RDFFormat.forPath(source).orElseThrow(
+                () -> new IllegalArgumentException("Unknown or ambiguous RDF file extension: " + source)));
+    }
+
+    /**
+     * Loads a file with an explicit format, using its URI as the base IRI.
+     * Context and transaction semantics are those of
+     * {@link #load(Reader, RDFFormat, String, Resource...)}.
+     *
+     * @param source RDF file, opened and closed by this method
+     * @param format explicit format, independent of the file extension
+     * @param contexts target graphs, or none to preserve source contexts
+     * @throws RepositoryException if the file cannot be read
+     * @throws fr.inria.corese.core.next.data.api.exception.ParsingException if parsing fails
+     */
+    default void load(Path source, RDFFormat format, Resource... contexts) {
+        Objects.requireNonNull(source, "source");
+        Objects.requireNonNull(format, "format");
+        try (InputStream input = Files.newInputStream(source)) {
+            load(input, format, source.toAbsolutePath().normalize().toUri().toString(), contexts);
+        } catch (IOException failure) {
+            throw new RepositoryException("Could not read RDF from " + source, failure);
+        }
+    }
+
+    /**
+     * Loads a caller-owned byte stream without an external base IRI.
+     *
+     * @param source input, never closed by this method
+     * @param format RDF format
+     * @param contexts target graphs, or none to preserve source contexts
+     * @see #load(Reader, RDFFormat, String, Resource...)
+     */
+    default void load(InputStream source, RDFFormat format, Resource... contexts) {
+        load(source, format, null, contexts);
+    }
+
+    /**
+     * Loads a caller-owned byte stream with an external base IRI. Context and
+     * transaction semantics are those of the reader overload.
+     *
+     * @param source input, never closed by this method
+     * @param format RDF format
+     * @param baseIRI external base IRI, or {@code null}
+     * @param contexts target graphs, or none to preserve source contexts
+     * @see #load(Reader, RDFFormat, String, Resource...)
+     */
+    void load(InputStream source, RDFFormat format, String baseIRI, Resource... contexts);
+
+    /**
+     * Loads a caller-owned reader without an external base IRI.
+     *
+     * @param source input, never closed by this method
+     * @param format RDF format
+     * @param contexts target graphs, or none to preserve source contexts
+     * @see #load(Reader, RDFFormat, String, Resource...)
+     */
+    default void load(Reader source, RDFFormat format, Resource... contexts) {
+        load(source, format, null, contexts);
+    }
+
+    /**
+     * Parses directly into this connection without an intermediate statement
+     * collection. N-Triples and N-Quads retain at most one physical line of parser
+     * input; other formats may buffer the document. The stored data still consumes
+     * memory proportional to its size.
+     *
+     * <p>With no active transaction, this method owns a transaction and rolls it
+     * back on failure. Otherwise it participates in the caller's transaction,
+     * without committing or rolling it back; a failure can leave an imported
+     * prefix in that transaction, which the caller must roll back. Transactional
+     * storage is required when this method needs to start a transaction.</p>
+     *
+     * <p>No contexts preserves source graph names; explicit contexts replace them
+     * and replicate statements into each target. A {@code null} element selects
+     * the default graph. Blank nodes are scoped to this invocation, including
+     * blank graph names from the document. Prefix declarations are used during
+     * parsing but are not persisted as repository metadata.</p>
+     *
+     * @param source input, never closed by this method
+     * @param format RDF format
+     * @param baseIRI external base IRI, or {@code null}
+     * @param contexts target graphs, or none to preserve source contexts
+     * @throws NullPointerException if the input, format, or contexts array is null
+     * @throws RepositoryException if storage access or transaction handling fails
+     * @throws fr.inria.corese.core.next.data.api.exception.ParsingException if parsing fails
+     */
+    void load(Reader source, RDFFormat format, String baseIRI, Resource... contexts);
+
+    /**
+     * Exports selected graphs to a UTF-8 file, closing the file opened here.
+     * A failed write may leave a partial file.
+     *
+     * @param destination output file
+     * @param format RDF format
+     * @param contexts selected graphs, or none for every graph
+     * @see #export(Writer, RDFFormat, Resource...)
+     */
+    void export(Path destination, RDFFormat format, Resource... contexts);
+
+    /**
+     * Exports selected graphs to a caller-owned byte stream without closing it.
+     *
+     * @param destination output stream
+     * @param format RDF format
+     * @param contexts selected graphs, or none for every graph
+     * @see #export(Writer, RDFFormat, Resource...)
+     */
+    void export(OutputStream destination, RDFFormat format, Resource... contexts);
+
+    /**
+     * Serializes a captured statement traversal and always closes its storage
+     * cursor, including on failure. N-Triples and N-Quads consume it progressively;
+     * other formats may materialize the selected data. A format without named graph
+     * support rejects named statements instead of silently discarding contexts.
+     * Failures may leave partial output; caller-owned outputs are never closed.
+     *
+     * @param destination output writer
+     * @param format RDF format
+     * @param contexts selected graphs; none means every graph, a null element the default graph
+     * @throws NullPointerException if a required argument or contexts array is null
+     * @throws fr.inria.corese.core.next.data.api.exception.SerializationException if serialization
+     *         fails or the format cannot preserve the selected contexts
+     * @throws RepositoryException if storage access fails
+     */
+    void export(Writer destination, RDFFormat format, Resource... contexts);
 
     /**
      * Adds a statement assembled from RDF terms. With no context, the statement
@@ -308,6 +458,58 @@ public interface RepositoryConnection extends AutoCloseable {
      *                             or the connection is closed
      */
     void rollback() throws RepositoryException;
+
+    /**
+     * Executes a callback in a transaction owned by this method. Nested use is
+     * rejected before invoking the callback. The callback must not close the
+     * connection or manually end the transaction, and runs on the calling thread.
+     * Callback and commit failures trigger rollback while the transaction is active;
+     * a rollback failure is suppressed on the original exception.
+     *
+     * @param action work to execute
+     * @throws NullPointerException if the callback is null
+     * @throws RepositoryException if a transaction is active or transaction handling fails
+     */
+    default void inTransaction(Consumer<? super RepositoryConnection> action) {
+        Objects.requireNonNull(action, "action");
+        computeInTransaction(connection -> {
+            action.accept(connection);
+            return null;
+        });
+    }
+
+    /**
+     * Executes work and returns its value after a successful commit. The lifecycle
+     * contract is the same as {@link #inTransaction(Consumer)}. Returned values must
+     * not depend on a cursor or transaction ended by this method.
+     *
+     * @param action work to execute
+     * @param <T> return value type
+     * @return the callback's value after commit
+     * @throws NullPointerException if the callback is null
+     * @throws RepositoryException if a transaction is active or transaction handling fails
+     */
+    @SuppressWarnings("java:S1181") // Roll back on callback Errors too, then rethrow the original failure unchanged.
+    default <T> T computeInTransaction(Function<? super RepositoryConnection, ? extends T> action) {
+        Objects.requireNonNull(action, "action");
+        begin();
+        try {
+            T result = action.apply(this);
+            commit();
+            return result;
+        } catch (RuntimeException | Error failure) {
+            try {
+                if (isActive()) {
+                    rollback();
+                }
+            } catch (RuntimeException | Error rollbackFailure) {
+                if (failure != rollbackFailure) {
+                    failure.addSuppressed(rollbackFailure);
+                }
+            }
+            throw failure;
+        }
+    }
 
     /**
      * Closes this connection and releases any resources it holds. Repeated calls

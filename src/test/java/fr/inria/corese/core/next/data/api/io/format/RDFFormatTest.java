@@ -5,10 +5,27 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Optional;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class RDFFormatTest {
+
+    @Test
+    void fileNameHintsUseOnlyTheFinalExtensionWithoutInspectingFiles() {
+        assertEquals(Optional.of(RDFFormat.TURTLE), RDFFormat.forFileName("data.TTL"));
+        assertEquals(Optional.of(RDFFormat.NQUADS), RDFFormat.forPath(Path.of("missing", "data.nq")));
+        assertEquals(Optional.of(RDFFormat.NTRIPLES), RDFFormat.forFileName("C:\\data\\file.nt"));
+        assertTrue(RDFFormat.forFileName("directory.ttl/file").isEmpty());
+        assertTrue(RDFFormat.forFileName("data.ttl.gz").isEmpty());
+        assertEquals(Optional.of(RDFFormat.RDFXML), RDFFormat.forFileName("data.xml"));
+        assertEquals(Optional.of(RDFFormat.RDFXML), RDFFormat.forFileName("data.rdf"));
+        assertEquals(Optional.of(RDFFormat.RDFA), RDFFormat.forFileName("data.xhtml"));
+        assertTrue(RDFFormat.forFileName(".ttl").isEmpty());
+        assertTrue(RDFFormat.forFileName("data.").isEmpty());
+        assertTrue(RDFFormat.forFileName(null).isEmpty());
+        assertTrue(RDFFormat.forPath(null).isEmpty());
+    }
 
 
     @Test
