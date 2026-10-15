@@ -79,7 +79,6 @@ or use the default native backend (`memory`).
 
 **- [Storage Backend Plugin Guide](docs/STORAGE_PLUGIN_GUIDE.md)**
 
-
 ## Contributing
 
 We welcome contributions! Here’s how to get involved:
