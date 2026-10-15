@@ -11,6 +11,15 @@ import fr.inria.corese.core.next.query.Repositories;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.OutputStream;
+import java.io.Writer;
+import java.nio.file.Path;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
+import fr.inria.corese.core.next.data.api.term.Resource;
 
 /**
  * A Corese repository that contains RDF data that can be queried and updated.
@@ -140,6 +149,164 @@ public interface Repository extends AutoCloseable {
     default void update(String sparqlUpdate) throws QuerySyntaxException, RepositoryException {
         try (RepositoryConnection conn = getConnection()) {
             conn.prepareUpdate(sparqlUpdate).execute();
+        }
+    }
+
+    /**
+     * Loads a file using its extension, owning the connection and import transaction.
+     *
+     * @param source RDF file
+     * @see RepositoryConnection#load(Path)
+     */
+    default void load(Path source) {
+        try (RepositoryConnection connection = getConnection()) {
+            connection.load(source);
+        }
+    }
+
+    /**
+     * Loads RDF through a connection owned and closed by this call.
+     * Caller-owned streams and readers remain open.
+     *
+     * @param source RDF input
+     * @param format explicit RDF format
+     * @param contexts target graphs, or none to preserve source contexts
+     * @see RepositoryConnection#load(Path, RDFFormat, Resource...)
+     */
+    default void load(Path source, RDFFormat format, Resource... contexts) {
+        try (RepositoryConnection connection = getConnection()) {
+            connection.load(source, format, contexts);
+        }
+    }
+
+    /**
+     * Loads RDF through a connection owned and closed by this call.
+     * Caller-owned streams and readers remain open.
+     *
+     * @param source RDF input
+     * @param format explicit RDF format
+     * @param contexts target graphs, or none to preserve source contexts
+     * @see RepositoryConnection#load(InputStream, RDFFormat, Resource...)
+     */
+    default void load(InputStream source, RDFFormat format, Resource... contexts) {
+        try (RepositoryConnection connection = getConnection()) {
+            connection.load(source, format, contexts);
+        }
+    }
+
+    /**
+     * Loads RDF with an external base IRI in a transaction owned by this call.
+     *
+     * @param source caller-owned input, never closed here
+     * @param format explicit RDF format
+     * @param baseIRI external base IRI, or null
+     * @param contexts target graphs, or none to preserve source contexts
+     * @see RepositoryConnection#load(InputStream, RDFFormat, String, Resource...)
+     */
+    default void load(InputStream source, RDFFormat format, String baseIRI, Resource... contexts) {
+        try (RepositoryConnection connection = getConnection()) {
+            connection.load(source, format, baseIRI, contexts);
+        }
+    }
+
+    /**
+     * Loads RDF through a connection owned and closed by this call.
+     * Caller-owned streams and readers remain open.
+     *
+     * @param source RDF input
+     * @param format explicit RDF format
+     * @param contexts target graphs, or none to preserve source contexts
+     * @see RepositoryConnection#load(Reader, RDFFormat, Resource...)
+     */
+    default void load(Reader source, RDFFormat format, Resource... contexts) {
+        try (RepositoryConnection connection = getConnection()) {
+            connection.load(source, format, contexts);
+        }
+    }
+
+    /**
+     * Loads RDF with an external base IRI in a transaction owned by this call.
+     *
+     * @param source caller-owned input, never closed here
+     * @param format explicit RDF format
+     * @param baseIRI external base IRI, or null
+     * @param contexts target graphs, or none to preserve source contexts
+     * @see RepositoryConnection#load(Reader, RDFFormat, String, Resource...)
+     */
+    default void load(Reader source, RDFFormat format, String baseIRI, Resource... contexts) {
+        try (RepositoryConnection connection = getConnection()) {
+            connection.load(source, format, baseIRI, contexts);
+        }
+    }
+
+    /**
+     * Exports RDF through a connection owned and closed by this call.
+     * Caller-owned streams and writers remain open.
+     *
+     * @param destination RDF output
+     * @param format RDF format
+     * @param contexts selected graphs, or none for every graph
+     * @see RepositoryConnection#export(Path, RDFFormat, Resource...)
+     */
+    default void export(Path destination, RDFFormat format, Resource... contexts) {
+        try (RepositoryConnection connection = getConnection()) {
+            connection.export(destination, format, contexts);
+        }
+    }
+
+    /**
+     * Exports RDF through a connection owned and closed by this call.
+     * Caller-owned streams and writers remain open.
+     *
+     * @param destination RDF output
+     * @param format RDF format
+     * @param contexts selected graphs, or none for every graph
+     * @see RepositoryConnection#export(OutputStream, RDFFormat, Resource...)
+     */
+    default void export(OutputStream destination, RDFFormat format, Resource... contexts) {
+        try (RepositoryConnection connection = getConnection()) {
+            connection.export(destination, format, contexts);
+        }
+    }
+
+    /**
+     * Exports RDF through a connection owned and closed by this call.
+     * Caller-owned streams and writers remain open.
+     *
+     * @param destination RDF output
+     * @param format RDF format
+     * @param contexts selected graphs, or none for every graph
+     * @see RepositoryConnection#export(Writer, RDFFormat, Resource...)
+     */
+    default void export(Writer destination, RDFFormat format, Resource... contexts) {
+        try (RepositoryConnection connection = getConnection()) {
+            connection.export(destination, format, contexts);
+        }
+    }
+
+    /**
+     * Runs work in an owned connection and transaction, then closes the connection.
+     *
+     * @param action work that must not manually end the transaction or close the connection
+     * @see RepositoryConnection#inTransaction(Consumer)
+     */
+    default void inTransaction(Consumer<? super RepositoryConnection> action) {
+        try (RepositoryConnection connection = getConnection()) {
+            connection.inTransaction(action);
+        }
+    }
+
+    /**
+     * Runs work in an owned connection and transaction and returns its detached value.
+     *
+     * @param action work that must not manually end the transaction or close the connection
+     * @param <T> return value type
+     * @return the callback's value after commit and connection closure
+     * @see RepositoryConnection#computeInTransaction(Function)
+     */
+    default <T> T computeInTransaction(Function<? super RepositoryConnection, ? extends T> action) {
+        try (RepositoryConnection connection = getConnection()) {
+            return connection.computeInTransaction(action);
         }
     }
 }

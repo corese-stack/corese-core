@@ -2,6 +2,12 @@ package fr.inria.corese.core.next.query.impl.repository;
 
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.model.Statement;
+import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
+import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
+import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
+import fr.inria.corese.core.next.data.api.exception.SerializationException;
+import fr.inria.corese.core.next.io.CoreseIO;
+import fr.inria.corese.core.next.storage.StorageModels;
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.term.Value;
@@ -37,6 +43,14 @@ import fr.inria.corese.core.next.storage.api.transaction.Transaction;
 import fr.inria.corese.core.next.storage.api.transaction.TransactionManager;
 
 import java.util.Objects;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.function.Consumer;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.OutputStream;
+import java.io.Writer;
+import java.nio.file.Path;
 
 /**
  * Connection to a Corese repository.
@@ -47,6 +61,8 @@ import java.util.Objects;
  * {@link GraphQuery}, and {@link Update} interfaces.</p>
  */
 public final class CoreseRepositoryConnection implements RepositoryConnection {
+
+    private static final String PARAM_DESTINATION = "destination";
 
     private final Repository repository;
     private final StorageManager storage;
@@ -92,6 +108,82 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
         } catch (StorageException | UnsupportedOperationException e) {
             throw new RepositoryException("Could not add statements", e);
         }
+    }
+
+    @Override
+    public void load(InputStream source, RDFFormat format, String baseIRI, Resource... contexts) {
+        Objects.requireNonNull(source, "source");
+        importData(format, contexts, rdfParser -> rdfParser.parse(source, baseIRI));
+    }
+
+    @Override
+    public void load(Reader source, RDFFormat format, String baseIRI, Resource... contexts) {
+        Objects.requireNonNull(source, "source");
+        importData(format, contexts, rdfParser -> rdfParser.parse(source, baseIRI));
+    }
+
+    private void importData(RDFFormat format, Resource[] contexts, Consumer<RDFParser> action) {
+        checkOpen();
+        Objects.requireNonNull(format, "format");
+        Objects.requireNonNull(contexts, "contexts");
+        RepositoryImportModel target = new RepositoryImportModel(
+                StorageModels.create(storage), getValueFactory(), contexts);
+        RDFParser rdfParser = CoreseIO.parser(format, target, getValueFactory());
+        if (isActive()) {
+            action.accept(rdfParser);
+        } else {
+            inTransaction(connection -> action.accept(rdfParser));
+        }
+    }
+
+    @Override
+    public void export(Path destination, RDFFormat format, Resource... contexts) {
+        Objects.requireNonNull(destination, PARAM_DESTINATION);
+        exportData(format, contexts, serializer -> serializer.write(destination));
+    }
+
+    @Override
+    public void export(OutputStream destination, RDFFormat format, Resource... contexts) {
+        Objects.requireNonNull(destination, PARAM_DESTINATION);
+        exportData(format, contexts, serializer -> serializer.write(destination));
+    }
+
+    @Override
+    public void export(Writer destination, RDFFormat format, Resource... contexts) {
+        Objects.requireNonNull(destination, PARAM_DESTINATION);
+        exportData(format, contexts, serializer -> serializer.write(destination));
+    }
+
+    private void exportData(RDFFormat format, Resource[] contexts, Consumer<RDFSerializer> action) {
+        checkOpen();
+        Objects.requireNonNull(format, "format");
+        Objects.requireNonNull(contexts, "contexts");
+        try (StatementResult statements = getStatements(null, null, null, contexts)) {
+            Iterable<Statement> source = format.supportsNamedGraphs()
+                    ? statements : requireDefaultGraph(statements, format);
+            action.accept(CoreseIO.serializer(source, format));
+        }
+    }
+
+    private static Iterable<Statement> requireDefaultGraph(StatementResult statements, RDFFormat format) {
+        return () -> new Iterator<>() {
+            @Override
+            public boolean hasNext() {
+                return statements.hasNext();
+            }
+
+            @Override
+            public Statement next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
+                Statement statement = statements.next();
+                if (statement.getContext() != null) {
+                    throw new SerializationException("Cannot preserve named graphs in " + format.getName(), format);
+                }
+                return statement;
+            }
+        };
     }
 
     @Override

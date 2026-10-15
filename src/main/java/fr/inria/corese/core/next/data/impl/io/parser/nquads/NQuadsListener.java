@@ -41,7 +41,6 @@ public class NQuadsListener extends NQuadsBaseListener {
     @Override
     public void enterStatement(NQuadsParser.StatementContext ctx) {
 
-        checkForInvalidDirectives(ctx);
 
 
         currentSubject = extractSubject(ctx.subject());
@@ -49,17 +48,6 @@ public class NQuadsListener extends NQuadsBaseListener {
         currentGraph = (ctx.graphLabel() != null) ? extractGraph(ctx.graphLabel()) : null;
     }
 
-    /**
-     * Checks for invalid directives in N-Quads format.
-     * N-Quads does not support @base or @prefix directives.
-     */
-    private void checkForInvalidDirectives(NQuadsParser.StatementContext ctx) {
-        String text = ctx.getText();
-        if (text != null && (text.contains("@base") || text.contains("@prefix"))) {
-            throw new ParsingException(
-                    "Directives (@base, @prefix) are not allowed in N-Quads format");
-        }
-    }
     @Override
     public void exitStatement(NQuadsParser.StatementContext ctx) {
         Value object = extractObject(ctx.object());

@@ -6,12 +6,10 @@ import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 import fr.inria.corese.core.next.data.spi.io.parser.AbstractRDFParser;
 import fr.inria.corese.core.next.data.api.io.option.RDFParsingOptions;
 import fr.inria.corese.core.next.data.api.exception.ParsingException;
+import fr.inria.corese.core.next.data.impl.io.parser.support.LineRDFParser;
 import fr.inria.corese.core.next.generated.antlr.NTriplesLexer;
-import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.ConsoleErrorListener;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.BaseErrorListener;
@@ -28,7 +26,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * An ANTLR4-based parser for the N-Triples format.
  * This parser uses an ANTLR grammar to tokenize and parse N-Triples documents,
- * then a listener to build the RDF model.
+ * then a listener to populate the RDF model one physical line at a time.
  */
 public class NTriplesParser extends AbstractRDFParser {
 
@@ -73,16 +71,7 @@ public class NTriplesParser extends AbstractRDFParser {
     @Override
     public void parse(Reader reader, String baseURI) throws ParsingException {
         try {
-            CharStream charStream = CharStreams.fromReader(reader);
-            String input = charStream.toString();
-            if (input.contains("@prefix")) {
-                throw new ParsingException("@prefix directives are not allowed in N-Triples");
-            }
-            if (input.contains("@base")) {
-                throw new ParsingException("@base directives are not allowed in N-Triples");
-            }
-            charStream = CharStreams.fromString(input);
-            NTriplesLexer lexer = new NTriplesLexer(charStream);
+            NTriplesLexer lexer = new NTriplesLexer(CharStreams.fromString(""));
 
             lexer.removeErrorListener(ConsoleErrorListener.INSTANCE);
             lexer.addErrorListener(new NTriplesErrorListener());
@@ -95,12 +84,8 @@ public class NTriplesParser extends AbstractRDFParser {
             antlrParser.setErrorHandler(new BailErrorStrategy());
             antlrParser.addErrorListener(new NTriplesErrorListener());
 
-            ParseTreeWalker walker = new ParseTreeWalker();
-            ParseTree tree = antlrParser.ntriplesDoc();
-
             NTriplesListener listener = new NTriplesListener(getModel(), getValueFactory(), getConfig());
-
-            walker.walk(listener, tree);
+            LineRDFParser.parse(reader, lexer, antlrParser, antlrParser::ntriplesDoc, listener);
 
         } catch (ParseCancellationException pce) {
             if (pce.getCause() instanceof ParsingException cause) {

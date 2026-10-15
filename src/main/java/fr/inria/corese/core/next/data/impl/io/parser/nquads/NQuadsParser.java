@@ -6,10 +6,9 @@ import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 import fr.inria.corese.core.next.data.spi.io.parser.AbstractRDFParser;
 import fr.inria.corese.core.next.data.api.io.option.RDFParsingOptions;
 import fr.inria.corese.core.next.data.api.exception.ParsingException;
+import fr.inria.corese.core.next.data.impl.io.parser.support.LineRDFParser;
 import fr.inria.corese.core.next.generated.antlr.NQuadsLexer;
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,7 +19,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * An ANTLR4-based parser for N-Quads format.
  * This parser uses an ANTLR grammar to tokenize and parse N-Quads documents,
- * then a listener to build the RDF model.
+ * then a listener to populate the RDF model one physical line at a time.
  */
 public class NQuadsParser extends AbstractRDFParser {
 
@@ -65,20 +64,15 @@ public class NQuadsParser extends AbstractRDFParser {
     @Override
     public void parse(Reader reader, String baseURI) throws ParsingException {
         try {
-            CharStream charStream = CharStreams.fromReader(reader);
-
-            NQuadsLexer lexer = new NQuadsLexer(charStream);
+            NQuadsLexer lexer = new NQuadsLexer(CharStreams.fromString(""));
             configureErrorHandling(lexer);
 
             CommonTokenStream tokens = new CommonTokenStream(lexer);
             fr.inria.corese.core.next.generated.antlr.NQuadsParser parser = new fr.inria.corese.core.next.generated.antlr.NQuadsParser(tokens);
             configureErrorHandling(parser);
 
-            ParseTree tree = parser.nquadsDoc();
-
-            ParseTreeWalker walker = new ParseTreeWalker();
             NQuadsListener listener = new NQuadsListener(getModel(), getValueFactory(), getConfig());
-            walker.walk(listener, tree);
+            LineRDFParser.parse(reader, lexer, parser, parser::nquadsDoc, listener);
 
         } catch (ParsingException e) {
             throw e;

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.nio.file.Path;
 
 /**
  * Describes a semantic RDF serialization format, extending file-level metadata
@@ -146,6 +147,44 @@ public class RDFFormat extends FileFormat {
                 .filter(format -> format.getExtensions().stream()
                         .anyMatch(e -> e.equalsIgnoreCase(candidate)))
                 .findFirst();
+    }
+
+    /**
+     * Looks up a format from the final extension of a file name, ignoring case.
+     * This is a name-based hint; the file is not opened or inspected. Compression
+     * suffixes are not interpreted. Ambiguous extensions require an explicit
+     * format. Canonical N-Quads is treated as N-Quads input.
+     *
+     * @param fileName file name, or {@code null}
+     * @return the matching input format, or empty for an ambiguous, unknown, or missing extension
+     */
+    public static Optional<RDFFormat> forFileName(String fileName) {
+        if (fileName == null) {
+            return Optional.empty();
+        }
+        int separator = Math.max(fileName.lastIndexOf('/'), fileName.lastIndexOf('\\'));
+        int dot = fileName.lastIndexOf('.');
+        if (dot <= separator + 1) {
+            return Optional.empty();
+        }
+        String extension = fileName.substring(dot + 1);
+        List<RDFFormat> candidates = all().stream()
+                .filter(format -> format != RDFC_1_0)
+                .filter(format -> format.getExtensions().stream().anyMatch(extension::equalsIgnoreCase))
+                .limit(2)
+                .toList();
+        return candidates.size() == 1 ? Optional.of(candidates.getFirst()) : Optional.empty();
+    }
+
+    /**
+     * Looks up a format from a path's file name without accessing the filesystem.
+     *
+     * @param path file path, or {@code null}
+     * @return the matching format, or empty when no supported extension is present
+     */
+    public static Optional<RDFFormat> forPath(Path path) {
+        return path == null || path.getFileName() == null
+                ? Optional.empty() : forFileName(path.getFileName().toString());
     }
 
     /**
