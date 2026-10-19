@@ -6,7 +6,7 @@ conservées.
 
 ## Timeout et transactions
 
-`NextSparqlPipelineExecutor` exécute toujours l'évaluation sur le thread qui possède
+`SparqlQueryExecutor` exécute toujours l'évaluation sur le thread qui possède
 la transaction. Le watchdog utilise désormais un seul `AtomicInteger` : le premier
 CAS départage fin d'évaluation et expiration, sans intervalle entre la revendication
 d'un timeout et sa publication. Un résultat ne peut pas être accepté après que le

@@ -59,6 +59,74 @@ sourceSets {
     }
 }
 
+// Compile and test the native implementation without historical Corese classes
+// on either classpath. No main output or JavaCC sources are included here.
+val nextSources = sourceSets.create("next") {
+    java.setSrcDirs(listOf("src/main/java", antlrGeneratedDir))
+    java.include("fr/inria/corese/core/next/**/*.java")
+    resources.setSrcDirs(listOf("src/main/resources"))
+    resources.include("META-INF/services/fr.inria.corese.core.next.storage.api.plugin.StoragePlugin")
+}
+
+val nextTestSources = sourceSets.create("nextTest") {
+    java.setSrcDirs(listOf("src/test/java"))
+    java.include("fr/inria/corese/core/next/**/*.java")
+    resources.setSrcDirs(listOf("src/test/resources"))
+    compileClasspath = nextSources.output + configurations[compileClasspathConfigurationName]
+    runtimeClasspath = output + nextSources.output + configurations[runtimeClasspathConfigurationName]
+}
+
+// Native sources and tests define their own dependency graph. The historical
+// build inherits those dependencies, while the native build never inherits its output or libraries.
+configurations.implementation.get().extendsFrom(configurations[nextSources.implementationConfigurationName])
+configurations[nextTestSources.implementationConfigurationName]
+    .extendsFrom(configurations[nextSources.implementationConfigurationName])
+configurations.testImplementation.get().extendsFrom(configurations[nextTestSources.implementationConfigurationName])
+configurations.testRuntimeOnly.get().extendsFrom(configurations[nextTestSources.runtimeOnlyConfigurationName])
+
+tasks.named<JavaCompile>(nextSources.compileJavaTaskName) {
+    dependsOn("generateGrammarSource")
+    options.encoding = "UTF-8"
+    options.compilerArgs.addAll(listOf("-proc:none", "-Xlint:all", "-Werror"))
+}
+
+val nextTest by tasks.registering(Test::class) {
+    description = "Tests the native implementation with no historical Corese classes available."
+    group = "verification"
+    testClassesDirs = nextTestSources.output.classesDirs
+    classpath = nextTestSources.runtimeClasspath
+    useJUnitPlatform()
+    systemProperty("corese.next.isolated", "true")
+    systemProperty("java.util.logging.config.file", "src/test/resources/logging.properties")
+}
+
+val nextJar by tasks.registering(Jar::class) {
+    description = "Builds the isolated native classes and their storage plugin descriptor."
+    group = "build"
+    archiveClassifier.set("next")
+    from(nextSources.output)
+}
+
+val nextJavadoc by tasks.registering(Javadoc::class) {
+    description = "Checks the native API documentation without historical Corese classes."
+    group = "documentation"
+    source = nextSources.allJava.matching { exclude("**/generated/**") }
+    classpath = nextSources.output + nextSources.compileClasspath
+    destinationDir = layout.buildDirectory.dir("docs/next-javadoc").get().asFile
+    options.encoding = "UTF-8"
+    (options as StandardJavadocDocletOptions).addStringOption("Xdoclint:all,-missing", "-quiet")
+}
+
+tasks.register("checkNext") {
+    description = "Compiles, packages, and tests next independently of historical Corese classes."
+    group = "verification"
+    dependsOn(nextTest, nextJar, nextJavadoc)
+}
+
+tasks.named("check") {
+    dependsOn(nextSources.compileJavaTaskName)
+}
+
 // Ensure JavaCC generation happens before compilation
 tasks.named("compileJava") {
     dependsOn("javaccSparqlCorese")
@@ -111,6 +179,14 @@ repositories {
 }
 
 dependencies {
+    // === Standalone native runtime ===
+    add(nextSources.implementationConfigurationName, "org.slf4j:slf4j-api:2.0.17")
+    add(nextSources.implementationConfigurationName, "org.antlr:antlr4-runtime:4.13.2")
+    add(nextSources.implementationConfigurationName, "com.apicatalog:titanium-json-ld:1.6.0")
+    add(nextSources.implementationConfigurationName, "com.apicatalog:titanium-rdf-api:1.0.0")
+    add(nextSources.implementationConfigurationName, "org.eclipse.parsson:parsson:1.1.7")
+    add(nextSources.implementationConfigurationName, "jakarta.json:jakarta.json-api:2.1.3")
+    add(nextSources.implementationConfigurationName, "com.typesafe:config:1.4.3")
     // === Logging ===
     // As a library, corese-core should only depend on the SLF4J API.
     // The actual logging implementation (Logback, Log4j2, etc.) should be chosen
@@ -124,19 +200,11 @@ dependencies {
 
     // === Antlr dependencies ===
     antlr("org.antlr:antlr4:4.13.2")                                                   // Antlr for parsing (ANTLR 4)
-    implementation("org.antlr:antlr4-runtime:4.13.2")                                  // Antlr runtime for parsing
 
     // === HTTP and XML ===
     implementation("org.glassfish.jersey.core:jersey-client:3.1.10")                   // HTTP client (Jersey)
     implementation("org.glassfish.jersey.inject:jersey-hk2:3.1.10")                    // Dependency injection for Jersey
     implementation("com.sun.activation:jakarta.activation:2.0.1")                      // MIME type handling (Jakarta Activation)
-
-    // === JSONLD Parsing ===
-    implementation("com.apicatalog:titanium-json-ld:1.6.0")                            // JSON-LD processing library
-    implementation("com.apicatalog:titanium-rdf-api:1.0.0")                            // Titanium RDF API for JSON-LD processing
-    implementation("org.eclipse.parsson:parsson:1.1.7")                                // JSON parser for JSON-LD
-    implementation("jakarta.json:jakarta.json-api:2.1.3")                              // Jakarta JSON API for JSON processing
-
 
     // === XML parsing ===
     implementation("com.typesafe.akka:akka-stream_2.13:2.6.20")                        // Akka Streams for reactive streams processing
@@ -148,16 +216,15 @@ dependencies {
     // === Utilities ===
     implementation("org.apache.commons:commons-text:1.13.1")                           // Text manipulation utilities (Commons Text)
     implementation("org.json:json:20250517")                                           // JSON processing
-    implementation("com.typesafe:config:1.4.3")                                        // Configuration library (Typesafe Config)
 
     // === Test dependencies ===
-    testImplementation(platform("org.junit:junit-bom:5.13.2"))                         // JUnit BOM for consistent test versions
-    testImplementation("org.junit.jupiter:junit-jupiter:5.13.2")                       // JUnit Jupiter API and engine
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.13.2")               // JUnit platform launcher (runtime)
-    testImplementation("org.mockito:mockito-core:5.18.0")                              // Mockito core for mocking in tests
-    testImplementation("org.mockito:mockito-junit-jupiter:5.18.0")                     // Mockito integration with JUnit Jupiter
-    testRuntimeOnly("org.apache.logging.log4j:log4j-core:2.25.0")                          // Log4j2 core for internal logging
-    testRuntimeOnly("org.apache.logging.log4j:log4j-slf4j2-impl:2.25.0")                   // SLF4J binding for Log4j2 (runtime)
+    add(nextTestSources.implementationConfigurationName, platform("org.junit:junit-bom:5.13.2"))
+    add(nextTestSources.implementationConfigurationName, "org.junit.jupiter:junit-jupiter:5.13.2")
+    add(nextTestSources.runtimeOnlyConfigurationName, "org.junit.platform:junit-platform-launcher:1.13.2")
+    add(nextTestSources.implementationConfigurationName, "org.mockito:mockito-core:5.18.0")
+    add(nextTestSources.implementationConfigurationName, "org.mockito:mockito-junit-jupiter:5.18.0")
+    add(nextTestSources.runtimeOnlyConfigurationName, "org.apache.logging.log4j:log4j-core:2.25.0")
+    add(nextTestSources.runtimeOnlyConfigurationName, "org.apache.logging.log4j:log4j-slf4j2-impl:2.25.0")
 
 }
 
