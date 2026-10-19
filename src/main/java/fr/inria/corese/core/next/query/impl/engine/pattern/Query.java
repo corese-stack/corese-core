@@ -15,7 +15,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Compiled query operators, projection, dataset and variable indexes.
@@ -635,6 +638,55 @@ public final class Query extends Exp {
 
     public void setDistinct(boolean b) {
         distinctResults = b;
+    }
+
+    /**
+     * Determines whether DISTINCT is strictly redundant with GROUP BY.
+     *
+     * <p>In SPARQL 1.1, if a query uses GROUP BY and all grouping expressions are simple
+     * variables directly projected in the SELECT list, then every solution row emitted
+     * by the GROUP BY stage already possesses a unique combination of group key values.
+     * Consequently, each projected row is guaranteed to be pairwise distinct, making an
+     * additional DISTINCT deduplication pass redundant.</p>
+     *
+     * <p>A counter-example where DISTINCT is NOT redundant:
+     * {@code SELECT DISTINCT (COUNT(*) AS ?n) WHERE { ... } GROUP BY ?x}
+     * Here, two distinct groups (:a and :b) may yield the same count ?n = 1. If ?x is not
+     * projected, removing DISTINCT would erroneously return two rows instead of one.</p>
+     *
+     * @return true if DISTINCT is guaranteed to be redundant with GROUP BY
+     */
+    public boolean isDistinctRedundantWithGroupBy() {
+        if (!isDistinct() || !hasGroupBy() || isListGroup()) {
+            return false;
+        }
+        List<Exp> groupList = getGroupBy();
+        List<Node> selectNodes = getSelect();
+        if (groupList == null || groupList.isEmpty() || selectNodes == null || selectNodes.isEmpty()) {
+            return false;
+        }
+        Set<String> selectVarNames = extractSelectVariableNames(selectNodes);
+        return areAllGroupKeysProjected(groupList, selectVarNames);
+    }
+
+    private static Set<String> extractSelectVariableNames(List<Node> selectNodes) {
+        return selectNodes.stream()
+                .filter(n -> n != null && n.isVariable())
+                .map(Node::getLabel)
+                .collect(Collectors.toSet());
+    }
+
+    private static boolean areAllGroupKeysProjected(List<Exp> groupList, Set<String> selectVarNames) {
+        for (Exp groupExp : groupList) {
+            if (groupExp == null || groupExp.getNode() == null || groupExp.getFilter() != null) {
+                return false;
+            }
+            Node groupNode = groupExp.getNode();
+            if (!groupNode.isVariable() || !selectVarNames.contains(groupNode.getLabel())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public boolean isCheck() {

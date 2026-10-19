@@ -138,7 +138,7 @@ public final class Mappings extends PointerObject
     }
 
     void init(Query q, boolean subEval) {
-        initiate(q, !subEval && q.isDistinct());
+        initiate(q, !subEval && q.isDistinct() && !q.isDistinctRedundantWithGroupBy());
     }
 
     void initiate(Query q, boolean b) {

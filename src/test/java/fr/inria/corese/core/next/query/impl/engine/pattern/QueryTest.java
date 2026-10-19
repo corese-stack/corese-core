@@ -14,6 +14,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Comprehensive unit tests for Query class.
@@ -672,4 +673,96 @@ class QueryTest {
             assertEquals("[Query]", label, "Datatype label should be [Query]");
         }
     }
+
+    @Nested
+    @DisplayName("Distinct GroupBy Redundancy Tests")
+    class DistinctGroupByRedundancyTests {
+
+        private Node createVariableNode(String name) {
+            Node node = mock(Node.class);
+            when(node.isVariable()).thenReturn(true);
+            when(node.getLabel()).thenReturn(name);
+            return node;
+        }
+
+        @Test
+        @DisplayName("Should detect DISTINCT is redundant when all group variables are projected")
+        void testDistinctRedundantWhenGroupKeysProjected() {
+            Node varX = createVariableNode("x");
+            Node varCount = createVariableNode("count");
+
+            query.setDistinct(true);
+            query.addGroupBy(varX);
+            query.setSelect(List.of(varX, varCount));
+
+            assertTrue(query.isDistinctRedundantWithGroupBy(),
+                    "DISTINCT must be redundant when ?x is the sole grouping key and is projected");
+        }
+
+        @Test
+        @DisplayName("Should NOT detect DISTINCT as redundant when group variable is NOT projected")
+        void testDistinctNotRedundantWhenGroupKeyNotProjected() {
+            Node varX = createVariableNode("x");
+            Node varCount = createVariableNode("count");
+
+            query.setDistinct(true);
+            query.addGroupBy(varX);
+            query.setSelect(List.of(varCount)); // ?x is NOT projected
+
+            assertFalse(query.isDistinctRedundantWithGroupBy(),
+                    "DISTINCT is NOT redundant if ?x is not projected (different groups could yield same ?count)");
+        }
+
+        @Test
+        @DisplayName("Should NOT detect DISTINCT as redundant when query is not distinct")
+        void testDistinctNotRedundantWhenNotDistinct() {
+            Node varX = createVariableNode("x");
+            query.setDistinct(false);
+            query.addGroupBy(varX);
+            query.setSelect(List.of(varX));
+
+            assertFalse(query.isDistinctRedundantWithGroupBy());
+        }
+
+        @Test
+        @DisplayName("Should NOT detect DISTINCT as redundant when query has no GROUP BY")
+        void testDistinctNotRedundantWhenNoGroupBy() {
+            Node varX = createVariableNode("x");
+            query.setDistinct(true);
+            query.setSelect(List.of(varX));
+
+            assertFalse(query.isDistinctRedundantWithGroupBy());
+        }
+
+        @Test
+        @DisplayName("Should NOT detect DISTINCT as redundant when a group key has an expression filter")
+        void testDistinctNotRedundantWhenGroupKeyHasFilter() {
+            Node varX = createVariableNode("x");
+            Exp groupExpWithFilter = Exp.create(ExpType.Type.NODE, varX);
+            groupExpWithFilter.setFilter(mock(Filter.class));
+
+            query.setDistinct(true);
+            query.setGroupBy(List.of(groupExpWithFilter));
+            query.setSelect(List.of(varX));
+
+            assertFalse(query.isDistinctRedundantWithGroupBy(),
+                    "Group expressions with non-trivial filter expressions must not be bypassed");
+        }
+
+        @Test
+        @DisplayName("Should NOT detect DISTINCT as redundant when one of multiple group keys is not projected")
+        void testDistinctNotRedundantWhenOneOfMultipleGroupKeysMissing() {
+            Node varX = createVariableNode("x");
+            Node varY = createVariableNode("y");
+
+            query.setDistinct(true);
+            query.addGroupBy(varX);
+            query.addGroupBy(varY);
+            query.setSelect(List.of(varX)); // ?y is missing from projection
+
+            assertFalse(query.isDistinctRedundantWithGroupBy(),
+                    "DISTINCT is not redundant if any grouping variable is omitted from SELECT");
+        }
+    }
 }
+
