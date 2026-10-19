@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 /**
  * Unified prefix handler for managing namespace prefix mappings across all RDF formats.
  */
-public class PrefixHandler implements PrefixMapping {
+public final class PrefixHandler implements PrefixMapping {
 
     /**
      * Map of prefix to namespace URI.

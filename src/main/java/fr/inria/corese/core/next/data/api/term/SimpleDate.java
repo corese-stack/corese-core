@@ -20,6 +20,7 @@ public final class SimpleDate extends AbstractTemporalPointLiteral {
     private static final long serialVersionUID = 1L;
 
     private final String label;
+    @SuppressWarnings("serial") // Calendar implementations have VM-specific serialization; RDF is the portable representation.
     private final XMLGregorianCalendar calendar;
 
     public SimpleDate(String lexicalValue) {

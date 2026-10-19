@@ -29,7 +29,7 @@ public class TurtleSerializerOptions extends AbstractTFamilyOptions {
      * Provides a fluent API for constructing {@code TurtleConfig} instances with default values
      * specific to the Turtle format.
      */
-    public static class Builder extends AbstractTFamilyOptions.AbstractTFamilyBuilder<Builder> {
+    public static final class Builder extends AbstractTFamilyOptions.AbstractTFamilyBuilder<Builder> {
         /**
          * Default constructor initializes all options with their default values for Turtle.
          */

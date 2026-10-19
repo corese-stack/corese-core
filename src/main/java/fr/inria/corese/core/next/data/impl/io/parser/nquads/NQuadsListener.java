@@ -3,9 +3,8 @@ package fr.inria.corese.core.next.data.impl.io.parser.nquads;
 import fr.inria.corese.core.next.data.api.term.*;
 import fr.inria.corese.core.next.data.api.model.*;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
-import fr.inria.corese.core.next.data.api.io.option.IOOptions;
 import fr.inria.corese.core.next.data.api.exception.ParsingException;
-import fr.inria.corese.core.next.data.impl.io.parser.support.AbstractNTriplesNQuadsListener;
+import fr.inria.corese.core.next.data.impl.io.parser.support.NTriplesQuadsTermDecoder;
 import fr.inria.corese.core.next.generated.antlr.NQuadsBaseListener;
 import fr.inria.corese.core.next.generated.antlr.NQuadsParser;
 
@@ -16,7 +15,7 @@ import fr.inria.corese.core.next.generated.antlr.NQuadsParser;
  */
 public class NQuadsListener extends NQuadsBaseListener {
 
-    private final AbstractNTriplesNQuadsListener abstractNTriplesQuadsListener;
+    private final NTriplesQuadsTermDecoder termDecoder;
     private final Model model;
     private final ValueFactory factory;
 
@@ -29,19 +28,15 @@ public class NQuadsListener extends NQuadsBaseListener {
      *
      * @param model   RDF model to populate
      * @param factory ValueFactory for creating RDF resources
-     * @param options IO configuration options
      */
-    public NQuadsListener(Model model, ValueFactory factory, IOOptions options) {
+    public NQuadsListener(Model model, ValueFactory factory) {
         this.model = model;
         this.factory = factory;
-        this.abstractNTriplesQuadsListener = new AbstractNTriplesNQuadsListener(model, factory, options) {
-        };
+        this.termDecoder = new NTriplesQuadsTermDecoder(factory);
     }
 
     @Override
     public void enterStatement(NQuadsParser.StatementContext ctx) {
-
-
 
         currentSubject = extractSubject(ctx.subject());
         currentPredicate = extractPredicate(ctx.predicate());
@@ -68,7 +63,7 @@ public class NQuadsListener extends NQuadsBaseListener {
      */
     protected Resource extractSubject(NQuadsParser.SubjectContext ctx) {
         if (ctx.IRIREF() != null) {
-            String iri = abstractNTriplesQuadsListener.unescapeUri(stripAngles(ctx.IRIREF().getText()));
+            String iri = termDecoder.unescapeUri(stripAngles(ctx.IRIREF().getText()));
             return factory.createIRI(iri);
         }
         if (ctx.BLANK_NODE_LABEL() != null) {
@@ -84,7 +79,7 @@ public class NQuadsListener extends NQuadsBaseListener {
      */
     protected IRI extractPredicate(NQuadsParser.PredicateContext ctx) {
         if (ctx.IRIREF() != null) {
-            String iri = abstractNTriplesQuadsListener.unescapeUri(stripAngles(ctx.IRIREF().getText()));
+            String iri = termDecoder.unescapeUri(stripAngles(ctx.IRIREF().getText()));
             return factory.createIRI(iri);
         }
         throw new ParsingException("Unsupported N-Quads predicate: " + ctx.getText());
@@ -95,7 +90,7 @@ public class NQuadsListener extends NQuadsBaseListener {
      */
     protected Value extractObject(NQuadsParser.ObjectContext ctx) {
         if (ctx.IRIREF() != null) {
-            String iri = abstractNTriplesQuadsListener.unescapeUri(stripAngles(ctx.IRIREF().getText()));
+            String iri = termDecoder.unescapeUri(stripAngles(ctx.IRIREF().getText()));
             return factory.createIRI(iri);
         }
         if (ctx.BLANK_NODE_LABEL() != null) {
@@ -114,7 +109,7 @@ public class NQuadsListener extends NQuadsBaseListener {
      */
     protected Resource extractGraph(NQuadsParser.GraphLabelContext ctx) {
         if (ctx.IRIREF() != null) {
-            String iri = abstractNTriplesQuadsListener.unescapeUri(stripAngles(ctx.IRIREF().getText()));
+            String iri = termDecoder.unescapeUri(stripAngles(ctx.IRIREF().getText()));
             return factory.createIRI(iri);
         }
         if (ctx.BLANK_NODE_LABEL() != null) {
@@ -137,26 +132,26 @@ public class NQuadsListener extends NQuadsBaseListener {
             throw new ParsingException("Missing literal token: " + ctx.getText());
         }
 
-        String label = abstractNTriplesQuadsListener.unescapeLiteral(rawText);
+        String label = termDecoder.unescapeLiteral(rawText);
 
         IRI datatype = null;
         String langTag = null;
 
         if (ctx.IRIREF() != null) {
-            String iri = abstractNTriplesQuadsListener.unescapeUri(stripAngles(ctx.IRIREF().getText()));
+            String iri = termDecoder.unescapeUri(stripAngles(ctx.IRIREF().getText()));
             datatype = factory.createIRI(iri);
         } else if (ctx.LANGTAG() != null) {
             langTag = ctx.LANGTAG().getText().substring(1);
         }
 
-        return abstractNTriplesQuadsListener.createLiteral(label, datatype, langTag);
+        return termDecoder.createLiteral(label, datatype, langTag);
     }
 
     /**
      * Strips angle brackets from an IRI reference.
      */
     private String stripAngles(String iriRef) {
-        return abstractNTriplesQuadsListener.stripAngles(iriRef);
+        return termDecoder.stripAngles(iriRef);
     }
 
     /**
@@ -167,34 +162,11 @@ public class NQuadsListener extends NQuadsBaseListener {
      * @throws ParsingException if the blank node label is invalid.
      */
     protected void validateBlankNodeLabel(String label) {
-        abstractNTriplesQuadsListener.validateBlankNodeLabel(label);
+        termDecoder.validateBlankNodeLabel(label);
 
         if (!label.matches("^\\w[\\w\\-\\.]*$")) {
             throw new ParsingException("Invalid blank node label syntax: " + label);
         }
     }
 
-    /**
-     * Unescapes common N-Quads literal escape sequences.
-     *
-     * @param literalText The raw literal string from ANTLR (including quotes)
-     * @return The unescaped literal string without surrounding quotes
-     * @deprecated Use helper.unescapeLiteral instead
-     */
-    @Deprecated(since = "4.5.0", forRemoval = false)
-    protected String unescapeLiteral(String literalText) {
-        return abstractNTriplesQuadsListener.unescapeLiteral(literalText);
-    }
-
-    /**
-     * Unescapes common N-Quads URI escape sequences.
-     *
-     * @param uri The escaped URI string
-     * @return The unescaped URI string
-     * @deprecated Use helper.unescapeUri instead
-     */
-    @Deprecated(since = "4.5.0", forRemoval = false)
-    protected String unescapeUri(String uri) {
-        return abstractNTriplesQuadsListener.unescapeUri(uri);
-    }
 }

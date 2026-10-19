@@ -7,6 +7,9 @@ import fr.inria.corese.core.next.data.api.term.BNode;
  * A blank node (BNode) <a href="https://www.w3.org/TR/rdf12-concepts/#section-blank-nodes">...</a>
  */
 public abstract class AbstractBNode implements BNode {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Returns the string value of this blank node, which is its unique identifier.

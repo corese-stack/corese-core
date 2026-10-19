@@ -17,6 +17,9 @@ import java.util.Objects;
  */
 
 public abstract class AbstractStatement implements Statement {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Compares this statement to another object for equality.

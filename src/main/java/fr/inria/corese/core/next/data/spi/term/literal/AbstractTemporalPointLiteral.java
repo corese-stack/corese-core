@@ -6,6 +6,9 @@ import fr.inria.corese.core.next.data.api.term.IRI;
  * Represents a temporal literal representing a point in time. Typically a date or a date and time. Implements the comparison between temporal literals.
  */
 public abstract class AbstractTemporalPointLiteral extends AbstractLiteral implements Comparable<AbstractTemporalPointLiteral> {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Constructor for AbstractTemporalPointLiteral.

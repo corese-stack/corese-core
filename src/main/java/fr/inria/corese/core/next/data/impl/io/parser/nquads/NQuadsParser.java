@@ -71,7 +71,7 @@ public class NQuadsParser extends AbstractRDFParser {
             fr.inria.corese.core.next.generated.antlr.NQuadsParser parser = new fr.inria.corese.core.next.generated.antlr.NQuadsParser(tokens);
             configureErrorHandling(parser);
 
-            NQuadsListener listener = new NQuadsListener(getModel(), getValueFactory(), getConfig());
+            NQuadsListener listener = new NQuadsListener(getModel(), getValueFactory());
             LineRDFParser.parse(reader, lexer, parser, parser::nquadsDoc, listener);
 
         } catch (ParsingException e) {

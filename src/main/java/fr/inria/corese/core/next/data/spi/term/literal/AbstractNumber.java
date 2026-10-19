@@ -6,6 +6,9 @@ import fr.inria.corese.core.next.data.api.term.IRI;
  * Abstract class representing a number literal in RDF.
  */
 public abstract class AbstractNumber extends AbstractLiteral implements Comparable<AbstractNumber> {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
+
 
 
     /**

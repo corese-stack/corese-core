@@ -11,6 +11,9 @@ import fr.inria.corese.core.next.common.exception.CoreseException;
  * stream.
  */
 public class SerializationException extends CoreseException {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
+
     private final String formatName;
     private final int lineNumber;
     private final int columnNumber;

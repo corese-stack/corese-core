@@ -2,32 +2,26 @@ package fr.inria.corese.core.next.data.impl.io.parser.support;
 
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Literal;
-import fr.inria.corese.core.next.data.api.model.Model;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
-import fr.inria.corese.core.next.data.api.io.option.IOOptions;
 import fr.inria.corese.core.next.data.api.exception.ParsingException;
 
 /**
- * Base class for N-Triples/N-Quads parsers providing common escape handling
- * and validation logic.
+ * Decodes lexical RDF terms shared by the N-Triples and N-Quads listeners.
+ *
+ * <p>This helper handles escapes and term construction; it does not receive
+ * parse-tree events or retain the destination model and parser configuration.</p>
  */
-public abstract class AbstractNTriplesNQuadsListener {
+public final class NTriplesQuadsTermDecoder {
 
-    protected final Model model;
-    protected final ValueFactory factory;
-    protected final IOOptions options;
+    private final ValueFactory factory;
 
     /**
-     * Constructs a parser helper.
+     * Creates a decoder using the listener's RDF value factory.
      *
-     * @param model   RDF model to populate
      * @param factory ValueFactory for creating RDF terms
-     * @param options IO configuration options
      */
-    protected AbstractNTriplesNQuadsListener(Model model, ValueFactory factory, IOOptions options) {
-        this.model = model;
+    public NTriplesQuadsTermDecoder(ValueFactory factory) {
         this.factory = factory;
-        this.options = options;
     }
 
     /**

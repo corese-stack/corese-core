@@ -198,23 +198,23 @@ public abstract class AbstractSerializerOptions implements RDFSerializationOptio
 
         protected AbstractBuilder(IOOptions otherOptions) {
             if(otherOptions instanceof AbstractSerializerOptions abstractSerializerOptions) {
-                this.escapeUnicode(abstractSerializerOptions.escapeUnicode());
-                this.trailingDot(abstractSerializerOptions.trailingDot());
-                this.strictMode(abstractSerializerOptions.isStrictMode());
-                this.validateURIs(abstractSerializerOptions.validateURIs());
-                this.includeContext(abstractSerializerOptions.includeContext());
+                this.escapeUnicode = abstractSerializerOptions.escapeUnicode();
+                this.trailingDot = abstractSerializerOptions.trailingDot();
+                this.strictMode = abstractSerializerOptions.isStrictMode();
+                this.validateURIs = abstractSerializerOptions.validateURIs();
+                this.includeContext = abstractSerializerOptions.includeContext();
             }
             if(otherOptions instanceof BaseIRIOptions baseIRIOptions) {
-                this.baseIRI(baseIRIOptions.getBaseIRI());
+                this.baseIRI = baseIRIOptions.getBaseIRI();
             }
             if(otherOptions instanceof LineEndingOptions lineEndingOptions) {
-                this.lineEnding(lineEndingOptions.getLineEnding());
+                this.lineEnding = Objects.requireNonNull(lineEndingOptions.getLineEnding());
             }
             if(otherOptions instanceof BlankNodeIdGenerationOptions blankNodeIdGenerationOptions) {
-                this.stableBlankNodeIds(blankNodeIdGenerationOptions.stableBlankNodeIds());
+                this.stableBlankNodeIds = blankNodeIdGenerationOptions.stableBlankNodeIds();
             }
             if(otherOptions instanceof DatatypePolicyOptions datatypePolicyOptions) {
-                this.literalDatatypePolicy(datatypePolicyOptions.getLiteralDatatypePolicy());
+                this.literalDatatypePolicy = Objects.requireNonNull(datatypePolicyOptions.getLiteralDatatypePolicy());
             }
         }
 

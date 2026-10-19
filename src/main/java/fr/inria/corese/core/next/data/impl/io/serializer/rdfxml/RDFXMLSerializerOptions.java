@@ -199,7 +199,7 @@ public class RDFXMLSerializerOptions extends AbstractSerializerOptions implement
      * Provides a fluent API for constructing {@code RDFXMLSerializerOptions} instances with default values
      * specific to the RDF/XML format.
      */
-    public static class Builder extends AbstractSerializerOptions.AbstractBuilder<Builder> {
+    public static final class Builder extends AbstractSerializerOptions.AbstractBuilder<Builder> {
         protected boolean usePrefixes = true;
         protected boolean autoDeclarePrefixes = true;
         protected PrefixOrdering prefixOrdering = PrefixOrdering.ALPHABETICAL;
