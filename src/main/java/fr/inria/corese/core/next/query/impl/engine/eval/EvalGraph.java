@@ -32,7 +32,7 @@ public class EvalGraph {
      * gNode is possible named graphURI stemming from evaluation context
      * It is not the named graph at stake here
      */
-    int eval(Producer p, Node gNode, Exp exp, Mappings data, Stack stack, int n) throws SparqlException {
+    int eval(Producer p, Node gNode, Exp exp, Mappings data, Stack stack, int n) {
         int backtrack = n - 1;
         Node graphNode = exp.getGraphName();
         Node graph = engine.getNode(p, graphNode);
@@ -103,7 +103,7 @@ public class EvalGraph {
      * named graph list may come from Mappings map  from previous statement
      * OR from the "from named" clause OR from dataset named graph list
      */
-    private Mappings graphNodes(Producer p, Exp exp, Mappings map) throws SparqlException {
+    private Mappings graphNodes(Producer p, Exp exp, Mappings map) {
         Memory env = engine.getMemory();
         Query qq = engine.getQuery();
         Matcher mm = engine.getMatcher();
@@ -141,7 +141,7 @@ public class EvalGraph {
      * Node graph: graph URI or Node graph pointer or Node path pointer
      * Exp exp: graph name { BGP }
      */
-    private Mappings graph(Producer p, Node graph, Exp exp, Mappings map) throws SparqlException {
+    private Mappings graph(Producer p, Node graph, Exp exp, Mappings map) {
         boolean external = false;
         Producer np = p;
         if (graph != null && p.isProducer(graph)) {

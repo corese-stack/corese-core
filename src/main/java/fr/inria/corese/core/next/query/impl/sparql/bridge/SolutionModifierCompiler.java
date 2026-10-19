@@ -284,6 +284,7 @@ final class SolutionModifierCompiler {
         return NodeImpl.forVariable("__order_by_" + syntheticIndex);
     }
 
+    @SuppressWarnings("java:S9391") // Preserve ordered accumulation without allocating a stream pipeline.
     private static List<Exp> toNodeExpressions(List<Node> nodes) {
         List<Exp> expressions = new ArrayList<>();
         for (Node node : nodes) {
@@ -292,6 +293,7 @@ final class SolutionModifierCompiler {
         return expressions;
     }
 
+    @SuppressWarnings("java:S9391") // Preserve ordered accumulation without allocating a stream pipeline.
     private static List<Node> selectNodeList(List<Exp> selectExpressions) {
         LinkedHashSet<Node> selectNodes = new LinkedHashSet<>();
         for (Exp selectExpression : selectExpressions) {

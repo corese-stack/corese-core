@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.query.impl.sparql.ast;
 
 import java.util.List;
 
-import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.AstVisitor;
+import fr.inria.corese.core.next.query.impl.sparql.ast.visitor.AstVisitor;
 
 /**
  * Represents ordered update operations and their effective PREFIX/BASE snapshots.

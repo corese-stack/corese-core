@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * term types (VarAst, IriAst, LiteralAst), TriplePatternAst, BgpAst, GroupGraphPatternAst, QueryAst.
  *
  */
+@SuppressWarnings("java:S2187") // JUnit discovers the tests in the @Nested suites below.
 class SparqlAstTest {
 
     // ---------- VarAst ----------

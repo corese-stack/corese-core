@@ -10,7 +10,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAstTestSupport;
 import fr.inria.corese.core.next.query.impl.sparql.ast.WhereClauseQueryAst;
 
-public class AbstractSparqlParserFeatureTest {
+public abstract class AbstractSparqlParserFeatureTest {
 
     /**
      * Expected {@link IriAst} for the SPARQL shortcut {@code a} ({@code rdf:type}), as produced by {@link SparqlAstBuilder#iri(String)}.

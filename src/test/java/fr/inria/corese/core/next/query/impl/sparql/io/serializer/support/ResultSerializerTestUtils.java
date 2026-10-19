@@ -41,7 +41,7 @@ public class ResultSerializerTestUtils {
 
         @Override
         public void close() {
-
+            // The in-memory fixture owns no external resources.
         }
 
     }

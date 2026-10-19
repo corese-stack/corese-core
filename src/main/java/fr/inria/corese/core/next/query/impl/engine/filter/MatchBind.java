@@ -11,61 +11,61 @@ import java.util.List;
 
 
 /**
- * Manage bindings of Matcher
+ * Manage bindings of ExpressionPatternMatcher
  * Can bind and unbind
  *
  * @author Olivier Corby, Edelweiss, INRIA 2010
  *
  */
 public class MatchBind {
-	private static final Logger logger = LoggerFactory.getLogger(MatchBind.class);
+    private static final Logger logger = LoggerFactory.getLogger(MatchBind.class);
 
-	Hashtable<Expr, Expr> table;
-	List<Expr> stack;
+    Hashtable<Expr, Expr> table;
+    List<Expr> stack;
 
-	MatchBind (){
-		table = new Hashtable<>();
-		stack = new ArrayList<>();
-	}
+    MatchBind (){
+        table = new Hashtable<>();
+        stack = new ArrayList<>();
+    }
 
-	static MatchBind create(){
-		return new MatchBind();
-	}
+    static MatchBind create(){
+        return new MatchBind();
+    }
 
-	boolean hasValue(Expr exp){
-		return table.containsKey(exp);
-	}
+    boolean hasValue(Expr exp){
+        return table.containsKey(exp);
+    }
 
-	Expr getValue(Expr exp){
-		return table.get(exp);
-	}
+    Expr getValue(Expr exp){
+        return table.get(exp);
+    }
 
-	void setValue(Expr qe, Expr te){
-		if (qe instanceof FilterPattern){
-			table.put(qe, te);
-			stack.add(qe);
-		}
-	}
+    void setValue(Expr qe, Expr te){
+        if (qe instanceof FilterPattern){
+            table.put(qe, te);
+            stack.add(qe);
+        }
+    }
 
-	void reset(Expr exp){
-		table.remove(exp);
-		stack.remove(exp);
-	}
+    void reset(Expr exp){
+        table.remove(exp);
+        stack.remove(exp);
+    }
 
-	int size(){
-		return stack.size();
-	}
+    int size(){
+        return stack.size();
+    }
 
-	/**
-	 * Remove last bindings until stack.size() = size
-	 */
-	void clean(int size){
-		while (stack.size()>size){
-			reset(stack.getLast());
-		}
-		if (table.size() != stack.size()){
-			logger.error("Match Bind: Stack and Table have different sizes");
-		}
-	}
+    /**
+     * Remove last bindings until stack.size() = size
+     */
+    void clean(int size){
+        while (stack.size()>size){
+            reset(stack.getLast());
+        }
+        if (table.size() != stack.size()){
+            logger.error("Match Bind: Stack and Table have different sizes");
+        }
+    }
 
 }

@@ -9,6 +9,9 @@ import fr.inria.corese.core.next.query.api.repository.RepositoryConnection;
  */
 @SuppressWarnings("java:S110")
 public class RepositoryException extends QueryException {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Constructs a RepositoryException with a detail message.

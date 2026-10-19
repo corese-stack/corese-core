@@ -23,7 +23,7 @@ class SparqlTermBuilderTest {
 
     @BeforeEach
     void setUp() {
-        builder = new SparqlTermBuilder(new SparqlParserOptions.Builder().build());
+        builder = new SparqlTermBuilder();
     }
 
     @Nested

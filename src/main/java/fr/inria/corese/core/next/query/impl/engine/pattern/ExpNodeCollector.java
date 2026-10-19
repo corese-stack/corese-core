@@ -8,7 +8,7 @@ import java.util.List;
 /**
  *
  */
-public class ExpNodeCollector {
+public final class ExpNodeCollector {
 
     private final List<Node> nodeList;
     private final List<Node> selectNodeList;

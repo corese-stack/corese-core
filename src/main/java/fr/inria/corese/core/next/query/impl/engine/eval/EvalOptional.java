@@ -49,7 +49,7 @@ public class EvalOptional {
      * merge ...
      */
     @SuppressWarnings("java:S3776")
-    int eval(Producer p, Node graphNode, Exp exp, Mappings data, Stack stack, int n) throws SparqlException {
+    int eval(Producer p, Node graphNode, Exp exp, Mappings data, Stack stack, int n) {
         int backtrack = n - 1;
         Memory env = engine.getMemory();
 
@@ -63,7 +63,7 @@ public class EvalOptional {
 
         Mappings map2;
         Exp rest = exp.rest();
-        MappingSet set1 = new MappingSet(getQuery(), map1);
+        MappingSet set1 = new MappingSet(map1);
         Mappings map = set1.prepareMappingsRest(rest);
 
         if (map != null && exp.getInscopeFilter() != null) {
@@ -96,8 +96,8 @@ public class EvalOptional {
 
         engine.getVisitor().optional(engine, engine.getGraphNode(graphNode), exp, map1, map2);
 
-        MappingSet set = new MappingSet(getQuery(), exp, set1,
-                new MappingSet(getQuery(), map2));
+        MappingSet set = new MappingSet(exp, set1,
+                new MappingSet(map2));
         set.start();
 
         for (Mapping m1 : map1) {

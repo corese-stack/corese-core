@@ -7,6 +7,9 @@ package fr.inria.corese.core.next.query.api.exception;
  */
 @SuppressWarnings("java:S110") // Retains the public query exception hierarchy and distinguishes SPARQL type errors.
 public final class QueryTypeErrorException extends QueryEvaluationException {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
+
     public QueryTypeErrorException(String message) {
         super(message);
     }

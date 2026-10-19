@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast.path;
 
-import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.AstVisitor;
+import fr.inria.corese.core.next.query.impl.sparql.ast.visitor.AstVisitor;
 
 public record AlternativePathAst(PathAst left, PathAst right) implements PathAst {
     public AlternativePathAst {

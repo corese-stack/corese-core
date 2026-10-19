@@ -185,10 +185,11 @@ public abstract class SparqlAstBuilder {
     /** Expression and constraint building helpers. */
     protected final SparqlExpressionBuilder expressions;
 
+    @SuppressWarnings("this-escape") // Callbacks are stored locally and are not invoked or published during construction.
     protected SparqlAstBuilder(SparqlParserOptions options) {
         this.options = options;
         this.baseUri = options.getBaseIRI();
-        this.terms = new SparqlTermBuilder(options, this::termFromBlankNode);
+        this.terms = new SparqlTermBuilder(this::termFromBlankNode);
         this.paths = new SparqlPathBuilder(this.terms);
         this.expressions = new SparqlExpressionBuilder(this.terms, this::popCapturedExistsPattern);
     }
@@ -843,6 +844,7 @@ public abstract class SparqlAstBuilder {
     /**
      * List of objects inside a property path triple.
      */
+    @SuppressWarnings("java:S9391") // Preserve ordered accumulation without allocating a stream pipeline.
     public List<TermAst> termListFromObjectListPath(SparqlParser.ObjectListPathContext ctx) {
         List<TermAst> out = new ArrayList<>();
         for (var objPath : ctx.objectPath()) {

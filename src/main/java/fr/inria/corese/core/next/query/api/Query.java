@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.query.api;
 
 import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.query.api.dataset.Dataset;
+import fr.inria.corese.core.next.query.api.diagnostics.QueryExecution;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.result.BindingSet;
 import fr.inria.corese.core.next.query.api.result.GraphQueryResult;
@@ -49,6 +50,23 @@ public interface Query<T> {
      * @throws QueryEvaluationException if an error occurs during query evaluation
      */
     T evaluate() throws QueryEvaluationException;
+
+    /**
+     * Executes this query once with planning and producer diagnostics enabled.
+     * Bindings, dataset, timeout and result ownership follow {@link #evaluate()}.
+     * This is an actual execution, not a dry-run explanation. No extra storage
+     * counts or scans are performed solely to populate the profile. Ordinary
+     * {@code evaluate()} calls do not allocate diagnostic collectors or wrappers.
+     *
+     * <p>For progressive SELECT results, {@code profile()} snapshots work performed
+     * so far. Consume or close the result before requesting final measurements.
+     * Lazy evaluation failures surface while advancing the result and release its
+     * resources. Prepared queries and diagnostic access are not thread-safe.</p>
+     *
+     * @return result and access to immutable progress measurements
+     * @throws QueryEvaluationException if evaluation fails
+     */
+    QueryExecution<T> evaluateWithDiagnostics() throws QueryEvaluationException;
 
     /**
      * Sets or replaces an initial variable binding.

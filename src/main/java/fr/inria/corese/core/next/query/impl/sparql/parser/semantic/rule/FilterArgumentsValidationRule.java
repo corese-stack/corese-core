@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.parser.semantic.rule;
 
 import fr.inria.corese.core.next.query.api.validation.QueryDiagnostic;
-import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.AbstractAstVisitor;
+import fr.inria.corese.core.next.query.impl.sparql.ast.visitor.AbstractAstVisitor;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 
 import java.util.ArrayList;

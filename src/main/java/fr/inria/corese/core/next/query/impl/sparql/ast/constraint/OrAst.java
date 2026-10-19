@@ -9,13 +9,9 @@ import java.util.List;
  */
 public class OrAst extends AbstractChainableOperatorAst implements BooleanExpressionAst {
     public OrAst(List<TermAst> args) {
-        super(args);
+        super(args, OrAst::new);
     }
 
-    @Override
-    protected TermAst create(List<TermAst> args) {
-        return new OrAst(args);
-    }
 
     @Override
     public String getName() {

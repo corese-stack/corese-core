@@ -4,7 +4,6 @@ import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.eval.Eval;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
-import fr.inria.corese.core.next.query.impl.engine.eval.SparqlException;
 
 /**
  * Service Provider
@@ -12,8 +11,7 @@ import fr.inria.corese.core.next.query.impl.engine.eval.SparqlException;
  * @author Olivier Corby, Edelweiss, INRIA 2011
  */
 public interface Provider {
-    default Mappings service(Node serv, Exp exp, Mappings map, Eval eval)
-            throws SparqlException {
+    default Mappings service(Node serv, Exp exp, Mappings map, Eval eval) {
         return null;
     }
 

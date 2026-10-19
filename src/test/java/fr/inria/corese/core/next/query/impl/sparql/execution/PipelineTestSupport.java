@@ -25,13 +25,13 @@ abstract class PipelineTestSupport {
 
     ValueFactory valueFactory;
     MemoryStorageManager storage;
-    NextSparqlPipelineExecutor executor;
+    SparqlQueryExecutor executor;
 
     @BeforeEach
     void setUp() {
         valueFactory = Values.factory();
         storage = MemoryStorageManager.builder().build();
-        executor = new NextSparqlPipelineExecutor(storage);
+        executor = new SparqlQueryExecutor(storage);
 
         insert(iri(ALICE), iri(KNOWS), iri(BOB));
     }

@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
-import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.AstVisitor;
-import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.VisitableAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.visitor.AstVisitor;
+import fr.inria.corese.core.next.query.impl.sparql.ast.visitor.VisitableAst;
 
 import java.util.LinkedHashSet;
 import java.util.Set;

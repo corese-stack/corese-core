@@ -1,5 +1,8 @@
 package fr.inria.corese.core.next.query.impl.engine.model;
 
+import fr.inria.corese.core.next.query.impl.engine.pattern.PlanCopy;
+import fr.inria.corese.core.next.query.impl.engine.pattern.PlanCopyable;
+
 import fr.inria.corese.core.next.data.Values;
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import fr.inria.corese.core.next.query.impl.engine.path.Path;
@@ -7,7 +10,7 @@ import fr.inria.corese.core.next.query.impl.engine.path.Path;
 import java.util.Objects;
 
 /** Native KGRAM node backed exclusively by Corese-next value contracts. */
-public final class NodeImpl implements Node {
+public final class NodeImpl implements Node, PlanCopyable<NodeImpl> {
 
     private DatatypeValue value;
     private final String variableName;
@@ -24,6 +27,17 @@ public final class NodeImpl implements Node {
         this.value = value;
         this.variableName = variableName;
         this.blankVariable = blankVariable;
+    }
+
+    /** Copies the indexed node without sharing mutable payload state. */
+    @Override
+    public NodeImpl copyPlan(PlanCopy copies) {
+        NodeImpl target = new NodeImpl(value, variableName, blankVariable);
+        copies.remember(this, target);
+        target.index = index;
+        target.key = key;
+        target.payload = copies.copy(payload);
+        return target;
     }
 
     /** Creates a constant node carrying a Corese-next RDF value. */

@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -36,7 +37,7 @@ class GraphIsolationTest {
      * then closes both. The {@code setup} lambda populates the model before
      * the query is executed.
      */
-    private int countRows(ModelSetup setup, String sparql) throws Exception {
+    private int countRows(Consumer<Model> setup, String sparql) {
         StorageManager storage = MemoryStorageManager.builder().build();
         Model model = StorageModels.create(storage);
         setup.accept(model);
@@ -52,7 +53,7 @@ class GraphIsolationTest {
         }
     }
 
-    private List<String> graphValues(ModelSetup setup) throws Exception {
+    private List<String> graphValues(Consumer<Model> setup) {
         StorageManager storage = MemoryStorageManager.builder().build();
         Model model = StorageModels.create(storage);
         setup.accept(model);
@@ -68,14 +69,9 @@ class GraphIsolationTest {
         }
     }
 
-    @FunctionalInterface
-    interface ModelSetup {
-        void accept(Model model) throws Exception;
-    }
-
     @Test
     @DisplayName("graph-02: only named graph data — default graph query returns 0 rows")
-    void namedGraphOnlyDefaultQueryReturnsZero() throws Exception {
+    void namedGraphOnlyDefaultQueryReturnsZero() {
         int rows = countRows(
                 model -> model.add(iri("s"), iri("p"), iri("o"), iri("g1")),
                 "SELECT * { ?s ?p ?o }");
@@ -85,7 +81,7 @@ class GraphIsolationTest {
 
     @Test
     @DisplayName("graph-05: default + named — default graph query returns only default rows")
-    void defaultAndNamedQueryReturnsOnlyDefault() throws Exception {
+    void defaultAndNamedQueryReturnsOnlyDefault() {
         int rows = countRows(model -> {
                     // 2 triples in default graph (null context)
                     model.add(iri("s1"), iri("p"), iri("o1"));
@@ -100,7 +96,7 @@ class GraphIsolationTest {
 
     @Test
     @DisplayName("GRAPH ?g — iterates only named graphs, never the default graph")
-    void graphVariableIteratesOnlyNamedGraphs() throws Exception {
+    void graphVariableIteratesOnlyNamedGraphs() {
         List<String> graphs = graphValues(model -> {
             // 1 triple in default graph — must NOT appear via GRAPH ?g
             model.add(iri("s0"), iri("p"), iri("o0"));
@@ -114,7 +110,7 @@ class GraphIsolationTest {
 
     @Test
     @DisplayName("UNION of default and named graphs produces combined results")
-    void unionDefaultAndNamedReturnsAll() throws Exception {
+    void unionDefaultAndNamedReturnsAll() {
         int rows = countRows(model -> {
                     model.add(iri("s1"), iri("p"), iri("o1")); // default
                     model.add(iri("s2"), iri("p"), iri("o2")); // default
@@ -127,7 +123,7 @@ class GraphIsolationTest {
 
     @Test
     @DisplayName("JOIN default + GRAPH — only subjects present in both graphs match")
-    void joinDefaultAndNamedGraphFiltersToCommonSubjects() throws Exception {
+    void joinDefaultAndNamedGraphFiltersToCommonSubjects() {
         int rows = countRows(model -> {
                     // subject s1 appears in default AND named graph
                     model.add(iri("s1"), iri("p"), iri("o1"));          // default

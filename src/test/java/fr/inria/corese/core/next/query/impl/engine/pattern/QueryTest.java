@@ -56,9 +56,9 @@ class QueryTest {
         }
 
         @Test
-        @DisplayName("Should create query with type")
+        @DisplayName("Should create an empty query")
         void testCreateQueryWithType() {
-            Query q = Query.create(0);
+            Query q = Query.create();
             assertNotNull(q, "Query should not be null");
         }
     }
@@ -510,13 +510,6 @@ class QueryTest {
             query.setGraphNode(mockNode);
             assertEquals(mockNode, query.getGraphNode(), "Graph node should match");
         }
-
-        @Test
-        @DisplayName("Should get path node")
-        void testGetPathNode() {
-            assertDoesNotThrow(() -> query.getPathNode(),
-                    "Getting path node should not throw");
-        }
     }
 
     @Nested
@@ -593,19 +586,6 @@ class QueryTest {
             assertTrue(result, "Should be detail by default");
         }
 
-        @Test
-        @DisplayName("Should set and check synchronized flag")
-        void testSetAndIsSynchronized() {
-            query.setSynchronized(true);
-            assertTrue(query.isSynchronized(), "Query should be synchronized");
-        }
-
-        @Test
-        @DisplayName("Should set and check algebra flag")
-        void testSetAndIsAlgebra() {
-            query.setAlgebra(true);
-            assertTrue(query.isAlgebra(), "Query should be algebra");
-        }
     }
 
     @Nested
@@ -625,25 +605,6 @@ class QueryTest {
             query.setService("http://example.org/sparql");
             assertEquals("http://example.org/sparql", query.getService(),
                     "Service URL should match");
-        }
-    }
-
-    @Nested
-    @DisplayName("Template Tests")
-    class TemplateTests {
-
-        @Test
-        @DisplayName("Should set and check if is template")
-        void testSetAndIsTemplate() {
-            query.setTemplate(true);
-            assertTrue(query.isTemplate(), "Query should be template");
-        }
-
-        @Test
-        @DisplayName("Should check if is transformation template")
-        void testIsTransformationTemplate() {
-            boolean result = query.isTransformationTemplate();
-            assertFalse(result, "Should not be transformation template by default");
         }
     }
 
@@ -671,38 +632,6 @@ class QueryTest {
         void testGetOuterQuery() {
             Query outer = query.getOuterQuery();
             assertSame(query, outer, "Should return self when no outer query");
-        }
-    }
-
-    @Nested
-    @DisplayName("Extension Tests")
-    class ExtensionTests {
-
-        @Test
-        @DisplayName("Should set and check if is extension")
-        void testSetAndIsExtension() {
-            query.setExtension(true);
-            assertTrue(query.isExtension(), "Query should be extension");
-        }
-
-    }
-
-    @Nested
-    @DisplayName("Parallel and Lock Tests")
-    class ParallelLockTests {
-
-        @Test
-        @DisplayName("Should set and check parallel flag")
-        void testSetAndIsParallel() {
-            query.setParallel(false);
-            assertFalse(query.isParallel(), "Query should not be parallel");
-        }
-
-        @Test
-        @DisplayName("Should set and check lock flag")
-        void testSetAndIsLock() {
-            query.setLock(false);
-            assertFalse(query.isLock(), "Query should not be lock");
         }
     }
 

@@ -28,6 +28,7 @@ public class ExpEdge extends Exp {
      * - oper = type or oper = boolean connector on such subexp
      */
     @Override
+    @SuppressWarnings("java:S9391") // Preserve ordered accumulation without allocating a stream pipeline.
     public List<Filter> getFilters(int node, int type){
         Node n = getNode(node);
         if (n == null || ! n.isVariable()){

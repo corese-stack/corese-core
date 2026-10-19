@@ -28,6 +28,22 @@ public interface StorageManager extends AutoCloseable {
         return this;
     }
 
+    /**
+     * Captures an independent, read-only session over the currently visible data,
+     * including this session's uncommitted writes. Later writes, commits and rollbacks
+     * must not alter the captured view. The caller must close it to release snapshots.
+     * The returned session belongs to the calling thread; closing it never commits
+     * or rolls back the source session's transaction. Reads are confined to the
+     * creating thread, but close must be idempotent and safe from a cancellation
+     * thread. It must not shut down the shared database.
+     *
+     * @return an owned read snapshot
+     * @throws UnsupportedOperationException if independent read snapshots are unavailable
+     */
+    default StorageManager openReadSnapshot() {
+        throw new UnsupportedOperationException("Independent read snapshots are unavailable");
+    }
+
     /** @return statement query operations */
     QueryOperations queries();
 

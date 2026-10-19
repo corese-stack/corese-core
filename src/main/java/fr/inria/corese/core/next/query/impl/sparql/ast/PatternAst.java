@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
-import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.AstVisitor;
-import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.VisitableAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.visitor.AstVisitor;
+import fr.inria.corese.core.next.query.impl.sparql.ast.visitor.VisitableAst;
 
 /**
  * Element of a group graph pattern (BGP, optional, union, etc.).

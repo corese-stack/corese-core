@@ -34,7 +34,7 @@ public class Group implements Comparator<Mappings> {
     }
 
     public Group(List<Node> list) {
-        setNodeList(list);
+        this.nodes = list;
         table = new TreeMapping(list);
     }
 
@@ -46,6 +46,7 @@ public class Group implements Comparator<Mappings> {
         return new Group(lNode);
     }
 
+    @SuppressWarnings("java:S9391") // Preserve ordered accumulation without allocating a stream pipeline.
     public static Group createFromExp(List<Exp> list) {
         List<Node> nodes = new ArrayList<>();
         for (Exp exp : list) {
@@ -133,6 +134,9 @@ public class Group implements Comparator<Mappings> {
     }
 
     class TreeMapping extends TreeMap<Mapping, Mappings> {
+        @java.io.Serial
+        private static final long serialVersionUID = 1L;
+
 
         TreeMapping(List<Node> ln) {
             super(new Compare(ln));

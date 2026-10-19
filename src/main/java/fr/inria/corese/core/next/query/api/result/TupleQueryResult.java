@@ -16,7 +16,17 @@ import java.util.stream.StreamSupport;
  * corresponding to the projection variables of the query.
  * </p>
  *
- * <p>Implementations are not required to be thread-safe.</p>
+ * <p>Results may evaluate lazily during {@link #hasNext()} and {@link #next()}.
+ * Native progressive results must be consumed on the thread that evaluated the
+ * query. They retain a stable read snapshot, including the transaction's visible
+ * uncommitted data, until exhaustion, failure or closure. Always use
+ * try-with-resources, especially for partial consumption: closing a stream early
+ * releases the result, but a stream terminal operation alone does not close it.
+ * Closing a result never commits or rolls back its source transaction.</p>
+ *
+ * <p>Implementations are not required to be thread-safe. Native cursors permit
+ * cross-thread close for cancellation. Their query timeout spans preparation,
+ * traversal and client idle time; idle expiration never interrupts client code.</p>
  *
  * @see TupleQuery
  * @see TupleQuery#evaluate()
@@ -37,6 +47,8 @@ public interface TupleQueryResult extends Closeable, Iterable<BindingSet> {
      *
      * @return {@code true} if another binding set is available, {@code false} otherwise
      * @throws IllegalStateException if this result has been closed
+     * @throws fr.inria.corese.core.next.query.api.exception.QueryEvaluationException
+     *         if lazy evaluation fails, is interrupted or reaches its timeout
      */
     boolean hasNext();
 
@@ -47,6 +59,8 @@ public interface TupleQueryResult extends Closeable, Iterable<BindingSet> {
      * @throws NoSuchElementException if no more solutions are available
      *         (i.e., {@link #hasNext()} would return {@code false})
      * @throws IllegalStateException if this result has been closed
+     * @throws fr.inria.corese.core.next.query.api.exception.QueryEvaluationException
+     *         if lazy evaluation fails, is interrupted or reaches its timeout
      */
     BindingSet next();
 

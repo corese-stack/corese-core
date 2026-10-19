@@ -1,6 +1,9 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
 
+import fr.inria.corese.core.next.query.impl.engine.pattern.PlanCopy;
+import fr.inria.corese.core.next.query.impl.engine.pattern.PlanCopyable;
+
 import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.BgpAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.BindAst;
@@ -47,7 +50,7 @@ import java.util.Set;
  * {@link PatternAst} nodes — into a KGRAM {@link Exp} body that the engine can
  * evaluate.
  */
-public final class WhereCompiler {
+public final class WhereCompiler implements PlanCopyable<WhereCompiler> {
 
     private final SparqlTermResolver termResolver;
     private final Map<GroupGraphPatternAst, Exp> compiledPatternCache =
@@ -60,6 +63,23 @@ public final class WhereCompiler {
 
     private WhereCompiler(QueryPrologueAst prologue) {
         termResolver = new SparqlTermResolver(prologue);
+    }
+
+    @SuppressWarnings("this-escape") // Registering first preserves compiler/filter/cache cycles; the shell never executes.
+    private WhereCompiler(WhereCompiler original, PlanCopy copies) {
+        copies.remember(original, this);
+        termResolver = copies.copy(original.termResolver);
+        inScopeVariables = original.inScopeVariables;
+        synchronized (original.compiledPatternCache) {
+            original.compiledPatternCache.forEach((ast, pattern) ->
+                    compiledPatternCache.put(ast, copies.copy(pattern)));
+        }
+    }
+
+    /** Copies precompiled EXISTS patterns and the resolver into one execution graph. */
+    @Override
+    public WhereCompiler copyPlan(PlanCopy copies) {
+        return new WhereCompiler(this, copies);
     }
 
     WhereCompiler withPrologue(QueryPrologueAst prologue) {
@@ -246,6 +266,7 @@ public final class WhereCompiler {
     }
 
     /** Lowers a SPARQL inline-data table to the runtime's native VALUES expression. */
+    @SuppressWarnings("java:S9391") // Preserve ordered accumulation without allocating a stream pipeline.
     Exp compileValues(ValuesAst values) {
         List<Node> variables = new ArrayList<>();
         for (VarAst variable : values.variables()) {

@@ -7,6 +7,9 @@ import fr.inria.corese.core.next.common.exception.CoreseException;
  * Base exception for all query-related errors in the Corese query API.
  */
 public class QueryException extends CoreseException {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Constructs a new QueryException with the specified detail message.

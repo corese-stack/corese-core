@@ -9,13 +9,9 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
  */
 public class DivideAst extends AbstractChainableOperatorAst implements NumericExpressionAst {
     public DivideAst(List<TermAst> args) {
-        super(args);
+        super(args, DivideAst::new);
     }
 
-    @Override
-    protected TermAst create(List<TermAst> args) {
-        return new DivideAst(args);
-    }
 
     @Override
     public String getName() {

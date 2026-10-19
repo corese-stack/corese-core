@@ -13,7 +13,6 @@ import fr.inria.corese.core.next.query.impl.engine.model.Expr;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.event.KgramEventDispatcher;
 import fr.inria.corese.core.next.query.impl.engine.path.Path;
-import fr.inria.corese.core.next.query.impl.engine.eval.ApproximateSearchEnv;
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 
 import java.util.Map;
@@ -129,7 +128,6 @@ public interface Environment {
 
     Node get(Expr varExpr);
 
-    ApproximateSearchEnv getAppxSearchEnv();
 
     Eval getEval();
 

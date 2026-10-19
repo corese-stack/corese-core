@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
-import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.AstVisitor;
+import fr.inria.corese.core.next.query.impl.sparql.ast.visitor.AstVisitor;
 
 /** A named graph pattern, with an IRI or variable graph name. */
 public record GraphAst(TermAst name, GroupGraphPatternAst pattern) implements PatternAst {

@@ -10,70 +10,70 @@ import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
  */
 public interface Event {
 
-	int BEGIN 	= 0;
-	int START 	= 1;
-	int ENUM 	= 2;
-	int MATCH 	= 3;
-	int FILTER 	= 4;
-	int BIND 	= 5;
-	int GRAPH 	= 6;
-	int PATH 	= 7;
-	int PATHSTEP 	= 8;
+    int BEGIN 	= 0;
+    int START 	= 1;
+    int ENUM 	= 2;
+    int MATCH 	= 3;
+    int FILTER 	= 4;
+    int BIND 	= 5;
+    int GRAPH 	= 6;
+    int PATH 	= 7;
+    int PATHSTEP 	= 8;
 
 
-	int AGG 	= 13;
+    int AGG 	= 13;
 
-	int FINISH 	= 14;
-	int DISTINCT = 15;
-	int LIMIT 	= 16;
+    int FINISH 	= 14;
+    int DISTINCT = 15;
+    int LIMIT 	= 16;
 
-	int RESULT 	= 19;
-	int END 	= 20;
-
-
-	int ALL 	= 50;
+    int RESULT 	= 19;
+    int END 	= 20;
 
 
+    int ALL 	= 50;
 
-	// events from user to listener
 
-	// next step
+
+    // events from user to listener
+
+    // next step
     int STEP 	= 101;
 
-	// next edge/node/path
+    // next edge/node/path
     int NEXT 	= 102;
 
-	// skip trace until next expression in stack
+    // skip trace until next expression in stack
     int FORWARD 	= 103;
 
-	// eval current expression silently
+    // eval current expression silently
     int COMPLETE 	= 104;
 
-	// eval until current expression succeed
+    // eval until current expression succeed
     int SUCCESS 	= 105;
 
-	// resume execution silently
+    // resume execution silently
     int QUIT 	= 109;
 
 
 
 
-	// pprint current Mapping
+    // pprint current Mapping
     int MAP 	= 110;
-	int VERBOSE = 111;
-	int HELP = 112;
+    int VERBOSE = 111;
+    int HELP = 112;
 
 
 
-	int getSort();
+    int getSort();
 
-	Object getObject();
+    Object getObject();
 
-	Object getArg(int n);
+    Object getArg(int n);
 
-	Exp getExp();
+    Exp getExp();
 
-	boolean isSuccess();
+    boolean isSuccess();
 
 
 }

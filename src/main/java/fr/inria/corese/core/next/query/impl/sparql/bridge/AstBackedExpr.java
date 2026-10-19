@@ -1,5 +1,9 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
+import fr.inria.corese.core.next.query.impl.engine.pattern.PlanCopy;
+import fr.inria.corese.core.next.query.impl.engine.pattern.PlanCopyable;
+
+import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import fr.inria.corese.core.next.query.impl.engine.model.BindingContext;
@@ -25,22 +29,20 @@ import java.util.Optional;
 import java.util.Set;
 
 /** Immutable KGRAM expression backed directly by a Corese-next AST term. */
-public final class AstBackedExpr implements Expr {
+public final class AstBackedExpr implements Expr, PlanCopyable<AstBackedExpr> {
 
     private final TermAst source;
     private final WhereCompiler whereCompiler;
     /**
      * Snapshot of the enclosing group's in-scope variables, captured at filter
-     * creation time so that {@link NextFilterFromAst#getVariables()} reports the
+     * creation time so that {@link AstBackedFilter#getVariables()} reports the
      * correct scheduling dependencies even after {@code WhereCompiler} has moved
      * to a different scope (e.g., after returning from a MINUS body).
      */
     private final Set<String> capturedInScope;
-    private final NextFilterFromAst filterView;
+    private final AstBackedFilter filterView;
     private int index = ExprType.UNBOUND;
-    private int subtype = ExprType.GLOBAL;
-    private int operator;
-    private boolean publicExpression;
+    private final int operator;
 
     public AstBackedExpr(TermAst source) {
         this(source, null);
@@ -53,7 +55,25 @@ public final class AstBackedExpr implements Expr {
                 ? Set.copyOf(whereCompiler.inScopeVariables())
                 : Set.of();
         this.operator = operator(source);
-        this.filterView = new NextFilterFromAst(this);
+        this.filterView = new AstBackedFilter(this);
+    }
+
+    // A filter points to its compiler, whose pattern cache can point back to this filter.
+    @SuppressWarnings("this-escape") // The registered shell is only linked by the copy operation, never evaluated.
+    private AstBackedExpr(AstBackedExpr original, PlanCopy copies) {
+        source = original.source;
+        capturedInScope = original.capturedInScope;
+        operator = original.operator;
+        index = original.index;
+        filterView = new AstBackedFilter(this);
+        copies.remember(original, this);
+        whereCompiler = copies.copy(original.whereCompiler);
+    }
+
+    /** Copies expression indexes and compiler caches while sharing immutable syntax. */
+    @Override
+    public AstBackedExpr copyPlan(PlanCopy copies) {
+        return new AstBackedExpr(this, copies);
     }
 
     public Optional<TermAst> sourceAst() {
@@ -75,7 +95,7 @@ public final class AstBackedExpr implements Expr {
     }
 
     @Override
-    public Object getPattern() {
+    public Exp getPattern() {
         return switch (source) {
             case ExistsAst(var pattern) ->
                     whereCompiler == null ? null : whereCompiler.compile(pattern);
@@ -84,46 +104,12 @@ public final class AstBackedExpr implements Expr {
     }
 
     @Override
-    public boolean isSystem() {
-        return false;
-    }
-
-    @Override
-    public boolean isPublic() {
-        return publicExpression;
-    }
-
-    @Override
-    public void setPublic(boolean value) {
-        publicExpression = value;
-    }
-
-    @Override
-    public boolean isDynamic() {
-        return false;
-    }
-
-    @Override
-    public boolean isTrace() {
-        return false;
-    }
-
-    @Override
-    public boolean isDebug() {
-        return false;
-    }
-
-    @Override
     public String getLabel() {
         return source.getName();
     }
 
     @Override
-    public String getModality() {
-        return null;
-    }
-
-    @Override
+    @SuppressWarnings("java:S9391") // Preserve ordered accumulation without allocating a stream pipeline.
     public List<Expr> getExpList() {
         List<Expr> expressions = new ArrayList<>();
         for (TermAst child : children(source)) {
@@ -138,21 +124,6 @@ public final class AstBackedExpr implements Expr {
     }
 
     @Override
-    public void setExp(int childIndex, Expr expression) {
-        throw new UnsupportedOperationException("Corese-next AST expressions are immutable");
-    }
-
-    @Override
-    public Expr getArg() {
-        return getExpList().isEmpty() ? null : getExpList().getFirst();
-    }
-
-    @Override
-    public void setArg(Expr expression) {
-        throw new UnsupportedOperationException("Corese-next AST expressions are immutable");
-    }
-
-    @Override
     public DatatypeValue getValue() {
         if (source instanceof IriAst || source instanceof LiteralAst) {
             SparqlTermResolver resolver = whereCompiler == null
@@ -161,11 +132,6 @@ public final class AstBackedExpr implements Expr {
             return resolver.toNode(source).getDatatypeValue();
         }
         return null;
-    }
-
-    @Override
-    public DatatypeValue getDatatypeValue() {
-        return getValue();
     }
 
     @Override
@@ -181,12 +147,7 @@ public final class AstBackedExpr implements Expr {
 
     @Override
     public int subtype() {
-        return subtype;
-    }
-
-    @Override
-    public void setSubtype(int value) {
-        subtype = value;
+        return ExprType.GLOBAL;
     }
 
     @Override
@@ -200,11 +161,6 @@ public final class AstBackedExpr implements Expr {
     }
 
     @Override
-    public void setOper(int value) {
-        operator = value;
-    }
-
-    @Override
     public boolean isAggregate() {
         return source instanceof AggregateAst;
     }
@@ -212,11 +168,6 @@ public final class AstBackedExpr implements Expr {
     @Override
     public boolean isRecAggregate() {
         return new VariableScopeAnalyzer().containsAggregate(source);
-    }
-
-    @Override
-    public boolean isExist() {
-        return source instanceof ExistsAst || source instanceof NotExistsAst;
     }
 
     @Override
@@ -235,21 +186,6 @@ public final class AstBackedExpr implements Expr {
     }
 
     @Override
-    public boolean isFuncall() {
-        return source instanceof FunctionCallAst;
-    }
-
-    @Override
-    public boolean isBound() {
-        return source instanceof BoundAst;
-    }
-
-    @Override
-    public boolean isDistinct() {
-        return source instanceof AggregateAst aggregate && aggregate.distinct();
-    }
-
-    @Override
     public int arity() {
         return children(source).size();
     }
@@ -262,41 +198,6 @@ public final class AstBackedExpr implements Expr {
     @Override
     public void setIndex(int value) {
         index = value;
-    }
-
-    @Override
-    public Expr getDefine() {
-        return null;
-    }
-
-    @Override
-    public void setDefine(Expr expression) {
-        throw new UnsupportedOperationException("Corese-next AST expressions are immutable");
-    }
-
-    @Override
-    public Expr getFunction() {
-        return null;
-    }
-
-    @Override
-    public Expr getBody() {
-        return null;
-    }
-
-    @Override
-    public Expr getVariable() {
-        return isVariable() ? this : null;
-    }
-
-    @Override
-    public Expr getDefinition() {
-        return null;
-    }
-
-    @Override
-    public boolean hasMetadata(String name) {
-        return false;
     }
 
     @Override

@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query.impl.engine.solution;
 
+import fr.inria.corese.core.next.query.impl.engine.pattern.PlanCopy;
+import fr.inria.corese.core.next.query.impl.engine.pattern.PlanCopyable;
 import fr.inria.corese.core.next.query.api.exception.QueryTypeErrorException;
 import fr.inria.corese.core.next.query.impl.engine.eval.Eval;
 import fr.inria.corese.core.next.query.impl.engine.eval.PointerObject;
@@ -37,7 +39,7 @@ import static fr.inria.corese.core.next.query.impl.engine.model.PointerType.MAPP
  * @author Olivier Corby, Edelweiss, INRIA 2009
  */
 public final class Mappings extends PointerObject
-        implements Comparator<Mapping>, Iterable<Mapping> {
+        implements Comparator<Mapping>, Iterable<Mapping>, PlanCopyable<Mappings> {
 
 
     private static final String NL = "\n";
@@ -55,7 +57,6 @@ public final class Mappings extends PointerObject
     // if true, store all Mapping of the group
     boolean isListGroup = false;
     boolean sortWithDesc = true;
-    List<Mapping> reject;
     KgramEventDispatcher manager;
     int count = 0;
     private Query query;
@@ -89,6 +90,15 @@ public final class Mappings extends PointerObject
     private int length = 0;
     // limit number of results to be displayed
     private int display = Integer.MAX_VALUE;
+
+    /** Copies a static VALUES table into independent row containers. */
+    @Override
+    public Mappings copyPlan(PlanCopy copies) {
+        Mappings target = new Mappings();
+        copies.remember(this, target);
+        for (Mapping row : list) target.add(copies.copy(row));
+        return target;
+    }
 
     public Mappings() {
         list = new ArrayList<>();
@@ -856,42 +866,6 @@ public final class Mappings extends PointerObject
                 mem.pop(map);
             }
         }
-    }
-
-    /**
-     * Template perform additionnal group_concat(?out)
-     */
-    public void template(Evaluator eval, Memory mem, Producer p) {
-        template(eval, getQuery(), mem, p);
-    }
-
-    void template(Evaluator eval, Query q, Memory mem, Producer p) {
-        if (q.isTemplate() && size() > 0 && !(isFake() && q.isTransformationTemplate())) {
-            // fake in transformation template -> fail
-            // fake in query template -> not fail
-            apply(eval, q.getTemplateGroup(), mem, p);
-        }
-    }
-
-    /**
-     * Template perform additionnal group_concat(?out)
-     */
-    public Node apply(Evaluator eval, Exp exp, Memory memory, Producer p) {
-        Mapping firstMap = get(0);
-        // bind the Mapping in memory to retrieve group by variables
-        memory.aggregate(firstMap);
-        if (size() == 1) {
-            Node node = eval(exp.getFilter().getExp().getExp(0).getFilter(), eval, memory, p);
-            if (node != null) {
-                // When node is null, go to aggregate below because we want it to be uniform
-                // whether there is one or several results
-                return node;
-            }
-        }
-
-        Node node = eval(exp.getFilter(), eval, memory, p);
-        memory.pop(firstMap);
-        return node;
     }
 
     /**

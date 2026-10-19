@@ -1,5 +1,8 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
+import fr.inria.corese.core.next.query.impl.engine.pattern.PlanCopy;
+import fr.inria.corese.core.next.query.impl.engine.pattern.PlanCopyable;
+
 import fr.inria.corese.core.next.common.text.RdfText;
 import fr.inria.corese.core.next.data.api.vocabulary.RDF;
 import fr.inria.corese.core.next.data.impl.namespace.PrefixHandler;
@@ -21,7 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /** Resolves SPARQL terms against one immutable query-prologue snapshot. */
-public final class SparqlTermResolver {
+public final class SparqlTermResolver implements PlanCopyable<SparqlTermResolver> {
 
     private final PrefixHandler prefixes;
     private final String baseIri;
@@ -35,6 +38,21 @@ public final class SparqlTermResolver {
                     RdfText.stripAngleBrackets(declaration.namespace().raw()));
         }
         this.baseIri = effectivePrologue.baseIri().raw();
+    }
+
+    private SparqlTermResolver(SparqlTermResolver original, PlanCopy copies) {
+        // Prefixes are private, fully initialized in the public constructor and never mutated afterward.
+        prefixes = original.prefixes;
+        baseIri = original.baseIri;
+        original.variables.forEach((name, node) -> variables.put(name, copies.copy(node)));
+    }
+
+    /** Copies variable-node interning without re-resolving constants or prologues. */
+    @Override
+    public SparqlTermResolver copyPlan(PlanCopy copies) {
+        SparqlTermResolver target = new SparqlTermResolver(this, copies);
+        copies.remember(this, target);
+        return target;
     }
 
     public String resolveIri(String raw) {

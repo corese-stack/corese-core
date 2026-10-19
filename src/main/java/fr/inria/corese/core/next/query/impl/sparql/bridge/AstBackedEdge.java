@@ -1,5 +1,8 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
+import fr.inria.corese.core.next.query.impl.engine.pattern.PlanCopy;
+import fr.inria.corese.core.next.query.impl.engine.pattern.PlanCopyable;
+
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.model.KgramNodes;
@@ -10,7 +13,7 @@ import java.util.Objects;
  * A query-side {@link Edge} produced by the WHERE compiler from a
  * {@link fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst}.
  */
-final class AstBackedEdge implements Edge {
+final class AstBackedEdge implements Edge, PlanCopyable<AstBackedEdge> {
 
     private final Node subject;
     private final Node edgeNode;
@@ -34,6 +37,15 @@ final class AstBackedEdge implements Edge {
         }
         this.object = Objects.requireNonNull(object, "object");
         this.graph = graph;
+    }
+
+    /** Copies the query edge and its indexed nodes. */
+    @Override
+    public AstBackedEdge copyPlan(PlanCopy copies) {
+        AstBackedEdge target = new AstBackedEdge(copies.copy(subject), copies.copy(getProperty()),
+                copies.copy(object), copies.copy(graph));
+        copies.remember(this, target);
+        return target;
     }
 
     @Override

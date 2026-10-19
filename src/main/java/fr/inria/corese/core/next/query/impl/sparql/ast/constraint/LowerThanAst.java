@@ -9,13 +9,9 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
  */
 public class LowerThanAst extends AbstractChainableOperatorAst implements BooleanExpressionAst {
     public LowerThanAst(List<TermAst> args) {
-        super(args);
+        super(args, LowerThanAst::new);
     }
 
-    @Override
-    protected TermAst create(List<TermAst> args) {
-        return new LowerThanAst(args);
-    }
 
     @Override
     public String getName() {

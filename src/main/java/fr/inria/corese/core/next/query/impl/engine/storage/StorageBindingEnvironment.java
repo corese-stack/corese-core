@@ -1,7 +1,6 @@
 package fr.inria.corese.core.next.query.impl.engine.storage;
 
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
-import fr.inria.corese.core.next.query.impl.engine.eval.ApproximateSearchEnv;
 import fr.inria.corese.core.next.query.impl.engine.eval.Eval;
 import fr.inria.corese.core.next.query.impl.engine.event.KgramEventDispatcher;
 import fr.inria.corese.core.next.query.impl.engine.event.ProcessVisitor;
@@ -185,11 +184,6 @@ final class StorageBindingEnvironment implements Environment {
     @Override
     public Node get(Expr varExpr) {
         return delegate == null ? null : delegate.get(varExpr);
-    }
-
-    @Override
-    public ApproximateSearchEnv getAppxSearchEnv() {
-        return delegate == null ? null : delegate.getAppxSearchEnv();
     }
 
     @Override

@@ -18,7 +18,7 @@ class ScalarFunctionsTest {
     @ParameterizedTest
     @CsvSource({"double,0E1,0", "double,1E0,1", "float,0E1,0", "float,1E0,1"})
     void decimalCastDoesNotRewriteItsSourceTerm(String type, String lexical, int expected) {
-        var executor = new NextSparqlPipelineExecutor(MemoryStorageManager.builder().build());
+        var executor = new SparqlQueryExecutor(MemoryStorageManager.builder().build());
         try (var result = executor.evaluateTuple(PREFIX
                 + "SELECT ?v (xsd:decimal(?v) AS ?decimal) WHERE { VALUES ?v { '"
                 + lexical + "'^^xsd:" + type + " } }")) {
@@ -34,7 +34,7 @@ class ScalarFunctionsTest {
     }
 
     private BindingSet evaluate(String expressions) {
-        var executor = new NextSparqlPipelineExecutor(MemoryStorageManager.builder().build());
+        var executor = new SparqlQueryExecutor(MemoryStorageManager.builder().build());
         try (var result = executor.evaluateTuple(PREFIX + "SELECT " + expressions + " WHERE {}")) {
             assertTrue(result.hasNext());
             var row = result.next();
@@ -117,7 +117,7 @@ class ScalarFunctionsTest {
 
     @Test
     void iriResolvesAgainstBaseWithoutExpandingPrefixes() {
-        var executor = new NextSparqlPipelineExecutor(MemoryStorageManager.builder().build());
+        var executor = new SparqlQueryExecutor(MemoryStorageManager.builder().build());
         try (var result = executor.evaluateTuple("BASE <http://example.org/> PREFIX ex: <http://other/> SELECT (IRI('relative') AS ?iri) (URI('ex:name') AS ?uri) WHERE {}")) {
             var row = result.next();
             assertEquals("http://example.org/relative", row.getValue("iri").stringValue());
@@ -127,7 +127,7 @@ class ScalarFunctionsTest {
 
     @Test
     void projectionAliasesJoinOrderAndDoNotLeakAcrossRows() {
-        var executor = new NextSparqlPipelineExecutor(MemoryStorageManager.builder().build());
+        var executor = new SparqlQueryExecutor(MemoryStorageManager.builder().build());
         try (var result = executor.evaluateTuple("SELECT (?x + 1 AS ?a) (?a + 1 AS ?b) WHERE { VALUES ?x { 2 1 } } ORDER BY ?a")) {
             var rows = result.stream().toList();
             assertEquals(2, rows.size());
@@ -139,7 +139,7 @@ class ScalarFunctionsTest {
 
     @Test
     void labeledBlankNodesAreFreshForEachSolutionAndEvaluation() {
-        var executor = new NextSparqlPipelineExecutor(MemoryStorageManager.builder().build());
+        var executor = new SparqlQueryExecutor(MemoryStorageManager.builder().build());
         String query = "SELECT (BNODE('label') AS ?a) (BNODE('label') AS ?b) WHERE { VALUES ?x { 1 2 } }";
         try (var first = executor.evaluateTuple(query); var second = executor.evaluateTuple(query)) {
             var rows = first.stream().toList();

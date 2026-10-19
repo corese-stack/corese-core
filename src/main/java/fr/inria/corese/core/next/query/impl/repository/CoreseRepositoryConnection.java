@@ -34,7 +34,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.DescribeQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.UpdateRequestAst;
-import fr.inria.corese.core.next.query.impl.sparql.execution.NextSparqlPipelineExecutor;
+import fr.inria.corese.core.next.query.impl.sparql.execution.SparqlQueryExecutor;
 import fr.inria.corese.core.next.query.impl.sparql.update.UpdateTransaction;
 import fr.inria.corese.core.next.storage.api.StorageManager;
 import fr.inria.corese.core.next.storage.api.exception.StorageException;
@@ -66,7 +66,7 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
 
     private final Repository repository;
     private final StorageManager storage;
-    private final NextSparqlPipelineExecutor executor;
+    private final SparqlQueryExecutor executor;
     private final SparqlParser parser;
     private Dataset connectionDataset;
     private Transaction transaction;
@@ -75,7 +75,7 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
     CoreseRepositoryConnection(Repository repository, StorageManager storage) {
         this.repository = repository;
         this.storage = storage;
-        this.executor = new NextSparqlPipelineExecutor(storage);
+        this.executor = new SparqlQueryExecutor(storage);
         this.parser = new SparqlParser();
     }
 
@@ -499,8 +499,8 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
         return parser.parse(queryString);
     }
 
-    private NextSparqlPipelineExecutor executorFor(String baseIRI) {
-        return baseIRI == null ? executor : new NextSparqlPipelineExecutor(storage, baseIRI);
+    private SparqlQueryExecutor executorFor(String baseIRI) {
+        return baseIRI == null ? executor : new SparqlQueryExecutor(storage, baseIRI);
     }
 
     private String requireSource(String source, String parameterName) {

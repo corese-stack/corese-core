@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast.path;
 
-import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.VisitableAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.visitor.VisitableAst;
 
 public sealed interface PathAst
         extends VisitableAst

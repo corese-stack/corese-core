@@ -7,7 +7,7 @@
  *
  * <p>The parser, AST, bridge, and KGRAM engine are invisible from this package.
  * {@link fr.inria.corese.core.next.query.impl.repository.CoreseRepositoryConnection}
- * hides {@link fr.inria.corese.core.next.query.impl.sparql.execution.NextSparqlPipelineExecutor}
+ * hides {@link fr.inria.corese.core.next.query.impl.sparql.execution.SparqlQueryExecutor}
  * and validates query syntax at preparation time before returning typed query objects.</p>
  */
 package fr.inria.corese.core.next.query.impl.repository;
