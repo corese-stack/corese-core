@@ -15,7 +15,7 @@ import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import fr.inria.corese.core.next.query.impl.engine.storage.StorageManagerProducer;
 import fr.inria.corese.core.next.query.impl.sparql.bridge.CoreseAstQueryBuilder;
-import fr.inria.corese.core.next.query.impl.sparql.execution.NextSparqlPipelineExecutor;
+import fr.inria.corese.core.next.query.impl.sparql.execution.SparqlQueryExecutor;
 import fr.inria.corese.core.next.query.impl.sparql.parser.SparqlParser;
 import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
 import fr.inria.corese.core.next.storage.Storages;
@@ -50,11 +50,12 @@ class LazyProducerTest {
         final AtomicInteger read = new AtomicInteger();
         final AtomicInteger closed = new AtomicInteger();
         Consumer<Statement> callback = s -> { };
-        final NextSparqlPipelineExecutor executor;
+        final SparqlQueryExecutor executor;
 
         Fixture() {
             root.mutations().addAll(StorageBenchmark.data(20, 0, false));
             when(observed.queries()).thenReturn(queries);
+            when(observed.openReadSnapshot()).thenThrow(UnsupportedOperationException.class);
             when(observed.metadata()).thenReturn(root.metadata());
             when(queries.find(any())).thenAnswer(call -> {
                 opened.incrementAndGet();
@@ -62,7 +63,7 @@ class LazyProducerTest {
                     read.incrementAndGet(); callback.accept(s);
                 }).onClose(closed::incrementAndGet);
             });
-            executor = new NextSparqlPipelineExecutor(observed);
+            executor = new SparqlQueryExecutor(observed);
         }
 
         @SuppressWarnings("java:S3011")

@@ -4,13 +4,11 @@ import fr.inria.corese.core.next.query.impl.engine.model.DatatypeNodeFactory;
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.Graph;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
-import fr.inria.corese.core.next.query.impl.engine.model.Regex;
 
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
-import fr.inria.corese.core.next.query.impl.engine.eval.SparqlException;
 
 import java.util.List;
 
@@ -86,63 +84,7 @@ public interface Producer {
         // Most producers return in-memory collections without owned resources.
     }
 
-    Mappings getMappings(Node gNode, List<Node> from, Exp exp, Environment env) throws SparqlException;
-
-    /*
-     *  * ************** PATH *************
-     */
-    /**
-     * Start the processing of a path instruction with qEdge as pseudo query
-     * edge. index is the index of the node in qEdge where to start path. It is
-     * the index of the node that we want to enumerate in getNodes()
-     *
-     */
-    void initPath(Edge qEdge, int index);
-
-    /**
-     * Return nodes for Zero length path
-     *
-     * @param gNode The graph node where to get nodes (may be null)
-     * @param from  from or from named, may be empty
-     * @param edge  Pseudo query edge for path
-     * @param env   The binding environment
-     * @param exp   either property name or a ! (pname | pname) or null
-     * @param index of the node to return
-     * @return Iterable of start nodes for exp
-     * <p>
-     * SPARQL 1.1 requires: ZeroLengthPath match all nodes of (current) graph,
-     * including Literals If the argument is a constant, it matches even if it
-     * is not a node of the graph
-     */
-    Iterable<Node> getNodes(Node gNode, List<Node> from, Edge edge, Environment env,
-                            List<Regex> exp, int index);
-
-    /**
-     * Return candidate edges for a path step for an elementary regex exp. Edge
-     * start at start Node, start is the node at index. Hence start can be
-     * edge.getNode(0) as well as edge.getNode(1)
-     * <p>
-     * isInverse = true means consider also target edge nodes in reverse order
-     * query: start = Bob ; ?a ^foaf:knows ?b target: Jack foaf:knows Bob return
-     * edge above because we consider also Bob foaf:knows Jack This is
-     * orthogonal to index = 1, in which case we also consider nodes in inverse
-     * order
-     *
-     * @param gNode The start node of edges
-     * @param from  from or from named, may be empty
-     * @param qEdge Pseudo query edge for path
-     * @param env   The binding environment
-     * @param exp   either property name or a ! (pname | pname)
-     * @param src   current source if any
-     * @param start The start node for current edge
-     * @param index of the start node in edge exp.isInverse() authorize to
-     *              consider nodes in reverse order (as if the symmetric relation would
-     *              exist)
-     * @return Iterable of start nodes for exp
-     */
-    @SuppressWarnings("java:S107") // Core KGRAM Producer interface method requires 8 execution parameters
-    Iterable<Edge> getEdges(Node gNode, List<Node> from, Edge qEdge, Environment env,
-                            Regex exp, Node src, Node start, int index);
+    Mappings getMappings(Node gNode, List<Node> from, Exp exp, Environment env);
 
     /*
      * ************** value to node *************

@@ -21,7 +21,6 @@ import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
 
 import fr.inria.corese.core.next.query.impl.engine.event.KgramEventDispatcher;
 import fr.inria.corese.core.next.query.impl.engine.path.Path;
-import fr.inria.corese.core.next.query.impl.engine.eval.ApproximateSearchEnv;
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 
 import java.util.ArrayList;
@@ -30,7 +29,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Node and Edge binding stacks for KGRAM evaluator
+ * Mutable binding stacks and solution construction for one evaluation.
+ *
+ * <p>Each query or nested evaluation owns its node arrays and binding counters.
+ * Push/pop pairs track the stack level at which a variable first became bound,
+ * allowing the evaluator to backtrack without rebuilding its environment.
+ * Instances are confined to the evaluation thread; cancellation is observed by
+ * the owning evaluator rather than by sharing these arrays with another thread.</p>
  *
  * @author Olivier Corby, Edelweiss, INRIA 2009
  */
@@ -76,7 +81,6 @@ public class Memory extends PointerObject implements Environment {
     private DatatypeValue detail;
     private boolean isEdge;
     private BindingContext bindingContext;
-    private ApproximateSearchEnv appxSearchEnv;
 
     public Memory() {
     }
@@ -85,7 +89,6 @@ public class Memory extends PointerObject implements Environment {
         match = m;
         eval = e;
         bnode = new HashMap<>();
-        this.appxSearchEnv = new ApproximateSearchEnv();
     }
 
     @Override
@@ -341,170 +344,151 @@ public class Memory extends PointerObject implements Environment {
         }
     }
 
-    public Mapping store(Query q, Producer p, boolean subEval) {
-        return store(q, p, subEval, false);
-    }
-
     /**
-     * subEval = true : result of statement such as minus/optional etc
-     * in this case: no select exp, no order by, no group by, etc
-     * subEval = false: main or nested select query.
+     * Copies the current bindings into one solution, evaluating projection and
+     * ordering expressions only for a complete query result.
+     *
+     * <p>The evaluator owns this mutable environment on its execution thread.
+     * Temporary SELECT bindings are removed before the next solution; the returned
+     * mapping owns its node arrays and retains the RDF values themselves.</p>
+     *
+     * @param query query whose projection and ordering apply
+     * @param producer producer used to evaluate expressions and copy recorded edges
+     * @param subEvaluation whether the solution belongs to an intermediate graph pattern
+     * @return captured solution, or null when a projection conflicts with a binding
      */
-    @SuppressWarnings("java:S3776") // Legacy KGRAM solution construction algorithm assembling Mapping results from memory state
-    Mapping store(Query q, Producer p, boolean subEval, boolean func) {
-        boolean complete = !q.getGlobalQuery().isAlgebra();
+    public Mapping store(Query query, Producer producer, boolean subEvaluation) {
+        Node reportNode = bindServiceReport();
+        int capacity = solutionNodeCapacity(query, subEvaluation);
+        Edge[] queryEdgeCopies = isEdge ? new Edge[nbEdge] : emptyEdges;
+        Edge[] targetEdgeCopies = isEdge ? new Edge[nbEdge] : emptyEntities;
+        copySolutionEdges(producer, queryEdgeCopies, targetEdgeCopies);
 
-        Node detailNode = null;
-        if (getReport() != null) {
-            // draft: set service report as variable value
-            // use case: xt:sparql() return map with report
-            // PluginImpl sparql() record report in Environment
-            // detailNode is defined by ASTParser with @report metadata
-            detailNode = getQuery().getSelectNode(SERVICE_REPORT_ZERO);
-            if (detailNode != null) {
-                push(detailNode, (Node) getReport());
-            }
+        Node[] queryNodeCopies = new Node[capacity];
+        Node[] targetNodeCopies = new Node[capacity];
+        int boundNodes = copySolutionNodes(queryNodeCopies, targetNodeCopies);
+        Node[] orderByNodes = new Node[query.getOrderBy().size()];
+        Node[] groupByNodes = new Node[query.getGroupBy().size()];
+
+        if (!subEvaluation && !projectSolution(query, producer, queryNodeCopies, targetNodeCopies, boundNodes)) {
+            return null;
         }
-
-        int nb = nbNode;
-        if (!subEval && complete) {
-            // select (exp as var) it may happen that var is already bound in
-            // memory (bindings, subquery), so we should not allocate a
-            // supplementary cell for var in Mapping node array
-            for (Exp selectFunExp : q.getSelectFun()) {
-                if (selectFunExp.getFilter() != null && !isBound(selectFunExp.getNode())) {
-                    nb++;
-                }
-            }
+        Mapping solution = new Mapping(queryEdgeCopies, targetEdgeCopies, queryNodeCopies, targetNodeCopies);
+        mapping = solution;
+        if (!subEvaluation) {
+            solution.init();
+            // Ordering expressions may inspect the projected solution through the environment.
+            orderGroup(query.getOrderBy(), orderByNodes, producer);
+            orderGroup(query.getGroupBy(), groupByNodes, producer);
+            popProjectionBindings(query);
         }
-        Edge[] qedge = emptyEdges;
-        Edge[] tedge = emptyEntities;
-        Node[] qnode = new Node[nb];
-        Node[] tnode = new Node[nb];
-        // order by
-        Node[] snode = new Node[q.getOrderBy().size()];
-        Node[] gnode = new Node[q.getGroupBy().size()];
-
-        int n = 0;
-        int i = 0;
-        if (isEdge) {
-            qedge = new Edge[nbEdge];
-            tedge = new Edge[nbEdge];
-            for (Edge edge : qEdges) {
-                if (edge != null) {
-                    qedge[n] = edge;
-
-                    tedge[n] = p.copy(result[i]);
-                    n++;
-                }
-                i++;
-            }
-        }
-
-        n = 0;
-        i = 0;
-        for (Node node : qNodes) {
-            if (node != null) {
-                qnode[n] = node;
-                tnode[n] = nodes[i];
-                n++;
-            }
-            i++;
-        }
-
-        Mapping map = null;
-
-        if (complete) {
-            if (subEval) {
-                // statement e.g. minus/optional/union
-                if (func) {
-                    orderGroup(q.getOrderBy(), snode, p);
-                    orderGroup(q.getGroupBy(), gnode, p);
-                }
-            } else {
-                // main query or nested query
-                int count = 0;
-                for (Exp e : q.getSelectFun()) {
-
-                    Filter f = e.getFilter();
-
-                    if (f != null) {
-                        // select fun(?x) as ?y
-                        Node node = null;
-                        boolean isBound = isBound(e.getNode());
-
-                        if (!e.isAggregate()) {
-
-
-                            node = evaluateExpressionNode(f, p);
-                            kgram.getVisitor().select(kgram, f.getExp(), node == null ? null : node.getDatatypeValue());
-                            // bind fun(?x) as ?y
-                            boolean success = push(e.getNode(), node);
-                            if (success) {
-                                count++;
-                            } else {
-                                // use case: var was already bound and there is a select (exp as var)
-                                // and the two values of var are different
-                                // pop previous exp nodes and return null
-                                int j = 0;
-
-                                for (Exp ee : q.getSelectFun()) {
-                                    // pop previous exp nodes if any
-                                    if (j >= count) {
-                                        // we have poped all exp nodes
-                                        return null;
-                                    }
-
-                                    if (ee.getFilter() != null) {
-                                        pop(ee.getNode());
-                                        j++;
-                                    }
-                                }
-                            }
-                        }
-
-                        if (!isBound) {
-                            // use case: select (exp as var) where var is already bound
-                            qnode[n] = e.getNode();
-                            tnode[n] = node;
-                            n++;
-                        }
-                    }
-                }
-
-                map = new Mapping(qedge, tedge, qnode, tnode);
-                mapping = map;
-                map.init();
-                // order/group by may access mapping with xt:result()
-                orderGroup(q.getOrderBy(), snode, p);
-                orderGroup(q.getGroupBy(), gnode, p);
-
-                for (Exp e : q.getSelectFun()) {
-                    Filter f = e.getFilter();
-                    if (f != null && !e.isAggregate()) {
-                        // pop fun(?x) as ?y
-                        pop(e.getNode());
-                    }
-                }
-            }
-        }
-
-        if (map == null) {
-            map = new Mapping(qedge, tedge, qnode, tnode);
-            mapping = map;
-        }
-
-        if (detailNode != null) {
-            pop(detailNode);
+        if (reportNode != null) {
+            pop(reportNode);
             setReport(null);
         }
-
-        map.setOrderBy(snode);
-        map.setGroupBy(gnode);
+        solution.setOrderBy(orderByNodes);
+        solution.setGroupBy(groupByNodes);
         clear();
         mapping = null;
+        return solution;
+    }
 
-        return map;
+    private Node bindServiceReport() {
+        if (getReport() == null) {
+            return null;
+        }
+        Node reportNode = getQuery().getSelectNode(SERVICE_REPORT_ZERO);
+        if (reportNode != null) {
+            push(reportNode, (Node) getReport());
+        }
+        return reportNode;
+    }
+
+    private int solutionNodeCapacity(Query query, boolean subEvaluation) {
+        int capacity = nbNode;
+        if (!subEvaluation) {
+            for (Exp projection : query.getSelectFun()) {
+                if (projection.getFilter() != null && !isBound(projection.getNode())) {
+                    capacity++;
+                }
+            }
+        }
+        return capacity;
+    }
+
+    private void copySolutionEdges(Producer producer, Edge[] queryEdgeCopies, Edge[] targetEdgeCopies) {
+        if (!isEdge) {
+            return;
+        }
+        int targetIndex = 0;
+        for (int sourceIndex = 0; sourceIndex < qEdges.length; sourceIndex++) {
+            if (qEdges[sourceIndex] != null) {
+                queryEdgeCopies[targetIndex] = qEdges[sourceIndex];
+                targetEdgeCopies[targetIndex] = producer.copy(result[sourceIndex]);
+                targetIndex++;
+            }
+        }
+    }
+
+    private int copySolutionNodes(Node[] queryNodeCopies, Node[] targetNodeCopies) {
+        int targetIndex = 0;
+        for (int sourceIndex = 0; sourceIndex < qNodes.length; sourceIndex++) {
+            if (qNodes[sourceIndex] != null) {
+                queryNodeCopies[targetIndex] = qNodes[sourceIndex];
+                targetNodeCopies[targetIndex] = nodes[sourceIndex];
+                targetIndex++;
+            }
+        }
+        return targetIndex;
+    }
+
+    private boolean projectSolution(Query query, Producer producer, Node[] queryNodeCopies,
+                                    Node[] targetNodeCopies, int targetIndex) {
+        int pushedBindings = 0;
+        for (Exp projection : query.getSelectFun()) {
+            Filter filter = projection.getFilter();
+            if (filter == null) {
+                continue;
+            }
+            boolean previouslyBound = isBound(projection.getNode());
+            Node value = null;
+            if (!projection.isAggregate()) {
+                value = evaluateExpressionNode(filter, producer);
+                kgram.getVisitor().select(kgram, filter.getExp(), value == null ? null : value.getDatatypeValue());
+                if (!push(projection.getNode(), value)) {
+                    popProjectionPrefix(query, pushedBindings);
+                    return false;
+                }
+                pushedBindings++;
+            }
+            if (!previouslyBound) {
+                queryNodeCopies[targetIndex] = projection.getNode();
+                targetNodeCopies[targetIndex] = value;
+                targetIndex++;
+            }
+        }
+        return true;
+    }
+
+    private void popProjectionPrefix(Query query, int count) {
+        int popped = 0;
+        for (Exp projection : query.getSelectFun()) {
+            if (popped >= count) {
+                return;
+            }
+            if (projection.getFilter() != null) {
+                pop(projection.getNode());
+                popped++;
+            }
+        }
+    }
+
+    private void popProjectionBindings(Query query) {
+        for (Exp projection : query.getSelectFun()) {
+            if (projection.getFilter() != null && !projection.isAggregate()) {
+                pop(projection.getNode());
+            }
+        }
     }
 
     @Override
@@ -1139,15 +1123,6 @@ public class Memory extends PointerObject implements Environment {
     @Override
     public boolean hasBind() {
         return bindingContext != null && bindingContext.hasBind();
-    }
-
-    @Override
-    public ApproximateSearchEnv getAppxSearchEnv() {
-        return this.appxSearchEnv;
-    }
-
-    public void setAppxSearchEnv(ApproximateSearchEnv appxEnv) {
-        this.appxSearchEnv = appxEnv;
     }
 
     /**

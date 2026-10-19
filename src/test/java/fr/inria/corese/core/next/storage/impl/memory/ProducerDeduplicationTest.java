@@ -12,7 +12,7 @@ import fr.inria.corese.core.next.query.impl.engine.storage.StorageManagerEdge;
 import fr.inria.corese.core.next.query.impl.engine.storage.StorageManagerProducer;
 import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.bridge.CoreseAstQueryBuilder;
-import fr.inria.corese.core.next.query.impl.sparql.execution.NextSparqlPipelineExecutor;
+import fr.inria.corese.core.next.query.impl.sparql.execution.SparqlQueryExecutor;
 import fr.inria.corese.core.next.query.impl.sparql.parser.SparqlParser;
 import fr.inria.corese.core.next.storage.Storages;
 import fr.inria.corese.core.next.storage.api.StorageManager;
@@ -181,7 +181,7 @@ class ProducerDeduplicationTest {
         try (var root = storage()) {
             root.mutations().add(row(0, G)); root.mutations().add(row(0, H));
             root.mutations().add(Values.factory().createStatement(new SimpleIRI("urn:s0"), new SimpleIRI("urn:p2"), new SimpleIRI("urn:o"), G));
-            var executor = new NextSparqlPipelineExecutor(root);
+            var executor = new SparqlQueryExecutor(root);
             try (var result = executor.evaluateTuple("SELECT ?s FROM <urn:g> FROM <urn:h> { ?s ?p ?o }")) {
                 assertEquals(List.of("urn:s0", "urn:s0"), result.stream().map(b -> b.getValue("s").stringValue()).toList());
             }

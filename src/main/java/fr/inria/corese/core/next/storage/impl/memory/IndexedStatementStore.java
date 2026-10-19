@@ -50,6 +50,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -80,6 +81,9 @@ import java.util.stream.StreamSupport;
  */
 final class IndexedStatementStore
         implements QueryOperations, MutationOperations, MetadataOperations, TransactionManager {
+
+    /** Allocates unique content versions without adding fields to retained database states. */
+    private static final AtomicLong REVISIONS = new AtomicLong();
     // One batch-wide reservation: at most 65,536 HashMap buckets, even for many graphs.
     /**
      * Upper bound on the batch-wide initial canonicalization reservation.
@@ -520,6 +524,23 @@ final class IndexedStatementStore
         }
     }
 
+    /** Captures the visible state without transferring ownership of an active transaction. */
+    @SuppressWarnings("java:S1181") // Release retained partitions if snapshot initialization fails, then rethrow unchanged.
+    IndexedStatementStore openReadSnapshot() {
+        synchronized (database) {
+            checkAccess();
+            final IndexedStatementStore snapshot = new IndexedStatementStore(database);
+            final State captured = state().copy();
+            try {
+                snapshot.transaction = snapshot.new SnapshotTransaction(captured, getDataVersion(), true);
+                return snapshot;
+            } catch (final RuntimeException | Error failure) {
+                captured.release();
+                throw failure;
+            }
+        }
+    }
+
     /**
      * Closes this session, rolling back its active transaction; independent read snapshots remain retained.
      *
@@ -534,7 +555,11 @@ final class IndexedStatementStore
                 throw new IllegalStateException("A batch is active on this session");
             }
             if (transaction != null) {
-                transaction.rollback();
+                if (transaction.readOnly) {
+                    transaction.finish(TransactionState.ROLLED_BACK);
+                } else {
+                    transaction.rollback();
+                }
             }
             closed = true;
         }
@@ -561,6 +586,9 @@ final class IndexedStatementStore
      */
     private void checkWrite() {
         checkAccess();
+        if (transaction != null && transaction.readOnly) {
+            throw new IllegalStateException("Read snapshots cannot be mutated");
+        }
         if (loading) {
             throw new IllegalStateException("A batch is active on this session");
         }
@@ -585,9 +613,19 @@ final class IndexedStatementStore
             return;
         }
         if (transaction == null) {
-            database.version++;
+            database.version = REVISIONS.incrementAndGet();
         } else {
             transaction.dirty = true;
+            transaction.revision = REVISIONS.incrementAndGet();
+        }
+    }
+
+    /** Returns the version of this session's visible data under the database monitor. */
+    @Override
+    public long getDataVersion() {
+        synchronized (database) {
+            checkAccess();
+            return transaction == null ? database.version : transaction.revision;
         }
     }
 
@@ -1656,6 +1694,10 @@ final class IndexedStatementStore
          * Committed version captured for optimistic conflict detection.
          */
         private final long version;
+        /** Version of the transaction's own visible content, independent of later commits. */
+        private long revision;
+        /** Independent query snapshots never publish mutations. */
+        private final boolean readOnly;
         /**
          * Transaction-owned state until publication or release.
          */
@@ -1676,8 +1718,14 @@ final class IndexedStatementStore
          * @param version committed version captured for conflict detection
          */
         private SnapshotTransaction(final State state, final long version) {
+            this(state, version, false);
+        }
+
+        private SnapshotTransaction(final State state, final long version, final boolean readOnly) {
             this.state = state;
             this.version = version;
+            this.revision = version;
+            this.readOnly = readOnly;
         }
 
         /**
@@ -1758,7 +1806,7 @@ final class IndexedStatementStore
                     database.committed.release();
                     database.committed = state;
                     state = null; // Ownership transferred to the committed state.
-                    database.version++;
+                    database.version = revision;
                 }
                 finish(TransactionState.COMMITTED);
             }

@@ -12,6 +12,25 @@ import java.util.stream.Stream;
 public interface QueryOperations {
 
     /**
+     * Returns a token identifying the data currently visible to this session.
+     * A supported token is stable across reads and changes after effective content
+     * or graph-registry mutations. A snapshot transaction keeps its captured token
+     * despite other sessions' commits, and changes it after its own writes. After
+     * rollback the token identifies the restored visible state. Tokens are opaque:
+     * clients compare equality, never infer statement counts or commit order.
+     *
+     * <p>Backends unable to provide reliable invalidation return {@code -1}; query
+     * planning then remains uncached. Implementations must validate session access
+     * and must not create a read cursor or transaction to obtain this token.</p>
+     *
+     * @return non-negative session-visible data token, or {@code -1} if unavailable
+     * @throws StorageException if the visible version cannot be read
+     */
+    default long getDataVersion() {
+        return -1;
+    }
+
+    /**
      * Queries statements matching the given pattern.
      *
      * @param pattern Statement pattern to match

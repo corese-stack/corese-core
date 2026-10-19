@@ -4,7 +4,6 @@ import fr.inria.corese.core.next.query.impl.engine.model.DatatypeNodeFactory;
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.Graph;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
-import fr.inria.corese.core.next.query.impl.engine.model.Regex;
 
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
@@ -37,22 +36,11 @@ public class ProducerDefault implements Producer {
         return new ArrayList<>();
     }
 
-    @Override
-    public Iterable<Edge> getEdges(Node gNode, List<Node> from, Edge edge, Environment env, Regex exp,
-                                   Node src, Node start,
-                                   int index) {
-        return new ArrayList<>();
-    }
 
     @Override
     public Iterable<Node> getGraphNodes(Node node, List<Node> from,
                                         Environment env) {
         return new ArrayList<>();
-    }
-
-    @Override
-    public void initPath(Edge edge, int index) {
-        // No-op by default in ProducerDefault
     }
 
     @Override
@@ -71,10 +59,6 @@ public class ProducerDefault implements Producer {
         return false;
     }
 
-    @Override
-    public Iterable<Node> getNodes(Node gNode, List<Node> from, Edge edge, Environment env, List<Regex> exp, int index) {
-        return new ArrayList<>();
-    }
 
     @Override
     public boolean isProducer(Node node) {

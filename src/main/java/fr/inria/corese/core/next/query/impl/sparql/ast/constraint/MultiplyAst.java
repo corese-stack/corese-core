@@ -9,13 +9,9 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
  */
 public class MultiplyAst extends AbstractChainableOperatorAst implements NumericExpressionAst {
     public MultiplyAst(List<TermAst> args) {
-        super(args);
+        super(args, MultiplyAst::new);
     }
 
-    @Override
-    protected TermAst create(List<TermAst> args) {
-        return new MultiplyAst(args);
-    }
 
     @Override
     public String getName() {

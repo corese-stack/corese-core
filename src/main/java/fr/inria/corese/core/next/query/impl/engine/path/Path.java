@@ -20,7 +20,7 @@ import static fr.inria.corese.core.next.query.impl.engine.model.PointerType.PATH
  *
  * @author Olivier Corby, Edelweiss, INRIA 2010
  */
-public class Path extends ProducerDefault implements Pointerable<Edge> {
+public final class Path extends ProducerDefault implements Pointerable<Edge> {
 
     boolean isShort = false;
     boolean isReverse = false;

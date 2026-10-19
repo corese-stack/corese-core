@@ -1,7 +1,6 @@
 package fr.inria.corese.core.next.query.impl.engine.solution;
 
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
 
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 
@@ -28,7 +27,7 @@ import java.util.NoSuchElementException;
  *
  * @author Olivier Corby, Wimmics INRIA I3S, 2018
  */
-public class MappingSet {
+public final class MappingSet {
     Mappings map;
     Exp exp;
     MappingSet set1;
@@ -39,18 +38,16 @@ public class MappingSet {
     boolean isBound = false;
 
 
-    public MappingSet(Query q, Exp exp, MappingSet s1, MappingSet s2) {
+    public MappingSet(Exp exp, MappingSet s1, MappingSet s2) {
         this.exp = exp;
         this.set1 = s1;
         this.set2 = s2;
-        setQuery(q);
     }
 
-    public MappingSet(Query q, Mappings mappings) {
+    public MappingSet(Mappings mappings) {
         this.map = mappings;
         union = new HashMap<>();
         intersection = new HashMap<>();
-        setQuery(q);
         process();
     }
 
@@ -224,10 +221,6 @@ public class MappingSet {
         // there is no in-scope variable.
         // return original Mappings in case of union in exp (see comment above)
         return getMappings();
-    }
-
-    public void setQuery(Query query) {
-        // query is kept for compatibility
     }
 
     class Iterate implements Iterator<Mapping> {

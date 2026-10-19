@@ -24,16 +24,29 @@ class NextModuleBoundaryTest {
     private static final Path CORE_SOURCES = Path.of("src/main/java/fr/inria/corese/core");
     private static final Path NEXT_SOURCES = CORE_SOURCES.resolve("next");
     private static final Pattern CORESE_TYPE_REFERENCE = Pattern.compile(
-            "\\bfr\\.inria\\.corese\\.core(?:\\.[A-Za-z_$][A-Za-z0-9_$]*)+");
-    private static final Pattern STATIC_IMPORT_PREFIX = Pattern.compile("^static\\s+");
+            "\\bfr\\.inria\\.corese(?:\\.[A-Za-z_$][A-Za-z0-9_$]*+)++");
 
-    // Engine must not depend on parser or AST types: zero exceptions.
-    // Exact source/type pairs only: see docs/next-engine-ast-boundary.md.
-    private static final Set<String> EXISTING_ENGINE_AST_DEPENDENCIES = Set.of();
+    @Test
+    void declaredIsolationMatchesTheActualRuntimeClasspath() {
+        boolean historicalClassesExpected = !Boolean.getBoolean("corese.next.isolated");
+        for (String type : List.of("fr.inria.corese.core.Graph",
+                "fr.inria.corese.core.kgram.core.Eval",
+                "fr.inria.corese.core.sparql.triple.parser.ASTQuery")) {
+            boolean present;
+            try {
+                Class.forName(type, false, getClass().getClassLoader());
+                present = true;
+            } catch (ClassNotFoundException absent) {
+                present = false;
+            }
+            assertEquals(historicalClassesExpected, present,
+                    "Historical class availability must match the declared verification mode: " + type);
+        }
+    }
 
     @Test
     void sharedCodeMustNotDependOnDomainModules() throws IOException {
-        assertNoImports(
+        assertNoReferences(
                 NEXT_SOURCES.resolve("common"),
                 imported -> imported.startsWith("fr.inria.corese.core.next.data.")
                         || imported.startsWith("fr.inria.corese.core.next.storage.")
@@ -42,7 +55,7 @@ class NextModuleBoundaryTest {
 
     @Test
     void dataMustNotDependOnStorageOrQuery() throws IOException {
-        assertNoImports(
+        assertNoReferences(
                 NEXT_SOURCES.resolve("data"),
                 imported -> imported.startsWith("fr.inria.corese.core.next.storage.")
                         || imported.startsWith("fr.inria.corese.core.next.query."));
@@ -50,9 +63,24 @@ class NextModuleBoundaryTest {
 
     @Test
     void storageMustNotDependOnQuery() throws IOException {
-        assertNoImports(
+        assertNoReferences(
                 NEXT_SOURCES.resolve("storage"),
                 imported -> imported.startsWith("fr.inria.corese.core.next.query."));
+    }
+
+    @Test
+    void nextMustNotDependOnAnyHistoricalCoresePackage() throws IOException {
+        assertNoReferences(NEXT_SOURCES,
+                reference -> reference.startsWith("fr.inria.corese.")
+                        && !reference.equals("fr.inria.corese.core.next")
+                        && !reference.startsWith("fr.inria.corese.core.next."));
+    }
+
+    @Test
+    void syntaxTreeMustNotDependOnItsParserOrExecutionEngine() throws IOException {
+        assertNoReferences(NEXT_SOURCES.resolve("query/impl/sparql/ast"),
+                reference -> reference.startsWith("fr.inria.corese.core.next.query.impl.sparql.parser.")
+                        || reference.startsWith("fr.inria.corese.core.next.query.impl.engine."));
     }
 
     @Test
@@ -96,7 +124,7 @@ class NextModuleBoundaryTest {
     @Test
     void queryEngineMustNotAddParserOrAstDependencies() throws IOException {
         Path engineSources = NEXT_SOURCES.resolve("query/impl/engine");
-        assertEquals(EXISTING_ENGINE_AST_DEPENDENCIES, engineSyntaxDependencies(engineSources),
+        assertEquals(Set.of(), engineSyntaxDependencies(engineSources),
                 "Unexpected engine syntax dependency, or obsolete exception: "
                         + "remove dependencies rather than expanding the exception list.");
     }
@@ -199,9 +227,9 @@ class NextModuleBoundaryTest {
     }
 
     @Test
-    void implementationPackagesMustBeDocumented() throws IOException {
+    void allNativePackagesMustBeDocumented() throws IOException {
         assertPackagesAreDocumented(
-                implementationDirectories(), "Undocumented implementation packages:");
+                List.of(NEXT_SOURCES), "Undocumented native packages:");
     }
 
     private static void assertPackagesAreDocumented(List<Path> packageRoots, String message)
@@ -232,48 +260,6 @@ class NextModuleBoundaryTest {
                 NEXT_SOURCES.resolve("data/spi"),
                 NEXT_SOURCES.resolve("storage/api"),
                 NEXT_SOURCES.resolve("query/api"));
-    }
-
-    private static List<Path> implementationDirectories() {
-        return List.of(
-                NEXT_SOURCES.resolve("data/impl"),
-                NEXT_SOURCES.resolve("storage/impl"),
-                NEXT_SOURCES.resolve("query/impl/engine"),
-                NEXT_SOURCES.resolve("query/impl/sparql"));
-    }
-
-    private static void assertNoImports(Path sourceDirectory, Predicate<String> forbidden)
-            throws IOException {
-        assertNoImports(sourceDirectory, source -> true, forbidden);
-    }
-
-    private static void assertNoImports(
-            Path sourceDirectory,
-            Predicate<Path> includedSource,
-            Predicate<String> forbidden) throws IOException {
-        List<String> violations = new ArrayList<>();
-        try (Stream<Path> paths = Files.walk(sourceDirectory)) {
-            for (Path source : paths
-                    .filter(path -> path.toString().endsWith(".java"))
-                    .filter(includedSource)
-                    .toList()) {
-                for (String line : Files.readAllLines(source)) {
-                    String trimmed = line.trim();
-                    if (trimmed.startsWith("import ")) {
-                        String imported = STATIC_IMPORT_PREFIX
-                                .matcher(trimmed.substring("import ".length()))
-                                .replaceFirst("")
-                                .replace(";", "");
-                        if (forbidden.test(imported)) {
-                            violations.add(NEXT_SOURCES.relativize(source) + " -> " + imported);
-                        }
-                    }
-                }
-            }
-        }
-        if (!violations.isEmpty()) {
-            fail("Forbidden next-module dependencies:\n" + String.join("\n", violations));
-        }
     }
 
     private static void assertNoReferences(

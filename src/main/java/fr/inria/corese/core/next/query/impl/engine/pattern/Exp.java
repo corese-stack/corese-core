@@ -12,23 +12,27 @@ import fr.inria.corese.core.next.query.impl.engine.model.ExprType;
 import fr.inria.corese.core.next.query.impl.engine.model.Filter;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.model.PointerType;
-import fr.inria.corese.core.next.query.impl.engine.model.Regex;
+import fr.inria.corese.core.next.query.impl.engine.path.PropertyPathEdge;
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 import static fr.inria.corese.core.next.query.impl.engine.model.PointerType.STATEMENT;
 
 /**
- * KGRAM/SPARQL expressions: bgp, union, optional, etc.
+ * Mutable operators for compiled SPARQL graph patterns and solution modifiers.
+ *
+ * <p>Child operators, indexed nodes and attached expressions belong to one
+ * compiler or evaluation. {@link #copyPlan(PlanCopy)} detaches mutable links
+ * while preserving their identity relationships within the copied graph.
+ * An executable graph must not be shared between concurrent evaluations.</p>
  *
  * @author Olivier Corby, Edelweiss, INRIA 2010
  */
 public class Exp extends PointerObject
-        implements ExpType, ExpPattern, Iterable<Exp> {
+        implements ExpType, ExpPattern, Iterable<Exp>, PlanCopyable<Exp> {
 
     public static final int SUBJECT = 0;
     public static final int OBJECT = 1;
@@ -37,43 +41,34 @@ public class Exp extends PointerObject
     static final String NEWLINE = "\n";
     static final String SP = " ";
     Type type;
-    int index = -1;
+    private int bindingIndex = -1;
     // optional success
     boolean status = false;
-    boolean skip;
     boolean isFail = false;
-    boolean isPath = false;
     boolean isAggregate = false;
     boolean isSilent = false;
     VExp args;
     Edge edge;
     Node node;
     List<Node> lNodes;
-    // Filter api refer to sparql.triple.parser.Expression
+    // Expression evaluation contract, independent of parser syntax types.
     Filter filter;
     List<Filter> lFilter;
     // min(?l, expGroupBy(?x, ?y))
     List<Exp> expGroupBy;
     // for UNION
     Stack stack;
-    // for EXTERN
+    // Optimizer-specific payload, such as candidate values for an equality filter.
     Object payload;
     Producer producer;
-    Regex regex;
     Mappings map;
-    HashMap<Node, Mappings> mappingCache;
-    int min = -1;
-    int max = -1;
     private boolean isPostpone = false;
-    private boolean bgpAble = false;
     private boolean isFunctional = false;
     private boolean generated = false;
-    private Node arg;
     //  service with several URI:
     private List<Node> simpleNodeList;
     private Exp postpone;
     private List<Exp> inscopeFilter;
-    private Exp path;
     private Exp bind;
     private Exp values;
     private int level = -1;
@@ -89,8 +84,51 @@ public class Exp extends PointerObject
         lFilter = new ArrayList<>();
     }
 
+    /** Copies this operator and all mutable links into an independent execution graph. */
+    @Override
+    public Exp copyPlan(PlanCopy copies) {
+        Exp target = Exp.create(type);
+        copies.remember(this, target);
+        copyPlanFields(target, copies);
+        return target;
+    }
+
+    /** Copies the common operator fields after the target has been registered. */
+    void copyPlanFields(Exp target, PlanCopy copies) {
+        target.type = type;
+        target.bindingIndex = bindingIndex;
+        target.status = status;
+        target.isFail = isFail;
+        target.isAggregate = isAggregate;
+        target.isSilent = isSilent;
+        target.edge = copies.copy(edge);
+        target.node = copies.copy(node);
+        target.lNodes = copies.copy(lNodes);
+        target.filter = copies.copy(filter);
+        target.lFilter = copies.copy(lFilter);
+        target.expGroupBy = copies.copy(expGroupBy);
+        target.stack = copies.copy(stack);
+        target.payload = copies.copy(payload);
+        target.producer = copies.copy(producer);
+        target.map = copies.copy(map);
+        target.isPostpone = isPostpone;
+        target.isFunctional = isFunctional;
+        target.generated = generated;
+        target.simpleNodeList = copies.copy(simpleNodeList);
+        target.postpone = copies.copy(postpone);
+        target.inscopeFilter = copies.copy(inscopeFilter);
+        target.bind = copies.copy(bind);
+        target.values = copies.copy(values);
+        target.level = level;
+        target.number = number;
+        target.num = num;
+        target.isSystem = isSystem;
+        target.mappings = mappings;
+        for (Exp child : args) target.args.add(copies.copy(child));
+    }
+
     public static Exp create(Type t) {
-        if (t == Type.PATH || t == Type.EDGE) {
+        if (t == Type.EDGE) {
             return new ExpEdge(t);
         }
         return new Exp(t);
@@ -154,14 +192,6 @@ public class Exp extends PointerObject
         this.isFunctional = isFunctional;
     }
 
-    public Exp getPath() {
-        return path;
-    }
-
-    public boolean hasPath() {
-        return path != null;
-    }
-
     public boolean isSystem() {
         return isSystem;
     }
@@ -186,22 +216,6 @@ public class Exp extends PointerObject
         return type == Type.AND || type == Type.BGP;
     }
 
-    public boolean isBGPAble() {
-        return bgpAble;
-    }
-
-    public void setBGPAble(boolean bgpAble) {
-        this.bgpAble = bgpAble;
-    }
-
-    public Node getCacheNode() {
-        return arg;
-    }
-
-    public void setCacheNode(Node arg) {
-        this.arg = arg;
-    }
-
     public Exp getValues() {
         return values;
     }
@@ -210,7 +224,7 @@ public class Exp extends PointerObject
         return isPostpone;
     }
 
-    // draft for BGP
+    /** Returns a shallow operator containing the same child references. */
     public Exp duplicate() {
         Exp exp = Exp.create(type());
         for (Exp e : this) {
@@ -372,11 +386,11 @@ public class Exp extends PointerObject
     }
 
     public int getIndex() {
-        return index;
+        return bindingIndex;
     }
 
     public void setIndex(int n) {
-        index = n;
+        bindingIndex = n;
     }
 
     public boolean isBGPFilter() {
@@ -421,7 +435,7 @@ public class Exp extends PointerObject
     }
 
     public boolean isEdgePath() {
-        return isEdge() || isPath();
+        return isEdge();
     }
 
     public boolean isOption() {
@@ -516,14 +530,6 @@ public class Exp extends PointerObject
         edge = e;
     }
 
-    public Regex getRegex() {
-        return regex;
-    }
-
-    public void setRegex(Regex f) {
-        regex = f;
-    }
-
     @Override
     public Mappings getMappings() {
         return map;
@@ -589,11 +595,7 @@ public class Exp extends PointerObject
     }
 
     public boolean isPath() {
-        return type == Type.PATH;
-    }
-
-    public void setPath(Exp path) {
-        this.path = path;
+        return isEdge() && getEdge() instanceof PropertyPathEdge;
     }
 
     public boolean isValues() {
@@ -671,21 +673,6 @@ public class Exp extends PointerObject
         return new ArrayList<>();
     }
 
-    public int getMin() {
-        return min;
-    }
-
-    public void setMin(int i) {
-        min = i;
-    }
-
-    public int getMax() {
-        return max;
-    }
-
-    public void setMax(int i) {
-        max = i;
-    }
 
     public Stack getStack() {
         return stack;
@@ -707,7 +694,7 @@ public class Exp extends PointerObject
             for (int i = 0; i < size(); i++) {
                 Exp exp = get(i);
                 switch (exp.type()) {
-                    case EDGE, PATH, XPATH, EVAL:
+                    case EDGE, XPATH, EVAL:
                         if (exp.contains(qNode)) {
                             add(i + 1, Exp.create(Type.ACCEPT, qNode));
                             return true;
@@ -730,12 +717,12 @@ public class Exp extends PointerObject
     }
 
     public boolean isSortable() {
-        return isEdge() || isPath() || isGraph() || type == Type.OPT_BIND;
+        return isEdge() || isGraph() || type == Type.OPT_BIND;
     }
 
     boolean isSimple() {
         return switch (type) {
-            case EDGE, PATH, EVAL, OPT_BIND -> true;
+            case EDGE, EVAL, OPT_BIND -> true;
             default -> false;
         };
     }
@@ -758,18 +745,6 @@ public class Exp extends PointerObject
         return false;
     }
 
-    /**
-     * check special case: e1: ?x path ?y e2: graph path {} e2 cannot be moved
-     * before e1
-     */
-    public boolean isGraphPath(Exp e1, Exp e2) {
-        if (e1.isPath() && e2.isGraph()) {
-            Node var1 = e1.getEdge().getEdgeVariable();
-            Node var2 = e2.getGraphName();
-            return var1 != null && var2.isVariable() && var1.same(var2);
-        }
-        return false;
-    }
 
     public int nBind(List<Node> lNode, List<String> lVar, List<Exp> lBind) {
         if (isSimple()) {
@@ -820,7 +795,7 @@ public class Exp extends PointerObject
 
     /**
      * list of nodes that are bound by this exp no minus and no exists
-     * use case: Sorter
+     * use case: ConnectedPatternOrdering
      */
     public void bind(List<Node> lNode) {
         if (isSimple()) {
@@ -846,7 +821,7 @@ public class Exp extends PointerObject
 
     public void addBind(List<String> lVar) {
         Type title = type();
-        if (title == Type.EDGE || title == Type.PATH) {
+        if (title == Type.EDGE) {
             for (int i = 0; i < nbNode(); i++) {
                 Node bindNode = getNode(i);
                 addBind(bindNode, lVar);
@@ -865,7 +840,7 @@ public class Exp extends PointerObject
      */
     int nbNode() {
         switch (type) {
-            case EDGE, PATH, EVAL:
+            case EDGE, EVAL:
                 if (edge.getEdgeVariable() == null) {
                     return edge.nbNode();
                 } else {
@@ -885,7 +860,7 @@ public class Exp extends PointerObject
      */
     Node getNode(int n) {
         switch (type) {
-            case EDGE, PATH, EVAL:
+            case EDGE, EVAL:
                 if (n < edge.nbNode()) {
                     return edge.getNode(n);
                 } else {
@@ -945,7 +920,7 @@ public class Exp extends PointerObject
                 share(getNode(), filterVar, expVar);
                 break;
 
-            case EDGE, PATH:
+            case EDGE:
                 for (int i = 0; i < nbNode(); i++) {
                     Node nodePath = getNode(i);
                     share(nodePath, filterVar, expVar);
@@ -1025,7 +1000,7 @@ public class Exp extends PointerObject
                 h.add(getNode());
                 break;
 
-            case EDGE, PATH:
+            case EDGE:
                 collectEdgeNodes(h);
                 break;
 
@@ -1171,7 +1146,7 @@ public class Exp extends PointerObject
      * For modularity reasons, Pattern is stored as ExpPattern interface
      */
     public Exp getPattern(Expr exp) {
-        return (Exp) exp.getPattern();
+        return exp.getPattern();
     }
 
     /**
@@ -1335,7 +1310,7 @@ public class Exp extends PointerObject
         }
         if (j >= 0) {
             Exp g = get(j);
-            if ((g.isEdge() || g.isPath())
+            if (g.isEdge()
                     && (!bindExp.isBindCst() || g.bind(bindExp.first().getNode()))) {
                 bindExp.status(true);
                 g.setBind(bindExp);
@@ -1353,18 +1328,6 @@ public class Exp extends PointerObject
             }
         }
         return false;
-    }
-
-    public boolean hasCache() {
-        return mappingCache != null;
-    }
-
-    public void cache(Node n, Mappings m) {
-        mappingCache.put(n, m);
-    }
-
-    public Mappings getMappings(Node n) {
-        return mappingCache.get(n);
     }
 
     /**
@@ -1459,7 +1422,7 @@ public class Exp extends PointerObject
         List<String> list = new ArrayList<>();
         for (Exp exp : this) {
             switch (exp.type()) {
-                case EDGE, PATH:
+                case EDGE:
                     exp.getEdgeVariables(list);
                     break;
                 case BIND:

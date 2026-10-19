@@ -41,7 +41,7 @@ import java.util.*;
  * This parser does NOT support vocabulary expansion
  * </p>
  */
-public class RDFaParser extends AbstractRDFParser {
+public final class RDFaParser extends AbstractRDFParser {
 
     private static final Logger logger = LoggerFactory.getLogger(RDFaParser.class);
 

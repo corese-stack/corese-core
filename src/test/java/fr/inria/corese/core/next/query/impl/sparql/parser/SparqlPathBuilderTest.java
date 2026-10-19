@@ -24,7 +24,7 @@ class SparqlPathBuilderTest extends AbstractSparqlParserFeatureTest {
 
     @BeforeEach
     void setUp() {
-        SparqlTermBuilder terms = new SparqlTermBuilder(new SparqlParserOptions.Builder().build());
+        SparqlTermBuilder terms = new SparqlTermBuilder();
         pathBuilder = new SparqlPathBuilder(terms);
     }
 

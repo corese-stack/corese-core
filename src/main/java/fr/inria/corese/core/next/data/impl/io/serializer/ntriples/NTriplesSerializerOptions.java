@@ -26,7 +26,7 @@ public class NTriplesSerializerOptions extends AbstractNFamilyOptions {
      * Provides a fluent API for constructing {@code NTriplesConfig} instances with default values
      * specific to the N-Triples format.
      */
-    public static class Builder extends AbstractNFamilyOptions.AbstractNFamilyBuilder<Builder> {
+    public static final class Builder extends AbstractNFamilyOptions.AbstractNFamilyBuilder<Builder> {
         /**
          * Default constructor initializes all options with their default values for N-Triples.
          */

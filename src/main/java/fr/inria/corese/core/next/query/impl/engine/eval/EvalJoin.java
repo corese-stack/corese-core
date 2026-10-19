@@ -13,13 +13,18 @@ import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
 import static fr.inria.corese.core.next.query.impl.engine.eval.Eval.STOP;
 
 /**
+ * Joins intermediate solutions on the evaluation thread. Cancellation may be
+ * requested concurrently and is observed through the volatile stop flag.
+ *
  * @author corby
  */
-@SuppressWarnings("java:S3776") // Legacy KGRAM join execution algorithms
-public class EvalJoin {
+final class EvalJoin {
 
-    Eval engine;
-    volatile boolean stop = false;
+    // Stack backtracking levels cannot reach this value; no continuation ran.
+    private static final int NO_CANDIDATE = Integer.MAX_VALUE;
+
+    private final Eval engine;
+    private volatile boolean stop;
 
     EvalJoin(Eval engine) {
         this.engine = engine;
@@ -37,7 +42,7 @@ public class EvalJoin {
      * JOIN(e1, e2) Eval e1, engine e2, generate all joins that are compatible in
      * cartesian product
      */
-    int eval(Producer p, Node graphNode, Exp exp, Mappings data, Stack stack, int n) throws SparqlException {
+    int eval(Producer p, Node graphNode, Exp exp, Mappings data, Stack stack, int n) {
         int backtrack = n - 1;
         Memory env = engine.getMemory();
         Mappings map1 = engine.subEval(p, graphNode, graphNode, exp.first(), exp, data);
@@ -59,7 +64,7 @@ public class EvalJoin {
             return STOP;
         }
 
-        MappingSet set1 = new MappingSet(getQuery(), map1Extended);
+        MappingSet set1 = new MappingSet(map1Extended);
         Mappings joinMappings = null;
         if (engine.isJoinMappings()) {
             joinMappings = set1.prepareMappingsRest(exp.rest());
@@ -76,7 +81,7 @@ public class EvalJoin {
     }
 
 
-    int join(Producer p, Node graphNode, Stack stack, Memory env, Mappings map1, Mappings map2, int n) throws SparqlException {
+    int join(Producer p, Node graphNode, Stack stack, Memory env, Mappings map1, Mappings map2, int n) {
         Node commonVariable = map1.getCommonNode(map2);
         if (commonVariable == null) {
             return joinWithoutCommonVariable(p, graphNode, stack, env, map1, map2, n);
@@ -86,125 +91,142 @@ public class EvalJoin {
     }
 
     /**
-     * Try to find common variable var in both mappings
-     * if any: sort second map wrt var
-     * iterate first map, find occurrence of same value of var by dichotomy in second map
-     * map1 and map2 share commonVariable
-     * sort map2 on commonVariable
-     * enumerate map1
-     * retrieve the index of value of commonVariable in map2 by dichotomy
+     * Sorts the smaller join input by a shared variable and enumerates compatible
+     * pairs. Unbound values remain compatible with every value on the other side.
      */
-    @SuppressWarnings("java:S107") // Internal KGRAM join execution method requires 8 execution parameters
-    int joinWithCommonVariable(Node commonVariable, Producer p, Node graphNode, Stack stack, Memory env, Mappings map1, Mappings map2, int n) throws SparqlException {
-        int backtrack = n - 1;
-        if (map1.size() > map2.size()) {
-            Mappings tmp = map1;
-            map1 = map2;
-            map2 = tmp;
+    @SuppressWarnings("java:S107") // The shared variable accompanies the existing evaluation frame.
+    int joinWithCommonVariable(Node commonVariable, Producer producer, Node graphNode, Stack stack,
+                               Memory environment, Mappings left, Mappings right, int level) {
+        if (left.size() > right.size()) {
+            Mappings temporary = left;
+            left = right;
+            right = temporary;
         }
-        // Enable comparison customization through the query-scoped visitor.
-        map2.setEval(engine);
-        map2.sort(commonVariable);
-
-        for (Mapping m1 : map1) {
+        right.setEval(engine);
+        right.sort(commonVariable);
+        int backtrack = level - 1;
+        for (Mapping candidate : left) {
             if (stop) {
                 return STOP;
             }
+            Node value = candidate.getNode(commonVariable);
+            if (!environment.push(candidate, level)) {
+                continue;
+            }
+            int continuation = value == null
+                    ? joinAllCandidates(producer, graphNode, stack, environment, right, level)
+                    : joinCandidatesForBinding(value, commonVariable, producer, graphNode, stack, right, level);
+            if (continuation != NO_CANDIDATE) {
+                backtrack = continuation;
+                if (backtrack < level) {
+                    return backtrack;
+                }
+            }
+            environment.pop(candidate);
+        }
+        return backtrack;
+    }
 
-            Node n1 = m1.getNode(commonVariable);
-            if (env.push(m1, n)) {
-
-                if (n1 == null) {
-                    // enumerate all map2
-                    for (Mapping m2 : map2) {
-                        if (stop) {
-                            return STOP;
-                        }
-                        if (env.push(m2, n)) {
-                            backtrack = engine.eval(p, graphNode, stack, n + 1);
-                            env.pop(m2);
-                            if (backtrack < n) {
-                                return backtrack;
-                            }
-                        }
-                    }
-                } else {
-                    // first, try : n2 == null
-                    for (Mapping m2 : map2) {
-                        if (stop) {
-                            return STOP;
-                        }
-                        Node n2 = m2.getNode(commonVariable);
-                        if (n2 != null) {
-                            break;
-                        }
-                        if (env.push(m2, n)) {
-                            backtrack = engine.eval(p, graphNode, stack, n + 1);
-                            env.pop(m2);
-                            if (backtrack < n) {
-                                return backtrack;
-                            }
-                        }
-                    }
-
-                    // second, try : n2 != null
-                    int nn = map2.find(n1, commonVariable);
-                    if (nn >= 0 && nn < map2.size()) {
-
-                        for (int i = nn; i < map2.size(); i++) {
-                            // get value of var in map2
-                            Mapping m2 = map2.get(i);
-                            Node n2 = m2.getNode(commonVariable);
-
-                            if (n2 == null || !n1.match(n2)) {
-                                // map2 is sorted, if n1 != n2 we can exit the loop
-                                break;
-                            } else if (env.push(m2, n)) {
-                                backtrack = engine.eval(p, graphNode, stack, n + 1);
-                                env.pop(m2);
-                                if (backtrack < n) {
-                                    return backtrack;
-                                }
-                            }
-                        }
+    /** Enumerates the Cartesian product when the inputs have no shared variable. */
+    int joinWithoutCommonVariable(Producer producer, Node graphNode, Stack stack, Memory environment,
+                                  Mappings left, Mappings right, int level) {
+        int backtrack = level - 1;
+        for (Mapping candidate : left) {
+            if (stop) {
+                return STOP;
+            }
+            if (environment.push(candidate, level)) {
+                int continuation = joinAllCandidates(producer, graphNode, stack, environment, right, level);
+                if (continuation != NO_CANDIDATE) {
+                    backtrack = continuation;
+                    if (backtrack < level) {
+                        return backtrack;
                     }
                 }
-                env.pop(m1);
+                environment.pop(candidate);
             }
         }
         return backtrack;
     }
 
-    /**
-     * No variable in common: cartesian product of mappings
-     */
-    int joinWithoutCommonVariable(Producer p, Node graphNode, Stack stack, Memory env, Mappings map1, Mappings map2, int n) throws SparqlException {
-        int backtrack = n - 1;
-        for (Mapping m1 : map1) {
+    private int joinAllCandidates(Producer producer, Node graphNode, Stack stack, Memory environment,
+                                  Mappings candidates, int level) {
+        int backtrack = NO_CANDIDATE;
+        for (Mapping candidate : candidates) {
             if (stop) {
                 return STOP;
             }
-            if (env.push(m1, n)) {
-
-                for (Mapping m2 : map2) {
-                    if (stop) {
-                        return STOP;
-                    }
-                    if (env.push(m2, n)) {
-                        backtrack = engine.eval(p, graphNode, stack, n + 1);
-                        env.pop(m2);
-                        if (backtrack < n) {
-                            return backtrack;
-                        }
-                    }
+            if (environment.push(candidate, level)) {
+                backtrack = evaluateCandidate(producer, graphNode, stack, environment, candidate, level);
+                if (backtrack < level) {
+                    return backtrack;
                 }
-
-                env.pop(m1);
             }
         }
         return backtrack;
     }
 
+    private int joinCandidatesForBinding(Node value, Node variable, Producer producer, Node graphNode,
+                                          Stack stack, Mappings candidates, int level) {
+        int unbound = joinUnboundCandidates(variable, producer, graphNode, stack, candidates, level);
+        if (unbound != NO_CANDIDATE && unbound < level) {
+            return unbound;
+        }
+        int bound = joinBoundCandidates(value, variable, producer, graphNode, stack, candidates, level);
+        return bound == NO_CANDIDATE ? unbound : bound;
+    }
+
+    private int joinUnboundCandidates(Node variable, Producer producer, Node graphNode, Stack stack,
+                                      Mappings candidates, int level) {
+        Memory environment = engine.getMemory();
+        int backtrack = NO_CANDIDATE;
+        for (Mapping candidate : candidates) {
+            if (stop) {
+                return STOP;
+            }
+            if (candidate.getNode(variable) != null) {
+                break;
+            }
+            if (environment.push(candidate, level)) {
+                backtrack = evaluateCandidate(producer, graphNode, stack, environment, candidate, level);
+                if (backtrack < level) {
+                    return backtrack;
+                }
+            }
+        }
+        return backtrack;
+    }
+
+    private int joinBoundCandidates(Node value, Node variable, Producer producer, Node graphNode,
+                                    Stack stack, Mappings candidates, int level) {
+        Memory environment = engine.getMemory();
+        int backtrack = NO_CANDIDATE;
+        int start = candidates.find(value, variable);
+        if (start < 0) {
+            return backtrack;
+        }
+        for (int index = start; index < candidates.size(); index++) {
+            Mapping candidate = candidates.get(index);
+            Node candidateValue = candidate.getNode(variable);
+            if (candidateValue == null || !value.match(candidateValue)) {
+                break;
+            }
+            if (environment.push(candidate, level)) {
+                backtrack = evaluateCandidate(producer, graphNode, stack, environment, candidate, level);
+                if (backtrack < level) {
+                    return backtrack;
+                }
+            }
+        }
+        return backtrack;
+    }
+
+    private int evaluateCandidate(Producer producer, Node graphNode, Stack stack, Memory environment,
+                                  Mapping candidate, int level) {
+        int backtrack = engine.eval(producer, graphNode, stack, level + 1);
+        environment.pop(candidate);
+        return backtrack;
+    }
 
     // use case: join(and(values ?s { <uri> }), service ?s { })
     boolean isFirstWithValuesOnly(Exp exp) {

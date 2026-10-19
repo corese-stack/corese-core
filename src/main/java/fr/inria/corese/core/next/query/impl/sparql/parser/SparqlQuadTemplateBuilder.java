@@ -32,6 +32,7 @@ final class SparqlQuadTemplateBuilder {
      * @param context the ANTLR quads context
      * @return the lowered {@link QuadsAst}
      */
+    @SuppressWarnings("java:S9391") // Preserve ordered accumulation without allocating a stream pipeline.
     QuadsAst quads(SparqlParser.QuadsContext context) {
         List<TriplePatternAst> defaults = new ArrayList<>();
         List<NamedGraphQuadsAst> named = new ArrayList<>();

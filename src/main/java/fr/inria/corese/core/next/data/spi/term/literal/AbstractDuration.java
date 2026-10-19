@@ -17,6 +17,9 @@ import fr.inria.corese.core.next.data.api.term.IRI;
  * Abstract class representing a duration literal in RDF.
  */
 public abstract class AbstractDuration extends AbstractLiteral implements Comparable<AbstractDuration> {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Constructor for AbstractDuration.

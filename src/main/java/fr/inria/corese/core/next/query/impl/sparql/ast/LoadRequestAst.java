@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.query.impl.sparql.ast;
 
 
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
-import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.AstVisitor;
+import fr.inria.corese.core.next.query.impl.sparql.ast.visitor.AstVisitor;
 
 /**
  * Represents the LOAD operation as defined in the <a href="https://www.w3.org/TR/2013/REC-sparql11-update-20130321/#load">SPARQL 1.1 recommendation<a/>.

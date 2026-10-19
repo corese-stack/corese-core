@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.data.impl.io.parser.ntriples;
 import fr.inria.corese.core.next.data.api.term.*;
 import fr.inria.corese.core.next.data.api.model.*;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
-import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.impl.io.parser.support.NTriplesQuadsTermDecoder;
 import fr.inria.corese.core.next.data.api.exception.ParsingException;
 import fr.inria.corese.core.next.generated.antlr.NTriplesParser;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for the NTriplesListenerImpl class.
+ * Unit tests for the NTriplesListener class.
  * These tests verify that the listener correctly processes ANTLR parse tree contexts
  * to extract and unescape RDF terms (IRIs, Blank Nodes, Literals) and add them to the model.
  */
@@ -33,8 +33,7 @@ class NTriplesListenerTest {
     @Mock
     private ValueFactory mockValueFactory;
 
-    @Mock
-    private IOOptions mockIOOptions;
+    private NTriplesQuadsTermDecoder termDecoder;
 
     private NTriplesListener listener;
 
@@ -49,7 +48,8 @@ class NTriplesListenerTest {
 
     @BeforeEach
     void setUp() {
-        listener = new NTriplesListener(mockModel, mockValueFactory, mockIOOptions);
+        termDecoder = new NTriplesQuadsTermDecoder(mockValueFactory);
+        listener = new NTriplesListener(mockModel, mockValueFactory);
 
         lenient().when(mockValueFactory.createIRI(anyString())).thenAnswer(invocation -> {
             String uri = invocation.getArgument(0);
@@ -116,7 +116,6 @@ class NTriplesListenerTest {
         when(mockValueFactory.createIRI("http://example.org/subject")).thenReturn(actualSubjectIRI);
         when(mockValueFactory.createIRI("http://example.org/predicate")).thenReturn(actualPredicateIRI);
         when(mockValueFactory.createIRI("http://example.org/object")).thenReturn(actualObjectIRI);
-
 
         listener.enterTriple(tripleCtx);
         listener.exitTriple(tripleCtx);
@@ -223,63 +222,47 @@ class NTriplesListenerTest {
         verify(mockValueFactory).createLiteral("hello", "en");
     }
 
-
     @Test
     @DisplayName("unescapeLiteral should throw ParsingException for invalid \\uXXXX")
-    @SuppressWarnings("deprecation")
-    void testUnescapeLiteralInvalidUx() throws NoSuchMethodException {
+    void testUnescapeLiteralInvalidUx() {
         String input = "\"Invalid\\uXXXX\"";
-        java.lang.reflect.Method method = NTriplesListener.class.getDeclaredMethod("unescapeLiteral", String.class);
-        method.setAccessible(true);
-
 
         assertThrows(ParsingException.class,
-                () -> listener.unescapeLiteral(input),
-                "Should throw unescapeLiteral should throw ParsingException for invalid \\uXXXX");
+                () -> termDecoder.unescapeLiteral(input),
+                "Malformed Unicode escapes must fail");
     }
 
     @Test
     @DisplayName("unescapeLiteral should throw ParsingException for invalid \\UXXXXXXXX")
-    @SuppressWarnings("deprecation")
-    void testUnescapeLiteralInvalid() throws NoSuchMethodException {
+    void testUnescapeLiteralInvalid() {
         String input = "\"Invalid\\U0000XXX\"";
-        java.lang.reflect.Method method = NTriplesListener.class.getDeclaredMethod("unescapeLiteral", String.class);
-        method.setAccessible(true);
-
 
         assertThrows(ParsingException.class,
-                () -> listener.unescapeLiteral(input),
-                "Should throw unescapeLiteral should throw ParsingException for invalid \\UXXXXXXXX");
+                () -> termDecoder.unescapeLiteral(input),
+                "Malformed Unicode escapes must fail");
     }
-
 
     @Test
     @DisplayName("unescapeUri should handle basic escape sequences")
-    void testUnescapeUriBasicEscapes() throws NoSuchMethodException, java.lang.reflect.InvocationTargetException, IllegalAccessException {
+    void testUnescapeUriBasicEscapes() {
 
         String input = "http://example.org/path\\>with\\<escaped\\_chars\\\\";
         String expected = "http://example.org/path>with\\<escaped\\_chars\\";
 
-        java.lang.reflect.Method method = NTriplesListener.class.getDeclaredMethod("unescapeUri", String.class);
-        method.setAccessible(true);
-        String result = (String) method.invoke(listener, input);
+        String result = termDecoder.unescapeUri(input);
 
         assertEquals(expected, result);
     }
-
 
     @Test
     @DisplayName("unescapeUri should handle \\UXXXXXXXX Unicode escapes")
-    void testUnescapeUriUnicodeU() throws NoSuchMethodException, java.lang.reflect.InvocationTargetException, IllegalAccessException {
-        String input = "http://example.org/path";
-        String expected = "http://example.org/path";
+    void testUnescapeUriUnicodeU() {
+        String input = "http://example.org/path\\U0001F600";
+        String expected = "http://example.org/path\uD83D\uDE00";
 
-        java.lang.reflect.Method method = NTriplesListener.class.getDeclaredMethod("unescapeUri", String.class);
-        method.setAccessible(true);
-        String result = (String) method.invoke(listener, input);
+        String result = termDecoder.unescapeUri(input);
 
         assertEquals(expected, result);
     }
-
 
 }

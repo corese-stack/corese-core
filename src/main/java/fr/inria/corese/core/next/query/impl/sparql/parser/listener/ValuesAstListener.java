@@ -40,6 +40,7 @@ public class ValuesAstListener extends AbstractSparqlQueryAstListener {
         throw new QuerySyntaxException("Missing data block in VALUES clause");
     }
 
+    @SuppressWarnings("java:S9391") // Preserve ordered accumulation without allocating a stream pipeline.
     private ValuesAst processInlineDataOneVar(SparqlParser.InlineDataOneVarContext ctx) {
         if (ctx.var_() == null) {
             throw new QuerySyntaxException("Missing variable for solution mapping in VALUES clause");
@@ -80,6 +81,7 @@ public class ValuesAstListener extends AbstractSparqlQueryAstListener {
         return valuesList;
     }
 
+    @SuppressWarnings("java:S9391") // Preserve ordered accumulation without allocating a stream pipeline.
     private ValuesAst processInlineDataFull(SparqlParser.InlineDataFullContext ctx) {
         List<VarAst> varList = new ArrayList<>();
         for (var variable : ctx.var_()) {

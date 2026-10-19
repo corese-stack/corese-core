@@ -19,97 +19,97 @@ import java.util.Map;
 
 public class EnvironmentImpl implements Environment {
     protected static final String NOT_SUPPORTED_YET = "Not supported yet.";
-	protected Query query;
+    protected Query query;
 
-	public EnvironmentImpl(){
-		// The base environment starts without a query or bindings.
-	}
-
-        @Override
-	public int count() {
-		return 0;
-	}
+    public EnvironmentImpl(){
+        // The base environment starts without a query or bindings.
+    }
 
         @Override
-	public Node getNode(Expr variable){
-		return null;
-	}
+    public int count() {
+        return 0;
+    }
+
+        @Override
+    public Node getNode(Expr variable){
+        return null;
+    }
 
         @Override
         public int size() {
             return 0;
         }
 
-	@Override
-	public Node getNode(String label) {
-		return null;
-	}
+    @Override
+    public Node getNode(String label) {
+        return null;
+    }
 
-	@Override
-	public Node getNode(Node node) {
-		return null;
-	}
+    @Override
+    public Node getNode(Node node) {
+        return null;
+    }
 
-	@Override
-	public Node getQueryNode(int n) {
-		return null;
-	}
+    @Override
+    public Node getQueryNode(int n) {
+        return null;
+    }
 
-	@Override
-	public Node getQueryNode(String label) {
-		return null;
-	}
+    @Override
+    public Node getQueryNode(String label) {
+        return null;
+    }
 
-	@Override
-	public boolean isBound(Node node) {
-		return false;
-	}
+    @Override
+    public boolean isBound(Node node) {
+        return false;
+    }
 
-	@Override
-	public int pathLength(Node node) {
-		return 0;
-	}
+    @Override
+    public int pathLength(Node node) {
+        return 0;
+    }
 
 
 
-	@Override
-	public Query getQuery() {
-		return query;
-	}
+    @Override
+    public Query getQuery() {
+        return query;
+    }
 
-	@Override
-	public KgramEventDispatcher getEventManager() {
-		return null;
-	}
+    @Override
+    public KgramEventDispatcher getEventManager() {
+        return null;
+    }
 
-	@Override
-	public Node getGraphNode() {
-		return null;
-	}
+    @Override
+    public Node getGraphNode() {
+        return null;
+    }
 
-	@Override
-	public void setObject(Object o) {
-		// The base environment does not retain an attached object.
-	}
+    @Override
+    public void setObject(Object o) {
+        // The base environment does not retain an attached object.
+    }
 
-	@Override
-	public Object getObject() {
-		return null;
-	}
+    @Override
+    public Object getObject() {
+        return null;
+    }
 
-	@Override
-	public void setExp(Exp exp) {
-		// Expression storage is supplied by concrete execution environments.
-	}
+    @Override
+    public void setExp(Exp exp) {
+        // Expression storage is supplied by concrete execution environments.
+    }
 
-	@Override
-	public Exp getExp() {
-		return null;
-	}
+    @Override
+    public Exp getExp() {
+        return null;
+    }
 
-	public Map<String, DatatypeValue> getMap() {
-		return Map.of();
-	}
+    public Map<String, DatatypeValue> getMap() {
+        return Map.of();
+    }
 
     @Override
     public Edge[] getEdges() {
@@ -149,11 +149,6 @@ public class EnvironmentImpl implements Environment {
 
     @Override
     public boolean hasBind() {
-        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
-    }
-
-    @Override
-    public ApproximateSearchEnv getAppxSearchEnv() {
         throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 

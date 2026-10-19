@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query.impl.engine.model;
 
+import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
+
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import fr.inria.corese.core.next.query.impl.engine.spi.Evaluator;
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
@@ -8,7 +10,9 @@ import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import java.util.List;
 
 /**
- * Expr api refer to sparql.triple.parser.Expression
+ * Compiled expression contract used by runtime evaluation and filter planning.
+ * Constants use the native datatype model; nested EXISTS patterns expose compiled
+ * operators rather than parser or syntax-tree objects.
  *
  * @author Olivier Corby, Edelweiss, INRIA 2010
  */
@@ -16,34 +20,14 @@ public interface Expr {
 
     Filter getFilter();
 
-    // Exp as Object for modularity
-    Object getPattern();
-
-    boolean isSystem();
-
-    boolean isPublic();
-
-    void setPublic(boolean b);
-
-    boolean isDynamic();
-
-    boolean isTrace();
-
-    boolean isDebug();
+    /** Returns a compiled EXISTS pattern, or null when this expression has none. */
+    Exp getPattern();
 
     String getLabel();
-
-    String getModality();
 
     List<Expr> getExpList();
 
     Expr getExp(int i);
-
-    void setExp(int i, Expr e);
-
-    Expr getArg();
-
-    void setArg(Expr exp);
 
     /**
      * Returns the constant value of this expression, if any.
@@ -52,30 +36,17 @@ public interface Expr {
      */
     DatatypeValue getValue();
 
-    /**
-     * Returns the datatype value of this expression.
-     *
-     * @return the datatype value
-     */
-    DatatypeValue getDatatypeValue();
-
     int type();
 
     int subtype();
-
-    void setSubtype(int n);
 
     int oper();
 
     boolean match(int oper);
 
-    void setOper(int n);
-
     boolean isAggregate();
 
     boolean isRecAggregate();
-
-    boolean isExist();
 
     boolean isRecExist();
 
@@ -83,31 +54,11 @@ public interface Expr {
 
     boolean isConstant();
 
-    boolean isFuncall();
-
-    boolean isBound();
-
-    boolean isDistinct();
-
     int arity();
 
     int getIndex();
 
     void setIndex(int index);
-
-    Expr getDefine();
-
-    void setDefine(Expr exp);
-
-    Expr getFunction();
-
-    Expr getBody();
-
-    Expr getVariable();
-
-    Expr getDefinition();
-
-    boolean hasMetadata(String name);
 
     /**
      * Evaluates this expression with the given context.

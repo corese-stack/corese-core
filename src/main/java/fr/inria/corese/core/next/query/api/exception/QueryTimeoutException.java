@@ -5,6 +5,9 @@ package fr.inria.corese.core.next.query.api.exception;
  */
 @SuppressWarnings("java:S110")
 public class QueryTimeoutException extends QueryEvaluationException {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Constructs a QueryTimeoutException with the timeout value that was exceeded.

@@ -22,11 +22,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class SparqlExpressionBuilderTest extends AbstractSparqlParserFeatureTest {
 
     private SparqlExpressionBuilder expressionBuilder;
-    private SparqlTermBuilder termBuilder;
 
     @BeforeEach
     void setUp() {
-        termBuilder = new SparqlTermBuilder(new SparqlParserOptions.Builder().build());
+        SparqlTermBuilder termBuilder = new SparqlTermBuilder();
         expressionBuilder = new SparqlExpressionBuilder(termBuilder, () -> null);
     }
 

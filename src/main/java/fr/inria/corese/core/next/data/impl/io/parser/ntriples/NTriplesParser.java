@@ -84,7 +84,7 @@ public class NTriplesParser extends AbstractRDFParser {
             antlrParser.setErrorHandler(new BailErrorStrategy());
             antlrParser.addErrorListener(new NTriplesErrorListener());
 
-            NTriplesListener listener = new NTriplesListener(getModel(), getValueFactory(), getConfig());
+            NTriplesListener listener = new NTriplesListener(getModel(), getValueFactory());
             LineRDFParser.parse(reader, lexer, antlrParser, antlrParser::ntriplesDoc, listener);
 
         } catch (ParseCancellationException pce) {

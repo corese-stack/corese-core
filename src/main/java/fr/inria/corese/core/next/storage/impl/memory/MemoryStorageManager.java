@@ -85,6 +85,12 @@ public final class MemoryStorageManager implements StorageManager {
         return new MemoryStorageManager(store.openSession());
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public StorageManager openReadSnapshot() {
+        return new MemoryStorageManager(store.openReadSnapshot());
+    }
+
     /**
      * {@inheritDoc}
      *

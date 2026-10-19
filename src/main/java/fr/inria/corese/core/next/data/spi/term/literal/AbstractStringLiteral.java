@@ -10,6 +10,9 @@ import fr.inria.corese.core.next.data.api.term.IRI;
 
 @SuppressWarnings("java:S1210")
 public abstract class AbstractStringLiteral extends AbstractLiteral implements Comparable<AbstractStringLiteral> {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
+
     /**
      * Constructs an instance of AbstractStringLiteral with the specified datatype.
      *

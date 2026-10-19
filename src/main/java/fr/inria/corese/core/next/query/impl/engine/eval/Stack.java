@@ -13,36 +13,39 @@ import java.util.ArrayList;
  * @author Olivier Corby, Edelweiss, INRIA 2009
  */
 public class Stack extends ArrayList<Exp> implements ExpType {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
 
 
-	public static Stack create(Exp e){
-		Stack st = new Stack();
-		st.add(e);
-		return st;
-	}
+
+    public static Stack create(Exp e){
+        Stack st = new Stack();
+        st.add(e);
+        return st;
+    }
 
 
-	Stack copy(){
-		Stack st = new Stack();
-		st.addAll(this);
-		return st;
-	}
+    Stack copy(){
+        Stack st = new Stack();
+        st.addAll(this);
+        return st;
+    }
 
 
-	/**
-	 * Push all elements of AND in the stack
-	 */
-	Stack and(Exp exp, int n){
-		remove(n);
-		int i = 0;
-		for (Exp e : exp){
+    /**
+     * Push all elements of AND in the stack
+     */
+    Stack and(Exp exp, int n){
+        remove(n);
+        int i = 0;
+        for (Exp e : exp){
                     if (e.getBind() != null){
                        add(n + i++, e.getBind());
                     }
                     add(n + i++, e);
-		}
-		return this;
-	}
+        }
+        return this;
+    }
 
         Stack addCopy(int n, Exp exp) {
             Stack copy = copy();
@@ -52,13 +55,13 @@ public class Stack extends ArrayList<Exp> implements ExpType {
 
 
         @Override
-	public String toString(){
-		StringBuilder str = new StringBuilder();
-		int i = 0;
-		for (Exp e : this){
-			str.append(i++).append(" ").append(e).append(", ");
-		}
-		return str.toString();
-	}
+    public String toString(){
+        StringBuilder str = new StringBuilder();
+        int i = 0;
+        for (Exp e : this){
+            str.append(i++).append(" ").append(e).append(", ");
+        }
+        return str.toString();
+    }
 
 }

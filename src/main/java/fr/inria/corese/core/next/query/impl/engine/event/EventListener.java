@@ -8,13 +8,13 @@ package fr.inria.corese.core.next.query.impl.engine.event;
  */
 public interface EventListener  {
 
-	boolean send(Event e);
+    boolean send(Event e);
 
-	boolean handle(int sort);
+    boolean handle(int sort);
 
-	boolean handle(int sort, boolean b);
+    boolean handle(int sort, boolean b);
 
-	void setObject(Object obj);
+    void setObject(Object obj);
 
 
 }

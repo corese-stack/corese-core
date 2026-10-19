@@ -2,6 +2,11 @@ package fr.inria.corese.core.next.query.impl.query;
 
 import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.query.api.Query;
+import fr.inria.corese.core.next.query.api.diagnostics.QueryExecution;
+import fr.inria.corese.core.next.query.impl.engine.diagnostics.ExecutionDiagnostics;
+import fr.inria.corese.core.next.query.impl.sparql.execution.SparqlQueryExecutor;
+import fr.inria.corese.core.next.query.impl.sparql.execution.PreparedQueryPlan;
+import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.api.dataset.Dataset;
 import fr.inria.corese.core.next.query.api.result.Binding;
 import fr.inria.corese.core.next.query.api.result.BindingSet;
@@ -25,14 +30,50 @@ abstract class AbstractCoreseQuery<T> implements Query<T> {
 
     private final String queryString;
     private final Runnable executionGuard;
+    private final SparqlQueryExecutor executor;
+    private final PreparedQueryPlan preparedPlan;
     private final LinkedHashMap<String, Value> bindings = new LinkedHashMap<>();
     private Dataset dataset;
     private Duration timeout = Duration.ZERO;
 
-    protected AbstractCoreseQuery(String queryString, Runnable executionGuard) {
+    protected AbstractCoreseQuery(String queryString, Runnable executionGuard, SparqlQueryExecutor executor, QueryAst parsedQuery) {
         this.queryString = Objects.requireNonNull(queryString, "queryString");
         this.executionGuard = Objects.requireNonNull(executionGuard, "executionGuard");
+        this.executor = Objects.requireNonNull(executor, "executor");
+        this.preparedPlan = executor.prepare(queryString, parsedQuery);
     }
+
+    /** Returns this prepared query's compilation cache, never shared with another prepared query. */
+    protected final PreparedQueryPlan preparedPlan() {
+        return preparedPlan;
+    }
+
+    @Override
+    public final T evaluate() {
+        checkExecutable();
+        return evaluate(executor);
+    }
+
+    @Override
+    public final QueryExecution<T> evaluateWithDiagnostics() {
+        checkExecutable();
+        ExecutionDiagnostics diagnostics = new ExecutionDiagnostics();
+        diagnostics.beginWork();
+        try {
+            T result = evaluate(executor.withDiagnostics(diagnostics));
+            return new QueryExecution<>(result, diagnostics::snapshot);
+        } finally {
+            diagnostics.endWork();
+        }
+    }
+
+    /**
+     * Evaluates with either the ordinary or a request-scoped diagnostic executor.
+     *
+     * @param execution query executor configured for this evaluation
+     * @return evaluated result owned by the caller
+     */
+    protected abstract T evaluate(SparqlQueryExecutor execution);
 
     @Override
     public String getQueryString() {
@@ -101,7 +142,7 @@ abstract class AbstractCoreseQuery<T> implements Query<T> {
         return Math.max(1L, millis);
     }
 
-    protected void checkExecutable() {
+    private void checkExecutable() {
         executionGuard.run();
     }
 

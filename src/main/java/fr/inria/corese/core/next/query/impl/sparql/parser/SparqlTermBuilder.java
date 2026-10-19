@@ -34,16 +34,12 @@ public final class SparqlTermBuilder {
     /**
      * Constructs a {@code SparqlTermBuilder} with a blank-node resolver callback.
      *
-     * @param options           parser options validated for non-null configuration
-     *                          (reserved for future term resolution extensions)
      * @param blankNodeResolver callback that handles {@code BlankNodeContext} and
      *                          updates the mutable blank-node label set held by
      *                          {@link SparqlAstBuilder}
      */
-    public SparqlTermBuilder(SparqlParserOptions options,
-                             Function<SparqlParser.BlankNodeContext, TermAst> blankNodeResolver) {
-        Objects.requireNonNull(options, "options");
-        this.blankNodeResolver = blankNodeResolver;
+    public SparqlTermBuilder(Function<SparqlParser.BlankNodeContext, TermAst> blankNodeResolver) {
+        this.blankNodeResolver = Objects.requireNonNull(blankNodeResolver, "blankNodeResolver");
     }
 
     /**
@@ -51,10 +47,10 @@ public final class SparqlTermBuilder {
      * Use this only when {@link #termFromGraphTerm} will never encounter a
      * {@code blankNode()} alternative.
      */
-    public SparqlTermBuilder(SparqlParserOptions options) {
-        this(options, ctx -> {
+    public SparqlTermBuilder() {
+        this(ctx -> {
             throw new UnsupportedOperationException(
-                    "Blank node resolution requires a blankNodeResolver — use the two-argument constructor");
+                    "Blank node resolution requires a blankNodeResolver — supply a blank-node resolver");
         });
     }
 
@@ -299,6 +295,7 @@ public final class SparqlTermBuilder {
      * @param ctx             the objectList parse context
      * @param objectConverter function converting a single {@code object_} to a term
      */
+    @SuppressWarnings("java:S9391") // Preserve ordered accumulation without allocating a stream pipeline.
     public List<TermAst> termListFromObjectList(SparqlParser.ObjectListContext ctx,
                                                 Function<SparqlParser.Object_Context, TermAst> objectConverter) {
         List<TermAst> out = new ArrayList<>();

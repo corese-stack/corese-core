@@ -3,8 +3,8 @@ package fr.inria.corese.core.next.query.impl.sparql.ast;
 import fr.inria.corese.core.next.data.spi.term.IRIUtils;
 import fr.inria.corese.core.next.data.spi.io.IOConstants;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
-import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.AstVisitor;
-import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.VisitableAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.visitor.AstVisitor;
+import fr.inria.corese.core.next.query.impl.sparql.ast.visitor.VisitableAst;
 
 import java.util.List;
 

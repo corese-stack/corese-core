@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query.impl.engine.solution;
 
+import fr.inria.corese.core.next.query.impl.engine.pattern.PlanCopy;
+import fr.inria.corese.core.next.query.impl.engine.pattern.PlanCopyable;
 import fr.inria.corese.core.next.query.impl.engine.eval.Eval;
 import fr.inria.corese.core.next.query.impl.engine.model.BindingContext;
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
@@ -11,7 +13,6 @@ import fr.inria.corese.core.next.query.impl.engine.model.Pointerable;
 import fr.inria.corese.core.next.query.impl.engine.model.TripleStore;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
 
-import fr.inria.corese.core.next.query.impl.engine.spi.Result;
 import fr.inria.corese.core.next.query.impl.engine.path.Path;
 import fr.inria.corese.core.next.query.impl.engine.eval.EnvironmentImpl;
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
@@ -39,7 +40,7 @@ import static fr.inria.corese.core.next.query.impl.engine.model.PointerType.MAPP
  */
 public final class Mapping
         extends EnvironmentImpl
-        implements Result, Pointerable<List<DatatypeValue>> {
+        implements Pointerable<List<DatatypeValue>>, PlanCopyable<Mapping> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Mapping.class);
 
@@ -66,6 +67,18 @@ public final class Mapping
     private Node targetGraphNode;
     private BindingContext bindingContext;
     private Eval eval;
+
+    /** Copies the variable and value arrays of a static VALUES row. */
+    @Override
+    public Mapping copyPlan(PlanCopy copies) {
+        Node[] variables = new Node[queryNodes.length];
+        Node[] targets = new Node[targetNodes.length];
+        for (int i = 0; i < variables.length; i++) variables[i] = copies.copy(queryNodes[i]);
+        for (int i = 0; i < targets.length; i++) targets[i] = copies.copy(targetNodes[i]);
+        Mapping target = Mapping.create(variables, targets);
+        copies.remember(this, target);
+        return target;
+    }
 
     public Mapping() {
         init(emptyEdge, emptyEdge);

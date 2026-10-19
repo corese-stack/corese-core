@@ -17,12 +17,16 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 class NTriplesSerializerTest {
+
+    private static final String LEX_JOHN = "John Doe";
+    private static final String HELLO = "Hello";
 
     private Model model;
     private NTriplesSerializer nTriplesSerializer;
@@ -31,9 +35,6 @@ class NTriplesSerializerTest {
     private Resource mockExPerson;
     private IRI mockExName;
     private IRI mockExKnows;
-
-    private final String lexJohn = "John Doe";
-    private final String hello = "Hello";
 
     private Literal mockLiteralJohn;
     private Literal mockLiteralHelloEn;
@@ -51,8 +52,8 @@ class NTriplesSerializerTest {
         mockExName = factory.createIRI("http://example.org/name");
         mockExKnows = factory.createIRI("http://example.org/knows");
 
-        mockLiteralJohn = factory.createLiteral(lexJohn, null, null);
-        mockLiteralHelloEn = factory.createLiteral(hello, null, "en");
+        mockLiteralJohn = factory.createLiteral(LEX_JOHN, null, null);
+        mockLiteralHelloEn = factory.createLiteral(HELLO, null, "en");
 
         mockBNode1 = factory.createBlankNode("b1");
         mockBNode2 = factory.createBlankNode("b2");
@@ -86,7 +87,7 @@ class NTriplesSerializerTest {
         String expected = String.format("<%s> <%s> \"%s\"",
                 mockExPerson.stringValue(),
                 mockExName.stringValue(),
-                escapeNTriplesString(lexJohn)) + " .\n";
+                escapeNTriplesString(LEX_JOHN)) + " .\n";
 
         assertEquals(expected, writer.toString());
     }
@@ -109,7 +110,7 @@ class NTriplesSerializerTest {
         String expected = String.format("<%s> <%s> \"%s\"",
                 mockExPerson.stringValue(),
                 mockExName.stringValue(),
-                escapeNTriplesString(lexJohn)) + " .\n";
+                escapeNTriplesString(LEX_JOHN)) + " .\n";
 
         assertEquals(expected, writer.toString());
     }
@@ -127,10 +128,8 @@ class NTriplesSerializerTest {
         StringWriter writer = new StringWriter();
         nTriplesSerializer.write(writer);
 
-        String expected = String.format("_:%s <%s> _:%s",
-                mockBNode1.stringValue(),
-                mockExKnows.stringValue(),
-                mockBNode2.stringValue()) + " .\n";
+        String expected = "_:" + mockBNode1.stringValue() + " <" + mockExKnows.stringValue()
+                + "> _:" + mockBNode2.stringValue() + " .\n";
 
         assertEquals(expected, writer.toString());
     }
@@ -221,7 +220,7 @@ class NTriplesSerializerTest {
         String expected = String.format("<%s> <%s> \"%s\"",
                 mockExPerson.stringValue(),
                 mockExName.stringValue(),
-                escapeNTriplesString(lexJohn)) + " .\n";
+                escapeNTriplesString(LEX_JOHN)) + " .\n";
 
         assertEquals(expected, writer.toString());
     }
@@ -280,7 +279,7 @@ class NTriplesSerializerTest {
         String expectedOutput = String.format("<%s> <%s> \"%s\"@%s",
                 mockExPerson.stringValue(),
                 factory.createIRI("http://example.org/greeting").stringValue(),
-                escapeNTriplesString(hello),
+                escapeNTriplesString(HELLO),
                 languageTag) + " .\n";
 
         assertEquals(expectedOutput, writer.toString());
@@ -365,6 +364,9 @@ class NTriplesSerializerTest {
 
         @Override
         public Statement next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
             return statements[index++];
         }
     }

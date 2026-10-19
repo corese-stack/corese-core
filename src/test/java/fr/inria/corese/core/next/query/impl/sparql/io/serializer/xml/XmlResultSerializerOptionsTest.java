@@ -27,14 +27,15 @@ class XmlResultSerializerOptionsTest {
         ResultSerializer serializer = new XmlTupleResultSerializer(results, options);
         serializer.write(outputWriter);
 
-        String expected =
-                "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-                        "<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">\n" +
-                        "    <head>\n" +
-                        "        <variable name=\"x\"/>\n" +
-                        "    </head>\n" +
-                        "    <results/>\n" +
-                        "</sparql>\n";
+        String expected = """
+                <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                <sparql xmlns="http://www.w3.org/2005/sparql-results#">
+                    <head>
+                        <variable name="x"/>
+                    </head>
+                    <results/>
+                </sparql>
+                """;
 
         assertEquals(
                 expected.replace("\r\n", "\n"),

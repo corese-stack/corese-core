@@ -6,10 +6,8 @@ import fr.inria.corese.core.next.query.impl.engine.solution.Memory;
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import fr.inria.corese.core.next.query.impl.engine.spi.Evaluator;
 import fr.inria.corese.core.next.query.impl.engine.spi.Matcher;
-import fr.inria.corese.core.next.query.impl.engine.spi.Plugin;
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
 import fr.inria.corese.core.next.query.impl.engine.spi.Provider;
-import fr.inria.corese.core.next.query.impl.engine.spi.SPARQLEngine;
 
 import fr.inria.corese.core.next.query.impl.engine.model.BindingContext;
 import fr.inria.corese.core.next.query.impl.engine.event.KgramEventDispatcher;
@@ -67,12 +65,6 @@ class EvalTest {
             assertNotNull(e, "Factory-created eval should not be null");
         }
 
-        @Test
-        @DisplayName("Should create empty eval")
-        void testCreateEmptyEval() {
-            Eval e = new Eval();
-            assertNotNull(e, "Empty eval should not be null");
-        }
     }
 
     @Nested
@@ -270,21 +262,6 @@ class EvalTest {
     }
 
     @Nested
-    @DisplayName("SPARQL Engine Tests")
-    class SPARQLEngineTests {
-
-        @Test
-        @DisplayName("Should set and get SPARQL engine")
-        void testSetAndGetSPARQLEngine() {
-            SPARQLEngine mockEngine = mock(SPARQLEngine.class);
-            eval.setSPARQLEngine(mockEngine);
-            assertEquals(mockEngine, eval.getSPARQLEngine(),
-                    "SPARQL engine should match");
-        }
-    }
-
-
-    @Nested
     @DisplayName("Stop Flag Tests")
     class StopFlagTests {
 
@@ -344,19 +321,6 @@ class EvalTest {
 
             Eval copy = eval.copy(mem, prod, true);
             assertNotNull(copy, "Copy with extern should not be null");
-        }
-    }
-
-    @Nested
-    @DisplayName("Plugin Tests")
-    class PluginTests {
-
-        @Test
-        @DisplayName("Should add plugin")
-        void testAddPlugin() {
-            Plugin mockPlugin = mock(Plugin.class);
-            assertDoesNotThrow(() -> eval.add(mockPlugin),
-                    "Adding plugin should not throw");
         }
     }
 
@@ -458,15 +422,4 @@ class EvalTest {
         }
     }
 
-    @Nested
-    @DisplayName("Clean Tests")
-    class CleanTests {
-
-        @Test
-        @DisplayName("Should clean eval state")
-        void testClean() {
-            assertDoesNotThrow(() -> eval.clean(),
-                    "Clean should not throw exception");
-        }
-    }
 }

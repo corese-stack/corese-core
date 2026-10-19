@@ -10,7 +10,7 @@ Previously, three source files in `next/query/impl/engine` retained AST dependen
 
 - `model/Filter.java`: returned `TermAst` via `getFilterExpression()` and `coreseNextSource()`.
   These AST accessors were removed from the engine interface; the bridge implementation
-  `NextFilterFromAst` retains AST-level access internally where needed.
+  `AstBackedFilter` retains AST-level access internally where needed.
 - `pattern/Exp.java`: exposed `getFilterExpression()` delegating to `Filter`. Removed as it
   had no engine callers.
 - `pattern/Query.java`: retained `QueryAst ast` with `getAST()`, `getGlobalAST()`, and `setAST()`.
@@ -18,7 +18,7 @@ Previously, three source files in `next/query/impl/engine` retained AST dependen
 
 ## Guard behavior
 
-- Zero exceptions: `EXISTING_ENGINE_AST_DEPENDENCIES` is empty.
+- The engine dependency set must be empty; no allowlist or exception mechanism exists.
 - Parser dependencies have no exceptions.
 - Both the actual `query.impl.sparql.ast` package and the historical
   `query.impl.ast` package are checked.
@@ -33,3 +33,17 @@ Previously, three source files in `next/query/impl/engine` retained AST dependen
 ./gradlew test --tests '*NextModuleBoundaryTest'
 ./gradlew check -x test
 ```
+
+## Syntax-tree ownership
+
+AST traversal contracts (`AstVisitor`, `AbstractAstVisitor`, and `VisitableAst`)
+reside in `sparql.ast.visitor`. Semantic validation depends on the syntax tree;
+the syntax tree cannot depend on its parser or the execution engine. The same
+boundary test protects this direction, including fully qualified references.
+
+## Independent verification
+
+`./gradlew checkNext --offline` compiles, documents, packages, and tests native
+sources with their own dependency graph. Historical Corese classes, the JavaCC
+parser, and historical runtime libraries are absent from the native classpaths.
+`compileNextJava` treats every Java 21 compiler warning as an error.

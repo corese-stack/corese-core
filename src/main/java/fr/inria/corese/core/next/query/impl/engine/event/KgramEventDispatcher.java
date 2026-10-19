@@ -12,7 +12,6 @@ import java.util.List;
  */
 public class KgramEventDispatcher implements Iterable<EventListener> {
 
-    boolean isEval = false;
 
     List<EventListener> observers = new ArrayList<>();
 

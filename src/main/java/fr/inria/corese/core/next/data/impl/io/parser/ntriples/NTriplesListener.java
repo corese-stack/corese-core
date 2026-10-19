@@ -6,9 +6,8 @@ import fr.inria.corese.core.next.data.api.model.Model;
 import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
-import fr.inria.corese.core.next.data.api.io.option.IOOptions;
 import fr.inria.corese.core.next.data.api.exception.ParsingException;
-import fr.inria.corese.core.next.data.impl.io.parser.support.AbstractNTriplesNQuadsListener;
+import fr.inria.corese.core.next.data.impl.io.parser.support.NTriplesQuadsTermDecoder;
 import fr.inria.corese.core.next.generated.antlr.NTriplesBaseListener;
 import fr.inria.corese.core.next.generated.antlr.NTriplesParser;
 
@@ -19,7 +18,7 @@ import fr.inria.corese.core.next.generated.antlr.NTriplesParser;
  */
 public class NTriplesListener extends NTriplesBaseListener {
 
-    private final AbstractNTriplesNQuadsListener abstractNTriplesQuadsListener;
+    private final NTriplesQuadsTermDecoder termDecoder;
     private final Model model;
     private final ValueFactory factory;
 
@@ -31,12 +30,11 @@ public class NTriplesListener extends NTriplesBaseListener {
      *
      * @param model   The RDF model to populate.
      * @param factory The ValueFactory for creating RDF resources.
-     * @param options IOOptions for configuration (if any).
      */
-    public NTriplesListener(Model model, ValueFactory factory, IOOptions options) {
+    public NTriplesListener(Model model, ValueFactory factory) {
         this.model = model;
         this.factory = factory;
-        this.abstractNTriplesQuadsListener = new AbstractNTriplesNQuadsListener(model, factory, options) {};
+        this.termDecoder = new NTriplesQuadsTermDecoder(factory);
     }
 
     @Override
@@ -58,12 +56,12 @@ public class NTriplesListener extends NTriplesBaseListener {
      */
     public Resource extractSubject(NTriplesParser.SubjectContext ctx) {
         if (ctx.IRIREF() != null) {
-            String iri = abstractNTriplesQuadsListener.unescapeUri(abstractNTriplesQuadsListener.stripAngles(ctx.IRIREF().getText()));
+            String iri = termDecoder.unescapeUri(termDecoder.stripAngles(ctx.IRIREF().getText()));
             return factory.createIRI(iri);
         }
         if (ctx.BLANK_NODE_LABEL() != null) {
-            String label = abstractNTriplesQuadsListener.extractBlankNodeLabel(ctx.BLANK_NODE_LABEL().getText());
-            abstractNTriplesQuadsListener.validateBlankNodeLabel(label);
+            String label = termDecoder.extractBlankNodeLabel(ctx.BLANK_NODE_LABEL().getText());
+            termDecoder.validateBlankNodeLabel(label);
             return factory.createBNode(label);
         }
         throw new ParsingException("Unsupported N-Triples subject: " + ctx.getText());
@@ -74,7 +72,7 @@ public class NTriplesListener extends NTriplesBaseListener {
      */
     public IRI extractPredicate(NTriplesParser.PredicateContext ctx) {
         if (ctx.IRIREF() != null) {
-            String iri = abstractNTriplesQuadsListener.unescapeUri(abstractNTriplesQuadsListener.stripAngles(ctx.IRIREF().getText()));
+            String iri = termDecoder.unescapeUri(termDecoder.stripAngles(ctx.IRIREF().getText()));
             return factory.createIRI(iri);
         }
         throw new ParsingException("Unsupported N-Triples predicate: " + ctx.getText());
@@ -85,12 +83,12 @@ public class NTriplesListener extends NTriplesBaseListener {
      */
     public Value extractObject(NTriplesParser.ObjectContext ctx) {
         if (ctx.IRIREF() != null) {
-            String iri = abstractNTriplesQuadsListener.unescapeUri(abstractNTriplesQuadsListener.stripAngles(ctx.IRIREF().getText()));
+            String iri = termDecoder.unescapeUri(termDecoder.stripAngles(ctx.IRIREF().getText()));
             return factory.createIRI(iri);
         }
         if (ctx.BLANK_NODE_LABEL() != null) {
-            String label = abstractNTriplesQuadsListener.extractBlankNodeLabel(ctx.BLANK_NODE_LABEL().getText());
-            abstractNTriplesQuadsListener.validateBlankNodeLabel(label);
+            String label = termDecoder.extractBlankNodeLabel(ctx.BLANK_NODE_LABEL().getText());
+            termDecoder.validateBlankNodeLabel(label);
             return factory.createBNode(label);
         }
         if (ctx.literal() != null) {
@@ -104,56 +102,19 @@ public class NTriplesListener extends NTriplesBaseListener {
      */
     protected Literal extractLiteral(NTriplesParser.LiteralContext ctx) {
         String rawText = ctx.STRING_LITERAL_QUOTE().getText();
-        String label = abstractNTriplesQuadsListener.unescapeLiteral(rawText);
+        String label = termDecoder.unescapeLiteral(rawText);
 
         IRI datatype = null;
         String langTag = null;
 
         if (ctx.IRIREF() != null) {
-            String iri = abstractNTriplesQuadsListener.unescapeUri(abstractNTriplesQuadsListener.stripAngles(ctx.IRIREF().getText()));
+            String iri = termDecoder.unescapeUri(termDecoder.stripAngles(ctx.IRIREF().getText()));
             datatype = factory.createIRI(iri);
         } else if (ctx.LANGTAG() != null) {
             langTag = ctx.LANGTAG().getText().substring(1);
         }
 
-        return abstractNTriplesQuadsListener.createLiteral(label, datatype, langTag);
+        return termDecoder.createLiteral(label, datatype, langTag);
     }
 
-    /**
-     * Validates a blank node label according to RDF N-Triples specification.
-     * Blank node labels must not be empty and must not contain a colon.
-     *
-     * @param label The blank node label (without the "_:" prefix)
-     * @throws ParsingException if the label is invalid
-     * @deprecated Use helper.validateBlankNodeLabel instead
-     */
-    @Deprecated(since = "4.5.0", forRemoval = false)
-    protected void validateBlankNodeLabel(String label) throws ParsingException {
-        abstractNTriplesQuadsListener.validateBlankNodeLabel(label);
-    }
-
-    /**
-     * Unescapes common N-Triples literal escape sequences.
-     *
-     * @param literalText The raw literal string from ANTLR (including quotes)
-     * @return The unescaped literal string without surrounding quotes
-     * @deprecated Use helper.unescapeLiteral instead
-     */
-    @Deprecated(since = "4.5.0", forRemoval = false)
-    public String unescapeLiteral(String literalText) {
-        return abstractNTriplesQuadsListener.unescapeLiteral(literalText);
-    }
-
-    /**
-     * Unescapes common N-Triples URI escape sequences.
-     *
-     * @param uri The escaped URI string
-     * @return The unescaped URI string
-     * @deprecated Use helper.unescapeUri instead
-     */
-    @Deprecated(since = "4.5.0", forRemoval = false)
-    protected String unescapeUri(String uri) {
-        return abstractNTriplesQuadsListener.unescapeUri(uri);
-    }
 }
-

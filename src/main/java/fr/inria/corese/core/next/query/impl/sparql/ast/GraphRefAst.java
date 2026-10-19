@@ -2,8 +2,8 @@ package fr.inria.corese.core.next.query.impl.sparql.ast;
 
 
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
-import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.AstVisitor;
-import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.VisitableAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.visitor.AstVisitor;
+import fr.inria.corese.core.next.query.impl.sparql.ast.visitor.VisitableAst;
 
 public record GraphRefAst(IriAst graph, boolean named, boolean all, boolean defaultGraph) implements VisitableAst {
     public GraphRefAst {

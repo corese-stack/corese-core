@@ -478,15 +478,14 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
     @DisplayName("Should not parse ORDER BY with a constant")
     void shouldNotParseOrderByConstant() {
         SparqlParser parser = newParserDefault();
+        String query = """
+                SELECT ?s WHERE {
+                    ?s ?p ?o
+                }
+                ORDER BY <http://ns.inria.fr/test>
+            """;
 
-        assertThrows(QuerySyntaxException.class, () -> {
-            parser.parse("""
-                    SELECT ?s WHERE {
-                        ?s ?p ?o
-                    }
-                    ORDER BY <http://ns.inria.fr/test>
-                """);
-        });
+        assertThrows(QuerySyntaxException.class, () -> parser.parse(query));
     }
 
     @Test
@@ -621,82 +620,88 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
     @DisplayName("Should accept HAVING on a GROUP BY expression alias")
     void shouldAcceptHavingUsingGroupByExpressionAlias() {
         SparqlParser parser = newParserDefault();
-
-        assertDoesNotThrow(() -> parser.parse("""
+        String query = """
                 SELECT ?key WHERE {
                   ?s ?p ?o
                 }
                 GROUP BY (CONCAT(STR(?s), STR(?o)) AS ?key)
                 HAVING (BOUND(?key))
-                """));
+                """;
+
+        assertDoesNotThrow(() -> parser.parse(query));
     }
 
     @Test
     @DisplayName("Should accept HAVING with an aggregate condition")
     void shouldAcceptHavingUsingAggregateCondition() {
         SparqlParser parser = newParserDefault();
-
-        assertDoesNotThrow(() -> parser.parse("""
+        String query = """
                 SELECT ?s WHERE {
                   ?s ?p ?o
                 }
                 GROUP BY ?s
                 HAVING (COUNT(?o) > 1)
-                """));
+                """;
+
+        assertDoesNotThrow(() -> parser.parse(query));
     }
 
     @Test
     @DisplayName("Should accept ORDER BY on a GROUP BY expression alias")
     void shouldAcceptOrderByUsingGroupByExpressionAlias() {
         SparqlParser parser = newParserDefault();
-
-        assertDoesNotThrow(() -> parser.parse("""
+        String query = """
                 SELECT ?key WHERE {
                   ?s ?p ?o
                 }
                 GROUP BY (CONCAT(STR(?s), STR(?o)) AS ?key)
                 ORDER BY ?key
-                """));
+                """;
+
+        assertDoesNotThrow(() -> parser.parse(query));
     }
 
     @Test
     @DisplayName("Should accept ORDER BY with an aggregate expression")
     void shouldAcceptOrderByUsingAggregateExpression() {
         SparqlParser parser = newParserDefault();
-
-        assertDoesNotThrow(() -> parser.parse("""
+        String query = """
                 SELECT ?s (COUNT(?o) AS ?count) WHERE {
                   ?s ?p ?o
                 }
                 GROUP BY ?s
                 ORDER BY COUNT(?o)
-                """));
+                """;
+
+        assertDoesNotThrow(() -> parser.parse(query));
     }
 
     @Test
     @DisplayName("Should accept ORDER BY on a projected aggregate alias")
     void shouldAcceptOrderByUsingProjectedAggregateAlias() {
         SparqlParser parser = newParserDefault();
-
-        assertDoesNotThrow(() -> parser.parse("""
+        String query = """
                 SELECT ?s (COUNT(?o) AS ?count) WHERE {
                   ?s ?p ?o
                 }
                 GROUP BY ?s
                 ORDER BY ?count
-                """));
+                """;
+
+        assertDoesNotThrow(() -> parser.parse(query));
     }
 
     @Test
     @DisplayName("Should accept projection variables visible through OPTIONAL")
     void shouldAcceptProjectionVisibleThroughOptional() {
         SparqlParser parser = newParserDefault();
-
-        assertDoesNotThrow(() -> parser.parse("""
+        String query = """
                     SELECT ?o WHERE {
                         OPTIONAL { ?s ?p ?o }
                     }
-                """));
+                """;
+
+        assertDoesNotThrow(() -> parser.parse(query));
     }
 
     @Test
@@ -745,13 +750,14 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
     @DisplayName("Should accept grouped SELECT aggregate projections")
     void shouldAcceptGroupedSelectAggregateProjection() {
         SparqlParser parser = newParserDefault();
-
-        assertDoesNotThrow(() -> parser.parse("""
+        String query = """
                 SELECT ?s (COUNT(?o) AS ?count) WHERE {
                     ?s ?p ?o
                 }
                 GROUP BY ?s
-                """));
+                """;
+
+        assertDoesNotThrow(() -> parser.parse(query));
     }
 
     @Test
@@ -861,7 +867,7 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
         assertInstanceOf(GroupGraphPatternAst.class, union.left());
         assertInstanceOf(GroupGraphPatternAst.class, union.right());
 
-        // Left branch: { ?country wdt:P36 ?city. }
+        // The left UNION branch contains the country-to-capital pattern.
         GroupGraphPatternAst leftBranch = union.left();
         assertEquals(1, leftBranch.patterns().size());
         assertInstanceOf(BgpAst.class, leftBranch.patterns().getFirst());
@@ -872,7 +878,7 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
         assertEquals("wdt:P36", ((IriAst) simplePredicateTerm(leftTriple)).raw());
         assertEquals("city", ((VarAst) leftTriple.object()).name());
 
-        // Right branch: { ?city wdt:P17 ?country. ?city wdt:P31 wd:Q1637706. } → two TriplesBlocks → two BGPs
+        // The right UNION branch expands into two basic graph patterns.
         GroupGraphPatternAst rightBranch = union.right();
         assertEquals(2, rightBranch.patterns().size());
         assertInstanceOf(BgpAst.class, rightBranch.patterns().get(0));

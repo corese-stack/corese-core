@@ -5,7 +5,6 @@ import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.ExpType;
 import fr.inria.corese.core.next.query.impl.engine.model.Filter;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
-import fr.inria.corese.core.next.query.impl.engine.model.Regex;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
@@ -442,46 +441,9 @@ class ExpTest {
             assertTrue(exp.isGenerated(), "Generated should be true");
         }
 
-        @Test
-        @DisplayName("Should set and check BGPAble flag")
-        void testSetAndIsBGPAble() {
-            exp.setBGPAble(true);
-            assertTrue(exp.isBGPAble(), "BGPAble should be true");
-        }
     }
 
-    @Nested
-    @DisplayName("Min/Max Tests")
-    class MinMaxTests {
 
-        @Test
-        @DisplayName("Should set and get min")
-        void testSetAndGetMin() {
-            exp.setMin(5);
-            assertEquals(5, exp.getMin(), "Min should be 5");
-        }
-
-        @Test
-        @DisplayName("Should set and get max")
-        void testSetAndGetMax() {
-            exp.setMax(10);
-            assertEquals(10, exp.getMax(), "Max should be 10");
-        }
-
-        @Test
-        @DisplayName("Should have default min -1")
-        void testDefaultMin() {
-            Exp e = Exp.create(ExpType.Type.AND);
-            assertEquals(-1, e.getMin(), "Default min should be -1");
-        }
-
-        @Test
-        @DisplayName("Should have default max -1")
-        void testDefaultMax() {
-            Exp e = Exp.create(ExpType.Type.AND);
-            assertEquals(-1, e.getMax(), "Default max should be -1");
-        }
-    }
 
     @Nested
     @DisplayName("Level Tests")
@@ -547,18 +509,6 @@ class ExpTest {
         }
     }
 
-    @Nested
-    @DisplayName("Regex Tests")
-    class RegexTests {
-
-        @Test
-        @DisplayName("Should set and get regex")
-        void testSetAndGetRegex() {
-            Regex mockRegex = mock(Regex.class);
-            exp.setRegex(mockRegex);
-            assertEquals(mockRegex, exp.getRegex(), "Regex should match");
-        }
-    }
 
     @Nested
     @DisplayName("Mappings Tests")
@@ -595,18 +545,6 @@ class ExpTest {
         }
     }
 
-    @Nested
-    @DisplayName("Path Expression Tests")
-    class PathExpressionTests {
-
-        @Test
-        @DisplayName("Should set and get path expression")
-        void testSetAndGetPath() {
-            Exp pathExp = Exp.create(ExpType.Type.PATH);
-            exp.setPath(pathExp);
-            assertEquals(pathExp, exp.getPath(), "Path expression should match");
-        }
-    }
 
     @Nested
     @DisplayName("Bind Expression Tests")
@@ -760,18 +698,6 @@ class ExpTest {
         void testGetStatement() {
             assertDoesNotThrow(() -> exp.getStatement(),
                     "getStatement should not throw");
-        }
-    }
-
-    @Nested
-    @DisplayName("Cache Tests")
-    class CacheTests {
-
-        @Test
-        @DisplayName("Should set and get cache node")
-        void testSetAndGetCacheNode() {
-            exp.setCacheNode(mockNode);
-            assertEquals(mockNode, exp.getCacheNode(), "Cache node should match");
         }
     }
 

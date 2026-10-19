@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.query.impl.sparql.ast.constraint;
 import java.util.List;
 import java.util.Objects;
 
-import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.AstVisitor;
+import fr.inria.corese.core.next.query.impl.sparql.ast.visitor.AstVisitor;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 
 /**
@@ -23,7 +23,7 @@ public abstract class AbstractBinaryConstraintAst implements BinaryConstraintAst
         return this.leftArgument;
     }
 
-    protected void setLeftArgument(TermAst arg) {
+    protected final void setLeftArgument(TermAst arg) {
         this.leftArgument = arg;
     }
 
@@ -32,7 +32,7 @@ public abstract class AbstractBinaryConstraintAst implements BinaryConstraintAst
         return this.rightArgument;
     }
 
-    protected void setRightArgument(TermAst arg) {
+    protected final void setRightArgument(TermAst arg) {
         this.rightArgument = arg;
     }
 

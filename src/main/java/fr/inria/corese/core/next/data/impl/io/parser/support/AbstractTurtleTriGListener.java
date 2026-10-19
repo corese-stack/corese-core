@@ -51,7 +51,6 @@ public abstract class AbstractTurtleTriGListener {
         this.baseURI = baseURI;
         this.prefixHandler = new PrefixHandler(true);
 
-        initializeBasePrefix();
     }
 
     /**
@@ -66,12 +65,6 @@ public abstract class AbstractTurtleTriGListener {
      */
     public BNode scopedBlankNode(String label) {
         return blankNodeScope.computeIfAbsent(label, k -> factory.createBNode());
-    }
-
-    /**
-     * Registers the base URI as the empty prefix namespace.
-     */
-    public void initializeBasePrefix() {
     }
 
     /**

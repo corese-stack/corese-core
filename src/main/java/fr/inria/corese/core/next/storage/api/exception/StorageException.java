@@ -8,6 +8,9 @@ import java.util.Objects;
  * Specific exception for StorageManager operations.
  */
 public class StorageException extends CoreseException {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
+
 
     private final ErrorCode code;
 

@@ -4,9 +4,12 @@ import fr.inria.corese.core.next.data.Values;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 import fr.inria.corese.core.next.data.api.term.Literal;
+import fr.inria.corese.core.next.data.api.term.SimpleLiteral;
 import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.data.api.vocabulary.XSD;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import java.math.BigDecimal;
 
@@ -44,6 +47,21 @@ class RdfValueOrderTest {
         DatatypeValue ten = values.createLiteral(new BigDecimal("10"));
 
         assertTrue(two.compare(ten) < 0);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = XSDDatatype.class, names = {"INTEGER", "DECIMAL", "FLOAT", "DOUBLE"})
+    void genericTypedNumbersUseTheSameOrderingWithoutChangingTheirLexicalForm(XSDDatatype datatype) {
+        var two = new SimpleLiteral("02", datatype.getIRI());
+        var ten = new SimpleLiteral("10", datatype.getIRI());
+        Literal specializedTwo = values.createLiteral("02", datatype.getIRI());
+        Literal specializedTen = values.createLiteral("10", datatype.getIRI());
+        assertTrue(two.compare(ten) < 0);
+        assertTrue(ten.compare(two) > 0);
+        assertEquals(0, two.compare(specializedTwo));
+        assertEquals(Integer.signum(specializedTen.compare(two)), Integer.signum(ten.compare(specializedTwo)));
+        assertEquals("02", two.getLabel());
+        assertEquals(datatype.getIRI(), two.getDatatype());
     }
 
     @Test

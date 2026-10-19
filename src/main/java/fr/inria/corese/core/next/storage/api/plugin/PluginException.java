@@ -8,6 +8,9 @@ import fr.inria.corese.core.next.storage.api.exception.StorageException;
  */
 @SuppressWarnings("java:S110")
 public class PluginException extends StorageException {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
+
 
     public PluginException(String message) {
         super(ErrorCode.PLUGIN_FAILED, message);

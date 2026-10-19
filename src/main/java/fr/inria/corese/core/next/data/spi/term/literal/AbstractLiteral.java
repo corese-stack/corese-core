@@ -20,6 +20,9 @@ import fr.inria.corese.core.next.data.api.exception.IncorrectOperationException;
  * Base class for all literals. All value accessors throw an exception by default.
  */
 public abstract class AbstractLiteral implements Literal {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
+
 
     protected IRI datatype;
 

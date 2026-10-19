@@ -50,7 +50,7 @@ public abstract class AbstractResultSerializerTest {
 
             @Override
             public void close() {
-
+                // The in-memory fixture owns no external resources.
             }
         };
     }

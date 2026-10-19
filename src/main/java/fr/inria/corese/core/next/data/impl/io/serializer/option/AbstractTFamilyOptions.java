@@ -130,7 +130,7 @@ public abstract class AbstractTFamilyOptions extends AbstractSerializerOptions i
         this.sortSubjects = builder.sortSubjects;
         this.sortPredicates = builder.sortPredicates;
 
-        if (this.escapeUnicode() && this.useMultilineLiterals) {
+        if (this.escapeUnicode && this.useMultilineLiterals) {
             throw new IllegalArgumentException("Cannot enable both escapeUnicode and useMultilineLiterals in Turtle TriG configs.");
         }
     }
@@ -315,25 +315,25 @@ public abstract class AbstractTFamilyOptions extends AbstractSerializerOptions i
         protected AbstractTFamilyBuilder(IOOptions otherOptions) {
             super(otherOptions);
             if(otherOptions instanceof AbstractTFamilyOptions otherTFamilyOptions) {
-                this.useRdfTypeShortcut(otherTFamilyOptions.useRdfTypeShortcut());
-                this.useCollections(otherTFamilyOptions.useCollections());
-                this.useMultilineLiterals(otherTFamilyOptions.useMultilineLiterals());
+                this.useRdfTypeShortcut = otherTFamilyOptions.useRdfTypeShortcut();
+                this.useCollections = otherTFamilyOptions.useCollections();
+                this.useMultilineLiterals = otherTFamilyOptions.useMultilineLiterals();
             }
             if(otherOptions instanceof UsesPrefixOptions usesPrefixOptions) {
-                this.usePrefixes(usesPrefixOptions.usePrefixes());
-                this.autoDeclarePrefixes(usesPrefixOptions.autoDeclarePrefixes());
-                this.prefixOrdering(usesPrefixOptions.getPrefixOrdering());
+                this.usePrefixes = usesPrefixOptions.usePrefixes();
+                this.autoDeclarePrefixes = usesPrefixOptions.autoDeclarePrefixes();
+                this.prefixOrdering = Objects.requireNonNull(usesPrefixOptions.getPrefixOrdering());
                 PrefixHandler copiedPrefixHandler = new PrefixHandler(false);
                 copiedPrefixHandler.copyFrom(usesPrefixOptions.getPrefixMapping());
-                this.prefixHandler(copiedPrefixHandler);
+                this.prefixHandler = copiedPrefixHandler;
             }
             if(otherOptions instanceof PrettyPrintOptions prettyPrintOptions) {
-                this.indent(prettyPrintOptions.getIndent());
-                this.prettyPrint(prettyPrintOptions.prettyPrint());
-                this.maxLineLength(prettyPrintOptions.getMaxLineLength());
-                this.sortSubjects(prettyPrintOptions.sortSubjects());
-                this.sortPredicates(prettyPrintOptions.sortPredicates());
-                this.prefixOrdering(prettyPrintOptions.getPrefixOrdering());
+                this.indent = Objects.requireNonNull(prettyPrintOptions.getIndent());
+                this.prettyPrint = prettyPrintOptions.prettyPrint();
+                this.maxLineLength = prettyPrintOptions.getMaxLineLength();
+                this.sortSubjects = prettyPrintOptions.sortSubjects();
+                this.sortPredicates = prettyPrintOptions.sortPredicates();
+                this.prefixOrdering = Objects.requireNonNull(prettyPrintOptions.getPrefixOrdering());
             }
         }
 

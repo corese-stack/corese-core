@@ -41,7 +41,9 @@ public final class MemoryStoragePlugin implements StoragePlugin {
      */
     @Override
     public boolean supports(final StorageConfig config) {
-        return config != null && config.getType().map(getName()::equalsIgnoreCase).orElse(false);
+        return config != null && config.getType()
+                .map(t -> getName().equalsIgnoreCase(t) || "indexed-memory".equalsIgnoreCase(t))
+                .orElse(false);
     }
 
     /**

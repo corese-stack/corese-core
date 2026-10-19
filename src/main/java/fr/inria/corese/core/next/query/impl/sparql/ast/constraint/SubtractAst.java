@@ -10,13 +10,9 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
  */
 public class SubtractAst extends AbstractChainableOperatorAst implements NumericExpressionAst {
     public SubtractAst(List<TermAst> args) {
-        super(args);
+        super(args, SubtractAst::new);
     }
 
-    @Override
-    protected TermAst create(List<TermAst> args) {
-        return new SubtractAst(args);
-    }
 
     @Override
     public String getName() {

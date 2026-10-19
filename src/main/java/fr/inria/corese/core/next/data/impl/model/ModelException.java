@@ -6,6 +6,9 @@ import fr.inria.corese.core.next.common.exception.CoreseException;
  * Exception thrown when a Model operation fails.
  */
 public class ModelException extends CoreseException {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * The operation that failed.

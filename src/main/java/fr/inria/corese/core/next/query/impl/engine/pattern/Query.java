@@ -4,12 +4,11 @@ import fr.inria.corese.core.next.query.impl.engine.model.Expr;
 import fr.inria.corese.core.next.query.impl.engine.model.ExprType;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
-import fr.inria.corese.core.next.query.impl.engine.sorter.QuerySorter;
+import fr.inria.corese.core.next.query.impl.engine.planning.QueryPlanner;
 
 import fr.inria.corese.core.next.query.impl.engine.model.Filter;
-import fr.inria.corese.core.next.query.impl.engine.spi.Matcher;
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
-import fr.inria.corese.core.next.query.impl.engine.filter.Compile;
+import fr.inria.corese.core.next.query.impl.engine.filter.FilterOptimizer;
 import fr.inria.corese.core.next.query.impl.engine.eval.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,13 +18,16 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * KGRAM Query
- * also used for subquery
+ * Compiled query operators, projection, dataset and variable indexes.
+ *
+ * <p>The compiler completes one mutable graph, including its subqueries, before
+ * execution. {@link CompiledQueryPlan} captures a detached compilation image and
+ * creates an independent graph for each evaluation. A query and its operators
+ * belong to that evaluation thread; they are not shared mutable execution state.</p>
  *
  * @author Olivier Corby, Edelweiss, INRIA 2009
  *
  */
-@SuppressWarnings({"java:S1845", "java:S1700", "java:S2387"}) // Legacy KGRAM AST structure
 public final class Query extends Exp {
 
 
@@ -39,15 +41,13 @@ public final class Query extends Exp {
 
     private static final Logger logger = LoggerFactory.getLogger(Query.class);
 
-    public static final String PATHNODE = "pathNode";
-
     int limit = Integer.MAX_VALUE;
     int offset = 0;
     // if slice > 0 : service gets mappings from previous pattern by slices
     int slice = 20;
 
     private int number = 0;
-    boolean distinct = false;
+    private boolean distinctResults;
     int iNode = 0;
     int iEdge = 0;
     List<Node> from;
@@ -71,7 +71,6 @@ public final class Query extends Exp {
     List<Exp> orderBy;
     List<Exp> groupBy;
     List<Filter> failure;
-    List<Filter> pathFilter;
     List<Filter> funList;
 
     List<String> errors;
@@ -79,29 +78,21 @@ public final class Query extends Exp {
     Exp having;
     Exp construct;
     Exp delete;
-	// gNode is a local graph node when subquery has no ?g in its select
+    // gNode is a local graph node when subquery has no ?g in its select
     // use case: graph ?g (select where ...)
     Node gNode;
-    Node pathNode;
-    // outer main query that contains this (when subquery)
-    // SPIN graph
-    Query query;
+    // Root query whose dataset is inherited by this subquery.
+    private Query globalQuery;
     Query outerQuery;
-    Object object;
+    private Object queryObject;
 
-    // current transformer if any
-    private Object transformer;
-    // table: transformation -> Transformer
-    // shared by templates of Transformer
-    HashMap<String, Object> tprinter;
-
-    Compile compiler;
-    private final QuerySorter querySorter;
+    FilterOptimizer compiler;
+    private final QueryPlanner querySorter;
 
     HashMap<String, Object> pragma;
     // Extended filters: pathNode()
     HashMap<String, Filter> ftable;
-	// Extended queries for type check
+    // Extended queries for type check
     // nb occurrences of predicates in where
     HashMap<String, Integer> ptable;
     HashMap<String, Edge> etable;
@@ -116,30 +107,20 @@ public final class Query extends Exp {
     boolean isCheck = false;
     private boolean isUseBind = true;
 
-    boolean
-            isAggregate = false;
+    private boolean aggregateQuery;
     boolean isRelax = false;
     boolean isDistribute = false;
     boolean isOptimize = false;
     boolean isTest = false;
     boolean isNew = true;
-    boolean isSort = true;
     boolean isConstruct = false;
     private boolean isInsert = false;
     boolean isDelete = false;
     boolean isUpdate = false;
     boolean isAsk = false;
-    boolean isCheckLoop = false;
     boolean isListGroup = false;
-    boolean isListPath = true;
-    private boolean parallel = true;
     private boolean validate = false;
     private boolean federate = false;
-    // store the list of edges of the path
-    private boolean isStorePath = true;
-    // cache PP result in PathFinder
-    private boolean isCachePath = false;
-    boolean isCountPath = false;
 
     boolean
             isCorrect = true;
@@ -147,63 +128,136 @@ public final class Query extends Exp {
     boolean isMap = true;
     boolean isRule = false;
     boolean isDetail = true;
-    private boolean algebra = false;
-    int mode = Matcher.UNDEF;
 
     int planner = QP_DEFAULT;
     private int queryProfile = STD_PROFILE;
 
     private boolean isService = false;
 
-    private boolean isSynchronized = false;
-    private boolean lock = true;
 
-    private boolean isTemplate = false;
-    private boolean isTransformationTemplate = false;
-
-    // member of a set of templates of a pprinter (not a single query that is a template)
-
-    private Exp templateGroup;
     private final List<Node> argList;
     private Mapping mapping;
-    private boolean isExtension = false;
 
 
-    private BgpGenerator bgpGenerator;
 
 
     private String service;
 
-	public Query(){
+    /** Creates an uncompiled query whose mutable containers belong to its compiler. */
+    public Query() {
         super(Type.QUERY);
-		from 		= new ArrayList<>();
-		named 		= new ArrayList<>();
-		selectExp 	= new ArrayList<>();
-		orderBy 	= new ArrayList<>();
-		groupBy 	= new ArrayList<>();
-		failure 	= new ArrayList<>();
-		pathFilter 	= new ArrayList<>();
-		funList 	= new ArrayList<>();
+        from = new ArrayList<>();
+        named = new ArrayList<>();
+        selectExp = new ArrayList<>();
+        orderBy = new ArrayList<>();
+        groupBy = new ArrayList<>();
+        failure = new ArrayList<>();
+        funList = new ArrayList<>();
+        compiler = new FilterOptimizer(this);
+        table = new HashMap<>();
+        ftable = new HashMap<>();
+        pragma = new HashMap<>();
+        ptable = new HashMap<>();
+        etable = new HashMap<>();
+        queries = new ArrayList<>();
+        selectNode = new ArrayList<>();
+        patternNodes = new ArrayList<>();
+        queryNodes = new ArrayList<>();
+        patternSelectNodes = new ArrayList<>();
+        querySelectNodes = new ArrayList<>();
+        bindingNodes = new ArrayList<>();
+        relaxEdges = new ArrayList<>();
+        argList = new ArrayList<>();
+        querySorter = new QueryPlanner(this);
+    }
 
-		compiler 	= new Compile(this);
-		table 		= new HashMap<>();
-		ftable 		= new HashMap<>();
-		pragma 		= new HashMap<>();
-		tprinter 	= new HashMap<> ();
-                ptable          = new HashMap<>();
-                etable          = new HashMap<>();
-		queries 	= new ArrayList<>();
+    /**
+     * Constructs a completed execution graph without allocating compilation services.
+     * Registration precedes graph links because subqueries refer to their outer query.
+     */
+    @SuppressWarnings("this-escape") // PlanCopy only records identity; no execution observes the shell before construction finishes.
+    private Query(Query source, PlanCopy copies) {
+        super(Type.QUERY);
+        copies.remember(source, this);
+        source.copyPlanFields(this, copies);
+        querySorter = null;
+        compiler = null;
+        argList = copies.copy(source.argList);
+        this.limit = source.limit;
+        this.offset = source.offset;
+        this.slice = source.slice;
+        this.number = source.number;
+        this.distinctResults = source.distinctResults;
+        this.iNode = source.iNode;
+        this.iEdge = source.iEdge;
+        this.from = copies.copy(source.from);
+        this.named = copies.copy(source.named);
+        this.selectNode = copies.copy(source.selectNode);
+        this.patternNodes = copies.copy(source.patternNodes);
+        this.patternSelectNodes = copies.copy(source.patternSelectNodes);
+        this.queryNodes = copies.copy(source.queryNodes);
+        this.querySelectNodes = copies.copy(source.querySelectNodes);
+        this.bindingNodes = copies.copy(source.bindingNodes);
+        this.constructNodes = copies.copy(source.constructNodes);
+        this.relaxEdges = copies.copy(source.relaxEdges);
+        this.selectExp = copies.copy(source.selectExp);
+        this.orderBy = copies.copy(source.orderBy);
+        this.groupBy = copies.copy(source.groupBy);
+        this.failure = copies.copy(source.failure);
+        this.funList = copies.copy(source.funList);
+        this.errors = copies.copy(source.errors);
+        this.info = copies.copy(source.info);
+        this.having = copies.copy(source.having);
+        this.construct = copies.copy(source.construct);
+        this.delete = copies.copy(source.delete);
+        this.gNode = copies.copy(source.gNode);
+        this.globalQuery = copies.copy(source.globalQuery);
+        this.outerQuery = copies.copy(source.outerQuery);
+        this.queryObject = copies.copy(source.queryObject);
+        this.pragma = copies.copy(source.pragma);
+        this.ftable = copies.copy(source.ftable);
+        this.ptable = copies.copy(source.ptable);
+        this.etable = copies.copy(source.etable);
+        this.table = copies.copy(source.table);
+        this.queries = copies.copy(source.queries);
+        this.isCompiled = source.isCompiled;
+        this.datasetSpecified = source.datasetSpecified;
+        this.reportEnabled = source.reportEnabled;
+        this.isCheck = source.isCheck;
+        this.isUseBind = source.isUseBind;
+        this.aggregateQuery = source.aggregateQuery;
+        this.isRelax = source.isRelax;
+        this.isDistribute = source.isDistribute;
+        this.isOptimize = source.isOptimize;
+        this.isTest = source.isTest;
+        this.isNew = source.isNew;
+        this.isConstruct = source.isConstruct;
+        this.isInsert = source.isInsert;
+        this.isDelete = source.isDelete;
+        this.isUpdate = source.isUpdate;
+        this.isAsk = source.isAsk;
+        this.isListGroup = source.isListGroup;
+        this.validate = source.validate;
+        this.federate = source.federate;
+        this.isCorrect = source.isCorrect;
+        this.isConnect = source.isConnect;
+        this.isMap = source.isMap;
+        this.isRule = source.isRule;
+        this.isDetail = source.isDetail;
+        this.planner = source.planner;
+        this.queryProfile = source.queryProfile;
+        this.isService = source.isService;
+        this.mapping = copies.copy(source.mapping);
+        this.service = copies.copy(source.service);
+    }
 
-                selectNode              = new ArrayList<>();
-		patternNodes 		= new ArrayList<>();
-		queryNodes 		= new ArrayList<>();
-		patternSelectNodes 	= new ArrayList<>();
-		querySelectNodes 	= new ArrayList<>();
-		bindingNodes 		= new ArrayList<>();
-		relaxEdges 		= new ArrayList<>();
-		argList 		= new ArrayList<>();
-                querySorter = new QuerySorter(this);
-
+    /** Copies a completed query, with fresh containers and no retained planning producer. */
+    @Override
+    public Query copyPlan(PlanCopy copies) {
+        if (!isCompiled) {
+            throw new IllegalStateException("Only completed queries can form an execution image");
+        }
+        return new Query(this, copies);
     }
 
     Query(Exp e) {
@@ -215,8 +269,8 @@ public final class Query extends Exp {
         return new Query(e);
     }
 
-    @SuppressWarnings("java:S1172") // Parameter preserved for legacy factory compatibility
-    public static Query create(int type) {
+    /** Creates an empty compiled query. */
+    public static Query create() {
         return new Query();
     }
 
@@ -277,12 +331,12 @@ public final class Query extends Exp {
 
     @Override
     public Object getObject() {
-        return object;
+        return queryObject;
     }
 
     @Override
     public void setObject(Object o) {
-        object = o;
+        queryObject = o;
     }
 
     public int getPlanProfile() {
@@ -343,7 +397,7 @@ public final class Query extends Exp {
     }
 
     void setGlobalQuery(Query q) {
-        query = q;
+        globalQuery = q;
         inherit(q);
     }
 
@@ -360,8 +414,8 @@ public final class Query extends Exp {
 
 
     public Query getGlobalQuery() {
-        if (query != null) {
-            return query;
+        if (globalQuery != null) {
+            return globalQuery;
         }
         return this;
     }
@@ -378,7 +432,7 @@ public final class Query extends Exp {
     }
 
     public boolean isSubQuery() {
-        return query != null;
+        return globalQuery != null;
     }
 
 
@@ -391,11 +445,6 @@ public final class Query extends Exp {
          return false;
     }
 
-    public boolean isCheckLoop() {
-        return isCheckLoop;
-    }
-
-
     /**
      * Fake local graph node
      */
@@ -406,17 +455,6 @@ public final class Query extends Exp {
 
     public void setGraphNode(Node n) {
         gNode = n;
-    }
-
-    public Node getPathNode() {
-        return pathNode;
-    }
-
-    /**
-     * constraint in property path: ?x ex:prop @[?this != <John>] ?y
-     */
-    List<Filter> getPathFilter() {
-        return pathFilter;
     }
 
     public List<Filter> getFunList(){
@@ -592,11 +630,11 @@ public final class Query extends Exp {
     }
 
     public boolean isDistinct() {
-        return distinct;
+        return distinctResults;
     }
 
     public void setDistinct(boolean b) {
-        distinct = b;
+        distinctResults = b;
     }
 
     public boolean isCheck() {
@@ -605,12 +643,12 @@ public final class Query extends Exp {
 
     @Override
     public boolean isAggregate() {
-        return isAggregate;
+        return aggregateQuery;
     }
 
     @Override
     public void setAggregate(boolean b) {
-        isAggregate = b;
+        aggregateQuery = b;
     }
 
     public boolean isRelax() {
@@ -622,8 +660,8 @@ public final class Query extends Exp {
     }
 
     public boolean isDistribute() {
-        if (query != null) {
-            return query.isDistribute();
+        if (globalQuery != null) {
+            return globalQuery.isDistribute();
         } else {
             return isDistribute;
         }
@@ -750,14 +788,6 @@ public final class Query extends Exp {
 
     public boolean isListGroup() {
         return isListGroup;
-    }
-
-    public boolean isListPath() {
-        return isListPath;
-    }
-
-    public boolean isCountPath() {
-        return isCountPath;
     }
 
     public boolean isCorrect() {
@@ -894,9 +924,6 @@ public final class Query extends Exp {
      * index(node) use global query index
      */
     void complete2() {
-        for (Filter f : getPathFilter()) {
-            index(this, f);
-        }
         index(getOrderBy());
         index(getGroupBy());
 
@@ -919,14 +946,11 @@ public final class Query extends Exp {
         if (getGraphNode() != null) {
             index(getGraphNode());
         }
-        if (getPathNode() != null) {
-            index(getPathNode());
-        }
     }
 
     void index(List<Exp> list) {
         for (Exp ee : list) {
-			// use case: group by (exists(?x :p ?y) as ?b)
+            // use case: group by (exists(?x :p ?y) as ?b)
             // use case: order by exists(?x :p ?y)
             if (ee.getFilter() != null) {
                 index(this, ee.getFilter());
@@ -1017,15 +1041,6 @@ public final class Query extends Exp {
      * called by compiler transformer
      */
     public void collect() {
-        if (getPathNode() != null) {
-            /*
-             * use case: ?x ex:prop @[?this != <John>] + ?y collect ?this first
-             * because it may be within @[exists {?this ?p ?y}} and even worse
-             * within @[exists {select ?this where {?this ?p ?y}}]
-             */
-            store(getPathNode(), false, false);
-        }
-
         for (Exp ee : this) {
             collect(ee, false);
         }
@@ -1038,10 +1053,6 @@ public final class Query extends Exp {
             store(node, false, false);
         }
 
-        for (Filter ff : getPathFilter()) {
-            collectExist(ff.getExp());
-        }
-
         for (Filter f : getFunList()){
              collectExist(f.getExp());
         }
@@ -1049,13 +1060,10 @@ public final class Query extends Exp {
 
     // exist: inside exists ( exp )
     // or inside    A minus ( exp )
-    @SuppressWarnings("java:S3776")
     void collect(Exp exp, boolean exist) {
         switch (exp.type()) {
 
             case FILTER:
-			// get exists () nodes
-                // draft
                 collectExist(exp.getFilter().getExp());
                 break;
 
@@ -1069,16 +1077,8 @@ public final class Query extends Exp {
                 }
                 break;
 
-            case EDGE, PATH:
-                Edge edge = exp.getEdge();
-                store(edge.getNode(0), exist, false);
-                if (edge.getEdgeVariable() != null) {
-                    store(edge.getEdgeVariable(), exist, false);
-                }
-                store(edge.getNode(1), exist, false);
-                for (int i = 2; i < edge.nbNode(); i++) {
-                    store(edge.getNode(i), exist, false);
-                }
+            case EDGE:
+                collectEdgeNodes(exp.getEdge(), exist);
                 break;
 
             case XPATH, EVAL:
@@ -1089,13 +1089,7 @@ public final class Query extends Exp {
                 break;
 
             case MINUS:
-                // second argument does not bind anything: skip it
-                if (exp.first() != null) {
-                    collect(exp.first(), exist);
-                }
-                if (exp.rest() != null) {
-                    collect(exp.rest(), true);
-                }
+                collectMinusNodes(exp, exist);
                 break;
 
             case QUERY:
@@ -1105,14 +1099,7 @@ public final class Query extends Exp {
                 break;
 
             case BIND:
-                collectExist(exp.getFilter().getExp());
-                store(exp.getNode(), exist, false); //true);
-                if (exp.getNodeList() != null){
-                    // values {unnest()} compiled as bind ()
-                    for (Node n : exp.getNodeList()){
-                        store(n, exist, false); //true);
-                    }
-                }
+                collectBindNodes(exp, exist);
                 break;
 
             default:
@@ -1121,6 +1108,37 @@ public final class Query extends Exp {
                 }
         }
 
+    }
+
+    private void collectEdgeNodes(Edge edge, boolean insideExistencePattern) {
+        store(edge.getNode(0), insideExistencePattern, false);
+        if (edge.getEdgeVariable() != null) {
+            store(edge.getEdgeVariable(), insideExistencePattern, false);
+        }
+        store(edge.getNode(1), insideExistencePattern, false);
+        for (int index = 2; index < edge.nbNode(); index++) {
+            store(edge.getNode(index), insideExistencePattern, false);
+        }
+    }
+
+    private void collectMinusNodes(Exp expression, boolean insideExistencePattern) {
+        if (expression.first() != null) {
+            collect(expression.first(), insideExistencePattern);
+        }
+        // The right operand is indexed but does not introduce solution bindings.
+        if (expression.rest() != null) {
+            collect(expression.rest(), true);
+        }
+    }
+
+    private void collectBindNodes(Exp expression, boolean insideExistencePattern) {
+        collectExist(expression.getFilter().getExp());
+        store(expression.getNode(), insideExistencePattern, false);
+        if (expression.getNodeList() != null) {
+            for (Node node : expression.getNodeList()) {
+                store(node, insideExistencePattern, false);
+            }
+        }
     }
 
     void collectExist(Expr exp) {
@@ -1143,9 +1161,9 @@ public final class Query extends Exp {
      */
     int index(Query query, Exp exp, boolean isExist, int start) {
         int min = switch (exp.type()) {
-            case EDGE, PATH, XPATH, EVAL -> indexEdgeExp(query, exp);
-            case VALUES -> indexValuesExp(query, exp);
-            case NODE -> qIndex(query, exp.getNode());
+            case EDGE, XPATH, EVAL -> indexEdgeExp(exp);
+            case VALUES -> indexValuesExp(exp);
+            case NODE -> index(exp.getNode());
             case BIND -> indexBindExp(query, exp, isExist);
             case FILTER -> indexExpFilter(query, exp, isExist);
             case QUERY -> indexExpQuery(query, exp, isExist);
@@ -1160,22 +1178,16 @@ public final class Query extends Exp {
         return min;
     }
 
-    private int indexEdgeExp(Query query, Exp exp) {
+    private int indexEdgeExp(Exp exp) {
         Edge edge = exp.getEdge();
         edge.setEdgeIndex(iEdge++);
-        int min = indexExpEdge(query, exp);
-        if (exp.hasPath()) {
-            Exp ep = exp.getPath();
-            ep.getEdge().setEdgeIndex(edge.getEdgeIndex());
-            indexExpEdge(query, ep);
-        }
-        return min;
+        return indexExpEdge(exp);
     }
 
-    private int indexValuesExp(Query query, Exp exp) {
+    private int indexValuesExp(Exp exp) {
         int min = Integer.MAX_VALUE;
         for (Node node : exp.getNodeList()) {
-            int n = qIndex(query, node);
+            int n = index(node);
             min = Math.min(min, n);
         }
         return min;
@@ -1183,10 +1195,10 @@ public final class Query extends Exp {
 
     private int indexBindExp(Query query, Exp exp, boolean isExist) {
         Node qn = exp.getNode();
-        int min = qIndex(query, qn);
+        int min = index(qn);
         if (exp.getNodeList() != null) {
             for (Node bn : exp.getNodeList()) {
-                int ii = qIndex(query, bn);
+                int ii = index(bn);
                 min = Math.min(min, ii);
             }
         }
@@ -1218,7 +1230,7 @@ public final class Query extends Exp {
                 logger.warn(Message.Prefix.UNDEF_VAR.getString(), variable);
                 addError(Message.Prefix.UNDEF_VAR.getString(), variable);
             } else if (!isExist && !hasExist) {
-                int n = qIndex(query, qNode);
+                int n = index(qNode);
                 min = Math.min(min, n);
             }
         }
@@ -1247,7 +1259,7 @@ public final class Query extends Exp {
             // use case: query node created to hold fun result
             // see Transformer compiler.compileSelectFun()
             Node sNode = ee.getNode();
-            int n = qIndex(qq, sNode);
+            int n = index(sNode);
             min = Math.min(min, n);
 
             if (ee.getFilter() != null) {
@@ -1259,35 +1271,22 @@ public final class Query extends Exp {
         return min;
     }
 
-    int indexExpEdge(Query query, Exp exp) {
+    private int indexExpEdge(Exp exp) {
         int min = Integer.MAX_VALUE;
         for (int i = 0; i < exp.nbNode(); i++) {
-            int n = qIndex(query, exp.getNode(i));
+            int n = index(exp.getNode(i));
             min = Math.min(min, n);
         }
         return min;
     }
 
 
-    @SuppressWarnings("java:S3400") // Placeholder method for future RDF-star variable annotations
-    boolean isTriple(Exp exp, String name) {
-        // RDF-star variable annotations belonged to the legacy parser expression.
-        // The native AST represents triple terms explicitly, so a plain variable
-        // reference cannot carry that hidden flag.
-        return false;
-    }
-
     /**
-     * Generate or retrieve index of node
-     * If node is in a sub query, return the
-     * index of the outer node corresponding to node and rec.
-     */
-    @SuppressWarnings("java:S1172") // Query parameter preserved for outer query scoping
-    int qIndex(Query query, Node node) {
-        return index(node);
-    }
-
-    /**
+     * Returns a node's existing index or assigns one from the outer query's
+     * binding space. Subqueries use the same index allocator as their parent.
+     *
+     * @param node node to index
+     * @return existing or newly assigned binding index
      */
     public int index(Node node) {
         if (node.getIndex() == -1) {
@@ -1319,6 +1318,7 @@ public final class Query extends Exp {
      *
      * @return list Exp(node) for select * node list
      */
+    @SuppressWarnings("java:S9391") // Preserve ordered accumulation without allocating a stream pipeline.
     public List<Exp> toExp(List<Node> lNode) {
         List<Exp> lExp = new ArrayList<>();
         for (Node node : lNode) {
@@ -1462,46 +1462,6 @@ public final class Query extends Exp {
         return isDetail;
     }
 
-    public void setSynchronized(boolean b) {
-        isSynchronized = b;
-    }
-
-    public boolean isSynchronized() {
-        return isSynchronized;
-    }
-
-    public void setTransformer(String p, Object transformer) {
-        getGlobalQuery().setPPrinter(p, transformer);
-    }
-
-    Object getPPrinter(String p) {
-        if (p == null) {
-            return transformer;
-        }
-        return tprinter.get(p);
-    }
-
-    void setPPrinter(String p, Object transformer) {
-        if (p == null) {
-            // next kg:pprint() will use this one
-            this.transformer = transformer;
-        } else {
-            if (this.transformer == null) {
-                // next kg:pprint() will use this one
-                this.transformer = transformer;
-            }
-            tprinter.putIfAbsent(p, transformer);
-        }
-    }
-
-    public void setTemplate(boolean template) {
-        isTemplate = template;
-    }
-
-    public boolean isTemplate() {
-        return isTemplate;
-    }
-
     @Override
     public int getNumber() {
         return number;
@@ -1513,31 +1473,9 @@ public final class Query extends Exp {
     }
 
 
-    public Exp getTemplateGroup() {
-        return templateGroup;
-    }
-
 
     public int getQueryProfile() {
         return queryProfile;
-    }
-
-
-    public boolean isStorePath() {
-        return isStorePath;
-    }
-
-
-    public boolean isCachePath() {
-        return isCachePath;
-    }
-
-    public void setExtension(boolean b) {
-        isExtension = b;
-    }
-
-    public boolean isExtension() {
-        return isExtension;
     }
 
 
@@ -1563,14 +1501,6 @@ public final class Query extends Exp {
     }
 
 
-    public BgpGenerator getBgpGenerator() {
-        return bgpGenerator;
-    }
-
-    public void setBgpGenerator(BgpGenerator bgpGenerator) {
-        this.bgpGenerator = bgpGenerator;
-    }
-
 
     public boolean isReportEnabled() {
         return getGlobalQuery().reportEnabled;
@@ -1580,10 +1510,6 @@ public final class Query extends Exp {
         getGlobalQuery().reportEnabled = reportEnabled;
     }
 
-
-    public boolean isTransformationTemplate() {
-        return isTransformationTemplate;
-    }
 
 
 
@@ -1600,26 +1526,6 @@ public final class Query extends Exp {
     public boolean isInsert() {
         return isInsert;
     }
-
-    public boolean isLock() {
-        return lock;
-    }
-
-
-    public void setLock(boolean lock) {
-        this.lock = lock;
-    }
-
-
-    public boolean isParallel() {
-        return parallel;
-    }
-
-
-    public void setParallel(boolean parallel) {
-        this.parallel = parallel;
-    }
-
 
     public boolean isFederate() {
         return federate;
@@ -1641,13 +1547,5 @@ public final class Query extends Exp {
     }
 
 
-    public boolean isAlgebra() {
-        return algebra;
-    }
-
-
-    public void setAlgebra(boolean algebra) {
-        this.algebra = algebra;
-    }
 
 }

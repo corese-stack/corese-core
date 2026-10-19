@@ -17,7 +17,6 @@ import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import fr.inria.corese.core.next.query.impl.engine.spi.Evaluator;
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
-import fr.inria.corese.core.next.query.impl.engine.eval.SparqlException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 
@@ -135,12 +134,8 @@ final class NativeEvaluationContext {
         if (environment == null || environment.getEval() == null || whereCompiler == null) {
             throw new QueryEvaluationException("EXISTS requires an active query evaluation context");
         }
-        try {
-            return environment.getEval().exists(
-                    producer, environment.getGraphNode(), environment, whereCompiler.compile(pattern));
-        } catch (SparqlException exception) {
-            throw new QueryEvaluationException("Failed to evaluate EXISTS graph pattern", exception);
-        }
+        return environment.getEval().exists(
+                producer, environment.getGraphNode(), environment, whereCompiler.compile(pattern));
     }
 
     DatatypeValue blankNode(TermAst label) {

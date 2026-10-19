@@ -5,15 +5,14 @@ import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.term.Value;
-import fr.inria.corese.core.next.query.api.exception.UnsupportedQueryFeatureException;
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.model.NodeImpl;
-import fr.inria.corese.core.next.query.impl.engine.model.Regex;
 import fr.inria.corese.core.next.query.impl.engine.path.NativePropertyPathEvaluator;
 import fr.inria.corese.core.next.query.impl.engine.path.PropertyPathEdge;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.planning.QueryStatistics;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import fr.inria.corese.core.next.storage.api.StorageManager;
@@ -41,7 +40,7 @@ import java.util.stream.Stream;
  * then adapting returned RDF statements back into KGRAM edges. It does not decide the final RDF-term
  * matching policy; that remains the matcher responsibility.</p>
  */
-public final class StorageManagerProducer extends ProducerDefault {
+public class StorageManagerProducer extends ProducerDefault implements QueryStatistics {
 
     private final StorageManager storage;
     private final Set<EdgeCursor> cursors = Collections.newSetFromMap(new IdentityHashMap<>());
@@ -54,6 +53,38 @@ public final class StorageManagerProducer extends ProducerDefault {
      */
     public StorageManagerProducer(StorageManager storage) {
         this.storage = Objects.requireNonNull(storage, "storage");
+    }
+
+    /**
+     * Counts a pattern directly in the session-visible indexes. No cursor or
+     * transaction is created. Complexity depends on the selected index prefix and
+     * number of contexts; a merged default graph count is an upper bound because
+     * identical triples in different graphs are counted separately.
+     *
+     * @param query query supplying dataset restrictions
+     * @param graphNode enclosing graph, or {@code null} for the default graph
+     * @param edge triple pattern to estimate
+     * @return matching statement count, or unknown for paths and variable graphs
+     */
+    @Override
+    public long estimateCardinality(Query query, Node graphNode, Edge edge) {
+        if (edge instanceof PropertyPathEdge || graphNode != null && graphNode.isVariable()) {
+            return UNKNOWN_CARDINALITY;
+        }
+        checkInterrupted();
+        List<Node> contexts = query.getFrom(graphNode);
+        if (query.isDatasetSpecified() && contexts.isEmpty()) {
+            return 0;
+        }
+        var pattern = StoragePatternTranslator.translate(graphNode, contexts, edge, null);
+        if (pattern.noMatch()) {
+            return 0;
+        }
+        try {
+            return storage.queries().count(pattern.statementPattern());
+        } catch (UnsupportedOperationException unavailable) {
+            return UNKNOWN_CARDINALITY;
+        }
     }
 
     @Override
@@ -128,7 +159,7 @@ public final class StorageManagerProducer extends ProducerDefault {
                 this.seen = deduplicate && !distinct ? new HashSet<>() : null;
                 statements = Spliterators.iterator(source);
             } catch (RuntimeException | Error failure) {
-                stream.close();
+                closeAfterFailure(stream::close, failure);
                 throw failure;
             }
         }
@@ -158,7 +189,7 @@ public final class StorageManagerProducer extends ProducerDefault {
                 close();
                 return false;
             } catch (RuntimeException | Error failure) {
-                close();
+                closeAfterFailure(this::close, failure);
                 throw failure;
             }
         }
@@ -175,7 +206,7 @@ public final class StorageManagerProducer extends ProducerDefault {
             try {
                 return new StorageManagerEdge(statement);
             } catch (RuntimeException | Error failure) {
-                close();
+                closeAfterFailure(this::close, failure);
                 throw failure;
             }
         }
@@ -198,6 +229,16 @@ public final class StorageManagerProducer extends ProducerDefault {
                     }
                 }
             }
+        }
+    }
+
+    /** Preserves the original traversal failure when a close callback also fails. */
+    @SuppressWarnings("java:S1181") // Fatal failures retain their identity after resource cleanup.
+    private static void closeAfterFailure(Runnable release, Throwable failure) {
+        try {
+            release.run();
+        } catch (RuntimeException | Error cleanup) {
+            if (cleanup != failure) failure.addSuppressed(cleanup);
         }
     }
 
@@ -264,20 +305,6 @@ public final class StorageManagerProducer extends ProducerDefault {
             }
         }
         return nodes;
-    }
-
-    @Override
-    public Iterable<Edge> getEdges(
-            Node graphNode,
-            List<Node> from,
-            Edge queryEdge,
-            Environment environment,
-            Regex regex,
-            Node source,
-            Node start,
-            int index) {
-        throw new UnsupportedQueryFeatureException(
-                "Property path edge enumeration is not supported yet by StorageManagerProducer");
     }
 
     @Override

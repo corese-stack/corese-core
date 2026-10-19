@@ -9,13 +9,9 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
  */
 public class GreaterOrEqualThanAst extends AbstractChainableOperatorAst implements BooleanExpressionAst {
     public GreaterOrEqualThanAst(List<TermAst> args) {
-        super(args);
+        super(args, GreaterOrEqualThanAst::new);
     }
 
-    @Override
-    protected TermAst create(List<TermAst> args) {
-        return new GreaterOrEqualThanAst(args);
-    }
 
     @Override
     public String getName() {

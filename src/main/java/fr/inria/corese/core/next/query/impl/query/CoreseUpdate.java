@@ -4,7 +4,7 @@ import fr.inria.corese.core.next.query.api.Update;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.UpdateRequestAst;
 import fr.inria.corese.core.next.query.impl.sparql.parser.SparqlParser;
-import fr.inria.corese.core.next.query.impl.sparql.update.NextSparqlUpdateExecutor;
+import fr.inria.corese.core.next.query.impl.sparql.update.SparqlUpdateExecutor;
 import fr.inria.corese.core.next.query.impl.sparql.update.UpdateTransaction;
 import fr.inria.corese.core.next.storage.api.StorageManager;
 
@@ -62,7 +62,7 @@ public final class CoreseUpdate implements Update {
     public void execute() throws QueryEvaluationException {
         executionGuard.run();
         UpdateRequestAst request = (UpdateRequestAst) parser.parse(updateString);
-        NextSparqlUpdateExecutor executor = new NextSparqlUpdateExecutor(storage, request.prologue());
+        SparqlUpdateExecutor executor = new SparqlUpdateExecutor(storage, request.prologue());
         transaction.accept(() -> executor.execute(request));
     }
 }

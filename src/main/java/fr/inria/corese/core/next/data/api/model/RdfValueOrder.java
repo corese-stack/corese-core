@@ -1,11 +1,13 @@
 package fr.inria.corese.core.next.data.api.model;
 
+import fr.inria.corese.core.next.data.Values;
 import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
 import fr.inria.corese.core.next.data.api.literal.RDFDatatype;
 import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 import fr.inria.corese.core.next.data.api.term.BNode;
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Literal;
+import fr.inria.corese.core.next.data.api.term.SimpleLiteral;
 import fr.inria.corese.core.next.data.api.term.Triple;
 
 import java.math.BigDecimal;
@@ -109,15 +111,23 @@ public final class RdfValueOrder implements Comparator<DatatypeValue> {
 
     private static int compareCompatibleValues(Literal left, Literal right) {
         if (isNumeric(left) && isNumeric(right)) {
+            Literal numericLeft = numericValue(left);
+            Literal numericRight = numericValue(right);
             if (isFloatingPoint(left) || isFloatingPoint(right)) {
-                return compareFloatingPoint(left.doubleValue(), right.doubleValue());
+                return compareFloatingPoint(numericLeft.doubleValue(), numericRight.doubleValue());
             }
-            return decimalValue(left).compareTo(decimalValue(right));
+            return decimalValue(numericLeft).compareTo(decimalValue(numericRight));
         }
         if (isBoolean(left) && isBoolean(right)) {
             return Boolean.compare(left.booleanValue(), right.booleanValue());
         }
         return left.getLabel().compareTo(right.getLabel());
+    }
+
+    /** Generic typed literals retain their RDF spelling but have no numeric accessors. */
+    private static Literal numericValue(Literal literal) {
+        return literal instanceof SimpleLiteral
+                ? Values.factory().createLiteral(literal.getLabel(), literal.getDatatype()) : literal;
     }
 
     private static int compareFloatingPoint(double left, double right) {

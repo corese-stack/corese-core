@@ -43,7 +43,6 @@ public interface ExprType {
     int DATATYPE = 30;
     int SELF = 32;
     int DEBUG = 33;
-    int EXTERN = 35;
     int KGRAM = 36;
     int SQL = 37;
     int XPATH = 38;

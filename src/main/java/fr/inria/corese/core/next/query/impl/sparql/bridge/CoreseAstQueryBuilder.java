@@ -239,6 +239,7 @@ public final class CoreseAstQueryBuilder {
                 !datasetClause.graphs().isEmpty() || !datasetClause.namedGraphs().isEmpty());
     }
 
+    @SuppressWarnings("java:S9391") // Preserve ordered accumulation without allocating a stream pipeline.
     private List<Node> toNodeList(Iterable<IriAst> iris, WhereCompiler compiler) {
         List<Node> nodes = new ArrayList<>();
         for (IriAst iri : iris) {

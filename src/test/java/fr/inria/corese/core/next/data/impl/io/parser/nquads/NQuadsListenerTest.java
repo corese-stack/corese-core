@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.data.impl.io.parser.nquads;
 import fr.inria.corese.core.next.data.api.term.*;
 import fr.inria.corese.core.next.data.api.model.*;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
-import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.impl.io.parser.support.NTriplesQuadsTermDecoder;
 import fr.inria.corese.core.next.data.api.exception.ParsingException;
 import fr.inria.corese.core.next.generated.antlr.NQuadsParser;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -34,11 +34,9 @@ class NQuadsListenerTest {
     @Mock
     private ValueFactory mockValueFactory;
 
-    @Mock
-    private IOOptions mockIOOptions;
+    private NTriplesQuadsTermDecoder termDecoder;
 
     private NQuadsListener listener;
-
 
     @Mock
     private IRI mockIRI;
@@ -55,7 +53,8 @@ class NQuadsListenerTest {
 
     @BeforeEach
     void setUp() {
-        listener = new NQuadsListener(mockModel, mockValueFactory, mockIOOptions);
+        termDecoder = new NTriplesQuadsTermDecoder(mockValueFactory);
+        listener = new NQuadsListener(mockModel, mockValueFactory);
 
         lenient().when(mockValueFactory.createIRI(anyString())).thenAnswer(invocation -> {
             String uri = invocation.getArgument(0);
@@ -106,7 +105,6 @@ class NQuadsListenerTest {
         NQuadsParser.ObjectContext objectCtx = mockRuleContext(NQuadsParser.ObjectContext.class);
         NQuadsParser.GraphLabelContext graphLabelCtx = mockRuleContext(NQuadsParser.GraphLabelContext.class);
 
-
         TerminalNode subjectIriRef = mockTerminalNode("<http://example.org/subject>");
         when(subjectCtx.IRIREF()).thenReturn(subjectIriRef);
 
@@ -118,7 +116,6 @@ class NQuadsListenerTest {
 
         TerminalNode graphIriRef = mockTerminalNode("<http://example.org/graph>");
         when(graphLabelCtx.IRIREF()).thenReturn(graphIriRef);
-
 
         when(statementCtx.subject()).thenReturn(subjectCtx);
         when(statementCtx.predicate()).thenReturn(predicateCtx);
@@ -133,7 +130,6 @@ class NQuadsListenerTest {
         when(mockValueFactory.createIRI("http://example.org/predicate")).thenReturn(actualPredicateIRI);
         when(mockValueFactory.createIRI("http://example.org/object")).thenReturn(actualObjectIRI);
         when(mockValueFactory.createIRI("http://example.org/graph")).thenReturn(actualGraphIRI);
-
 
         listener.enterStatement(statementCtx);
         listener.exitStatement(statementCtx);
@@ -170,7 +166,6 @@ class NQuadsListenerTest {
         when(mockValueFactory.createIRI("http://example.org/subject")).thenReturn(actualSubjectIRI);
         when(mockValueFactory.createIRI("http://example.org/predicate")).thenReturn(actualPredicateIRI);
         when(mockValueFactory.createIRI("http://example.org/object")).thenReturn(actualObjectIRI);
-
 
         listener.enterStatement(statementCtx);
         listener.exitStatement(statementCtx);
@@ -277,7 +272,6 @@ class NQuadsListenerTest {
         verify(mockValueFactory).createLiteral("hello", "en");
     }
 
-
     @Test
     @DisplayName("extractGraph should return IRI for IRIREF context")
     void testExtractGraphIRI() {
@@ -302,64 +296,47 @@ class NQuadsListenerTest {
         verify(mockValueFactory).createBNode("graph1");
     }
 
-
-
-
     @Test
-    @DisplayName("unescapeLiteral should throw IllegalArgumentException for invalid \\UXXXXXXXX")
-    @SuppressWarnings("deprecation")
-    void testUnescapeLiteralInvalidUx() throws NoSuchMethodException {
+    @DisplayName("unescapeLiteral should throw ParsingException for invalid \\UXXXXXXXX")
+    void testUnescapeLiteralInvalidUx() {
         String input = "\"Invalid\\U0000XXX\"";
-        java.lang.reflect.Method method = NQuadsListener.class.getDeclaredMethod("unescapeLiteral", String.class);
-        method.setAccessible(true);
         assertThrows(ParsingException.class,
-                () -> listener.unescapeLiteral(input),
+                () -> termDecoder.unescapeLiteral(input),
                 "Should throw for malformed \\UXXXXXXXX escape sequence");
     }
 
-
     @Test
     @DisplayName("unescapeUri should handle basic escape sequences")
-    void testUnescapeUriBasicEscapes() throws NoSuchMethodException, java.lang.reflect.InvocationTargetException, IllegalAccessException {
+    void testUnescapeUriBasicEscapes() {
 
         String input = "http://example.org/path\\>with\\<escaped\\_chars\\\\";
         String expected = "http://example.org/path>with\\<escaped\\_chars\\";
 
-        java.lang.reflect.Method method = NQuadsListener.class.getDeclaredMethod("unescapeUri", String.class);
-        method.setAccessible(true);
-        String result = (String) method.invoke(listener, input);
+        String result = termDecoder.unescapeUri(input);
 
         assertEquals(expected, result);
     }
-
 
     @Test
     @DisplayName("unescapeUri should handle \\uXXXX Unicode escapes")
-    void testUnescapeUriUnicodeU() throws NoSuchMethodException, java.lang.reflect.InvocationTargetException, IllegalAccessException {
+    void testUnescapeUriUnicodeU() {
         String input = "http://example.org/path\\u0020with";
         String expected = "http://example.org/path with";
 
-        java.lang.reflect.Method method = NQuadsListener.class.getDeclaredMethod("unescapeUri", String.class);
-        method.setAccessible(true);
-        String result = (String) method.invoke(listener, input);
+        String result = termDecoder.unescapeUri(input);
 
         assertEquals(expected, result);
     }
 
-
     @Test
     @DisplayName("unescapeUri should throw ParsingException for invalid \\uXXXX")
-    @SuppressWarnings("deprecation")
-    void testUnescapeUriInvalidU() throws NoSuchMethodException {
+    void testUnescapeUriInvalidU() {
         String input = "http://example.org/invalid\\uXXX";
-        java.lang.reflect.Method method = NQuadsListener.class.getDeclaredMethod("unescapeUri", String.class);
-        method.setAccessible(true);
 
         assertThrows(ParsingException.class,
-                () -> listener.unescapeLiteral(input),
-                "Should throw unescapeUri should throw IllegalArgumentException for invalid \\uXXXX");
+                () -> termDecoder.unescapeUri(input),
+                "Malformed Unicode escapes in IRIs must fail");
 
     }
-
 
 }

@@ -53,7 +53,6 @@ class AstBackedExprTest {
         assertTrue(varExpr.isVariable());
         assertFalse(varExpr.isConstant());
         assertTrue(varExpr.getExpList().isEmpty());
-        assertNull(varExpr.getArg());
     }
 
     @Test
@@ -62,11 +61,10 @@ class AstBackedExprTest {
         BoundAst boundAst = new BoundAst(List.of(new VarAst("y")));
         AstBackedExpr boundExpr = new AstBackedExpr(boundAst, compiler);
 
-        assertTrue(boundExpr.isBound());
         assertNotNull(boundExpr.getFilter());
         assertTrue(boundExpr.getFilter().isBound());
         assertEquals(List.of("y"), boundExpr.getFilter().getVariables());
-        assertEquals(boundAst, ((NextFilterFromAst) boundExpr.getFilter()).getFilterExpression());
+        assertEquals(boundAst, ((AstBackedFilter) boundExpr.getFilter()).getFilterExpression());
     }
 
     @Test
@@ -74,7 +72,7 @@ class AstBackedExprTest {
         WhereCompiler compiler = new WhereCompiler();
         AstBackedExpr expr = new AstBackedExpr(new VarAst("z"), compiler);
 
-        assertThrows(UnsupportedOperationException.class, () -> expr.setExp(0, expr));
-        assertThrows(UnsupportedOperationException.class, () -> expr.setArg(expr));
+        assertThrows(UnsupportedOperationException.class, () -> expr.getExpList().add(expr));
+        assertTrue(expr.getExpList().isEmpty());
     }
 }

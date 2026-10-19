@@ -2,8 +2,8 @@ package fr.inria.corese.core.next.query.impl.sparql.ast;
 
 import java.util.List;
 
-import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.AstVisitor;
-import fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.VisitableAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.visitor.AstVisitor;
+import fr.inria.corese.core.next.query.impl.sparql.ast.visitor.VisitableAst;
 
 /**
  * SPARQL {@code HAVING} clause: boolean constraints evaluated after grouping.
