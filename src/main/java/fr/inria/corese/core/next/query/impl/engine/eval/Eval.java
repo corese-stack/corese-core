@@ -728,7 +728,7 @@ public final class Eval implements ExpType {
                 backtrack = backjump;
                 backjump = -1;
             }
-        } else if ((query.isDistinct()) && (!isSubEval && optim)) {
+        } else if (query.isDistinct() && !query.isDistinctRedundantWithGroupBy() && !isSubEval && optim) {
             int index = memory.getIndex(query.getSelect());
             if (index != -1) {
                 backtrack = index;

@@ -6,6 +6,7 @@ import fr.inria.corese.core.next.query.impl.engine.path.PropertyPathEdge;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,12 +17,17 @@ import java.util.List;
  */
 final class CardinalityPatternOrdering {
 
+    // Heuristics until conditional distinct-term statistics are available.
+    private static final int SUBJECT_REDUCTION_SCALE = 3;
+    private static final int OBJECT_REDUCTION_SCALE = 1;
+    private static final int PREDICATE_REDUCTION_SCALE = 1;
+
     private CardinalityPatternOrdering() {
     }
 
     /**
-     * Chooses the smallest known pattern first, then favors connected joins.
-     * Unknown or equal counts fall back to binding connectivity and source order.
+     * Favors connected joins, then estimates fan-out using currently bound variables.
+     * Unknown or equal costs fall back to binding hints and stable source order.
      * Each pattern is counted once, never from a sorting comparator.
      *
      * @param query query supplying the active dataset
@@ -100,10 +106,17 @@ final class CardinalityPatternOrdering {
 
     private static void orderRun(Exp expression, int start, int end, long[] counts,
             List<Node> bound, List<String> variables, List<Exp> bindings) {
-        for (int i = start; i < end; i++) {
+        int first = start;
+        int seed = SelectiveFilterPushdown.seed(expression, start, end);
+        if (seed >= 0) {
+            moveFirst(expression, counts, start, first, seed);
+            recordBindings(expression.get(first), bound);
+            first++;
+        }
+        for (int i = first; i < end; i++) {
             int best = i;
             for (int j = i + 1; j < end; j++) {
-                if (before(expression.get(j), expression.get(best), counts[j - start], counts[best - start],
+                if (isLowerCost(expression.get(j), expression.get(best), counts[j - start], counts[best - start],
                         bound, variables, bindings)) {
                     best = j;
                 }
@@ -123,17 +136,61 @@ final class CardinalityPatternOrdering {
         }
     }
 
-    private static boolean before(Exp candidate, Exp current, long candidateCount, long currentCount,
+    private static boolean isLowerCost(Exp candidate, Exp current, long candidateCount, long currentCount,
             List<Node> bound, List<String> variables, List<Exp> bindings) {
         boolean candidateConnected = connected(candidate.getEdge(), bound, variables);
         boolean currentConnected = connected(current.getEdge(), bound, variables);
+        // Lexicographic cross-product penalty: retain costs within each component,
+        // including the initial step when no pattern is connected yet.
         if (candidateConnected != currentConnected) {
             return candidateConnected;
         }
-        if (candidateCount >= 0 && currentCount >= 0 && candidateCount != currentCount) {
-            return candidateCount < currentCount;
+        if (candidateCount >= 0 && currentCount >= 0) {
+            int comparison = effectiveCost(candidate, candidateCount, bound, variables)
+                    .compareTo(effectiveCost(current, currentCount, bound, variables));
+            if (comparison != 0) {
+                return comparison < 0;
+            }
         }
+        // Strict comparison plus moveFirst's stable shift preserves source order
+        // when both cost and binding score tie. Unavailable counts retain fallback.
         return candidate.nBind(bound, variables, bindings) > current.nBind(bound, variables, bindings);
+    }
+
+    /**
+     * Estimates matches per incoming binding; called only for nonnegative counts.
+     * Constants already constrain baseCount, so only newly bound variables reduce it.
+     * Decimal scaling preserves long precision without overflow or rounding.
+     */
+    private static BigDecimal effectiveCost(Exp exp, long baseCount,
+            List<Node> bound, List<String> variables) {
+        if (baseCount == 0) {
+            return BigDecimal.ZERO;
+        }
+        Edge edge = exp.getEdge();
+        if (fullyBound(edge, bound, variables)) {
+            // A probe estimate, not a dataset-wide uniqueness guarantee.
+            return BigDecimal.ONE;
+        }
+        int scale = reductionScale(edge.getNode(0), bound, variables, SUBJECT_REDUCTION_SCALE)
+                + reductionScale(edge.getNode(1), bound, variables, OBJECT_REDUCTION_SCALE)
+                + reductionScale(edge.getEdgeVariable(), bound, variables, PREDICATE_REDUCTION_SCALE);
+        return BigDecimal.valueOf(baseCount).movePointLeft(scale).max(BigDecimal.ONE);
+    }
+
+    private static int reductionScale(Node node, List<Node> bound, List<String> variables, int scale) {
+        return bound(node, bound, variables) ? scale : 0;
+    }
+
+    private static boolean fullyBound(Edge edge, List<Node> bound, List<String> variables) {
+        boolean predicateBound = edge.getEdgeVariable() == null
+                || bound(edge.getEdgeVariable(), bound, variables);
+        return predicateBound && termBound(edge.getNode(0), bound, variables)
+                && termBound(edge.getNode(1), bound, variables);
+    }
+
+    private static boolean termBound(Node node, List<Node> bound, List<String> variables) {
+        return node != null && (node.isConstant() || bound(node, bound, variables));
     }
 
     private static boolean connected(Edge edge, List<Node> bound, List<String> variables) {
