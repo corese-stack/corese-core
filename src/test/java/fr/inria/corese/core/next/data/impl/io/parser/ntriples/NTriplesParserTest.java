@@ -192,9 +192,9 @@ class NTriplesParserTest {
     @Test
     @DisplayName("Test parsing a triple with Unicode escape in IRI (\\uXXXX)")
     void testParseUnicodeEscapeIRIUxxxx() throws ParsingException {
-        String ntriple = "<http://example.org/s\\u0020ubject> <http://example.org/predicate> <http://example.org/object> .";
+        String ntriple = "<http://example.org/s\\u00E9ubject> <http://example.org/predicate> <http://example.org/object> .";
         IRI expectedSubjectIRI = mock(IRI.class);
-        lenient().when(mockValueFactory.createIRI(eq("http://example.org/s ubject"))).thenReturn(expectedSubjectIRI);
+        lenient().when(mockValueFactory.createIRI(eq("http://example.org/séubject"))).thenReturn(expectedSubjectIRI);
 
         parser.parse(new StringReader(ntriple));
         verify(mockModel).add(expectedSubjectIRI, mockPredicateIRI, mockObjectIRI);
