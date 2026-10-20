@@ -313,6 +313,87 @@ class CardinalityQueryPlannerTest {
                 predicates(query));
     }
 
+
+    @Test
+    void subjectBindingBeatsSmallerObjectBoundPattern() {
+        assertPlan("?x :object ?s . ?s :subject ?y . ?s :seed ?o",
+                Map.of("object", 500L, "subject", 5000L, "seed", 1L),
+                List.of("seed", "subject", "object"));
+    }
+
+    @Test
+    void fullyBoundTripleIsAProbe() {
+        assertPlan("?s :scan ?x . ?s :probe ?o . ?s :seed ?o",
+                Map.of("scan", 5000L, "probe", 1000000L, "seed", 1L),
+                List.of("seed", "probe", "scan"));
+    }
+
+    @Test
+    void costsAreRecomputedAfterEachSelectedEdge() {
+        assertPlan("?y :type :Professor . ?s :wide ?z . ?s :link ?y . ?s :seed ?o",
+                Map.of("type", 100000L, "wide", 100000L, "link", 5000L, "seed", 1L),
+                List.of("seed", "link", "type", "wide"));
+    }
+
+    @Test
+    void constantsDoNotReceiveASecondReduction() {
+        assertPlan("?s :name \"literal\" . ?a :rare ?b",
+                Map.of("name", 20L, "rare", 10L), List.of("rare", "name"));
+    }
+
+    @Test
+    void equalEffectiveCostsPreserveSourceOrder() {
+        assertPlan("?x :object ?s . ?s :subject ?y . ?s :seed ?o",
+                Map.of("object", 500L, "subject", 50000L, "seed", 1L),
+                List.of("seed", "object", "subject"));
+    }
+
+    @Test
+    void scaledCostsRetainAdjacentLongPrecision() {
+        assertPlan("?s :large ?x . ?s :small ?y . ?s :seed ?o",
+                Map.of("large", Long.MAX_VALUE, "small", Long.MAX_VALUE - 1, "seed", 1L),
+                List.of("seed", "small", "large"));
+    }
+
+    @Test
+    void variablePredicateDoesNotBecomeSingleTripleProbe() {
+        Query query = query("?s ?p ?o . ?s :scan ?x . ?s :seed ?o");
+        query.complete(new StatisticsProducer(Map.of("urn:bench:scan", 5000L, "urn:bench:seed", 1L)) {
+            @Override
+            public long estimateCardinality(Query scope, Node graph, Edge edge) {
+                return edge.getEdgeVariable() == null ? super.estimateCardinality(scope, graph, edge) : 1000000;
+            }
+        });
+        List<Edge> plan = edges(query.getBody());
+        assertEquals("urn:bench:seed", plan.get(0).getEdgeLabel());
+        assertEquals("urn:bench:scan", plan.get(1).getEdgeLabel());
+        assertEquals("p", plan.get(2).getEdgeVariable().getLabel());
+    }
+
+    @Test
+    void enclosingScopeVariablesReduceLookupCost() {
+        Query query = query("?x :object ?s . ?s :subject ?y");
+        CardinalityPatternOrdering.sort(query, null, query.getBody(), List.of("s"), List.of(),
+                new StatisticsProducer(Map.of("urn:bench:object", 500L, "urn:bench:subject", 5000L)));
+        assertEquals(List.of("urn:bench:subject", "urn:bench:object"), predicates(query));
+    }
+
+    @Test
+    void zeroCardinalityRemainsCheaperThanFullyBoundProbe() {
+        Query query = query("?s :probe ?o . ?s :empty ?o");
+        CardinalityPatternOrdering.sort(query, null, query.getBody(), List.of("s", "o"), List.of(),
+                new StatisticsProducer(Map.of("urn:bench:probe", 1L, "urn:bench:empty", 0L)));
+        assertEquals(List.of("urn:bench:empty", "urn:bench:probe"), predicates(query));
+    }
+
+    private static void assertPlan(String body, Map<String, Long> counts, List<String> expected) {
+        Map<String, Long> qualified = new java.util.HashMap<>();
+        counts.forEach((key, value) -> qualified.put("urn:bench:" + key, value));
+        Query query = query(body);
+        query.complete(new StatisticsProducer(qualified));
+        assertEquals(expected.stream().map(name -> "urn:bench:" + name).toList(), predicates(query));
+    }
+
     private static Query query(String body) {
         return new CoreseAstQueryBuilder().toNextQuery((SelectQueryAst) new SparqlParser()
                 .parse(PREFIX + "SELECT * { " + body + " }"));
