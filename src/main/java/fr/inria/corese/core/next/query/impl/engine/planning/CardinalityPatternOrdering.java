@@ -100,7 +100,14 @@ final class CardinalityPatternOrdering {
 
     private static void orderRun(Exp expression, int start, int end, long[] counts,
             List<Node> bound, List<String> variables, List<Exp> bindings) {
-        for (int i = start; i < end; i++) {
+        int first = start;
+        int seed = SelectiveFilterPushdown.seed(expression, start, end);
+        if (seed >= 0) {
+            moveFirst(expression, counts, start, first, seed);
+            recordBindings(expression.get(first), bound);
+            first++;
+        }
+        for (int i = first; i < end; i++) {
             int best = i;
             for (int j = i + 1; j < end; j++) {
                 if (before(expression.get(j), expression.get(best), counts[j - start], counts[best - start],

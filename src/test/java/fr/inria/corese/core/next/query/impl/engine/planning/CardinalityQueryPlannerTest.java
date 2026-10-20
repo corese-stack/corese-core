@@ -304,6 +304,15 @@ class CardinalityQueryPlannerTest {
         verify(operations, never()).find(any());
     }
 
+    @Test
+    void selectiveFilterPushdownSeedsComparisonEdgeFirst() {
+        String sparql = "?x :type :Teaching_Unit . ?e :type :Evaluation . ?e :evaluatesTeachingUnit ?x . ?e :hasMark ?y . FILTER (?y < 3)";
+        Query query = query(sparql);
+        query.complete(new StorageManagerProducer(storage));
+        assertEquals(List.of("urn:bench:hasMark", "urn:bench:type", "urn:bench:evaluatesTeachingUnit", "urn:bench:type"),
+                predicates(query));
+    }
+
     private static Query query(String body) {
         return new CoreseAstQueryBuilder().toNextQuery((SelectQueryAst) new SparqlParser()
                 .parse(PREFIX + "SELECT * { " + body + " }"));
