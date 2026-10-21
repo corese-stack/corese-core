@@ -655,6 +655,11 @@ public final class Mappings extends PointerObject
             }
         }
 
+        if (fr.inria.corese.core.next.query.impl.sparql.bridge.DirectGroupAggregation.tryAggregate(q, this)) {
+            finish(q);
+            return;
+        }
+
         // select (count(?n) as ?count)
         aggregateExpList(q, evaluator, memory, p, q.getSelectFun(), true);
 
