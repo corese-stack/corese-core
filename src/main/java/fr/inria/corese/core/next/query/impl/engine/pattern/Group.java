@@ -1,66 +1,65 @@
 package fr.inria.corese.core.next.query.impl.engine.pattern;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.TreeMap;
+import java.util.Map;
 
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 
 /**
- * select distinct ?x ?y select (count(distinct *) as ?c)
- * <p>
- * group by ?x ?y min(?l, groupBy(?x, ?y))
- * <p>
- * Compare Mapping using a TreeMap
+ * Groups mappings and tracks distinct solutions using immutable tuple keys.
+ * Groups are visited in insertion order.
  *
  * @author Olivier Corby, Edelweiss, INRIA 2011
  */
 public class Group implements Comparator<Mappings> {
 
     private static final boolean COMPARE_INDEX = false;
-    TreeMapping table;
+    private static final Mappings DISTINCT_MARKER = new Mappings();
 
-    boolean isDistinct = false;
-    // min(?l, groupBy(?x, ?y))
-    boolean isExtend = false;
+    private final Map<GroupKey, Mappings> table = new LinkedHashMap<>();
+    private boolean isDistinct;
+    private boolean isExtend;
     private List<Node> nodes;
-    private boolean isFake = false;
+    private boolean isFake;
 
+    /** Preserves the no-argument constructor used by Merge. */
     public Group() {
-
+        this(List.of());
     }
 
     public Group(List<Node> list) {
         this.nodes = list;
-        table = new TreeMapping(list);
     }
 
     public static boolean isCompareIndex() {
         return COMPARE_INDEX;
     }
 
-    public static Group create(List<Node> lNode) {
-        return new Group(lNode);
+    public static Group create(List<Node> nodeList) {
+        return new Group(nodeList);
     }
 
-    @SuppressWarnings("java:S9391") // Preserve ordered accumulation without allocating a stream pipeline.
+    @SuppressWarnings("java:S9391") // Avoid allocating a stream pipeline.
     public static Group createFromExp(List<Exp> list) {
-        List<Node> nodes = new ArrayList<>();
+        List<Node> nodeList = new ArrayList<>(list.size());
         for (Exp exp : list) {
-            nodes.add(exp.getNode());
+            nodeList.add(exp.getNode());
         }
-        return new Group(nodes);
+        return new Group(nodeList);
     }
 
     public boolean isFake() {
         return isFake;
     }
 
-    public void setFake(boolean afake) {
-        this.isFake = afake;
+    public void setFake(boolean fake) {
+        this.isFake = fake;
     }
 
     public List<Node> getNodeList() {
@@ -71,148 +70,135 @@ public class Group implements Comparator<Mappings> {
         this.nodes = nodes;
     }
 
-    public void setDistinct(boolean b) {
-        isDistinct = b;
+    public void setDistinct(boolean distinct) {
+        isDistinct = distinct;
     }
 
-    public void setExtend(boolean b) {
-        isExtend = b;
+    public void setExtend(boolean extend) {
+        isExtend = extend;
     }
 
-    public void setDuplicate(boolean b) {
-        // Duplicates are managed by the mappings collection, not this grouping
-        // comparator.
+    @SuppressWarnings("java:S1172") // Retained for API compatibility.
+    public void setDuplicate(boolean duplicate) {
+        // Duplicates are managed by the mappings collection.
     }
 
-    @SuppressWarnings("java:S1172")
+    @SuppressWarnings("java:S1172") // Retained as an extension point.
     public boolean accept(Node node) {
         return true;
     }
 
     @Override
-    public int compare(Mappings lm1, Mappings lm2) {
-        Mapping m1 = lm1.get(0);
-        Mapping m2 = lm2.get(0);
-        return lm1.compare(m1, m2);
+    public int compare(Mappings left, Mappings right) {
+        return left.compare(left.get(0), right.get(0));
     }
 
-    /**
-     * add map in a group by
-     */
+    /** Adds a mapping to its group in expected constant time per tuple lookup. */
     public boolean add(Mapping map) {
-        if (isExtend) {
-            // min(?l, groupBy(?x, ?y))
-            // store value of ?x ?y in an array to speed up
-            map.setGroup(getNodeList());
-        }
-
-        Mappings lm = table.get(map);
-        if (lm == null) {
-            lm = new Mappings();
-            lm.setFake(isFake());
-            table.put(map, lm);
-        }
-        lm.add(map);
-
+        GroupKey key = groupKey(map);
+        Mappings mappings = table.computeIfAbsent(key, ignored -> createNewMappings(isFake()));
+        mappings.add(map);
         return true;
     }
 
-    // select distinct *
-    // select (avg(distinct ?x) as ?a
-    public boolean isDistinct(Mapping map) {
-        map.computeDistinct(getNodeList());
-
-        if (table.containsKey(map)) {
-            return false;
+    private GroupKey groupKey(Mapping map) {
+        if (isExtend) {
+            map.setGroup(getNodeList());
+            return new GroupKey(map.getGroupNodes());
         }
-        table.put(map, null);
-        return true;
+        if (isDistinct) {
+            return distinctKey(map);
+        }
+        Node[] values = new Node[nodes.size()];
+        for (int i = 0; i < values.length; i++) {
+            values[i] = map.getGroupBy(nodes.get(i), i);
+        }
+        return new GroupKey(values);
+    }
+
+    private static Mappings createNewMappings(boolean fake) {
+        Mappings mappings = new Mappings();
+        mappings.setFake(fake);
+        return mappings;
+    }
+
+    /** Returns true only for the first occurrence of the distinct tuple. */
+    public boolean isDistinct(Mapping map) {
+        GroupKey key = distinctKey(map);
+        return table.putIfAbsent(key, DISTINCT_MARKER) == null;
+    }
+
+    private GroupKey distinctKey(Mapping map) {
+        map.computeDistinct(getNodeList());
+        return new GroupKey(map.getDistinctNodes());
     }
 
     public Iterable<Mappings> getValues() {
         return table.values();
     }
 
-    class TreeMapping extends TreeMap<Mapping, Mappings> {
-        @java.io.Serial
-        private static final long serialVersionUID = 1L;
+    /**
+     * Owns a defensive copy of the tuple array, never exposed to callers.
+     * As with other hash keys, nodes must retain their term values and indices
+     * while stored in the table.
+     */
+    private static final class GroupKey {
 
+        private final Node[] values;
+        private final int hash;
 
-        TreeMapping(List<Node> ln) {
-            super(new Compare(ln));
-        }
-    }
-
-    class Compare implements Comparator<Mapping> {
-
-        List<Node> list;
-        int size;
-
-        Compare(List<Node> ln) {
-            list = ln;
-            size = list.size();
+        private GroupKey(Node[] values) {
+            this.values = values.clone();
+            int[] componentHashes = new int[this.values.length];
+            for (int i = 0; i < componentHashes.length; i++) {
+                componentHashes[i] = nodeHash(this.values[i]);
+            }
+            hash = Arrays.hashCode(componentHashes);
         }
 
         @Override
-        public int compare(Mapping m1, Mapping m2) {
-            if (isExtend) {
-                return compareExtend(m1, m2);
+        public boolean equals(Object other) {
+            if (this == other) {
+                return true;
             }
-
-            if (isDistinct) {
-                return compareDistinct(m1, m2);
+            if (!(other instanceof GroupKey key) || values.length != key.values.length) {
+                return false;
             }
-
-            return compareGroup(m1, m2);
-        }
-
-        int compareExtend(Mapping m1, Mapping m2) {
-            Node[] g1 = m1.getGroupNodes();
-            Node[] g2 = m2.getGroupNodes();
-
-            for (int i = 0; i < size; i++) {
-                int res = compare(g1[i], g2[i]);
-                if (res != 0) {
-                    return res;
+            for (int i = 0; i < values.length; i++) {
+                if (!sameNode(values[i], key.values[i])) {
+                    return false;
                 }
             }
-            return 0;
+            return true;
         }
 
-        int compareDistinct(Mapping m1, Mapping m2) {
-            for (int i = 0; i < size; i++) {
-                int res = compare(m1.getDistinctNode(i), m2.getDistinctNode(i));
-                if (res != 0) {
-                    return res;
-                }
+        private static boolean sameNode(Node left, Node right) {
+            if (left == right) {
+                return true;
             }
-            return 0;
-        }
-
-        int compareGroup(Mapping m1, Mapping m2) {
-            for (int i = 0; i < size; i++) {
-                Node qNode = list.get(i);
-                int res = compare(m1.getGroupBy(qNode, i), m2.getGroupBy(qNode, i));
-                if (res != 0) {
-                    return res;
-                }
+            if (left == null || right == null) {
+                return false;
             }
-            return 0;
+            if (isCompareIndex() && left.getIndex() != -1 && right.getIndex() != -1) {
+                return left.getIndex() == right.getIndex();
+            }
+            // Preserve the original grouping comparator, including datatype ordering.
+            return left.compare(right) == 0;
         }
 
-        int compare(Node n1, Node n2) {
-            if (n1 == n2) {
+        private static int nodeHash(Node node) {
+            if (node == null) {
                 return 0;
-            } else if (n1 == null) {
-                return -1;
-            } else if (n2 == null) {
-                return +1;
-            } else if (isCompareIndex() && n1.getIndex() != -1 && n2.getIndex() != -1) {
-                return Integer.compare(n1.getIndex(), n2.getIndex());
-            } else {
-                return n1.compare(n2);
             }
+            if (isCompareIndex() && node.getIndex() != -1) {
+                return Integer.hashCode(node.getIndex());
+            }
+            return node.hashCode();
+        }
+
+        @Override
+        public int hashCode() {
+            return hash;
         }
     }
-
 }

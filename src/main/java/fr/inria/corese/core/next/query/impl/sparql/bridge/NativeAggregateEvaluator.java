@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
+import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.term.Literal;
 import fr.inria.corese.core.next.query.api.exception.QueryTypeErrorException;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
@@ -124,7 +125,7 @@ final class NativeAggregateEvaluator {
         if (!accumulator.hasValues()) {
             return context.values().createLiteral(BigInteger.ZERO);
         }
-        return accumulator.toSumLiteral(context);
+        return accumulator.toSumLiteral(context.values());
     }
 
     private static DatatypeValue evaluateAvg(
@@ -153,7 +154,7 @@ final class NativeAggregateEvaluator {
             throw new QueryTypeErrorException("AVG is undefined when all values are unbound");
         }
 
-        return accumulator.toAvgLiteral(context);
+        return accumulator.toAvgLiteral(context.values());
     }
 
     private static DatatypeValue evaluateMinMax(
@@ -276,7 +277,7 @@ final class NativeAggregateEvaluator {
     }
 
     /** Helper class accumulating numeric values across solution mappings. */
-    private static final class NumericAccumulator {
+    static final class NumericAccumulator {
         private BigInteger intSum = BigInteger.ZERO;
         private BigDecimal decSum = BigDecimal.ZERO;
         private double doubleSum = 0.0;
@@ -323,22 +324,22 @@ final class NativeAggregateEvaluator {
             return count > 0;
         }
 
-        DatatypeValue toSumLiteral(NativeEvaluationContext context) {
+        DatatypeValue toSumLiteral(ValueFactory values) {
             return switch (currentKind) {
-                case DOUBLE -> context.values().createLiteral(doubleSum);
-                case FLOAT -> context.values().createLiteral((float) doubleSum);
-                case DECIMAL -> context.values().createLiteral(decSum);
-                case INTEGER -> context.values().createLiteral(intSum);
+                case DOUBLE -> values.createLiteral(doubleSum);
+                case FLOAT -> values.createLiteral((float) doubleSum);
+                case DECIMAL -> values.createLiteral(decSum);
+                case INTEGER -> values.createLiteral(intSum);
             };
         }
 
-        DatatypeValue toAvgLiteral(NativeEvaluationContext context) {
+        DatatypeValue toAvgLiteral(ValueFactory values) {
             return switch (currentKind) {
-                case DOUBLE -> context.values().createLiteral(doubleSum / count);
-                case FLOAT -> context.values().createLiteral((float) (doubleSum / count));
-                case DECIMAL -> context.values().createLiteral(
+                case DOUBLE -> values.createLiteral(doubleSum / count);
+                case FLOAT -> values.createLiteral((float) (doubleSum / count));
+                case DECIMAL -> values.createLiteral(
                         decSum.divide(BigDecimal.valueOf(count), MathContext.DECIMAL128));
-                case INTEGER -> context.values().createLiteral(
+                case INTEGER -> values.createLiteral(
                         new BigDecimal(intSum).divide(BigDecimal.valueOf(count), MathContext.DECIMAL128));
             };
         }
