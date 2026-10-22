@@ -31,4 +31,12 @@ public class CoreseDateTime extends CoreseDate {
 		return code;
 	}
 
+	@Override
+	public IDatatype cast(String target) {
+		if (RDF.xsddateTime.equals(target)) {
+			return this;
+		}
+		return super.cast(target);
+	}
+
 }

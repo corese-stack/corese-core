@@ -1,12 +1,7 @@
 package fr.inria.corese.core.sparql.datatype;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
-import org.slf4j.Marker;
-import org.slf4j.MarkerFactory;
 
 /**
  * <p>
@@ -33,26 +28,26 @@ import org.slf4j.MarkerFactory;
  */
 public abstract class CoreseStringableImpl extends CoreseDatatype {
 
-    /**
-     * logger from log4j
-     */
-    private static final Logger logger = LoggerFactory.getLogger(CoreseStringableImpl.class);
-    private final Marker fatal = MarkerFactory.getMarker("FATAL");
-
     static IDatatype.Datatype code = IDatatype.Datatype.STRINGABLE;
     public static int count = 0;
     String value = "";
 
-    public CoreseStringableImpl() {
+    private transient volatile IDatatype cachedDateTime;
+    private transient volatile IDatatype cachedDate;
+    private static final CoreseUndefLiteral CAST_FAILURE = new CoreseUndefLiteral("CAST_FAILURE");
+
+    protected CoreseStringableImpl() {
     }
 
-    public CoreseStringableImpl(String str) {
+    protected CoreseStringableImpl(String str) {
         setValue(str);
     }
 
     @Override
     public void setValue(String str) {
         this.value = str;
+        this.cachedDateTime = null;
+        this.cachedDate = null;
     }
 
     @Override
@@ -67,20 +62,48 @@ public abstract class CoreseStringableImpl extends CoreseDatatype {
      */
     @Override
     public IDatatype cast(String target) {
+        if (RDF.xsddateTime.equals(target)) {
+            return castDateTime();
+        }
+        if (RDF.xsddate.equals(target)) {
+            return castDate();
+        }
         if (target.equals(RDF.xsdboolean)) {
-            try {
-                Float f =  Float.parseFloat(getLabel());
-                if (f == 0) {
-                    return CoreseBoolean.FALSE;
-                } else if (f == 1) {
-                    return CoreseBoolean.TRUE;
-                } else {
-                    return null;
-                }
-            } catch (NumberFormatException e) {
-                return super.cast(target);
+            return castBoolean(target);
+        }
+        return super.cast(target);
+    }
+
+    private IDatatype castDateTime() {
+        IDatatype cached = cachedDateTime;
+        if (cached != null) {
+            return (cached == CAST_FAILURE) ? null : cached;
+        }
+        IDatatype res = super.cast(RDF.xsddateTime);
+        cachedDateTime = (res != null) ? res : CAST_FAILURE;
+        return res;
+    }
+
+    private IDatatype castDate() {
+        IDatatype cached = cachedDate;
+        if (cached != null) {
+            return (cached == CAST_FAILURE) ? null : cached;
+        }
+        IDatatype res = super.cast(RDF.xsddate);
+        cachedDate = (res != null) ? res : CAST_FAILURE;
+        return res;
+    }
+
+    private IDatatype castBoolean(String target) {
+        try {
+            float f = Float.parseFloat(getLabel());
+            if (f == 0) {
+                return CoreseBoolean.FALSE;
+            } else if (f == 1) {
+                return CoreseBoolean.TRUE;
             }
-        } else {
+            return null;
+        } catch (NumberFormatException e) {
             return super.cast(target);
         }
     }
@@ -107,7 +130,7 @@ public abstract class CoreseStringableImpl extends CoreseDatatype {
 
     @Override
     public boolean booleanValue() {
-        return getLabel().length() > 0;
+        return !getLabel().isEmpty();
     }
 
     @Override
