@@ -129,20 +129,68 @@ public class CoreseDatatype
             lang = lang.toLowerCase();
         }
         switch (valueJType) {
-            case Cst.jTypeString:
+            case Cst.jTypeString -> {
                 return new CoreseString(label);
-            case Cst.jTypeURI:
+            }
+            case Cst.jTypeURI -> {
                 return new CoreseURI(label);
-            case Cst.jTypeLiteral:
+            }
+            case Cst.jTypeLiteral -> {
                 return new CoreseLiteral(label, lang);
-            case Cst.jTypeJSON:
+            }
+            case Cst.jTypeJSON -> {
                 return DatatypeMap.json(label);
+            }
+            default -> {
+                // Non-primitive datatypes fall through to constructBuiltin
+            }
         }
 
         String display = (datatype == null) ? valueJType : datatype;
-
         CoreseDatatype o = null;
-        Class valueClass = null;
+
+        try {
+            o = constructBuiltin(valueJType, label);
+        } catch (CoreseDatatypeException | RuntimeException e) {
+            if (cast) {
+                throw failure;
+            } else {
+                throw new CoreseDatatypeException(e, display, label);
+            }
+        }
+
+        if (o == null) {
+            o = constructReflective(valueJType, label, display, cast);
+        }
+
+        o.setLang(lang);
+        o.setDatatype(datatype);
+        return o.typeCheck();
+    }
+
+    private static CoreseDatatype constructBuiltin(String valueJType, String label) throws CoreseDatatypeException {
+        return switch (valueJType) {
+            case Cst.jTypeBoolean -> new CoreseBoolean(label);
+            case Cst.jTypeInteger -> new CoreseInteger(label);
+            case Cst.jTypeGenericInteger -> new CoreseGenericInteger(label);
+            case Cst.jTypeDecimal -> new CoreseDecimal(label);
+            case Cst.jTypeFloat -> new CoreseFloat(label);
+            case Cst.jTypeDouble -> new CoreseDouble(label);
+            case Cst.jTypeDate -> new CoreseDate(label);
+            case Cst.jTypeDateTime -> new CoreseDateTime(label);
+            case Cst.jTypeDay -> new CoreseDay(label);
+            case Cst.jTypeMonth -> new CoreseMonth(label);
+            case Cst.jTypeYear -> new CoreseYear(label);
+            case Cst.jTypeUndef -> new CoreseUndefLiteral(label);
+            case Cst.jTypeXMLString -> new CoreseXMLLiteral(label);
+            case Cst.jTypeGeneric -> new CoreseGeneric(label);
+            default -> null;
+        };
+    }
+
+    private static CoreseDatatype constructReflective(String valueJType, String label, String display, boolean cast)
+            throws CoreseDatatypeException {
+        Class<?> valueClass;
         try {
             valueClass = Class.forName(valueJType);
         } catch (ClassNotFoundException e) {
@@ -150,25 +198,18 @@ public class CoreseDatatype
         }
 
         try {
-            Class[] argClass = {label.getClass()};
+            Class<?>[] argClass = {label.getClass()};
             String[] arg = {label};
-            o = (CoreseDatatype) valueClass.getConstructor(argClass).newInstance((Object[]) arg);
+            return (CoreseDatatype) valueClass.getConstructor(argClass).newInstance((Object[]) arg);
         } catch (ClassCastException | IllegalAccessException | InstantiationException | NoSuchMethodException e) {
             throw new CoreseDatatypeException(e, valueJType, label);
         } catch (java.lang.reflect.InvocationTargetException e) {
-            // CoreseDatatypeException arrives here
             if (cast) {
-                // to speed up sparql cast we throw a static exception
-                // because it will be transformed to null
                 throw failure;
             } else {
                 throw new CoreseDatatypeException(e, display, label);
             }
         }
-
-        o.setLang(lang);
-        o.setDatatype(datatype);
-        return o.typeCheck();
     }
 
     static boolean isNumber(String name, String cname) {

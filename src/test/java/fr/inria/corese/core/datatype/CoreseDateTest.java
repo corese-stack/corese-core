@@ -11,6 +11,7 @@ import fr.inria.corese.core.sparql.datatype.CoreseDate;
 import fr.inria.corese.core.sparql.datatype.CoreseDateTime;
 import fr.inria.corese.core.sparql.datatype.CoreseDecimal;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.datatype.RDF;
 import fr.inria.corese.core.sparql.datatype.XSD;
 
 public class CoreseDateTest {
@@ -146,6 +147,24 @@ public class CoreseDateTest {
 
         date = (CoreseDateTime) DatatypeMap.newDateTime("2021-07-20T10:23:54.5+11:00");
         assertEquals(DatatypeMap.newLiteral("+PT11H"), date.getTimezone());
+    }
+
+    @Test
+    public void testCastIdentityAndConversions() {
+        IDatatype dateTime = DatatypeMap.newDateTime("2024-03-15T10:30:00Z");
+        IDatatype date = DatatypeMap.newDate("2024-03-15Z");
+
+        org.junit.jupiter.api.Assertions.assertSame(dateTime, dateTime.cast(RDF.xsddateTime));
+        org.junit.jupiter.api.Assertions.assertSame(date, date.cast(RDF.xsddate));
+
+        IDatatype dateFromDateTime = dateTime.cast(RDF.xsddate);
+        assertEquals(IDatatype.Datatype.DATE, dateFromDateTime.getCode());
+        assertEquals(RDF.xsddate, dateFromDateTime.getDatatypeURI());
+
+        IDatatype str = DatatypeMap.newLiteral("2024-03-15T10:30:00Z");
+        IDatatype cast1 = str.cast(RDF.xsddateTime);
+        IDatatype cast2 = str.cast(RDF.xsddateTime);
+        org.junit.jupiter.api.Assertions.assertSame(cast1, cast2);
     }
 
 }

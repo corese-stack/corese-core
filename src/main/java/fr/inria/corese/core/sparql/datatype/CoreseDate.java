@@ -14,6 +14,10 @@ import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
 public class CoreseDate extends CoreseDatatype {
 
     private final XMLGregorianCalendar cal;
+    private final long epochMillis;
+    private final boolean hasZone;
+    private final boolean hasFastEpoch;
+    private static final java.util.TimeZone UTC_ZONE = java.util.TimeZone.getTimeZone("UTC");
     private static final String TODAY = "today";
     private static final IDatatype.Datatype code = IDatatype.Datatype.DATE;
     private static final CoreseURI datatype = new CoreseURI(RDF.xsddate);
@@ -22,11 +26,19 @@ public class CoreseDate extends CoreseDatatype {
     public CoreseDate() {
         this.cal = DatatypeMap.newXMLGregorianCalendar();
         setLabel(cal.toString());
+        this.hasZone = (this.cal.getTimezone() != DatatypeConstants.FIELD_UNDEFINED);
+        long em = computeSafeEpoch(this.cal, this.hasZone);
+        this.epochMillis = em;
+        this.hasFastEpoch = (em != Long.MIN_VALUE);
     }
 
     public CoreseDate(XMLGregorianCalendar cal) {
         this.cal = cal;
         setLabel(cal.toString());
+        this.hasZone = (this.cal.getTimezone() != DatatypeConstants.FIELD_UNDEFINED);
+        long em = computeSafeEpoch(this.cal, this.hasZone);
+        this.epochMillis = em;
+        this.hasFastEpoch = (em != Long.MIN_VALUE);
     }
       
     public CoreseDate(String label) {
@@ -37,6 +49,25 @@ public class CoreseDate extends CoreseDatatype {
             this.cal = DatatypeMap.newXMLGregorianCalendar(label);
             setLabel(label);
         }
+        this.hasZone = (this.cal.getTimezone() != DatatypeConstants.FIELD_UNDEFINED);
+        long em = computeSafeEpoch(this.cal, this.hasZone);
+        this.epochMillis = em;
+        this.hasFastEpoch = (em != Long.MIN_VALUE);
+    }
+
+    private static long computeSafeEpoch(XMLGregorianCalendar calendar, boolean zone) {
+        try {
+            return computeEpoch(calendar, zone);
+        } catch (IllegalArgumentException | IllegalStateException | ArithmeticException e) {
+            return Long.MIN_VALUE;
+        }
+    }
+
+    private static long computeEpoch(XMLGregorianCalendar calendar, boolean zone) {
+        if (zone) {
+            return calendar.normalize().toGregorianCalendar().getTimeInMillis();
+        }
+        return calendar.toGregorianCalendar(UTC_ZONE, java.util.Locale.ROOT, null).getTimeInMillis();
     }
 
 
@@ -161,88 +192,76 @@ public class CoreseDate extends CoreseDatatype {
         }
     }
 
+    public int compareTo(CoreseDate dt) throws CoreseDatatypeException {
+        if (this.hasFastEpoch && dt.hasFastEpoch && this.hasZone == dt.hasZone) {
+            if (this.epochMillis < dt.epochMillis) {
+                return -1;
+            } else if (this.epochMillis > dt.epochMillis) {
+                return 1;
+            }
+        }
+        return this.compare(this.getCalendar(), dt.getCalendar());
+    }
+
+    @Override
+    public IDatatype cast(String target) {
+        if (RDF.xsddate.equals(target) && getCode() == IDatatype.Datatype.DATE) {
+            return this;
+        }
+        return super.cast(target);
+    }
+
     @Override
     public int compare(IDatatype iod) throws CoreseDatatypeException {
-        switch (iod.getCode()) {
-            case DATE:
-            case DATETIME:
-                CoreseDate dt = (CoreseDate) iod;
-                XMLGregorianCalendar cal1 = this.getCalendar();
-                XMLGregorianCalendar cal2 = dt.getCalendar();
-                return this.compare(cal1, cal2);
+        if (iod.getCode() == IDatatype.Datatype.DATE || iod.getCode() == IDatatype.Datatype.DATETIME) {
+            return this.compareTo((CoreseDate) iod);
         }
         throw failure();
     }
 
     @Override
     public boolean less(IDatatype iod) throws CoreseDatatypeException {
-        switch (iod.getCode()) {
-            case DATE:
-            case DATETIME:
-                this.check(iod);
-                CoreseDate dt = (CoreseDate) iod;
-                XMLGregorianCalendar cal1 = this.getCalendar();
-                XMLGregorianCalendar cal2 = dt.getCalendar();
-                return this.compare(cal1, cal2) < 0;
+        if (iod.getCode() == IDatatype.Datatype.DATE || iod.getCode() == IDatatype.Datatype.DATETIME) {
+            this.check(iod);
+            return this.compareTo((CoreseDate) iod) < 0;
         }
         throw failure();
     }
 
     @Override
     public boolean lessOrEqual(IDatatype iod) throws CoreseDatatypeException {
-        switch (iod.getCode()) {
-            case DATE:
-            case DATETIME:
-                this.check(iod);
-                CoreseDate dt = (CoreseDate) iod;
-                XMLGregorianCalendar cal1 = this.getCalendar();
-                XMLGregorianCalendar cal2 = dt.getCalendar();
-                return this.compare(cal1, cal2) <= 0;
+        if (iod.getCode() == IDatatype.Datatype.DATE || iod.getCode() == IDatatype.Datatype.DATETIME) {
+            this.check(iod);
+            return this.compareTo((CoreseDate) iod) <= 0;
         }
         throw failure();
     }
 
     @Override
     public boolean greater(IDatatype iod) throws CoreseDatatypeException {
-        switch (iod.getCode()) {
-            case DATE:
-            case DATETIME:
-                this.check(iod);
-                CoreseDate dt = (CoreseDate) iod;
-                XMLGregorianCalendar cal1 = this.getCalendar();
-                XMLGregorianCalendar cal2 = dt.getCalendar();
-                return this.compare(cal1, cal2) > 0;
+        if (iod.getCode() == IDatatype.Datatype.DATE || iod.getCode() == IDatatype.Datatype.DATETIME) {
+            this.check(iod);
+            return this.compareTo((CoreseDate) iod) > 0;
         }
         throw failure();
     }
 
     @Override
     public boolean greaterOrEqual(IDatatype iod) throws CoreseDatatypeException {
-        switch (iod.getCode()) {
-            case DATE:
-            case DATETIME:
-                this.check(iod);
-                CoreseDate dt = (CoreseDate) iod;
-                XMLGregorianCalendar cal1 = this.getCalendar();
-                XMLGregorianCalendar cal2 = dt.getCalendar();
-                return this.compare(cal1, cal2) >= 0;
+        if (iod.getCode() == IDatatype.Datatype.DATE || iod.getCode() == IDatatype.Datatype.DATETIME) {
+            this.check(iod);
+            return this.compareTo((CoreseDate) iod) >= 0;
         }
         throw failure();
     }
 
     @Override
     public boolean equalsWE(IDatatype iod) throws CoreseDatatypeException {
-        switch (iod.getCode()) {
-            case DATE:
-            case DATETIME:
-                CoreseDate dt = (CoreseDate) iod;
-                XMLGregorianCalendar cal1 = this.getCalendar();
-                XMLGregorianCalendar cal2 = dt.getCalendar();
-                return this.compare(cal1, cal2) == 0;
-
-            case URI:
-            case BLANK: case TRIPLE:
-                return false;
+        if (iod.getCode() == IDatatype.Datatype.DATE || iod.getCode() == IDatatype.Datatype.DATETIME) {
+            return this.compareTo((CoreseDate) iod) == 0;
+        }
+        if (iod.isURI() || iod.isBlank() || iod.isTriple()) {
+            return false;
         }
         throw failure();
     }

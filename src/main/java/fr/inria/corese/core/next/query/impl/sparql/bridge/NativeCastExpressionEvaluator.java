@@ -150,7 +150,10 @@ final class NativeCastExpressionEvaluator {
     }
 
     private static DatatypeValue dateTime(Literal value, NativeEvaluationContext context) {
-        if (value.getCoreDatatype() != XSDDatatype.STRING && value.getCoreDatatype() != XSDDatatype.DATETIME) {
+        if (value.getCoreDatatype() == XSDDatatype.DATETIME) {
+            return value;
+        }
+        if (value.getCoreDatatype() != XSDDatatype.STRING) {
             throw new QueryTypeErrorException("Cannot cast this datatype to xsd:dateTime");
         }
         Literal result = context.values().createLiteral(whitespaceCollapsed(value.getLabel()), XSDDatatype.DATETIME.getIRI());

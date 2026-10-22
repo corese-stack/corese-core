@@ -19,6 +19,8 @@ public final class SimpleDate extends AbstractTemporalPointLiteral {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    private static final DatatypeFactory DATATYPE_FACTORY = DatatypeFactory.newDefaultInstance();
+
     private final String label;
     @SuppressWarnings("serial") // Calendar implementations have VM-specific serialization; RDF is the portable representation.
     private final XMLGregorianCalendar calendar;
@@ -36,7 +38,7 @@ public final class SimpleDate extends AbstractTemporalPointLiteral {
     public SimpleDate(String lexicalValue, IRI datatype) {
         super(datatype == null ? XSDDatatype.DATE.getIRI() : datatype);
         this.label = Objects.requireNonNull(lexicalValue, "lexicalValue");
-        this.calendar = DatatypeFactory.newDefaultInstance().newXMLGregorianCalendar(lexicalValue);
+        this.calendar = DATATYPE_FACTORY.newXMLGregorianCalendar(lexicalValue);
     }
 
     @Override
