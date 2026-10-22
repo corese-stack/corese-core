@@ -10,7 +10,6 @@ import fr.inria.corese.core.next.query.impl.engine.eval.RdfTermMatcher;
 import fr.inria.corese.core.next.query.impl.engine.eval.SparqlKgramEvaluator;
 import fr.inria.corese.core.next.query.impl.engine.event.ResultListener;
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
-import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import fr.inria.corese.core.next.query.impl.engine.storage.StorageManagerProducer;
@@ -21,7 +20,6 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
 import fr.inria.corese.core.next.storage.Storages;
 import fr.inria.corese.core.next.storage.api.StorageManager;
 import fr.inria.corese.core.next.storage.api.config.StorageConfig;
-import fr.inria.corese.core.next.storage.api.model.StatementPattern;
 import fr.inria.corese.core.next.storage.api.operations.QueryOperations;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +31,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
