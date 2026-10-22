@@ -16,6 +16,8 @@ import fr.inria.corese.core.next.query.impl.engine.planning.QueryStatistics;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import fr.inria.corese.core.next.storage.api.StorageManager;
+import fr.inria.corese.core.next.storage.api.model.PredicateStatistics;
+import fr.inria.corese.core.next.storage.api.model.StorageStatistics;
 import fr.inria.corese.core.next.storage.api.operations.StatementSpliterator;
 import fr.inria.corese.core.next.storage.api.model.StatementPattern;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
@@ -43,6 +45,8 @@ import java.util.stream.Stream;
 public class StorageManagerProducer extends ProducerDefault implements QueryStatistics {
 
     private final StorageManager storage;
+    private final java.util.Map<IRI, PredicateStatistics> predicateStatsCache = new java.util.concurrent.ConcurrentHashMap<>();
+    private StorageStatistics cachedStorageStats;
     private final Set<EdgeCursor> cursors = Collections.newSetFromMap(new IdentityHashMap<>());
     private boolean closed;
 
@@ -85,6 +89,36 @@ public class StorageManagerProducer extends ProducerDefault implements QueryStat
         } catch (UnsupportedOperationException unavailable) {
             return UNKNOWN_CARDINALITY;
         }
+    }
+
+    @Override
+    public PredicateStatistics getPredicateStatistics(Query query, Node graphNode, IRI predicate) {
+        if (predicate == null) {
+            return null;
+        }
+        checkInterrupted();
+        return predicateStatsCache.computeIfAbsent(predicate, p -> {
+            try {
+                var meta = storage.metadata();
+                return meta == null ? null : meta.getPredicateStatistics(p);
+            } catch (UnsupportedOperationException | IllegalArgumentException unavailable) {
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public StorageStatistics getStorageStatistics() {
+        checkInterrupted();
+        if (cachedStorageStats == null) {
+            try {
+                var meta = storage.metadata();
+                cachedStorageStats = meta == null ? null : meta.getStatistics();
+            } catch (UnsupportedOperationException | IllegalArgumentException unavailable) {
+                return null;
+            }
+        }
+        return cachedStorageStats;
     }
 
     @Override

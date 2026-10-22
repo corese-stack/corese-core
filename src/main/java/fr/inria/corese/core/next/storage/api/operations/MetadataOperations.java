@@ -4,6 +4,7 @@ import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.storage.api.exception.StorageException;
+import fr.inria.corese.core.next.storage.api.model.PredicateStatistics;
 import fr.inria.corese.core.next.storage.api.model.StorageStatistics;
 
 import java.util.Set;
@@ -53,4 +54,15 @@ public interface MetadataOperations {
      * @throws StorageException if statistics cannot be computed
      */
     StorageStatistics getStatistics() throws StorageException;
+
+    /**
+     * Returns statistics about a specific predicate, or {@code null} if unavailable.
+     *
+     * @param predicate the predicate IRI to inspect
+     * @return predicate statistics, or {@code null} if unavailable or not tracked
+     * @throws StorageException if statistics cannot be computed
+     */
+    default PredicateStatistics getPredicateStatistics(IRI predicate) throws StorageException {
+        return null;
+    }
 }

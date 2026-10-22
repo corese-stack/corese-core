@@ -25,6 +25,7 @@ import fr.inria.corese.core.next.storage.api.exception.ErrorCode;
 import fr.inria.corese.core.next.storage.api.exception.StorageException;
 import fr.inria.corese.core.next.storage.api.lifecycle.LifecycleState;
 import fr.inria.corese.core.next.storage.api.lifecycle.StorageLifecycle;
+import fr.inria.corese.core.next.storage.api.model.PredicateStatistics;
 import fr.inria.corese.core.next.storage.api.model.StatementPattern;
 import fr.inria.corese.core.next.storage.api.model.StorageStatistics;
 import fr.inria.corese.core.next.storage.api.operations.MetadataOperations;
@@ -1620,6 +1621,36 @@ final class IndexedStatementStore
             checkAccess();
             return new StorageStatistics(state().size, getSubjects().size(), getPredicates().size(),
                     getObjects().size(), getContexts().size());
+        }
+    }
+
+    @Override
+    public PredicateStatistics getPredicateStatistics(IRI predicate) {
+        if (predicate == null) {
+            return null;
+        }
+        synchronized (database) {
+            checkAccess();
+            long totalCount = 0;
+            long distinctSubjects = 0;
+            long distinctObjects = 0;
+            boolean found = false;
+
+            for (Partition p : state().graphs.values()) {
+                PredicateStatistics ps = p.pos.estimatePredicateStatistics(predicate, 512);
+                if (ps != null) {
+                    found = true;
+                    totalCount += ps.count();
+                    distinctSubjects += ps.distinctSubjects();
+                    distinctObjects += ps.distinctObjects();
+                }
+            }
+            if (!found) {
+                return null;
+            }
+            return new PredicateStatistics(predicate, totalCount,
+                    Math.min(totalCount, distinctSubjects),
+                    Math.min(totalCount, distinctObjects));
         }
     }
 

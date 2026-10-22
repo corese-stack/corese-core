@@ -18,6 +18,7 @@ import fr.inria.corese.core.next.query.impl.sparql.parser.SparqlParser;
 import fr.inria.corese.core.next.storage.api.StorageManager;
 import fr.inria.corese.core.next.storage.api.exception.ErrorCode;
 import fr.inria.corese.core.next.storage.api.exception.StorageException;
+import fr.inria.corese.core.next.storage.api.model.PredicateStatistics;
 import fr.inria.corese.core.next.storage.api.model.StatementPattern;
 import fr.inria.corese.core.next.storage.api.operations.QueryOperations;
 import fr.inria.corese.core.next.storage.impl.memory.MemoryStorageManager;
@@ -418,16 +419,132 @@ class CardinalityQueryPlannerTest {
         return result;
     }
 
+    @Test
+    void joinOrderingUsesPredicateStatisticsWhenAvailable() {
+        IRI seedIri = iri("seed");
+        IRI highDistinctIri = iri("highDistinct");
+        IRI lowDistinctIri = iri("lowDistinct");
+
+        Map<String, Long> counts = Map.of(
+                seedIri.stringValue(), 1L,
+                lowDistinctIri.stringValue(), 1000L,
+                highDistinctIri.stringValue(), 1000L);
+
+        Map<String, PredicateStatistics> pStats = Map.of(
+                lowDistinctIri.stringValue(), new PredicateStatistics(lowDistinctIri, 1000, 2, 100),
+                highDistinctIri.stringValue(), new PredicateStatistics(highDistinctIri, 1000, 500, 100));
+
+        Query query = query("?s :seed 1 . ?s :lowDistinct ?o1 . ?s :highDistinct ?o2");
+        query.complete(new StatisticsProducer(counts, pStats));
+
+        List<String> plan = predicates(query);
+        assertEquals(seedIri.stringValue(), plan.get(0));
+        assertEquals(highDistinctIri.stringValue(), plan.get(1));
+        assertEquals(lowDistinctIri.stringValue(), plan.get(2));
+    }
+
+    @Test
+    void joinOrderingUsesPredicateStatisticsWhenObjectIsBound() {
+        IRI seedIri = iri("seed");
+        IRI highDistinctIri = iri("highDistinctObj");
+        IRI lowDistinctIri = iri("lowDistinctObj");
+
+        Map<String, Long> counts = Map.of(
+                seedIri.stringValue(), 1L,
+                lowDistinctIri.stringValue(), 1000L,
+                highDistinctIri.stringValue(), 1000L);
+
+        Map<String, PredicateStatistics> pStats = Map.of(
+                lowDistinctIri.stringValue(), new PredicateStatistics(lowDistinctIri, 1000, 100, 2),
+                highDistinctIri.stringValue(), new PredicateStatistics(highDistinctIri, 1000, 100, 500));
+
+        Query query = query("?x :seed ?shared . ?s1 :lowDistinctObj ?shared . ?s2 :highDistinctObj ?shared");
+        query.complete(new StatisticsProducer(counts, pStats));
+
+        List<String> plan = predicates(query);
+        assertEquals(seedIri.stringValue(), plan.get(0));
+        assertEquals(highDistinctIri.stringValue(), plan.get(1));
+        assertEquals(lowDistinctIri.stringValue(), plan.get(2));
+    }
+
+    @Test
+    void memoryStorageManagerProvidesExactPredicateStatistics() {
+        IRI type = iri("type");
+        var stats = storage.metadata().getPredicateStatistics(type);
+        org.junit.jupiter.api.Assertions.assertNotNull(stats);
+        assertEquals(type, stats.predicate());
+        assertTrue(stats.count() > 0);
+        assertTrue(stats.distinctSubjects() > 0);
+        assertTrue(stats.distinctObjects() > 0);
+    }
+
+    @Test
+    void joinOrderingWithIndexStatisticsAvoidsIntermediateCartesianExplosion() {
+        var benchStorage = MemoryStorageManager.builder().build();
+        IRI seed = iri("seed");
+        IRI target = iri("target");
+        IRI lowSel = iri("lowSel");
+        IRI highSel = iri("highSel");
+
+        var stmts = new ArrayList<fr.inria.corese.core.next.data.api.model.Statement>();
+        stmts.add(Values.factory().createStatement(iri("s0"), seed, target));
+
+        // lowSel: 10,000 statements all pointing to the same target object (1 distinct object)
+        for (int i = 0; i < 10000; i++) {
+            stmts.add(Values.factory().createStatement(iri("s_low_" + i), lowSel, target));
+        }
+        // highSel: 10,000 statements each pointing to a distinct object (10,000 distinct objects)
+        stmts.add(Values.factory().createStatement(iri("s_high_0"), highSel, target));
+        for (int i = 1; i < 10000; i++) {
+            stmts.add(Values.factory().createStatement(iri("s_high_" + i), highSel, iri("other_" + i)));
+        }
+        benchStorage.mutations().addAll(stmts);
+
+        var statsLow = benchStorage.metadata().getPredicateStatistics(lowSel);
+        var statsHigh = benchStorage.metadata().getPredicateStatistics(highSel);
+
+        assertEquals(1, statsLow.distinctObjects());
+        assertEquals(10000, statsHigh.distinctObjects());
+
+        // High selectivity (high distinct objects = small match count per bound object) is placed first
+        Query plannedQuery = query("?x :seed ?t . ?s1 :lowSel ?t . ?s2 :highSel ?t");
+        plannedQuery.complete(new StorageManagerProducer(benchStorage));
+        List<String> optimalPlan = predicates(plannedQuery);
+        assertEquals(List.of(seed.stringValue(), highSel.stringValue(), lowSel.stringValue()), optimalPlan);
+
+        // Verify query produces the exact expected count
+        String sparql = "PREFIX : <urn:bench:> SELECT * WHERE { ?x :seed ?t . ?s1 :lowSel ?t . ?s2 :highSel ?t }";
+        int countCbo = 0;
+        try (var res = new SparqlQueryExecutor(benchStorage).evaluateTuple(sparql)) {
+            while (res.hasNext()) {
+                res.next();
+                countCbo++;
+            }
+        }
+        assertEquals(10000, countCbo);
+    }
+
     private static class StatisticsProducer extends ProducerDefault implements QueryStatistics {
         private final Map<String, Long> counts;
+        private final Map<String, PredicateStatistics> predicateStats;
 
         private StatisticsProducer(Map<String, Long> counts) {
+            this(counts, Map.of());
+        }
+
+        private StatisticsProducer(Map<String, Long> counts, Map<String, PredicateStatistics> predicateStats) {
             this.counts = counts;
+            this.predicateStats = predicateStats;
         }
 
         @Override
         public long estimateCardinality(Query query, Node graph, Edge edge) {
             return counts.getOrDefault(edge.getEdgeLabel(), UNKNOWN_CARDINALITY);
+        }
+
+        @Override
+        public PredicateStatistics getPredicateStatistics(Query query, Node graphNode, IRI predicate) {
+            return predicateStats.get(predicate.stringValue());
         }
     }
 }
