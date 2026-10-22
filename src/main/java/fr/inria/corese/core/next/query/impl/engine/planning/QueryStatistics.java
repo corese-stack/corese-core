@@ -1,8 +1,11 @@
 package fr.inria.corese.core.next.query.impl.engine.planning;
 
+import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.storage.api.model.PredicateStatistics;
+import fr.inria.corese.core.next.storage.api.model.StorageStatistics;
 
 /**
  * Supplies optional planning statistics without opening statement cursors.
@@ -48,5 +51,26 @@ public interface QueryStatistics {
      */
     default int getCount(QueryPlanNode node, int type) {
         return -1;
+    }
+
+    /**
+     * Returns statistics for a specific predicate, or {@code null} if unavailable.
+     *
+     * @param query query supplying the active dataset
+     * @param graphNode enclosing GRAPH node, or {@code null} for the default graph
+     * @param predicate the predicate IRI to inspect
+     * @return predicate statistics or {@code null} if unavailable
+     */
+    default PredicateStatistics getPredicateStatistics(Query query, Node graphNode, IRI predicate) {
+        return null;
+    }
+
+    /**
+     * Returns global storage statistics, or {@code null} if unavailable.
+     *
+     * @return storage statistics or {@code null} if unavailable
+     */
+    default StorageStatistics getStorageStatistics() {
+        return null;
     }
 }

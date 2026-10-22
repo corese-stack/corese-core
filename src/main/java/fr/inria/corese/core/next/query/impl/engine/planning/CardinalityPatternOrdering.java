@@ -1,12 +1,17 @@
 package fr.inria.corese.core.next.query.impl.engine.planning;
 
+import fr.inria.corese.core.next.data.Values;
+import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.path.PropertyPathEdge;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.storage.api.model.PredicateStatistics;
+import fr.inria.corese.core.next.storage.api.model.StorageStatistics;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +46,7 @@ final class CardinalityPatternOrdering {
             List<Exp> bindings, QueryStatistics statistics) {
         flattenTripleGroups(expression);
         List<Node> bound = new ArrayList<>();
+        PlanningContext context = new PlanningContext(query, graph, statistics, bound, variables, bindings);
         int start = 0;
         while (start < expression.size()) {
             if (!isTriple(expression.get(start))) {
@@ -53,12 +59,21 @@ final class CardinalityPatternOrdering {
             }
             if (end - start > 1) {
                 long[] counts = cardinalities(query, graph, expression, start, end, statistics);
-                orderRun(expression, start, end, counts, bound, variables, bindings);
+                orderRun(expression, start, end, counts, context);
             } else {
                 recordBindings(expression.get(start), bound);
             }
             start = end;
         }
+    }
+
+    private record PlanningContext(
+            Query query,
+            Node graph,
+            QueryStatistics statistics,
+            List<Node> bound,
+            List<String> variables,
+            List<Exp> bindings) {
     }
 
     // The parser may emit one BGP per dotted triple. Adjacent pure triple groups
@@ -105,24 +120,24 @@ final class CardinalityPatternOrdering {
     }
 
     private static void orderRun(Exp expression, int start, int end, long[] counts,
-            List<Node> bound, List<String> variables, List<Exp> bindings) {
+            PlanningContext context) {
         int first = start;
         int seed = SelectiveFilterPushdown.seed(expression, start, end);
         if (seed >= 0) {
             moveFirst(expression, counts, start, first, seed);
-            recordBindings(expression.get(first), bound);
+            recordBindings(expression.get(first), context.bound());
             first++;
         }
         for (int i = first; i < end; i++) {
             int best = i;
             for (int j = i + 1; j < end; j++) {
                 if (isLowerCost(expression.get(j), expression.get(best), counts[j - start], counts[best - start],
-                        bound, variables, bindings)) {
+                        context)) {
                     best = j;
                 }
             }
             moveFirst(expression, counts, start, i, best);
-            recordBindings(expression.get(i), bound);
+            recordBindings(expression.get(i), context.bound());
         }
     }
 
@@ -137,45 +152,142 @@ final class CardinalityPatternOrdering {
     }
 
     private static boolean isLowerCost(Exp candidate, Exp current, long candidateCount, long currentCount,
-            List<Node> bound, List<String> variables, List<Exp> bindings) {
-        boolean candidateConnected = connected(candidate.getEdge(), bound, variables);
-        boolean currentConnected = connected(current.getEdge(), bound, variables);
+            PlanningContext context) {
+        boolean candidateConnected = connected(candidate.getEdge(), context.bound(), context.variables());
+        boolean currentConnected = connected(current.getEdge(), context.bound(), context.variables());
         // Lexicographic cross-product penalty: retain costs within each component,
         // including the initial step when no pattern is connected yet.
         if (candidateConnected != currentConnected) {
             return candidateConnected;
         }
         if (candidateCount >= 0 && currentCount >= 0) {
-            int comparison = effectiveCost(candidate, candidateCount, bound, variables)
-                    .compareTo(effectiveCost(current, currentCount, bound, variables));
+            int comparison = effectiveCost(candidate, candidateCount, context)
+                    .compareTo(effectiveCost(current, currentCount, context));
             if (comparison != 0) {
                 return comparison < 0;
             }
         }
         // Strict comparison plus moveFirst's stable shift preserves source order
         // when both cost and binding score tie. Unavailable counts retain fallback.
-        return candidate.nBind(bound, variables, bindings) > current.nBind(bound, variables, bindings);
+        return candidate.nBind(context.bound(), context.variables(), context.bindings()) > current.nBind(
+                context.bound(), context.variables(), context.bindings());
     }
 
     /**
      * Estimates matches per incoming binding; called only for nonnegative counts.
      * Constants already constrain baseCount, so only newly bound variables reduce it.
-     * Decimal scaling preserves long precision without overflow or rounding.
+     * When index statistics are available, uses exact or sampled distinct counts.
+     * Otherwise, falls back to static decimal scaling.
      */
-    private static BigDecimal effectiveCost(Exp exp, long baseCount,
-            List<Node> bound, List<String> variables) {
+    private static BigDecimal effectiveCost(Exp exp, long baseCount, PlanningContext context) {
         if (baseCount == 0) {
             return BigDecimal.ZERO;
         }
         Edge edge = exp.getEdge();
-        if (fullyBound(edge, bound, variables)) {
+        if (fullyBound(edge, context.bound(), context.variables())) {
             // A probe estimate, not a dataset-wide uniqueness guarantee.
             return BigDecimal.ONE;
         }
-        int scale = reductionScale(edge.getNode(0), bound, variables, SUBJECT_REDUCTION_SCALE)
-                + reductionScale(edge.getNode(1), bound, variables, OBJECT_REDUCTION_SCALE)
-                + reductionScale(edge.getEdgeVariable(), bound, variables, PREDICATE_REDUCTION_SCALE);
+
+        if (context.statistics() != null) {
+            BigDecimal statCost = computeCostFromStatistics(edge, baseCount, context);
+            if (statCost != null) {
+                return statCost;
+            }
+        }
+
+        int scale = reductionScale(edge.getNode(0), context.bound(), context.variables(), SUBJECT_REDUCTION_SCALE)
+                + reductionScale(edge.getNode(1), context.bound(), context.variables(), OBJECT_REDUCTION_SCALE)
+                + reductionScale(edge.getEdgeVariable(), context.bound(), context.variables(), PREDICATE_REDUCTION_SCALE);
         return BigDecimal.valueOf(baseCount).movePointLeft(scale).max(BigDecimal.ONE);
+    }
+
+    private static BigDecimal computeCostFromStatistics(Edge edge, long baseCount,
+            PlanningContext context) {
+        Node edgePred = edge.getEdgeVariable() == null ? edge.getEdgeNode() : null;
+        if (edgePred != null && edgePred.isConstant()) {
+            IRI predicateIri = toPredicateIri(edgePred);
+            if (predicateIri != null) {
+                PredicateStatistics stats = context.statistics().getPredicateStatistics(
+                        context.query(), context.graph(), predicateIri);
+                if (stats != null && stats.count() > 0) {
+                    return computeCostFromPredicateStats(edge, baseCount, context.bound(), context.variables(), stats);
+                }
+            }
+        } else if (edge.getEdgeVariable() != null) {
+            StorageStatistics stats = context.statistics().getStorageStatistics();
+            if (stats != null && stats.statementCount() > 0) {
+                return computeCostFromStorageStats(edge, baseCount, context.bound(), context.variables(), stats);
+            }
+        }
+        return null;
+    }
+
+    private static IRI toPredicateIri(Node node) {
+        if (node == null) {
+            return null;
+        }
+        if (node.getDatatypeValue() instanceof IRI iri) {
+            return iri;
+        }
+        String label = node.getLabel();
+        if (label != null && !label.isEmpty()) {
+            try {
+                return Values.factory().createIRI(label);
+            } catch (IllegalArgumentException e) {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    private static BigDecimal computeCostFromPredicateStats(Edge edge, long baseCount,
+            List<Node> bound, List<String> variables, PredicateStatistics stats) {
+        boolean subjBound = bound(edge.getNode(0), bound, variables);
+        boolean objBound = bound(edge.getNode(1), bound, variables);
+
+        if (subjBound && objBound) {
+            BigDecimal reduction = BigDecimal.valueOf(Math.max(1, stats.distinctSubjects()))
+                    .multiply(BigDecimal.valueOf(Math.max(1, stats.distinctObjects())));
+            return BigDecimal.valueOf(baseCount)
+                    .divide(reduction, 4, RoundingMode.HALF_UP)
+                    .max(BigDecimal.ONE);
+        } else if (subjBound) {
+            long distinctSubj = Math.max(1, stats.distinctSubjects());
+            return BigDecimal.valueOf(baseCount)
+                    .divide(BigDecimal.valueOf(distinctSubj), 4, RoundingMode.HALF_UP)
+                    .max(BigDecimal.ONE);
+        } else if (objBound) {
+            long distinctObj = Math.max(1, stats.distinctObjects());
+            return BigDecimal.valueOf(baseCount)
+                    .divide(BigDecimal.valueOf(distinctObj), 4, RoundingMode.HALF_UP)
+                    .max(BigDecimal.ONE);
+        }
+        return BigDecimal.valueOf(baseCount);
+    }
+
+    private static BigDecimal computeCostFromStorageStats(Edge edge, long baseCount,
+            List<Node> bound, List<String> variables, StorageStatistics stats) {
+        boolean subjBound = bound(edge.getNode(0), bound, variables);
+        boolean objBound = bound(edge.getNode(1), bound, variables);
+        boolean predBound = bound(edge.getEdgeVariable(), bound, variables);
+
+        BigDecimal divisor = BigDecimal.ONE;
+        if (subjBound && stats.subjectCount() > 0) {
+            divisor = divisor.multiply(BigDecimal.valueOf(Math.max(1, stats.subjectCount())));
+        }
+        if (objBound && stats.objectCount() > 0) {
+            divisor = divisor.multiply(BigDecimal.valueOf(Math.max(1, stats.objectCount())));
+        }
+        if (predBound && stats.predicateCount() > 0) {
+            divisor = divisor.multiply(BigDecimal.valueOf(Math.max(1, stats.predicateCount())));
+        }
+        if (divisor.compareTo(BigDecimal.ONE) > 0) {
+            return BigDecimal.valueOf(baseCount)
+                    .divide(divisor, 4, RoundingMode.HALF_UP)
+                    .max(BigDecimal.ONE);
+        }
+        return BigDecimal.valueOf(baseCount);
     }
 
     private static int reductionScale(Node node, List<Node> bound, List<String> variables, int scale) {

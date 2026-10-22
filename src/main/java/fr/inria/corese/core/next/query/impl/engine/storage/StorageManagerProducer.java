@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.engine.storage;
 
+import fr.inria.corese.core.next.data.Values;
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.data.api.term.IRI;
@@ -16,6 +17,9 @@ import fr.inria.corese.core.next.query.impl.engine.planning.QueryStatistics;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import fr.inria.corese.core.next.storage.api.StorageManager;
+import fr.inria.corese.core.next.storage.api.exception.StorageException;
+import fr.inria.corese.core.next.storage.api.model.PredicateStatistics;
+import fr.inria.corese.core.next.storage.api.model.StorageStatistics;
 import fr.inria.corese.core.next.storage.api.operations.StatementSpliterator;
 import fr.inria.corese.core.next.storage.api.model.StatementPattern;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
@@ -25,11 +29,13 @@ import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.Spliterators;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 /**
@@ -42,7 +48,12 @@ import java.util.stream.Stream;
  */
 public class StorageManagerProducer extends ProducerDefault implements QueryStatistics {
 
+    private static final PredicateStatistics MISSING_PREDICATE_STATS =
+            new PredicateStatistics(Values.factory().createIRI("urn:corese:internal:missing-stats"), 0, 0, 0);
+
     private final StorageManager storage;
+    private final Map<IRI, PredicateStatistics> predicateStatsCache = new ConcurrentHashMap<>();
+    private volatile StorageStatistics cachedStorageStats;
     private final Set<EdgeCursor> cursors = Collections.newSetFromMap(new IdentityHashMap<>());
     private boolean closed;
 
@@ -85,6 +96,41 @@ public class StorageManagerProducer extends ProducerDefault implements QueryStat
         } catch (UnsupportedOperationException unavailable) {
             return UNKNOWN_CARDINALITY;
         }
+    }
+
+    @Override
+    public PredicateStatistics getPredicateStatistics(Query query, Node graphNode, IRI predicate) {
+        if (predicate == null || closed) {
+            return null;
+        }
+        checkInterrupted();
+        PredicateStatistics stats = predicateStatsCache.computeIfAbsent(predicate, p -> {
+            try {
+                var meta = storage.metadata();
+                PredicateStatistics resolved = meta == null ? null : meta.getPredicateStatistics(p);
+                return resolved != null ? resolved : MISSING_PREDICATE_STATS;
+            } catch (StorageException | UnsupportedOperationException | IllegalArgumentException unavailable) {
+                return MISSING_PREDICATE_STATS;
+            }
+        });
+        return stats == MISSING_PREDICATE_STATS ? null : stats;
+    }
+
+    @Override
+    public StorageStatistics getStorageStatistics() {
+        if (closed) {
+            return null;
+        }
+        checkInterrupted();
+        if (cachedStorageStats == null) {
+            try {
+                var meta = storage.metadata();
+                cachedStorageStats = meta == null ? null : meta.getStatistics();
+            } catch (StorageException | UnsupportedOperationException | IllegalArgumentException unavailable) {
+                return null;
+            }
+        }
+        return cachedStorageStats;
     }
 
     @Override
