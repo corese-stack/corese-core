@@ -886,7 +886,8 @@ final class TripleIndex {
                 return subjects.size();
             }
             final double ratio = (double) distinctObjects / Math.max(1, sampled);
-            return Math.min(totalCount, Math.max(1, Math.round(subjects.size() * Math.min(ratio, 2.0))));
+            final long estimated = Math.round(subjects.size() * ratio);
+            return Math.min(totalCount, Math.max(subjects.size(), estimated));
         }
     }
 

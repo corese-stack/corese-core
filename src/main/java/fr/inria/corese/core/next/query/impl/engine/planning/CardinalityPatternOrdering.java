@@ -232,7 +232,11 @@ final class CardinalityPatternOrdering {
         }
         String label = node.getLabel();
         if (label != null && !label.isEmpty()) {
-            return Values.factory().createIRI(label);
+            try {
+                return Values.factory().createIRI(label);
+            } catch (IllegalArgumentException e) {
+                return null;
+            }
         }
         return null;
     }
@@ -243,9 +247,10 @@ final class CardinalityPatternOrdering {
         boolean objBound = bound(edge.getNode(1), bound, variables);
 
         if (subjBound && objBound) {
-            long reduction = Math.max(1, stats.distinctSubjects()) * Math.max(1, stats.distinctObjects());
+            BigDecimal reduction = BigDecimal.valueOf(Math.max(1, stats.distinctSubjects()))
+                    .multiply(BigDecimal.valueOf(Math.max(1, stats.distinctObjects())));
             return BigDecimal.valueOf(baseCount)
-                    .divide(BigDecimal.valueOf(reduction), 4, RoundingMode.HALF_UP)
+                    .divide(reduction, 4, RoundingMode.HALF_UP)
                     .max(BigDecimal.ONE);
         } else if (subjBound) {
             long distinctSubj = Math.max(1, stats.distinctSubjects());
@@ -267,19 +272,19 @@ final class CardinalityPatternOrdering {
         boolean objBound = bound(edge.getNode(1), bound, variables);
         boolean predBound = bound(edge.getEdgeVariable(), bound, variables);
 
-        long divisor = 1;
+        BigDecimal divisor = BigDecimal.ONE;
         if (subjBound && stats.subjectCount() > 0) {
-            divisor *= Math.max(1, stats.subjectCount());
+            divisor = divisor.multiply(BigDecimal.valueOf(Math.max(1, stats.subjectCount())));
         }
         if (objBound && stats.objectCount() > 0) {
-            divisor *= Math.max(1, stats.objectCount());
+            divisor = divisor.multiply(BigDecimal.valueOf(Math.max(1, stats.objectCount())));
         }
         if (predBound && stats.predicateCount() > 0) {
-            divisor *= Math.max(1, stats.predicateCount());
+            divisor = divisor.multiply(BigDecimal.valueOf(Math.max(1, stats.predicateCount())));
         }
-        if (divisor > 1) {
+        if (divisor.compareTo(BigDecimal.ONE) > 0) {
             return BigDecimal.valueOf(baseCount)
-                    .divide(BigDecimal.valueOf(divisor), 4, RoundingMode.HALF_UP)
+                    .divide(divisor, 4, RoundingMode.HALF_UP)
                     .max(BigDecimal.ONE);
         }
         return BigDecimal.valueOf(baseCount);
