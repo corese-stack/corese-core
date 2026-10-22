@@ -6,7 +6,6 @@ import fr.inria.corese.core.next.query.Repositories;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.QueryTimeoutException;
 import fr.inria.corese.core.next.query.api.repository.Repository;
-import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 import fr.inria.corese.core.next.storage.api.StorageManager;
 import fr.inria.corese.core.next.storage.api.exception.ErrorCode;
 import fr.inria.corese.core.next.storage.api.exception.StorageException;

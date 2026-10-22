@@ -6,7 +6,6 @@ import fr.inria.corese.core.next.data.api.model.Model;
 import fr.inria.corese.core.next.data.impl.io.serializer.rdfc10.RDFC10Canonicalizer;
 import fr.inria.corese.core.next.data.impl.io.serializer.rdfc10.RDFC10SerializerOptions;
 import fr.inria.corese.core.next.storage.Storages;
-import fr.inria.corese.core.next.storage.api.config.StorageConfig;
 import fr.inria.corese.core.next.storage.impl.model.StorageModel;
 import org.junit.jupiter.api.BeforeEach;
 
