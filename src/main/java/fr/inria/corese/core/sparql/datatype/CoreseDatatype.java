@@ -151,7 +151,7 @@ public class CoreseDatatype
 
         try {
             o = constructBuiltin(valueJType, label);
-        } catch (CoreseDatatypeException | IllegalArgumentException e) {
+        } catch (CoreseDatatypeException | RuntimeException e) {
             if (cast) {
                 throw failure;
             } else {

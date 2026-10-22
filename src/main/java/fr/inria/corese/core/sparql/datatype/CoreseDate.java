@@ -27,32 +27,18 @@ public class CoreseDate extends CoreseDatatype {
         this.cal = DatatypeMap.newXMLGregorianCalendar();
         setLabel(cal.toString());
         this.hasZone = (this.cal.getTimezone() != DatatypeConstants.FIELD_UNDEFINED);
-        long em = 0;
-        boolean fast = false;
-        try {
-            em = computeEpoch(this.cal, this.hasZone);
-            fast = true;
-        } catch (Exception e) {
-            fast = false;
-        }
+        long em = computeSafeEpoch(this.cal, this.hasZone);
         this.epochMillis = em;
-        this.hasFastEpoch = fast;
+        this.hasFastEpoch = (em != Long.MIN_VALUE);
     }
 
     public CoreseDate(XMLGregorianCalendar cal) {
         this.cal = cal;
         setLabel(cal.toString());
         this.hasZone = (this.cal.getTimezone() != DatatypeConstants.FIELD_UNDEFINED);
-        long em = 0;
-        boolean fast = false;
-        try {
-            em = computeEpoch(this.cal, this.hasZone);
-            fast = true;
-        } catch (Exception e) {
-            fast = false;
-        }
+        long em = computeSafeEpoch(this.cal, this.hasZone);
         this.epochMillis = em;
-        this.hasFastEpoch = fast;
+        this.hasFastEpoch = (em != Long.MIN_VALUE);
     }
       
     public CoreseDate(String label) {
@@ -64,16 +50,17 @@ public class CoreseDate extends CoreseDatatype {
             setLabel(label);
         }
         this.hasZone = (this.cal.getTimezone() != DatatypeConstants.FIELD_UNDEFINED);
-        long em = 0;
-        boolean fast = false;
-        try {
-            em = computeEpoch(this.cal, this.hasZone);
-            fast = true;
-        } catch (Exception e) {
-            fast = false;
-        }
+        long em = computeSafeEpoch(this.cal, this.hasZone);
         this.epochMillis = em;
-        this.hasFastEpoch = fast;
+        this.hasFastEpoch = (em != Long.MIN_VALUE);
+    }
+
+    private static long computeSafeEpoch(XMLGregorianCalendar calendar, boolean zone) {
+        try {
+            return computeEpoch(calendar, zone);
+        } catch (IllegalArgumentException | IllegalStateException | ArithmeticException e) {
+            return Long.MIN_VALUE;
+        }
     }
 
     private static long computeEpoch(XMLGregorianCalendar calendar, boolean zone) {
@@ -218,7 +205,7 @@ public class CoreseDate extends CoreseDatatype {
 
     @Override
     public IDatatype cast(String target) {
-        if (RDF.xsddate.equals(target)) {
+        if (RDF.xsddate.equals(target) && getCode() == IDatatype.Datatype.DATE) {
             return this;
         }
         return super.cast(target);
