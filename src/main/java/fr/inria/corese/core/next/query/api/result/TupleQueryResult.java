@@ -90,6 +90,11 @@ public interface TupleQueryResult extends Closeable, Iterable<BindingSet> {
     /**
      * Returns a sequential {@link Stream} over the query results.
      *
+     * <p>Closing the returned stream triggers {@link #close()} on this result.
+     * Note that terminal operations (such as {@code forEach}, {@code findFirst}, or {@code limit})
+     * do <strong>not</strong> automatically close the stream. Callers must manage the stream
+     * with {@code try-with-resources} to guarantee underlying snapshot partition release.</p>
+     *
      * @return a sequential stream over the binding sets in this result
      * @throws IllegalStateException if this result has been closed
      */

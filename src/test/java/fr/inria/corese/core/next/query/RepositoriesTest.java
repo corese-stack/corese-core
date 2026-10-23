@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query;
 
+import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 import fr.inria.corese.core.next.query.api.exception.RepositoryException;
 import fr.inria.corese.core.next.query.api.repository.Repository;
 import fr.inria.corese.core.next.query.api.repository.RepositoryConnection;
@@ -9,7 +10,12 @@ import fr.inria.corese.core.next.storage.api.lifecycle.LifecycleState;
 import fr.inria.corese.core.next.storage.api.lifecycle.StorageLifecycle;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -108,5 +114,35 @@ class RepositoriesTest {
         assertThrows(NullPointerException.class, () -> Repositories.create((StorageConfig) null));
         assertThrows(NullPointerException.class, () -> Repositories.create((StorageManager) null));
         assertThrows(NullPointerException.class, () -> Repositories.create(mock(StorageManager.class), null));
+    }
+
+    @Test
+    void withMemoryAndComputeWithMemoryExecuteAndCloseRepository() {
+        AtomicBoolean wasExecuted = new AtomicBoolean(false);
+        Repositories.withMemory(repo -> {
+            assertTrue(repo.isOpen());
+            repo.update("INSERT DATA { <urn:s> <urn:p> <urn:o> }");
+            assertTrue(repo.ask("ASK { <urn:s> <urn:p> <urn:o> }"));
+            wasExecuted.set(true);
+        });
+        assertTrue(wasExecuted.get());
+
+        boolean present = Repositories.computeWithMemory(repo -> {
+            repo.update("INSERT DATA { <urn:s> <urn:p> 42 }");
+            return repo.ask("ASK { <urn:s> <urn:p> 42 }");
+        });
+        assertTrue(present);
+    }
+
+    @Test
+    void createFromInputStreamLoadsDataImmediately() {
+        String turtle = "<urn:alice> <urn:name> \"Alice\" .";
+        ByteArrayInputStream input = new ByteArrayInputStream(turtle.getBytes(StandardCharsets.UTF_8));
+
+        try (Repository repo = Repositories.createFrom(input, RDFFormat.TURTLE)) {
+            assertTrue(repo.isOpen());
+            assertEquals(1L, repo.size());
+            assertTrue(repo.ask("ASK { <urn:alice> <urn:name> \"Alice\" }"));
+        }
     }
 }

@@ -44,6 +44,27 @@ class DatasetTest {
                 namedGraphs::clear);
     }
 
+    @Test
+    void ofFactoryAndCollectionBuilderMethodsCreateExpectedDatasets() {
+        IRI g1 = iri("urn:g1");
+        IRI g2 = iri("urn:g2");
+        IRI n1 = iri("urn:n1");
+
+        Dataset datasetOf = Dataset.of(g1, g2);
+        assertEquals(Set.of(g1, g2), datasetOf.getDefaultGraphs());
+        assertTrue(datasetOf.getNamedGraphs().isEmpty());
+
+        Dataset datasetEmpty = Dataset.of();
+        assertSame(Dataset.empty(), datasetEmpty);
+
+        Dataset datasetCollections = Dataset.builder()
+                .defaultGraphs(java.util.List.of(g1, g2))
+                .namedGraphs(java.util.List.of(n1))
+                .build();
+        assertEquals(Set.of(g1, g2), datasetCollections.getDefaultGraphs());
+        assertEquals(Set.of(n1), datasetCollections.getNamedGraphs());
+    }
+
     private IRI iri(String value) {
         return values.createIRI(value);
     }

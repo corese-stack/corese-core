@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query;
 
+import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 import fr.inria.corese.core.next.query.api.exception.RepositoryException;
 import fr.inria.corese.core.next.query.api.repository.Repository;
 import fr.inria.corese.core.next.query.impl.repository.CoreseRepository;
@@ -8,7 +9,11 @@ import fr.inria.corese.core.next.storage.api.config.StorageConfig;
 import fr.inria.corese.core.next.storage.Storages;
 import fr.inria.corese.core.next.storage.api.plugin.PluginException;
 
+import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Public entry point for creating ready-to-use Corese repositories.
@@ -81,5 +86,86 @@ public final class Repositories {
         return new CoreseRepository(
                 Objects.requireNonNull(storage, "storage"),
                 Objects.requireNonNull(config, "config"));
+    }
+
+    /**
+     * Creates an open in-memory repository pre-loaded with RDF statements from the specified file.
+     * The file format is inferred from the file extension.
+     *
+     * @param source RDF source file
+     * @return a ready-to-use repository containing the loaded data
+     * @throws RepositoryException if repository creation or RDF loading fails
+     * @throws NullPointerException if {@code source} is {@code null}
+     */
+    public static Repository createFrom(Path source) {
+        Objects.requireNonNull(source, "source");
+        Repository repository = create();
+        try {
+            repository.load(source);
+            return repository;
+        } catch (RuntimeException | Error e) {
+            try {
+                repository.close();
+            } catch (Exception closeEx) {
+                e.addSuppressed(closeEx);
+            }
+            throw e;
+        }
+    }
+
+    /**
+     * Creates an open in-memory repository pre-loaded with RDF statements from the specified input stream.
+     *
+     * @param source RDF input stream
+     * @param format explicit RDF serialization format
+     * @return a ready-to-use repository containing the loaded data
+     * @throws RepositoryException if repository creation or RDF loading fails
+     * @throws NullPointerException if {@code source} or {@code format} is {@code null}
+     */
+    public static Repository createFrom(InputStream source, RDFFormat format) {
+        Objects.requireNonNull(source, "source");
+        Objects.requireNonNull(format, "format");
+        Repository repository = create();
+        try {
+            repository.load(source, format);
+            return repository;
+        } catch (RuntimeException | Error e) {
+            try {
+                repository.close();
+            } catch (Exception closeEx) {
+                e.addSuppressed(closeEx);
+            }
+            throw e;
+        }
+    }
+
+    /**
+     * Executes work against a temporary in-memory repository, ensuring deterministic closure.
+     *
+     * @param consumer repository callback
+     * @throws RepositoryException if repository creation, execution, or closure fails
+     * @throws NullPointerException if {@code consumer} is {@code null}
+     */
+    public static void withMemory(Consumer<? super Repository> consumer) {
+        Objects.requireNonNull(consumer, "consumer");
+        try (Repository repository = create()) {
+            consumer.accept(repository);
+        }
+    }
+
+    /**
+     * Computes a result against a temporary in-memory repository, ensuring deterministic closure.
+     *
+     * @param function computation callback
+     * @param <T> result type
+     * @return the computed value
+     * @throws RepositoryException if repository creation, execution, or closure fails
+     * @throws NullPointerException if {@code function} is {@code null}
+     */
+    public static <T> T computeWithMemory(Function<? super Repository, ? extends T> function) {
+        Objects.requireNonNull(function, "function");
+        try (Repository repository = create()) {
+            return function.apply(repository);
+        }
     }
 }
