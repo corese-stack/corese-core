@@ -28,7 +28,7 @@ public final class CoreseBindingSet implements BindingSet {
      * @throws NullPointerException if the mapping is null
      */
     public CoreseBindingSet(Mapping mapping) {
-        this(mapping, Set.copyOf(mapping.getVariableNames()));
+        this(mapping, Collections.unmodifiableSet(new LinkedHashSet<>(mapping.getVariableNames())));
     }
 
     /**

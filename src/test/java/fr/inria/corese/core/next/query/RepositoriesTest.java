@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -119,19 +120,27 @@ class RepositoriesTest {
     @Test
     void withMemoryAndComputeWithMemoryExecuteAndCloseRepository() {
         AtomicBoolean wasExecuted = new AtomicBoolean(false);
+        AtomicReference<Repository> capturedRepo = new AtomicReference<>();
         Repositories.withMemory(repo -> {
+            capturedRepo.set(repo);
             assertTrue(repo.isOpen());
             repo.update("INSERT DATA { <urn:s> <urn:p> <urn:o> }");
             assertTrue(repo.ask("ASK { <urn:s> <urn:p> <urn:o> }"));
             wasExecuted.set(true);
         });
         assertTrue(wasExecuted.get());
+        assertNotNull(capturedRepo.get());
+        assertFalse(capturedRepo.get().isOpen());
 
+        AtomicReference<Repository> capturedComputeRepo = new AtomicReference<>();
         boolean present = Repositories.computeWithMemory(repo -> {
+            capturedComputeRepo.set(repo);
             repo.update("INSERT DATA { <urn:s> <urn:p> 42 }");
             return repo.ask("ASK { <urn:s> <urn:p> 42 }");
         });
         assertTrue(present);
+        assertNotNull(capturedComputeRepo.get());
+        assertFalse(capturedComputeRepo.get().isOpen());
     }
 
     @Test

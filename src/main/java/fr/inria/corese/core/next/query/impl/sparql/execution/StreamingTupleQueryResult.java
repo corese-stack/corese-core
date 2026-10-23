@@ -13,6 +13,8 @@ import fr.inria.corese.core.next.query.impl.engine.storage.StorageManagerProduce
 import fr.inria.corese.core.next.storage.api.StorageManager;
 import fr.inria.corese.core.next.storage.api.exception.StorageException;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -66,7 +68,7 @@ final class StreamingTupleQueryResult implements TupleQueryResult {
         this.timeoutMillis = timeoutMillis;
         this.started = started;
         names = query.getSelect().stream().map(Node::getLabel).toList();
-        projected = Set.copyOf(names);
+        projected = Collections.unmodifiableSet(new LinkedHashSet<>(names));
         long remaining = TimeUnit.MILLISECONDS.toNanos(timeoutMillis) - (System.nanoTime() - started);
         deadline = timeoutMillis <= 0 ? null
                 : DEADLINES.schedule(this::expire, Math.max(0, remaining), TimeUnit.NANOSECONDS);

@@ -115,7 +115,7 @@ public final class Dataset {
         }
 
         /** Adds multiple default graphs. */
-        public Builder defaultGraphs(Collection<IRI> graphs) {
+        public Builder defaultGraphs(Collection<? extends IRI> graphs) {
             Objects.requireNonNull(graphs, "graphs");
             for (IRI graph : graphs) {
                 defaultGraph(graph);
@@ -130,7 +130,7 @@ public final class Dataset {
         }
 
         /** Adds multiple named graphs. */
-        public Builder namedGraphs(Collection<IRI> graphs) {
+        public Builder namedGraphs(Collection<? extends IRI> graphs) {
             Objects.requireNonNull(graphs, "graphs");
             for (IRI graph : graphs) {
                 namedGraph(graph);

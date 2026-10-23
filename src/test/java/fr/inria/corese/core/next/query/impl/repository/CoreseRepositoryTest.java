@@ -165,6 +165,11 @@ class CoreseRepositoryTest {
             assertEquals(1L, repository.size());
             assertTrue(repository.hasStatement(s, p, o));
             assertTrue(repository.hasStatement(s, null, null));
+
+            Statement stmt2 = Values.statement(s, p, Values.literal("o2"));
+            Statement stmt3 = Values.statement(s, p, Values.literal("o3"));
+            repository.add(stmt2, stmt3);
+            assertEquals(3L, repository.size());
         }
 
         @Test

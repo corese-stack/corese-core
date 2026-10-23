@@ -21,19 +21,20 @@ final class MaterializedResults {
     }
 
     static TupleQueryResult tuple(List<String> bindingNames, List<BindingSet> rows) {
+        List<String> orderedNames = List.copyOf(bindingNames);
         List<BindingSet> snapshots = rows.stream()
-                .map(MaterializedResults::snapshot)
+                .map(row -> snapshot(orderedNames, row))
                 .toList();
-        return new TupleResult(List.copyOf(bindingNames), snapshots.iterator());
+        return new TupleResult(orderedNames, snapshots.iterator());
     }
 
     static GraphQueryResult graph(List<Statement> statements) {
         return new GraphResult(List.copyOf(statements).iterator());
     }
 
-    private static BindingSet snapshot(BindingSet source) {
+    private static BindingSet snapshot(List<String> bindingNames, BindingSet source) {
         Map<String, Value> values = new LinkedHashMap<>();
-        for (String name : source.getBindingNames()) {
+        for (String name : bindingNames) {
             Value value = source.getValue(name);
             if (value != null) {
                 values.put(name, value);

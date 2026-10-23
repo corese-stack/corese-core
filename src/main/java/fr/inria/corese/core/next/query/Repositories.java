@@ -99,22 +99,12 @@ public final class Repositories {
      */
     public static Repository createFrom(Path source) {
         Objects.requireNonNull(source, "source");
-        Repository repository = create();
-        try {
-            repository.load(source);
-            return repository;
-        } catch (RuntimeException | Error e) {
-            try {
-                repository.close();
-            } catch (Exception closeEx) {
-                e.addSuppressed(closeEx);
-            }
-            throw e;
-        }
+        return createAndLoad(repo -> repo.load(source));
     }
 
     /**
      * Creates an open in-memory repository pre-loaded with RDF statements from the specified input stream.
+     * The input stream is consumed by the parser but remains caller-owned.
      *
      * @param source RDF input stream
      * @param format explicit RDF serialization format
@@ -125,9 +115,13 @@ public final class Repositories {
     public static Repository createFrom(InputStream source, RDFFormat format) {
         Objects.requireNonNull(source, "source");
         Objects.requireNonNull(format, "format");
+        return createAndLoad(repo -> repo.load(source, format));
+    }
+
+    private static Repository createAndLoad(Consumer<Repository> loader) {
         Repository repository = create();
         try {
-            repository.load(source, format);
+            loader.accept(repository);
             return repository;
         } catch (RuntimeException | Error e) {
             try {

@@ -10,6 +10,8 @@ import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 import fr.inria.corese.core.next.query.Repositories;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.io.InputStream;
 import java.io.Reader;
@@ -107,13 +109,13 @@ public interface Repository extends AutoCloseable {
      * mapping each solution {@link BindingSet} using the provided mapper function.
      *
      * <p>The repository connection is automatically opened and closed within this call.
-     * Solutions are mapped and collected into an immutable list without retaining the
-     * raw query result in memory.</p>
+     * The mapper should extract needed terms eagerly rather than retaining references
+     * to the row, because the underlying query cursor is closed upon return.</p>
      *
      * @param sparqlSelect the SPARQL SELECT query text
      * @param mapper mapping function converting each {@link BindingSet} into a result element
      * @param <T> the mapped result type
-     * @return an immutable list of mapped results
+     * @return an unmodifiable list of mapped results
      * @throws QuerySyntaxException if the query string is syntactically invalid
      * @throws RepositoryException if evaluation fails
      * @throws NullPointerException if {@code mapper} is {@code null}
@@ -128,7 +130,7 @@ public interface Repository extends AutoCloseable {
                 results.add(mapper.apply(raw.next()));
             }
         }
-        return List.copyOf(results);
+        return Collections.unmodifiableList(results);
     }
 
     /**
@@ -228,9 +230,7 @@ public interface Repository extends AutoCloseable {
     default void add(Statement... statements) throws RepositoryException {
         Objects.requireNonNull(statements, "statements");
         try (RepositoryConnection conn = getConnection()) {
-            for (Statement statement : statements) {
-                conn.add(statement);
-            }
+            conn.add(Arrays.asList(statements));
         }
     }
 

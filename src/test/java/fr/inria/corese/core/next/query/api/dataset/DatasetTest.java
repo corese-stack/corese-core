@@ -5,6 +5,7 @@ import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.Values;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -58,8 +59,8 @@ class DatasetTest {
         assertSame(Dataset.empty(), datasetEmpty);
 
         Dataset datasetCollections = Dataset.builder()
-                .defaultGraphs(java.util.List.of(g1, g2))
-                .namedGraphs(java.util.List.of(n1))
+                .defaultGraphs(List.of(g1, g2))
+                .namedGraphs(List.of(n1))
                 .build();
         assertEquals(Set.of(g1, g2), datasetCollections.getDefaultGraphs());
         assertEquals(Set.of(n1), datasetCollections.getNamedGraphs());
