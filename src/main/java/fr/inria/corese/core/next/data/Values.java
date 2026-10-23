@@ -10,9 +10,11 @@ import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.term.Triple;
 import fr.inria.corese.core.next.data.api.term.Value;
 
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalAmount;
 import java.util.Objects;
 
 /**
@@ -131,6 +133,26 @@ public final class Values {
     }
 
     /**
+     * Creates a literal typed as xsd:byte.
+     *
+     * @param value byte value
+     * @return Literal instance
+     */
+    public static Literal literal(byte value) {
+        return DEFAULT_FACTORY.createLiteral(value);
+    }
+
+    /**
+     * Creates a literal typed as xsd:short.
+     *
+     * @param value short value
+     * @return Literal instance
+     */
+    public static Literal literal(short value) {
+        return DEFAULT_FACTORY.createLiteral(value);
+    }
+
+    /**
      * Creates a literal typed as xsd:int.
      *
      * @param value int value
@@ -147,6 +169,16 @@ public final class Values {
      * @return Literal instance
      */
     public static Literal literal(long value) {
+        return DEFAULT_FACTORY.createLiteral(value);
+    }
+
+    /**
+     * Creates a literal typed as xsd:float.
+     *
+     * @param value float value
+     * @return Literal instance
+     */
+    public static Literal literal(float value) {
         return DEFAULT_FACTORY.createLiteral(value);
     }
 
@@ -188,6 +220,26 @@ public final class Values {
      */
     public static Literal literal(TemporalAccessor temporal) {
         return DEFAULT_FACTORY.createLiteral(temporal);
+    }
+
+    /**
+     * Creates a literal typed as xsd:duration from a temporal amount.
+     *
+     * @param amount temporal amount value
+     * @return Literal instance
+     */
+    public static Literal literal(TemporalAmount amount) {
+        return DEFAULT_FACTORY.createLiteral(amount);
+    }
+
+    /**
+     * Creates a literal typed as xsd:dateTime from an XMLGregorianCalendar.
+     *
+     * @param calendar XMLGregorianCalendar value
+     * @return Literal instance
+     */
+    public static Literal literal(XMLGregorianCalendar calendar) {
+        return DEFAULT_FACTORY.createLiteral(calendar);
     }
 
     /**

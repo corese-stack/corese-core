@@ -8,8 +8,13 @@ import fr.inria.corese.core.next.data.api.term.Triple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.Duration;
+import java.time.Instant;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -71,11 +76,20 @@ class ValuesTest {
         Literal lBool = Values.literal(true);
         assertEquals("true", lBool.getLabel());
 
+        Literal lByte = Values.literal((byte) 8);
+        assertEquals("8", lByte.getLabel());
+
+        Literal lShort = Values.literal((short) 16);
+        assertEquals("16", lShort.getLabel());
+
         Literal lInt = Values.literal(42);
         assertEquals("42", lInt.getLabel());
 
         Literal lLong = Values.literal(123456789L);
         assertEquals("123456789", lLong.getLabel());
+
+        Literal lFloat = Values.literal(1.25f);
+        assertEquals("1.25", lFloat.getLabel());
 
         Literal lDouble = Values.literal(2.5);
         assertEquals("2.5", lDouble.getLabel());
@@ -85,6 +99,25 @@ class ValuesTest {
 
         Literal lBigInt = Values.literal(BigInteger.valueOf(1000));
         assertEquals("1000", lBigInt.getLabel());
+    }
+
+    @Test
+    @DisplayName("Values.literal creates temporal literals")
+    void testTemporalLiterals() throws DatatypeConfigurationException {
+        Instant now = Instant.parse("2026-10-23T15:30:00Z");
+        Literal lTemporal = Values.literal(now);
+        assertNotNull(lTemporal);
+        assertTrue(lTemporal.getLabel().contains("2026-10-23"));
+
+        Duration duration = Duration.ofHours(2);
+        Literal lDuration = Values.literal(duration);
+        assertNotNull(lDuration);
+        assertEquals("PT2H", lDuration.getLabel());
+
+        XMLGregorianCalendar cal = DatatypeFactory.newInstance().newXMLGregorianCalendar("2026-10-23T15:30:00Z");
+        Literal lXmlCal = Values.literal(cal);
+        assertNotNull(lXmlCal);
+        assertEquals("2026-10-23T15:30:00Z", lXmlCal.getLabel());
     }
 
     @Test

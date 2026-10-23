@@ -24,13 +24,12 @@ import java.util.stream.Stream;
  * streams can lead to partition retention and increased memory footprint.</p>
  *
  * <h2>Graph Matching Semantics</h2>
- * <p>Pattern matching respects the dataset semantics defined by {@link StatementPattern}:
+ * <p>Pattern matching respects the dataset semantics defined by {@link StatementPattern}:</p>
  * <ul>
  *   <li>A {@code null} or empty contexts array matches statements across all graphs (default graph and named graphs).</li>
  *   <li>An explicit {@code null} array element matches only statements in the default graph.</li>
  *   <li>Specific resource IRIs or blank nodes match only statements in those designated named graphs.</li>
  * </ul>
- * </p>
  */
 public interface QueryOperations {
 

@@ -19,12 +19,11 @@
  *
  * <h2>Graph Matching Semantics</h2>
  * <p>Operations accepting {@link fr.inria.corese.core.next.storage.api.model.StatementPattern} follow standard
- * SPARQL dataset semantics:
+ * SPARQL dataset semantics:</p>
  * <ul>
  *   <li>A {@code null} or empty contexts array matches across all graphs (the union of default and named graphs).</li>
  *   <li>An explicit {@code null} array element (e.g., {@code new Resource[] { null }}) matches strictly the default graph.</li>
  *   <li>Named graph identifiers restrict matching to the specified named graph(s).</li>
  * </ul>
- * </p>
  */
 package fr.inria.corese.core.next.storage.api.operations;
