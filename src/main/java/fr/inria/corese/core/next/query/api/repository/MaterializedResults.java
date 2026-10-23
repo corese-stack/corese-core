@@ -7,6 +7,7 @@ import fr.inria.corese.core.next.query.api.result.BindingSet;
 import fr.inria.corese.core.next.query.api.result.GraphQueryResult;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -20,19 +21,20 @@ final class MaterializedResults {
     }
 
     static TupleQueryResult tuple(List<String> bindingNames, List<BindingSet> rows) {
+        List<String> orderedNames = List.copyOf(bindingNames);
         List<BindingSet> snapshots = rows.stream()
-                .map(MaterializedResults::snapshot)
+                .map(row -> snapshot(orderedNames, row))
                 .toList();
-        return new TupleResult(List.copyOf(bindingNames), snapshots.iterator());
+        return new TupleResult(orderedNames, snapshots.iterator());
     }
 
     static GraphQueryResult graph(List<Statement> statements) {
         return new GraphResult(List.copyOf(statements).iterator());
     }
 
-    private static BindingSet snapshot(BindingSet source) {
+    private static BindingSet snapshot(List<String> bindingNames, BindingSet source) {
         Map<String, Value> values = new LinkedHashMap<>();
-        for (String name : source.getBindingNames()) {
+        for (String name : bindingNames) {
             Value value = source.getValue(name);
             if (value != null) {
                 values.put(name, value);
@@ -44,7 +46,7 @@ final class MaterializedResults {
     private static final class TupleResult implements TupleQueryResult {
         private final List<String> bindingNames;
         private final Iterator<BindingSet> rows;
-        private boolean closed;
+        private volatile boolean closed;
 
         private TupleResult(List<String> bindingNames, Iterator<BindingSet> rows) {
             this.bindingNames = bindingNames;
@@ -82,7 +84,7 @@ final class MaterializedResults {
 
     private static final class GraphResult implements GraphQueryResult {
         private final Iterator<Statement> statements;
-        private boolean closed;
+        private volatile boolean closed;
 
         private GraphResult(Iterator<Statement> statements) {
             this.statements = statements;
@@ -115,7 +117,7 @@ final class MaterializedResults {
     private record ImmutableBindingSet(Map<String, Value> values) implements BindingSet {
 
         private ImmutableBindingSet {
-            values = Map.copyOf(values);
+            values = Collections.unmodifiableMap(new LinkedHashMap<>(values));
         }
 
         @Override

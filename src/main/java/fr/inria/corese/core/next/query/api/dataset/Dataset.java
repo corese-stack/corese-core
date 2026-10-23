@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.query.api.dataset;
 
 import fr.inria.corese.core.next.data.api.term.IRI;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Objects;
@@ -36,6 +37,25 @@ public final class Dataset {
     /** Returns a dataset with no default or named graphs. */
     public static Dataset empty() {
         return EMPTY;
+    }
+
+    /**
+     * Creates an immutable dataset with the specified default graphs and no named graphs.
+     *
+     * @param defaultGraphs default graph IRIs
+     * @return an immutable Dataset instance
+     * @throws NullPointerException if {@code defaultGraphs} or any element is {@code null}
+     */
+    public static Dataset of(IRI... defaultGraphs) {
+        Objects.requireNonNull(defaultGraphs, "defaultGraphs");
+        if (defaultGraphs.length == 0) {
+            return empty();
+        }
+        Builder builder = builder();
+        for (IRI graph : defaultGraphs) {
+            builder.defaultGraph(graph);
+        }
+        return builder.build();
     }
 
     /** Returns a builder for an immutable dataset. */
@@ -94,9 +114,27 @@ public final class Dataset {
             return this;
         }
 
+        /** Adds multiple default graphs. */
+        public Builder defaultGraphs(Collection<? extends IRI> graphs) {
+            Objects.requireNonNull(graphs, "graphs");
+            for (IRI graph : graphs) {
+                defaultGraph(graph);
+            }
+            return this;
+        }
+
         /** Adds a named graph. */
         public Builder namedGraph(IRI graph) {
             namedGraphs.add(Objects.requireNonNull(graph, "graph"));
+            return this;
+        }
+
+        /** Adds multiple named graphs. */
+        public Builder namedGraphs(Collection<? extends IRI> graphs) {
+            Objects.requireNonNull(graphs, "graphs");
+            for (IRI graph : graphs) {
+                namedGraph(graph);
+            }
             return this;
         }
 

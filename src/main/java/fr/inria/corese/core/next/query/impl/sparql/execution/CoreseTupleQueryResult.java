@@ -6,7 +6,9 @@ import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -24,7 +26,8 @@ public final class CoreseTupleQueryResult implements TupleQueryResult {
     public CoreseTupleQueryResult(Mappings mappings) {
         this.mappings = Objects.requireNonNull(mappings, "mappings");
         this.iterator = this.mappings.iterator();
-        this.projectedNames = Set.copyOf(this.mappings.getSelect().stream().map(Node::getLabel).toList());
+        this.projectedNames = Collections.unmodifiableSet(
+                new LinkedHashSet<>(this.mappings.getSelect().stream().map(Node::getLabel).toList()));
     }
 
     @Override

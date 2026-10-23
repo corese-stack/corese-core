@@ -10,6 +10,8 @@ import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 import fr.inria.corese.core.next.query.Repositories;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.io.InputStream;
 import java.io.Reader;
@@ -19,7 +21,10 @@ import java.nio.file.Path;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
+import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Resource;
+import fr.inria.corese.core.next.data.api.term.Value;
+import java.util.Objects;
 
 /**
  * A Corese repository that contains RDF data that can be queried and updated.
@@ -100,6 +105,35 @@ public interface Repository extends AutoCloseable {
     }
 
     /**
+     * Evaluates a SPARQL SELECT query directly against this repository in one call,
+     * mapping each solution {@link BindingSet} using the provided mapper function.
+     *
+     * <p>The repository connection is automatically opened and closed within this call.
+     * The mapper should extract needed terms eagerly rather than retaining references
+     * to the row, because the underlying query cursor is closed upon return.</p>
+     *
+     * @param sparqlSelect the SPARQL SELECT query text
+     * @param mapper mapping function converting each {@link BindingSet} into a result element
+     * @param <T> the mapped result type
+     * @return an unmodifiable list of mapped results
+     * @throws QuerySyntaxException if the query string is syntactically invalid
+     * @throws RepositoryException if evaluation fails
+     * @throws NullPointerException if {@code mapper} is {@code null}
+     */
+    default <T> List<T> select(String sparqlSelect, Function<? super BindingSet, ? extends T> mapper)
+            throws QuerySyntaxException, RepositoryException {
+        Objects.requireNonNull(mapper, "mapper");
+        List<T> results = new ArrayList<>();
+        try (RepositoryConnection conn = getConnection();
+             TupleQueryResult raw = conn.prepareTupleQuery(sparqlSelect).evaluate()) {
+            while (raw.hasNext()) {
+                results.add(mapper.apply(raw.next()));
+            }
+        }
+        return Collections.unmodifiableList(results);
+    }
+
+    /**
      * Evaluates a SPARQL ASK query directly against this repository in one call.
      *
      * @param sparqlAsk the SPARQL ASK query text
@@ -137,6 +171,67 @@ public interface Repository extends AutoCloseable {
             }
         }
         return MaterializedResults.graph(statements);
+    }
+
+    /**
+     * Evaluates a SPARQL CONSTRUCT or DESCRIBE query directly against this repository in one call.
+     *
+     * <p>This is a natural semantic alias for {@link #graph(String)} following SPARQL 1.1 terminology.</p>
+     *
+     * @param sparqlConstruct the SPARQL CONSTRUCT query text
+     * @return a materialized {@link GraphQueryResult} containing output statements
+     * @throws QuerySyntaxException if the query string is syntactically invalid
+     * @throws RepositoryException if evaluation fails
+     * @see #graph(String)
+     */
+    default GraphQueryResult construct(String sparqlConstruct) throws QuerySyntaxException, RepositoryException {
+        return graph(sparqlConstruct);
+    }
+
+    /**
+     * Tests whether at least one statement matching the specified pattern exists in this repository.
+     * A {@code null} term is treated as a wildcard.
+     *
+     * @param subject statement subject to match, or {@code null} for wildcard
+     * @param predicate statement predicate to match, or {@code null} for wildcard
+     * @param object statement object to match, or {@code null} for wildcard
+     * @param contexts contexts to match, or empty for every graph
+     * @return {@code true} if a matching statement exists, {@code false} otherwise
+     * @throws RepositoryException if the check fails
+     */
+    default boolean hasStatement(Resource subject, IRI predicate, Value object, Resource... contexts)
+            throws RepositoryException {
+        try (RepositoryConnection conn = getConnection()) {
+            return conn.hasStatement(subject, predicate, object, contexts);
+        }
+    }
+
+    /**
+     * Returns the total number of statements in the designated graph contexts.
+     * An empty {@code contexts} array counts across all graphs (default and named graphs).
+     *
+     * @param contexts contexts to count, or none for every graph
+     * @return number of statements in the selected contexts
+     * @throws RepositoryException if the count cannot be performed
+     */
+    default long size(Resource... contexts) throws RepositoryException {
+        try (RepositoryConnection conn = getConnection()) {
+            return conn.size(contexts);
+        }
+    }
+
+    /**
+     * Adds the specified statements to this repository in an auto-managed connection.
+     *
+     * @param statements statements to add
+     * @throws RepositoryException if the addition fails
+     * @throws NullPointerException if {@code statements} or any element is {@code null}
+     */
+    default void add(Statement... statements) throws RepositoryException {
+        Objects.requireNonNull(statements, "statements");
+        try (RepositoryConnection conn = getConnection()) {
+            conn.add(Arrays.asList(statements));
+        }
     }
 
     /**

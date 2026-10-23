@@ -5,6 +5,7 @@ import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.Values;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,6 +43,27 @@ class DatasetTest {
         Set<IRI> namedGraphs = dataset.getNamedGraphs();
         assertThrows(UnsupportedOperationException.class,
                 namedGraphs::clear);
+    }
+
+    @Test
+    void ofFactoryAndCollectionBuilderMethodsCreateExpectedDatasets() {
+        IRI g1 = iri("urn:g1");
+        IRI g2 = iri("urn:g2");
+        IRI n1 = iri("urn:n1");
+
+        Dataset datasetOf = Dataset.of(g1, g2);
+        assertEquals(Set.of(g1, g2), datasetOf.getDefaultGraphs());
+        assertTrue(datasetOf.getNamedGraphs().isEmpty());
+
+        Dataset datasetEmpty = Dataset.of();
+        assertSame(Dataset.empty(), datasetEmpty);
+
+        Dataset datasetCollections = Dataset.builder()
+                .defaultGraphs(List.of(g1, g2))
+                .namedGraphs(List.of(n1))
+                .build();
+        assertEquals(Set.of(g1, g2), datasetCollections.getDefaultGraphs());
+        assertEquals(Set.of(n1), datasetCollections.getNamedGraphs());
     }
 
     private IRI iri(String value) {
