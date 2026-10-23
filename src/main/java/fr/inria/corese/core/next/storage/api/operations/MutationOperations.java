@@ -8,11 +8,31 @@ import fr.inria.corese.core.next.storage.api.model.StatementPattern;
 import java.util.Objects;
 
 /**
- * Write operations implemented by an RDF storage backend.
+ * Write and update operations implemented by an RDF storage backend session.
  *
- * <p>Duplicate insertion and removal of absent statements are normal set
- * operations, not failures. Exceptional backend failures are reported with
- * {@link StorageException}.</p>
+ * <h2>Threading &amp; Session Confinement</h2>
+ * <p>Instances obtained from a {@link fr.inria.corese.core.next.storage.api.StorageManager} session
+ * are not thread-safe. Mutations must be confined to the session's owning thread.</p>
+ *
+ * <h2>Transactions &amp; Visibility</h2>
+ * <ul>
+ *   <li>When operating outside an active transaction, mutations may auto-commit immediately
+ *       or participate in an implicit session transaction depending on backend configuration.</li>
+ *   <li>When an explicit transaction is active (via {@link fr.inria.corese.core.next.storage.api.transaction.TransactionManager}),
+ *       uncommitted mutations are immediately visible to the current session but remain isolated
+ *       from other concurrent sessions until commit.</li>
+ *   <li>The default implementations of batch operations (such as {@link #addAll}) iterate sequentially;
+ *       backends with transactional staging may override them to provide atomic batch publishing.</li>
+ * </ul>
+ *
+ * <h2>Graph Semantics &amp; Invariants</h2>
+ * <ul>
+ *   <li>Inserting a statement with a {@code null} context targets the default graph.</li>
+ *   <li>{@link #createGraph(Resource)} registers an empty named graph without requiring statements.
+ *       Registered empty named graphs survive {@link #clear(Resource...)} but are removed by {@link #dropGraph(Resource)}.</li>
+ *   <li>Duplicate insertion and removal of absent statements are idempotent set operations,
+ *       returning {@code false} without raising exceptions.</li>
+ * </ul>
  */
 public interface MutationOperations {
 

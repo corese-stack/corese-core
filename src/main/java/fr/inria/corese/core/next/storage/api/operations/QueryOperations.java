@@ -7,7 +7,29 @@ import fr.inria.corese.core.next.storage.api.model.StatementPattern;
 import java.util.stream.Stream;
 
 /**
- * Read operations implemented by an RDF storage backend.
+ * Read and pattern-matching operations implemented by an RDF storage backend session.
+ *
+ * <h2>Threading &amp; Session Confinement</h2>
+ * <p>Instances obtained from a {@link fr.inria.corese.core.next.storage.api.StorageManager} session
+ * are not thread-safe. Each thread must operate on its own session obtained via
+ * {@link fr.inria.corese.core.next.storage.api.StorageManager#openSession()} or an independent
+ * snapshot via {@link fr.inria.corese.core.next.storage.api.StorageManager#openReadSnapshot()}.</p>
+ *
+ * <h2>Stream &amp; Resource Lifecycle</h2>
+ * <p>Streams returned by {@link #find(StatementPattern)} are lazy, single-use, and may hold low-level
+ * cursor and snapshot partition resources. <strong>Callers must always close returned streams</strong>,
+ * preferably using a {@code try-with-resources} block. This requirement applies even when using
+ * short-circuiting terminal operations such as {@link Stream#findAny()} or {@link Stream#limit(long)},
+ * as the terminal operation alone does not automatically close the underlying stream. Failure to close
+ * streams can lead to partition retention and increased memory footprint.</p>
+ *
+ * <h2>Graph Matching Semantics</h2>
+ * <p>Pattern matching respects the dataset semantics defined by {@link StatementPattern}:</p>
+ * <ul>
+ *   <li>A {@code null} or empty contexts array matches statements across all graphs (default graph and named graphs).</li>
+ *   <li>An explicit {@code null} array element matches only statements in the default graph.</li>
+ *   <li>Specific resource IRIs or blank nodes match only statements in those designated named graphs.</li>
+ * </ul>
  */
 public interface QueryOperations {
 
