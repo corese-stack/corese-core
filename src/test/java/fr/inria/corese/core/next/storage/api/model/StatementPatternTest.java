@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.storage.api.model;
 
+import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.term.Value;
@@ -147,5 +148,56 @@ class StatementPatternTest {
         assertArrayEquals(new Resource[]{first, second}, oneOrder.getContexts());
         assertFalse(defaultGraph.isContextWildcard());
         assertArrayEquals(new Resource[]{null}, defaultGraph.getContexts());
+    }
+
+    @Test
+    @DisplayName("Should create exact pattern from statement with named graph context")
+    void testOfStatementWithNamedGraph() {
+        Resource subject = mock(Resource.class);
+        IRI predicate = mock(IRI.class);
+        Value object = mock(Value.class);
+        Resource context = mock(Resource.class);
+
+        Statement statement = mock(Statement.class);
+        org.mockito.Mockito.when(statement.getSubject()).thenReturn(subject);
+        org.mockito.Mockito.when(statement.getPredicate()).thenReturn(predicate);
+        org.mockito.Mockito.when(statement.getObject()).thenReturn(object);
+        org.mockito.Mockito.when(statement.getContext()).thenReturn(context);
+
+        StatementPattern pattern = StatementPattern.of(statement);
+
+        assertEquals(subject, pattern.getSubject());
+        assertEquals(predicate, pattern.getPredicate());
+        assertEquals(object, pattern.getObject());
+        assertArrayEquals(new Resource[]{context}, pattern.getContexts());
+        assertFalse(pattern.isContextWildcard());
+    }
+
+    @Test
+    @DisplayName("Should create exact pattern from statement with default graph context")
+    void testOfStatementWithDefaultGraph() {
+        Resource subject = mock(Resource.class);
+        IRI predicate = mock(IRI.class);
+        Value object = mock(Value.class);
+
+        Statement statement = mock(Statement.class);
+        org.mockito.Mockito.when(statement.getSubject()).thenReturn(subject);
+        org.mockito.Mockito.when(statement.getPredicate()).thenReturn(predicate);
+        org.mockito.Mockito.when(statement.getObject()).thenReturn(object);
+        org.mockito.Mockito.when(statement.getContext()).thenReturn(null);
+
+        StatementPattern pattern = StatementPattern.of(statement);
+
+        assertEquals(subject, pattern.getSubject());
+        assertEquals(predicate, pattern.getPredicate());
+        assertEquals(object, pattern.getObject());
+        assertArrayEquals(new Resource[]{null}, pattern.getContexts());
+        assertFalse(pattern.isContextWildcard());
+    }
+
+    @Test
+    @DisplayName("Should reject null statement in StatementPattern.of(Statement)")
+    void testOfStatementNullRejected() {
+        assertThrows(NullPointerException.class, () -> StatementPattern.of((Statement) null));
     }
 }

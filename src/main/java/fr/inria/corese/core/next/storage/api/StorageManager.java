@@ -8,11 +8,24 @@ import fr.inria.corese.core.next.storage.api.operations.QueryOperations;
 import fr.inria.corese.core.next.storage.api.transaction.TransactionManager;
 
 /**
- * Service-provider contract for an RDF storage backend.
+ * Service-provider contract (SPI) for an RDF storage backend in Corese v5.
  *
- * <p>Repository users normally interact with the query API rather than this
- * interface. Storage implementations expose focused capabilities for reads,
- * writes, metadata, transactions, and lifecycle management.</p>
+ * <p>Repository users normally interact with the query engine or repository facade rather than
+ * this low-level SPI. Storage implementations expose focused, cohesive capabilities for reads
+ * ({@link #queries()}), writes ({@link #mutations()}), structural introspection ({@link #metadata()}),
+ * transactions ({@link #transactions()}), and lifecycle management ({@link #lifecycle()}).</p>
+ *
+ * <h2>Threading &amp; Session Confinement</h2>
+ * <ul>
+ *   <li><strong>Root Manager:</strong> The root {@link StorageManager} instance represents the shared
+ *       database state and its lifecycle. It is thread-safe for opening connection-scoped sessions.</li>
+ *   <li><strong>Working Sessions:</strong> Working sessions obtained via {@link #openSession()} and
+ *       their associated operation facets ({@link #queries()}, {@link #mutations()}) are confined
+ *       to a single thread. Multiple threads must each obtain their own session.</li>
+ *   <li><strong>Snapshot Views:</strong> Independent, point-in-time read views obtained via
+ *       {@link #openReadSnapshot()} provide immutable snapshots. Reads are confined to the calling
+ *       thread, but {@link #close()} must be idempotent and safe to invoke concurrently from a cancellation thread.</li>
+ * </ul>
  */
 public interface StorageManager extends AutoCloseable {
 

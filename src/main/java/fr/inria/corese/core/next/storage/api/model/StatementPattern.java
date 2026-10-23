@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.storage.api.model;
 
+import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.term.Value;
@@ -69,6 +70,23 @@ public final class StatementPattern {
                 .object(object)
                 .contexts(contexts)
                 .build();
+    }
+
+    /**
+     * Creates an exact pattern matching the given statement in its designated context.
+     *
+     * <p>If the statement specifies a non-null context, the pattern restricts matching
+     * strictly to that named graph. If the statement has a {@code null} context (default graph),
+     * the pattern selects the default graph specifically via {@code new Resource[] { null }}.</p>
+     *
+     * @param statement statement to match (must not be {@code null})
+     * @return exact statement pattern
+     * @throws NullPointerException if {@code statement} is {@code null}
+     */
+    public static StatementPattern of(Statement statement) {
+        Objects.requireNonNull(statement, "statement");
+        Resource context = statement.getContext();
+        return of(statement.getSubject(), statement.getPredicate(), statement.getObject(), new Resource[] { context });
     }
 
     /**
