@@ -4,7 +4,7 @@ import fr.inria.corese.core.next.query.impl.engine.model.ExpType.Type;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.model.NodeImpl;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.sparql.ast.DescribeQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
@@ -25,7 +25,7 @@ final class DescribeQueryCompiler {
      * @param compiler compiler carrying the query prologue
      * @throws IllegalArgumentException if a described variable is not visible
      */
-    static void compile(Query query, DescribeQueryAst description, WhereCompiler compiler) {
+    static void compile(QueryPlan query, DescribeQueryAst description, WhereCompiler compiler) {
         lowerDescribeToConstructQuery(query, describeNodes(query, description, compiler));
     }
 
@@ -37,7 +37,7 @@ final class DescribeQueryCompiler {
      * fails fast when it is not visible; a described IRI becomes a fresh constant node.</p>
      */
     private static List<Node> describeNodes(
-            Query query, DescribeQueryAst describeQueryAst, WhereCompiler compiler) {
+            QueryPlan query, DescribeQueryAst describeQueryAst, WhereCompiler compiler) {
         if (describeQueryAst.isDescribeAll()) {
             return query.selectNodesFromPattern();
         }
@@ -66,7 +66,7 @@ final class DescribeQueryCompiler {
      * <p>This keeps the current KGRAM contract, inherited from the historical pipeline:
      * {@code DESCRIBE} is executed through the construct runtime path.</p>
      */
-    private static void lowerDescribeToConstructQuery(Query query, List<Node> describedNodes) {
+    private static void lowerDescribeToConstructQuery(QueryPlan query, List<Node> describedNodes) {
         Exp constructTemplate = Exp.create(Type.BGP);
         int syntheticIndex = 0;
         for (Node describedNode : describedNodes) {

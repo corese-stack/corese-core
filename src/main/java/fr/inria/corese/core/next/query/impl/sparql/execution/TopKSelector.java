@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.execution;
 
 import fr.inria.corese.core.next.query.impl.engine.eval.Eval;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 
@@ -31,7 +31,7 @@ final class TopKSelector {
      * @param query completed eligible ordered SELECT with finite LIMIT plus OFFSET
      * @param eval evaluator supplying the official Corese ordering comparator
      */
-    TopKSelector(Query query, Eval eval) {
+    TopKSelector(QueryPlan query, Eval eval) {
         capacity = Math.addExact(query.getLimit(), query.getOffset());
         offset = query.getOffset();
         needsInput = query.getLimit() != 0;

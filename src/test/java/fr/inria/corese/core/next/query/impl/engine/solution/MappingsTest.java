@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.query.impl.engine.solution;
 
 import fr.inria.corese.core.next.query.impl.engine.eval.Eval;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
@@ -26,13 +26,13 @@ import static org.mockito.Mockito.*;
 class MappingsTest {
 
     private Mappings mappings;
-    private Query mockQuery;
+    private QueryPlan mockQuery;
     private Mapping mockMapping;
     private Node mockNode;
 
     @BeforeEach
     void setUp() {
-        mockQuery = mock(Query.class);
+        mockQuery = mock(QueryPlan.class);
         when(mockQuery.getSelect()).thenReturn(new ArrayList<>());
         when(mockQuery.getOrderBy()).thenReturn(new ArrayList<>());
         when(mockQuery.getGroupBy()).thenReturn(new ArrayList<>());
@@ -63,7 +63,7 @@ class MappingsTest {
         void testCreateMappingsWithQuery() {
             Mappings m = Mappings.create(mockQuery);
             assertNotNull(m, "Mappings should not be null");
-            assertEquals(mockQuery, m.getQuery(), "Query should match");
+            assertEquals(mockQuery, m.getQuery(), "QueryPlan should match");
         }
 
         @Test
@@ -201,22 +201,22 @@ class MappingsTest {
     }
 
     @Nested
-    @DisplayName("Query Management Tests")
+    @DisplayName("QueryPlan Management Tests")
     class QueryManagementTests {
 
         @Test
         @DisplayName("Should get query")
         void testGetQuery() {
-            Query result = mappings.getQuery();
+            QueryPlan result = mappings.getQuery();
             assertEquals(mockQuery, result, "Should return query");
         }
 
         @Test
         @DisplayName("Should set query")
         void testSetQuery() {
-            Query newQuery = mock(Query.class);
+            QueryPlan newQuery = mock(QueryPlan.class);
             mappings.setQuery(newQuery);
-            assertEquals(newQuery, mappings.getQuery(), "Query should be updated");
+            assertEquals(newQuery, mappings.getQuery(), "QueryPlan should be updated");
         }
     }
 

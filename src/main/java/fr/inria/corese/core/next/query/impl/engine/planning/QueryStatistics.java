@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.query.impl.engine.planning;
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.storage.api.model.PredicateStatistics;
 import fr.inria.corese.core.next.storage.api.model.StorageStatistics;
 
@@ -28,7 +28,7 @@ public interface QueryStatistics {
      * @param edge triple pattern whose constants constrain the estimate
      * @return nonnegative cardinality, or {@link #UNKNOWN_CARDINALITY} if unavailable
      */
-    default long estimateCardinality(Query query, Node graphNode, Edge edge) {
+    default long estimateCardinality(QueryPlan query, Node graphNode, Edge edge) {
         return UNKNOWN_CARDINALITY;
     }
 
@@ -61,7 +61,7 @@ public interface QueryStatistics {
      * @param predicate the predicate IRI to inspect
      * @return predicate statistics or {@code null} if unavailable
      */
-    default PredicateStatistics getPredicateStatistics(Query query, Node graphNode, IRI predicate) {
+    default PredicateStatistics getPredicateStatistics(QueryPlan query, Node graphNode, IRI predicate) {
         return null;
     }
 

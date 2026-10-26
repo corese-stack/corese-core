@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.query.impl.engine.eval;
 
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 
@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class EnvironmentImpl implements Environment {
     protected static final String NOT_SUPPORTED_YET = "Not supported yet.";
-    protected Query query;
+    protected QueryPlan query;
 
     public EnvironmentImpl(){
         // The base environment starts without a query or bindings.
@@ -72,7 +72,7 @@ public class EnvironmentImpl implements Environment {
 
 
     @Override
-    public Query getQuery() {
+    public QueryPlan getQuery() {
         return query;
     }
 

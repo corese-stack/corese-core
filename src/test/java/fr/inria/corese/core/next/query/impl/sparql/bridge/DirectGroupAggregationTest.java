@@ -6,7 +6,7 @@ import fr.inria.corese.core.next.data.api.term.Literal;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.model.NodeImpl;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.model.ExpType.Type;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
@@ -30,7 +30,7 @@ class DirectGroupAggregationTest {
 
     @Test
     void aggregatesAllScalarsOnFirstRepresentative() {
-        Query query = query();
+        QueryPlan query = query();
         Mappings mappings = Mappings.create(query);
         Mapping first = row("a", integer(10));
         mappings.add(first);
@@ -53,7 +53,7 @@ class DirectGroupAggregationTest {
 
     @Test
     void allUnboundValuesAndUnboundGroupKey() {
-        Query query = query();
+        QueryPlan query = query();
         Mappings mappings = Mappings.create(query);
         Mapping first = row(null, null);
         mappings.add(first);
@@ -70,7 +70,7 @@ class DirectGroupAggregationTest {
 
     @Test
     void numericErrorDoesNotAffectOtherAggregates() {
-        Query query = query();
+        QueryPlan query = query();
         Mappings mappings = Mappings.create(query);
         Mapping first = row("a", integer(10));
         mappings.add(first);
@@ -84,7 +84,7 @@ class DirectGroupAggregationTest {
 
     @Test
     void promotesMixedNumericTypesAndPreservesLargeIntegers() {
-        Query query = query();
+        QueryPlan query = query();
         Mappings mappings = Mappings.create(query);
         Mapping first = row("a", integer(1));
         mappings.add(first);
@@ -104,7 +104,7 @@ class DirectGroupAggregationTest {
 
     @Test
     void emptyGroupedInputProducesNoRepresentative() {
-        Query query = query();
+        QueryPlan query = query();
         Mappings mappings = Mappings.create(query);
         assertTrue(DirectGroupAggregation.tryAggregate(query, mappings));
         assertEquals(0, mappings.size());
@@ -112,7 +112,7 @@ class DirectGroupAggregationTest {
 
     @Test
     void usesAllGroupKeysAndPreparedGroupValues() {
-        Query query = query();
+        QueryPlan query = query();
         Node secondKey = NodeImpl.forVariable("?second");
         query.addGroupBy(secondKey);
         Mappings mappings = Mappings.create(query);
@@ -134,7 +134,7 @@ class DirectGroupAggregationTest {
 
     @Test
     void rejectsDistinctWithoutChangingInput() {
-        Query query = query();
+        QueryPlan query = query();
         query.getSelectFun().add(projection("?distinct", AggregateFunction.COUNT, true, new VarAst("?v")));
         Mappings mappings = Mappings.create(query);
         Mapping first = row("a", integer(1));
@@ -147,7 +147,7 @@ class DirectGroupAggregationTest {
 
     @Test
     void rejectsUnsupportedModifiersAndAggregateArguments() {
-        Query query = query();
+        QueryPlan query = query();
         query.addOrderBy(GROUP);
         assertFalse(DirectGroupAggregation.isEligible(query));
         query = query();
@@ -161,8 +161,8 @@ class DirectGroupAggregationTest {
         assertFalse(DirectGroupAggregation.isEligible(query));
     }
 
-    private static Query query() {
-        Query query = Query.create();
+    private static QueryPlan query() {
+        QueryPlan query = QueryPlan.create();
         query.addGroupBy(GROUP);
         query.addSelect(GROUP);
         query.getSelectFun().add(projection("?all", AggregateFunction.COUNT, false, null));

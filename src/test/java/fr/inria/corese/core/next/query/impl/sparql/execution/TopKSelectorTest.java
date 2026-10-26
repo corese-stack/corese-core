@@ -5,7 +5,7 @@ import fr.inria.corese.core.next.query.impl.engine.eval.Eval;
 import fr.inria.corese.core.next.query.impl.engine.event.ProcessVisitor;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.model.NodeImpl;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +20,7 @@ import static org.mockito.Mockito.*;
 class TopKSelectorTest {
     @Test
     void theHeapNeverRetainsMoreThanLimitPlusOffsetAndReleasesDiscardedSlots() throws ReflectiveOperationException {
-        Query query = Query.create();
+        QueryPlan query = QueryPlan.create();
         query.setLimit(5);
         query.setOffset(2);
         query.addOrderBy(NodeImpl.forVariable("key"));
@@ -42,7 +42,7 @@ class TopKSelectorTest {
 
     @Test
     void officialComparatorVisitorOverridesAreUsedForSelectionAndFinalOrdering() {
-        Query query = Query.create();
+        QueryPlan query = QueryPlan.create();
         query.setLimit(2);
         query.addOrderBy(NodeImpl.forVariable("key"));
         Eval eval = mock(Eval.class);

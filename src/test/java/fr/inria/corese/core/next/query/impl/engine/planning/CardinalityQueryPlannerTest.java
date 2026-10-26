@@ -8,7 +8,7 @@ import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.model.NodeImpl;
 import fr.inria.corese.core.next.query.impl.engine.path.PropertyPathEdge;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.storage.ProducerDefault;
 import fr.inria.corese.core.next.query.impl.engine.storage.StorageManagerProducer;
 import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
@@ -68,7 +68,7 @@ class CardinalityQueryPlannerTest {
 
     @Test
     void choosesSelectiveFirstPatternWithoutOpeningCursorsOrTransactions() {
-        Query query = query(BROAD_THEN_SELECTIVE);
+        QueryPlan query = query(BROAD_THEN_SELECTIVE);
         QueryOperations operations = mock(QueryOperations.class, delegatesTo(storage.queries()));
         StorageManager observed = mock(StorageManager.class);
         when(observed.queries()).thenReturn(operations);
@@ -109,7 +109,7 @@ class CardinalityQueryPlannerTest {
 
     @Test
     void connectedJoinsPrecedeDisconnectedPatternsAfterSelectiveSeed() {
-        Query query = query("?s :link ?v . ?u :unrelated ?z . ?s :seed ?x");
+        QueryPlan query = query("?s :link ?v . ?u :unrelated ?z . ?s :seed ?x");
         query.complete(new StatisticsProducer(Map.of("urn:bench:link", 100L,
                 "urn:bench:unrelated", 2L, "urn:bench:seed", 1L)));
         assertEquals(List.of("urn:bench:seed", "urn:bench:link", "urn:bench:unrelated"), predicates(query));
@@ -117,10 +117,10 @@ class CardinalityQueryPlannerTest {
 
     @Test
     void variablePredicatesParticipateInJoinConnectivity() {
-        Query query = query("?s ?p :seed . ?u :unrelated ?z . ?p :link ?x");
+        QueryPlan query = query("?s ?p :seed . ?u :unrelated ?z . ?p :link ?x");
         query.complete(new StatisticsProducer(Map.of("urn:bench:link", 100L, "urn:bench:unrelated", 2L)) {
             @Override
-            public long estimateCardinality(Query scope, Node graph, Edge edge) {
+            public long estimateCardinality(QueryPlan scope, Node graph, Edge edge) {
                 return edge.getEdgeVariable() == null ? super.estimateCardinality(scope, graph, edge) : 1;
             }
         });
@@ -132,7 +132,7 @@ class CardinalityQueryPlannerTest {
 
     @Test
     void cardinalitiesRetainLongPrecision() {
-        Query query = query("?s :large ?x . ?s :small ?y");
+        QueryPlan query = query("?s :large ?x . ?s :small ?y");
         query.complete(new StatisticsProducer(Map.of("urn:bench:large", Long.MAX_VALUE,
                 "urn:bench:small", 3_000_000_000L)));
         assertEquals(List.of("urn:bench:small", "urn:bench:large"), predicates(query));
@@ -141,14 +141,14 @@ class CardinalityQueryPlannerTest {
     @ParameterizedTest
     @ValueSource(longs = {0, QueryStatistics.UNKNOWN_CARDINALITY, 7})
     void equalOrUnavailableStatisticsKeepStableSourceOrder(long count) {
-        Query query = query("?s :left ?x . ?s :right ?y");
+        QueryPlan query = query("?s :left ?x . ?s :right ?y");
         query.complete(new StatisticsProducer(Map.of("urn:bench:left", count, "urn:bench:right", count)));
         assertEquals(List.of("urn:bench:left", "urn:bench:right"), predicates(query));
     }
 
     @Test
     void producerWithoutStatisticsRetainsConnectedFallback() {
-        Query query = query(BROAD_THEN_SELECTIVE);
+        QueryPlan query = query(BROAD_THEN_SELECTIVE);
         query.complete(new ProducerDefault());
         assertEquals(List.of("urn:bench:type", "urn:bench:name"), predicates(query));
     }
@@ -180,7 +180,7 @@ class CardinalityQueryPlannerTest {
     @Test
     void emptyStorageProducesStablePlansAndEmptyResults() {
         storage.mutations().clear();
-        Query query = query(BROAD_THEN_SELECTIVE);
+        QueryPlan query = query(BROAD_THEN_SELECTIVE);
         query.complete(new StorageManagerProducer(storage));
         assertEquals(List.of("urn:bench:type", "urn:bench:name"), predicates(query));
         try (var result = new SparqlQueryExecutor(storage).evaluateTuple(
@@ -230,7 +230,7 @@ class CardinalityQueryPlannerTest {
 
     @Test
     void pathsAreBarriersAndDoNotReceiveOrdinaryTripleCounts() {
-        Query query = query("?s :type :Person . ?s :knows/:knows ?friend . ?s :name \"name42\"");
+        QueryPlan query = query("?s :type :Person . ?s :knows/:knows ?friend . ?s :name \"name42\"");
         QueryOperations operations = mock(QueryOperations.class, delegatesTo(storage.queries()));
         StorageManager observed = mock(StorageManager.class);
         when(observed.queries()).thenReturn(operations);
@@ -245,7 +245,7 @@ class CardinalityQueryPlannerTest {
         storage.mutations().add(Values.factory().createStatement(iri("s42"), iri("name"),
                 Values.factory().createLiteral("name42"), iri("g")));
         StorageManagerProducer producer = new StorageManagerProducer(storage);
-        Query query = query("?s :name \"name42\"");
+        QueryPlan query = query("?s :name \"name42\"");
         Edge edge = edges(query.getBody()).getFirst();
         assertEquals(1, producer.estimateCardinality(query, null, edge));
 
@@ -262,12 +262,12 @@ class CardinalityQueryPlannerTest {
 
     @Test
     void graphScopeIsRestoredBeforePlanningDefaultGraphPatterns() {
-        Query query = query("GRAPH :g { ?s :type :Person . ?s :name \"name42\" } "
+        QueryPlan query = query("GRAPH :g { ?s :type :Person . ?s :name \"name42\" } "
                 + "?x :type :Person . ?x :name \"name42\"");
         List<Node> graphs = new ArrayList<>();
         StatisticsProducer producer = new StatisticsProducer(Map.of()) {
             @Override
-            public long estimateCardinality(Query scope, Node graph, Edge edge) {
+            public long estimateCardinality(QueryPlan scope, Node graph, Edge edge) {
                 graphs.add(graph);
                 return 1;
             }
@@ -280,7 +280,7 @@ class CardinalityQueryPlannerTest {
     @Test
     void statisticsUseTheExistingSessionSnapshot() {
         try (var reader = storage.openSession(); var transaction = reader.transactions().beginTransaction()) {
-            Query query = query("?s :name \"name42\"");
+            QueryPlan query = query("?s :name \"name42\"");
             Edge edge = edges(query.getBody()).getFirst();
             StorageManagerProducer producer = new StorageManagerProducer(reader);
             assertEquals(1, producer.estimateCardinality(query, null, edge));
@@ -308,7 +308,7 @@ class CardinalityQueryPlannerTest {
     @Test
     void selectiveFilterPushdownSeedsComparisonEdgeFirst() {
         String sparql = "?x :type :Teaching_Unit . ?e :type :Evaluation . ?e :evaluatesTeachingUnit ?x . ?e :hasMark ?y . FILTER (?y < 3)";
-        Query query = query(sparql);
+        QueryPlan query = query(sparql);
         query.complete(new StorageManagerProducer(storage));
         assertEquals(List.of("urn:bench:hasMark", "urn:bench:type", "urn:bench:evaluatesTeachingUnit", "urn:bench:type"),
                 predicates(query));
@@ -358,10 +358,10 @@ class CardinalityQueryPlannerTest {
 
     @Test
     void variablePredicateDoesNotBecomeSingleTripleProbe() {
-        Query query = query("?s ?p ?o . ?s :scan ?x . ?s :seed ?o");
+        QueryPlan query = query("?s ?p ?o . ?s :scan ?x . ?s :seed ?o");
         query.complete(new StatisticsProducer(Map.of("urn:bench:scan", 5000L, "urn:bench:seed", 1L)) {
             @Override
-            public long estimateCardinality(Query scope, Node graph, Edge edge) {
+            public long estimateCardinality(QueryPlan scope, Node graph, Edge edge) {
                 return edge.getEdgeVariable() == null ? super.estimateCardinality(scope, graph, edge) : 1000000;
             }
         });
@@ -373,7 +373,7 @@ class CardinalityQueryPlannerTest {
 
     @Test
     void enclosingScopeVariablesReduceLookupCost() {
-        Query query = query("?x :object ?s . ?s :subject ?y");
+        QueryPlan query = query("?x :object ?s . ?s :subject ?y");
         CardinalityPatternOrdering.sort(query, null, query.getBody(), List.of("s"), List.of(),
                 new StatisticsProducer(Map.of("urn:bench:object", 500L, "urn:bench:subject", 5000L)));
         assertEquals(List.of("urn:bench:subject", "urn:bench:object"), predicates(query));
@@ -381,7 +381,7 @@ class CardinalityQueryPlannerTest {
 
     @Test
     void zeroCardinalityRemainsCheaperThanFullyBoundProbe() {
-        Query query = query("?s :probe ?o . ?s :empty ?o");
+        QueryPlan query = query("?s :probe ?o . ?s :empty ?o");
         CardinalityPatternOrdering.sort(query, null, query.getBody(), List.of("s", "o"), List.of(),
                 new StatisticsProducer(Map.of("urn:bench:probe", 1L, "urn:bench:empty", 0L)));
         assertEquals(List.of("urn:bench:empty", "urn:bench:probe"), predicates(query));
@@ -390,12 +390,12 @@ class CardinalityQueryPlannerTest {
     private static void assertPlan(String body, Map<String, Long> counts, List<String> expected) {
         Map<String, Long> qualified = new java.util.HashMap<>();
         counts.forEach((key, value) -> qualified.put("urn:bench:" + key, value));
-        Query query = query(body);
+        QueryPlan query = query(body);
         query.complete(new StatisticsProducer(qualified));
         assertEquals(expected.stream().map(name -> "urn:bench:" + name).toList(), predicates(query));
     }
 
-    private static Query query(String body) {
+    private static QueryPlan query(String body) {
         return new CoreseAstQueryBuilder().toNextQuery((SelectQueryAst) new SparqlParser()
                 .parse(PREFIX + "SELECT * { " + body + " }"));
     }
@@ -404,7 +404,7 @@ class CardinalityQueryPlannerTest {
         return Values.factory().createIRI("urn:bench:" + local);
     }
 
-    private static List<String> predicates(Query query) {
+    private static List<String> predicates(QueryPlan query) {
         return edges(query.getBody()).stream().map(edge -> edge.getEdgeLabel()).toList();
     }
 
@@ -434,7 +434,7 @@ class CardinalityQueryPlannerTest {
                 lowDistinctIri.stringValue(), new PredicateStatistics(lowDistinctIri, 1000, 2, 100),
                 highDistinctIri.stringValue(), new PredicateStatistics(highDistinctIri, 1000, 500, 100));
 
-        Query query = query("?s :seed 1 . ?s :lowDistinct ?o1 . ?s :highDistinct ?o2");
+        QueryPlan query = query("?s :seed 1 . ?s :lowDistinct ?o1 . ?s :highDistinct ?o2");
         query.complete(new StatisticsProducer(counts, pStats));
 
         List<String> plan = predicates(query);
@@ -458,7 +458,7 @@ class CardinalityQueryPlannerTest {
                 lowDistinctIri.stringValue(), new PredicateStatistics(lowDistinctIri, 1000, 100, 2),
                 highDistinctIri.stringValue(), new PredicateStatistics(highDistinctIri, 1000, 100, 500));
 
-        Query query = query("?x :seed ?shared . ?s1 :lowDistinctObj ?shared . ?s2 :highDistinctObj ?shared");
+        QueryPlan query = query("?x :seed ?shared . ?s1 :lowDistinctObj ?shared . ?s2 :highDistinctObj ?shared");
         query.complete(new StatisticsProducer(counts, pStats));
 
         List<String> plan = predicates(query);
@@ -507,7 +507,7 @@ class CardinalityQueryPlannerTest {
         assertEquals(10000, statsHigh.distinctObjects());
 
         // High selectivity (high distinct objects = small match count per bound object) is placed first
-        Query plannedQuery = query("?x :seed ?t . ?s1 :lowSel ?t . ?s2 :highSel ?t");
+        QueryPlan plannedQuery = query("?x :seed ?t . ?s1 :lowSel ?t . ?s2 :highSel ?t");
         plannedQuery.complete(new StorageManagerProducer(benchStorage));
         List<String> optimalPlan = predicates(plannedQuery);
         assertEquals(List.of(seed.stringValue(), highSel.stringValue(), lowSel.stringValue()), optimalPlan);
@@ -538,12 +538,12 @@ class CardinalityQueryPlannerTest {
         }
 
         @Override
-        public long estimateCardinality(Query query, Node graph, Edge edge) {
+        public long estimateCardinality(QueryPlan query, Node graph, Edge edge) {
             return counts.getOrDefault(edge.getEdgeLabel(), UNKNOWN_CARDINALITY);
         }
 
         @Override
-        public PredicateStatistics getPredicateStatistics(Query query, Node graphNode, IRI predicate) {
+        public PredicateStatistics getPredicateStatistics(QueryPlan query, Node graphNode, IRI predicate) {
             return predicateStats.get(predicate.stringValue());
         }
     }

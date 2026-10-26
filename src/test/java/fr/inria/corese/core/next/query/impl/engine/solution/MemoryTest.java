@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.query.impl.engine.solution;
 
 import fr.inria.corese.core.next.query.impl.engine.eval.Eval;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 
 import fr.inria.corese.core.next.query.impl.engine.model.BindingContext;
 import fr.inria.corese.core.next.query.impl.engine.model.ExpType;
@@ -34,7 +34,7 @@ class MemoryTest {
     private Matcher mockMatcher;
     private Evaluator mockEvaluator;
     private Node mockNode;
-    private Query mockQuery;
+    private QueryPlan mockQuery;
     private Eval mockEval;
 
     @BeforeEach
@@ -42,7 +42,7 @@ class MemoryTest {
         mockMatcher = mock(Matcher.class);
         mockEvaluator = mock(Evaluator.class);
         mockNode = mock(Node.class);
-        mockQuery = mock(Query.class);
+        mockQuery = mock(QueryPlan.class);
         mockEval = mock(Eval.class);
 
         memory = new Memory(mockMatcher, mockEvaluator);
@@ -115,7 +115,7 @@ class MemoryTest {
     }
 
     @Nested
-    @DisplayName("Query Management Tests")
+    @DisplayName("QueryPlan Management Tests")
     class QueryManagementTests {
 
         @Test

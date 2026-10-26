@@ -22,7 +22,7 @@ import fr.inria.corese.core.next.query.impl.engine.model.Expr;
 import fr.inria.corese.core.next.query.impl.engine.model.ExprType;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,7 +47,7 @@ class CoreseAstQueryBuilderTest extends AbstractSparqlParserFeatureTest {
     void buildsMinimalSelectStarQuery() {
         SelectQueryAst select = new SelectQueryAst(group(singleTriple()));
 
-        Query query = builder.toNextQuery(select);
+        QueryPlan query = builder.toNextQuery(select);
 
         assertTrue(query.getBody().isAnd(), "the query body should be an AND group");
         assertEquals(1, query.getBody().size(), "the WHERE should contain one compiled element");
@@ -59,12 +59,12 @@ class CoreseAstQueryBuilderTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
-    @DisplayName("Parser -> SelectQueryAst -> Query keeps the SELECT * path executable")
+    @DisplayName("Parser -> SelectQueryAst -> QueryPlan keeps the SELECT * path executable")
     void buildsQueryFromParsedSelectStar() {
         QueryAst ast = newParserDefault().parse("SELECT * WHERE { ?s ?p ?o . }");
         SelectQueryAst select = assertInstanceOf(SelectQueryAst.class, ast);
 
-        Query query = builder.toNextQuery(select);
+        QueryPlan query = builder.toNextQuery(select);
 
         assertEquals(List.of("s", "p", "o"), labels(query.getSelect()));
         assertTrue(query.getBody().get(0).isBGP());
@@ -78,7 +78,7 @@ class CoreseAstQueryBuilderTest extends AbstractSparqlParserFeatureTest {
                 "PREFIX ex: <http://example.org/ex#> " +
                 "SELECT * WHERE { ?s :p ex:o . }");
         SelectQueryAst select = assertInstanceOf(SelectQueryAst.class, ast);
-        Query query = builder.toNextQuery(select);
+        QueryPlan query = builder.toNextQuery(select);
 
         Exp bgp = query.getBody().get(0);
         Edge edge = bgp.get(0).getEdge();
@@ -112,7 +112,7 @@ class CoreseAstQueryBuilderTest extends AbstractSparqlParserFeatureTest {
                 "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
                 "SELECT * WHERE { ?s <rdf:type> ?o . }");
         SelectQueryAst select = assertInstanceOf(SelectQueryAst.class, ast);
-        Query query = builder.toNextQuery(select);
+        QueryPlan query = builder.toNextQuery(select);
 
         Exp bgp = query.getBody().get(0);
         Edge edge = bgp.get(0).getEdge();
@@ -136,7 +136,7 @@ class CoreseAstQueryBuilderTest extends AbstractSparqlParserFeatureTest {
                 "PREFIX http: <http://wrong/> " +
                 "SELECT * WHERE { ?s ?p true . }");
         SelectQueryAst select = assertInstanceOf(SelectQueryAst.class, ast);
-        Query query = builder.toNextQuery(select);
+        QueryPlan query = builder.toNextQuery(select);
 
         Exp bgp = query.getBody().get(0);
         Edge edge = bgp.get(0).getEdge();
@@ -152,7 +152,7 @@ class CoreseAstQueryBuilderTest extends AbstractSparqlParserFeatureTest {
                 "PREFIX file: <http://example.org/file/> " +
                 "SELECT * WHERE { ?s urn:p \"val\"^^file:type . }");
         SelectQueryAst select = assertInstanceOf(SelectQueryAst.class, ast);
-        Query query = builder.toNextQuery(select);
+        QueryPlan query = builder.toNextQuery(select);
 
         Exp bgp = query.getBody().get(0);
         Edge edge = bgp.get(0).getEdge();
@@ -168,7 +168,7 @@ class CoreseAstQueryBuilderTest extends AbstractSparqlParserFeatureTest {
                 null,
                 group(singleTriple()));
 
-        Query query = builder.toNextQuery(select);
+        QueryPlan query = builder.toNextQuery(select);
 
         assertEquals(List.of("o", "s"), labels(query.getSelect()));
     }
@@ -178,7 +178,7 @@ class CoreseAstQueryBuilderTest extends AbstractSparqlParserFeatureTest {
     void selectStarExcludesMinusOnlyVariables() {
         SelectQueryAst select = parseSelect("SELECT * WHERE { ?s ?p ?o . MINUS { ?s ?q ?z } }");
 
-        Query query = builder.toNextQuery(select);
+        QueryPlan query = builder.toNextQuery(select);
 
         assertEquals(List.of("s", "p", "o"), labels(query.getSelect()),
                 "MINUS-only variables are stored separately and must not be visible to SELECT *");
@@ -204,7 +204,7 @@ class CoreseAstQueryBuilderTest extends AbstractSparqlParserFeatureTest {
     void selectStarIncludesOptionalVariables() {
         SelectQueryAst select = parseSelect("SELECT * WHERE { ?s ?p ?o . OPTIONAL { ?s ?q ?z } }");
 
-        Query query = builder.toNextQuery(select);
+        QueryPlan query = builder.toNextQuery(select);
 
         assertEquals(List.of("s", "p", "o", "q", "z"), labels(query.getSelect()),
                 "OPTIONAL variables remain visible in the outer query scope");
@@ -219,7 +219,7 @@ class CoreseAstQueryBuilderTest extends AbstractSparqlParserFeatureTest {
                 group(singleTriple()),
                 SolutionModifierAst.withoutGroupBy(true, false, List.of(), 10L, 3L));
 
-        Query query = builder.toNextQuery(select);
+        QueryPlan query = builder.toNextQuery(select);
 
         assertTrue(query.isDistinct());
         assertEquals(10, query.getLimit());
@@ -238,7 +238,7 @@ class CoreseAstQueryBuilderTest extends AbstractSparqlParserFeatureTest {
                         null,
                         null));
 
-        Query query = builder.toNextQuery(select);
+        QueryPlan query = builder.toNextQuery(select);
 
         assertEquals(1, query.getOrderBy().size());
         assertEquals("s", query.getOrderBy().getFirst().getNode().getLabel());
@@ -251,7 +251,7 @@ class CoreseAstQueryBuilderTest extends AbstractSparqlParserFeatureTest {
         QueryAst ast = newParserDefault().parse("SELECT * WHERE { ?s ?p ?o . } ORDER BY DESC(?o)");
         SelectQueryAst select = assertInstanceOf(SelectQueryAst.class, ast);
 
-        Query query = builder.toNextQuery(select);
+        QueryPlan query = builder.toNextQuery(select);
 
         assertEquals(1, query.getOrderBy().size());
         assertEquals("o", query.getOrderBy().getFirst().getNode().getLabel());
@@ -264,7 +264,7 @@ class CoreseAstQueryBuilderTest extends AbstractSparqlParserFeatureTest {
         QueryAst ast = newParserDefault().parse("SELECT * WHERE { ?s ?p ?o . } ORDER BY STR(?o)");
         SelectQueryAst select = assertInstanceOf(SelectQueryAst.class, ast);
 
-        Query query = builder.toNextQuery(select);
+        QueryPlan query = builder.toNextQuery(select);
 
         assertEquals(1, query.getOrderBy().size());
         assertNotNull(query.getOrderBy().getFirst().getFilter(),
@@ -294,14 +294,14 @@ class CoreseAstQueryBuilderTest extends AbstractSparqlParserFeatureTest {
     void orderByAcceptsOptionalVariable() {
         SelectQueryAst select = parseSelect("SELECT * WHERE { ?s ?p ?o . OPTIONAL { ?s ?q ?z } } ORDER BY ?z");
 
-        Query query = builder.toNextQuery(select);
+        QueryPlan query = builder.toNextQuery(select);
 
         assertEquals(1, query.getOrderBy().size());
         assertEquals("z", query.getOrderBy().getFirst().getNode().getLabel());
     }
 
     @Test
-    @DisplayName("FROM and FROM NAMED are copied onto the next Query dataset")
+    @DisplayName("FROM and FROM NAMED are copied onto the next QueryPlan dataset")
     void appliesDatasetClauses() {
         DatasetClauseAst dataset = new DatasetClauseAst(
                 Set.of(new IriAst("http://example.org/default")),
@@ -311,7 +311,7 @@ class CoreseAstQueryBuilderTest extends AbstractSparqlParserFeatureTest {
                 dataset,
                 group(singleTriple()));
 
-        Query query = builder.toNextQuery(select);
+        QueryPlan query = builder.toNextQuery(select);
 
         assertEquals(List.of("http://example.org/default"), labels(query.getFrom()));
         assertEquals(List.of("http://example.org/named"), labels(query.getNamed()));
@@ -360,7 +360,7 @@ class CoreseAstQueryBuilderTest extends AbstractSparqlParserFeatureTest {
     void filterExistsInSelectWhere() {
         SelectQueryAst select = getSelectQueryAst();
 
-        Query query = builder.toNextQuery(select);
+        QueryPlan query = builder.toNextQuery(select);
 
         Exp filterExp = findFilter(query.getBody());
         assertNotNull(filterExp, "FILTER is in the compiled body");
@@ -385,7 +385,7 @@ class CoreseAstQueryBuilderTest extends AbstractSparqlParserFeatureTest {
                 "SELECT * WHERE { ?s ?p ?o . FILTER NOT EXISTS { ?s <http://example.org/type> ?t } }");
         SelectQueryAst select = assertInstanceOf(SelectQueryAst.class, ast);
 
-        Query query = builder.toNextQuery(select);
+        QueryPlan query = builder.toNextQuery(select);
 
         Exp filterExp = findFilter(query.getBody());
         assertNotNull(filterExp, "FILTER NOT EXISTS compiled into body");
@@ -402,7 +402,7 @@ class CoreseAstQueryBuilderTest extends AbstractSparqlParserFeatureTest {
                 "SELECT * WHERE { ?s ?p ?o . FILTER(!EXISTS { ?s <http://example.org/type> ?t }) }");
         SelectQueryAst select = assertInstanceOf(SelectQueryAst.class, ast);
 
-        Query query = builder.toNextQuery(select);
+        QueryPlan query = builder.toNextQuery(select);
 
         Exp filterExp = findFilter(query.getBody());
         assertNotNull(filterExp, "FILTER !EXISTS compiled into body");

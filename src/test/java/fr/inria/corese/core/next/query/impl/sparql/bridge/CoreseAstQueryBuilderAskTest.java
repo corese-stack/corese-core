@@ -20,7 +20,7 @@ import fr.inria.corese.core.next.query.impl.engine.model.Expr;
 import fr.inria.corese.core.next.query.impl.engine.model.ExprType;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -46,11 +46,11 @@ class CoreseAstQueryBuilderAskTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
-    @DisplayName("Query body is the compiled WHERE and the query is flagged as ASK")
+    @DisplayName("QueryPlan body is the compiled WHERE and the query is flagged as ASK")
     void buildsBodyAndAskFlag() {
         AskQueryAst ask = new AskQueryAst(DatasetClauseAst.none(), whereOneTriple());
 
-        Query query = builder.toNextQuery(ask);
+        QueryPlan query = builder.toNextQuery(ask);
 
         assertNotNull(query.getBody(), "body set from WHERE");
         assertTrue(query.getBody().isAnd(), "group compiles to AND");
@@ -60,12 +60,12 @@ class CoreseAstQueryBuilderAskTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
-    @DisplayName("Parser -> AskQueryAst -> Query keeps the ASK form")
+    @DisplayName("Parser -> AskQueryAst -> QueryPlan keeps the ASK form")
     void buildsQueryFromParsedAsk() {
         SparqlParser parser = newParserDefault();
         AskQueryAst ask = assertInstanceOf(AskQueryAst.class, parser.parse("ASK WHERE { ?s ?p ?o . }"));
 
-        Query query = builder.toNextQuery(ask);
+        QueryPlan query = builder.toNextQuery(ask);
 
         assertTrue(query.isAsk());
         assertFalse(query.isSelect());
@@ -83,33 +83,33 @@ class CoreseAstQueryBuilderAskTest extends AbstractSparqlParserFeatureTest {
                 filter));
         AskQueryAst ask = new AskQueryAst(DatasetClauseAst.none(), where);
 
-        Query query = builder.toNextQuery(ask);
+        QueryPlan query = builder.toNextQuery(ask);
 
         assertTrue(query.isAsk());
         assertTrue(query.getBody().get(1).isFilter(), "FILTER compiled into the body");
     }
 
     @Test
-    @DisplayName("FROM graphs are copied onto the next Query dataset")
+    @DisplayName("FROM graphs are copied onto the next QueryPlan dataset")
     void appliesFromClause() {
         DatasetClauseAst dataset = new DatasetClauseAst(
                 Set.of(new IriAst("http://example.org/g")), Set.of());
         AskQueryAst ask = new AskQueryAst(dataset, whereOneTriple());
 
-        Query query = builder.toNextQuery(ask);
+        QueryPlan query = builder.toNextQuery(ask);
 
         assertEquals(List.of("http://example.org/g"), labels(query.getFrom()));
         assertTrue(query.getNamed().isEmpty());
     }
 
     @Test
-    @DisplayName("FROM NAMED graphs are copied onto the next Query dataset")
+    @DisplayName("FROM NAMED graphs are copied onto the next QueryPlan dataset")
     void appliesFromNamedClause() {
         DatasetClauseAst dataset = new DatasetClauseAst(
                 Set.of(), Set.of(new IriAst("http://example.org/g")));
         AskQueryAst ask = new AskQueryAst(dataset, whereOneTriple());
 
-        Query query = builder.toNextQuery(ask);
+        QueryPlan query = builder.toNextQuery(ask);
 
         assertTrue(query.getFrom().isEmpty());
         assertEquals(List.of("http://example.org/g"), labels(query.getNamed()));
@@ -123,7 +123,7 @@ class CoreseAstQueryBuilderAskTest extends AbstractSparqlParserFeatureTest {
         AskQueryAst ask = new AskQueryAst(
                 DatasetClauseAst.none(), whereOneTriple(), null, null, values);
 
-        Query query = builder.toNextQuery(ask);
+        QueryPlan query = builder.toNextQuery(ask);
         assertTrue(query.getBody().isJoin());
         assertTrue(query.getBody().rest().isValues());
     }
@@ -140,7 +140,7 @@ class CoreseAstQueryBuilderAskTest extends AbstractSparqlParserFeatureTest {
         AskQueryAst ask = new AskQueryAst(DatasetClauseAst.none(),
                 new GroupGraphPatternAst(List.of()));
 
-        Query query = builder.toNextQuery(ask);
+        QueryPlan query = builder.toNextQuery(ask);
 
         assertNotNull(query.getBody());
         assertTrue(query.getBody().isAnd());
@@ -154,7 +154,7 @@ class CoreseAstQueryBuilderAskTest extends AbstractSparqlParserFeatureTest {
         SolutionModifierAst mod = SolutionModifierAst.withoutGroupBy(false, false, List.of(), 10L, 3L);
         AskQueryAst ask = new AskQueryAst(DatasetClauseAst.none(), whereOneTriple(), mod, null, null);
 
-        Query query = builder.toNextQuery(ask);
+        QueryPlan query = builder.toNextQuery(ask);
 
         assertEquals(10, query.getLimit());
         assertEquals(3, query.getOffset());
@@ -166,7 +166,7 @@ class CoreseAstQueryBuilderAskTest extends AbstractSparqlParserFeatureTest {
         AskQueryAst ask = assertInstanceOf(AskQueryAst.class,
                 newParserDefault().parse("ASK WHERE { ?s ?p ?o . } ORDER BY ?s"));
 
-        Query query = builder.toNextQuery(ask);
+        QueryPlan query = builder.toNextQuery(ask);
 
         assertEquals(1, query.getOrderBy().size());
         assertEquals("s", query.getOrderBy().getFirst().getNode().getLabel());
@@ -184,7 +184,7 @@ class CoreseAstQueryBuilderAskTest extends AbstractSparqlParserFeatureTest {
                 filter));
         AskQueryAst ask = new AskQueryAst(DatasetClauseAst.none(), where);
 
-        Query query = builder.toNextQuery(ask);
+        QueryPlan query = builder.toNextQuery(ask);
 
         assertTrue(query.isAsk());
         Exp filterExp = findFilter(query.getBody());
@@ -199,7 +199,7 @@ class CoreseAstQueryBuilderAskTest extends AbstractSparqlParserFeatureTest {
         AskQueryAst ask = assertInstanceOf(AskQueryAst.class,
                 newParserDefault().parse("ASK WHERE { ?s ?p ?o . FILTER NOT EXISTS { ?s <http://example.org/type> ?t } }"));
 
-        Query query = builder.toNextQuery(ask);
+        QueryPlan query = builder.toNextQuery(ask);
 
         assertTrue(query.isAsk());
         Exp filterExp = findFilter(query.getBody());

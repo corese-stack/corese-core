@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.query.impl.engine.diagnostics;
 
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import fr.inria.corese.core.next.query.impl.engine.storage.StorageManagerProducer;
 import fr.inria.corese.core.next.storage.api.StorageManager;
@@ -32,7 +32,7 @@ public final class DiagnosticProducer extends StorageManagerProducer {
     }
 
     @Override
-    public long estimateCardinality(Query query, Node graphNode, Edge edge) {
+    public long estimateCardinality(QueryPlan query, Node graphNode, Edge edge) {
         long count = super.estimateCardinality(query, graphNode, edge);
         diagnostics.estimated(edge, count);
         return count;

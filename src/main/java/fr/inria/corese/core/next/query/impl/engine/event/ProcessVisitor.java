@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.query.impl.engine.event;
 
 import fr.inria.corese.core.next.query.impl.engine.eval.Eval;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 
@@ -29,11 +29,11 @@ public interface ProcessVisitor extends Pointerable<Object> {
         return null;
     }
 
-    default DatatypeValue init(Query q) {
+    default DatatypeValue init(QueryPlan q) {
         return defaultValue();
     }
 
-    default DatatypeValue before(Query q) {
+    default DatatypeValue before(QueryPlan q) {
         return defaultValue();
     }
 
@@ -41,7 +41,7 @@ public interface ProcessVisitor extends Pointerable<Object> {
         return defaultValue();
     }
 
-    default DatatypeValue start(Query q) {
+    default DatatypeValue start(QueryPlan q) {
         return defaultValue();
     }
 
@@ -53,7 +53,7 @@ public interface ProcessVisitor extends Pointerable<Object> {
         return defaultValue();
     }
 
-    default boolean distinct(Eval eval, Query q, Mapping map) {
+    default boolean distinct(Eval eval, QueryPlan q, Mapping map) {
         return true;
     }
 

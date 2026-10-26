@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.query.impl.engine.solution;
 
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 
 /**
  * Strategy interface for direct group aggregation without general expression evaluation.
@@ -15,5 +15,5 @@ public interface GroupAggregator {
      * @param mappings input mappings to reduce
      * @return {@code true} if aggregation succeeded, {@code false} if ordinary evaluation is required
      */
-    boolean tryAggregate(Query query, Mappings mappings);
+    boolean tryAggregate(QueryPlan query, Mappings mappings);
 }

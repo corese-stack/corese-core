@@ -6,7 +6,7 @@ import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.Filter;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
 
 import java.util.List;
@@ -27,7 +27,7 @@ final class SolutionMaterializer {
         this.memory = Objects.requireNonNull(memory, "memory");
     }
 
-    Mapping materialize(Query query, Producer producer, boolean subEvaluation) {
+    Mapping materialize(QueryPlan query, Producer producer, boolean subEvaluation) {
         Node reportNode = bindServiceReport();
         int capacity = solutionNodeCapacity(query, subEvaluation);
         Edge[] queryEdgeCopies = memory.isEdge ? new Edge[memory.nbEdge] : EMPTY_EDGES;
@@ -74,7 +74,7 @@ final class SolutionMaterializer {
         return reportNode;
     }
 
-    private int solutionNodeCapacity(Query query, boolean subEvaluation) {
+    private int solutionNodeCapacity(QueryPlan query, boolean subEvaluation) {
         int capacity = memory.nbNode;
         if (!subEvaluation) {
             for (Exp projection : query.getSelectFun()) {
@@ -112,7 +112,7 @@ final class SolutionMaterializer {
         return targetIndex;
     }
 
-    private boolean projectSolution(Query query, Producer producer, Node[] queryNodeCopies,
+    private boolean projectSolution(QueryPlan query, Producer producer, Node[] queryNodeCopies,
                                     Node[] targetNodeCopies, int targetIndex) {
         int pushedBindings = 0;
         int currentIndex = targetIndex;
@@ -159,7 +159,7 @@ final class SolutionMaterializer {
         return new ProjectionResult(true, pushed, !previouslyBound, value);
     }
 
-    private void popProjectionPrefix(Query query, int count) {
+    private void popProjectionPrefix(QueryPlan query, int count) {
         int popped = 0;
         for (Exp projection : query.getSelectFun()) {
             if (popped >= count) {
@@ -172,7 +172,7 @@ final class SolutionMaterializer {
         }
     }
 
-    private void popProjectionBindings(Query query) {
+    private void popProjectionBindings(QueryPlan query) {
         for (Exp projection : query.getSelectFun()) {
             if (projection.getFilter() != null && !projection.isAggregate()) {
                 memory.pop(projection.getNode());

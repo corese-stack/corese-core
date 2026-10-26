@@ -31,7 +31,7 @@ import fr.inria.corese.core.next.query.impl.engine.model.ExpType.Type;
 import fr.inria.corese.core.next.query.impl.engine.model.Filter;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 
@@ -96,7 +96,7 @@ public final class WhereCompiler implements PlanCopyable<WhereCompiler> {
 
     /**
      * Compiles a full SPARQL {@code WHERE} clause into the runtime body carried by a
-     * KGRAM {@link Query}.
+     * KGRAM {@link QueryPlan}.
      *
      * <p>This is the main entry point of the compiler. It expects the root
      * {@link GroupGraphPatternAst} produced by the parser for a complete
@@ -296,7 +296,7 @@ public final class WhereCompiler implements PlanCopyable<WhereCompiler> {
     private Exp compileService(ServiceAst service) {
         Node endpoint = termResolver.toNode(service.endpoint());
         Exp endpointNode = Exp.create(Type.NODE, endpoint);
-        Query body = Query.create(compile(service.pattern()));
+        QueryPlan body = QueryPlan.create(compile(service.pattern()));
         body.setService(true);
         body.setSilent(service.silent());
         Exp exp = Exp.create(Type.SERVICE, endpointNode, body);

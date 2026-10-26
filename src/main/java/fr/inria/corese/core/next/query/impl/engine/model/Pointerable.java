@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.query.impl.engine.model;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 
 import java.util.ArrayList;
 
@@ -35,7 +35,11 @@ public interface Pointerable<T> extends Loopable<T> {
         return null;
     }
 
-    default Query getQuery() {
+    default QueryPlan getQueryPlan() {
+        return getQuery();
+    }
+
+    default QueryPlan getQuery() {
         return null;
     }
 

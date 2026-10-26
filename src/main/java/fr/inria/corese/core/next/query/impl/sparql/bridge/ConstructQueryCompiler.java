@@ -5,7 +5,7 @@ import fr.inria.corese.core.next.query.impl.engine.model.ExpType.Type;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.model.NodeImpl;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ConstructQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ConstructTemplateAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.SolutionModifierAst;
@@ -16,7 +16,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 import java.util.Objects;
 
 /**
- * Compiles a {@link ConstructQueryAst} template and modifiers into a runtime {@link Query}.
+ * Compiles a {@link ConstructQueryAst} template and modifiers into a runtime {@link QueryPlan}.
  */
 final class ConstructQueryCompiler {
 
@@ -30,7 +30,7 @@ final class ConstructQueryCompiler {
      * @param constructQueryAst AST of the CONSTRUCT query
      * @param compiler where compiler carrying the query prologue
      */
-    static void compile(Query query, ConstructQueryAst constructQueryAst, WhereCompiler compiler) {
+    static void compile(QueryPlan query, ConstructQueryAst constructQueryAst, WhereCompiler compiler) {
         Objects.requireNonNull(query, "query");
         Objects.requireNonNull(constructQueryAst, "constructQueryAst");
         Objects.requireNonNull(compiler, "compiler");
@@ -58,10 +58,10 @@ final class ConstructQueryCompiler {
 
     /**
      * Compiles a {@code CONSTRUCT} template into a KGRAM {@link Exp} (a BGP of edges), kept separate
-     * from the {@code WHERE} body and carried by {@link Query#setConstruct(Exp)}.
+     * from the {@code WHERE} body and carried by {@link QueryPlan#setConstruct(Exp)}.
      */
     private static Exp compileConstructTemplate(
-            Query query, ConstructTemplateAst template, WhereCompiler compiler) {
+            QueryPlan query, ConstructTemplateAst template, WhereCompiler compiler) {
         Exp bgp = Exp.create(Type.BGP);
         for (TriplePatternAst triple : template.triplePatternAsts()) {
             Node subject = constructNode(query, triple.subject(), compiler);
@@ -80,7 +80,7 @@ final class ConstructQueryCompiler {
      * labels become existential (blank-variable) nodes that generate a fresh blank node per solution,
      * as required by the SPARQL specification. IRIs and literals become fresh constant nodes.
      */
-    private static Node constructNode(Query query, TermAst term, WhereCompiler compiler) {
+    private static Node constructNode(QueryPlan query, TermAst term, WhereCompiler compiler) {
         if (term instanceof VarAst(String name)) {
             Node bound = visibleBodyNode(query, name);
             return bound != null ? bound : NodeImpl.forVariable(name);
@@ -90,7 +90,7 @@ final class ConstructQueryCompiler {
         return compiler.termResolver().toPatternNode(term);
     }
 
-    private static Node visibleBodyNode(Query query, String name) {
+    private static Node visibleBodyNode(QueryPlan query, String name) {
         for (Node node : query.selectNodesFromPattern()) {
             if (node.getLabel().equals(name)) {
                 return node;

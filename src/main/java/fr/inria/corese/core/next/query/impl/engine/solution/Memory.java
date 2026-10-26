@@ -13,7 +13,7 @@ import fr.inria.corese.core.next.query.impl.engine.model.ExprType;
 import fr.inria.corese.core.next.query.impl.engine.model.Filter;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import fr.inria.corese.core.next.query.impl.engine.spi.Evaluator;
 import fr.inria.corese.core.next.query.impl.engine.spi.Matcher;
@@ -60,7 +60,7 @@ public class Memory extends PointerObject implements Environment {
     // hence must clear bnodes after each solution
     Map<String, DatatypeValue> bnode;
     //  query or sub query
-    Query query;
+    QueryPlan query;
     Node gNode;
     // to evaluate aggregates such as count(?x)
     Mappings results;
@@ -109,7 +109,7 @@ public class Memory extends PointerObject implements Environment {
     }
 
     @Override
-    public Query getQuery() {
+    public QueryPlan getQuery() {
         return query;
     }
 
@@ -151,7 +151,7 @@ public class Memory extends PointerObject implements Environment {
         setEval(memory.getEval());
     }
 
-    public Memory init(Query q) {
+    public Memory init(QueryPlan q) {
         // store (sub) query
         query = q;
         if (q.isSubQuery()) {
@@ -235,7 +235,7 @@ public class Memory extends PointerObject implements Environment {
      * Note: let ( .., exists pattern),
      * MUST push BGP solution and then push Bind
      */
-    public void copyInto(Query sub, Memory mem, Exp exp) {
+    public void copyInto(QueryPlan sub, Memory mem, Exp exp) {
         if (sub == null) {
             // exists pattern
             copyInto(mem, exp);
@@ -337,7 +337,7 @@ public class Memory extends PointerObject implements Environment {
      * @param subEvaluation whether the solution belongs to an intermediate graph pattern
      * @return captured solution, or null when a projection conflicts with a binding
      */
-    public Mapping store(Query query, Producer producer, boolean subEvaluation) {
+    public Mapping store(QueryPlan query, Producer producer, boolean subEvaluation) {
         return new SolutionMaterializer(this).materialize(query, producer, subEvaluation);
     }
 
@@ -488,7 +488,7 @@ public class Memory extends PointerObject implements Environment {
             return true;
         }
 
-        // Query node already bound but target not equal to binding
+        // QueryPlan node already bound but target not equal to binding
         // also process use case: ?x ?p ?p
         return false;
     }

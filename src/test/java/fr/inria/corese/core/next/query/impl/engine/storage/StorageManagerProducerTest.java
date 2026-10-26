@@ -19,7 +19,7 @@ import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import fr.inria.corese.core.next.query.impl.engine.eval.Eval;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.eval.RdfTermMatcher;
 import fr.inria.corese.core.next.query.impl.engine.eval.SparqlKgramEvaluator;
 import fr.inria.corese.core.next.storage.impl.memory.MemoryStorageManager;
@@ -202,7 +202,7 @@ class StorageManagerProducerTest {
         Node s = variable("s");
         Node p = variable("p");
         Node o = variable("o");
-        Query query = selectStarSpoQuery(s, p, o);
+        QueryPlan query = selectStarSpoQuery(s, p, o);
         Eval eval = Eval.create(producer, new SparqlKgramEvaluator(), new RdfTermMatcher());
 
         Mappings mappings = eval.query(query);
@@ -216,7 +216,7 @@ class StorageManagerProducerTest {
     void parserBridgeExecutesSelectStarSpoOverStorageManagerProducer() throws Exception {
         QueryAst ast = new SparqlParser().parse("SELECT * WHERE { ?s ?p ?o }");
         SelectQueryAst select = assertInstanceOf(SelectQueryAst.class, ast);
-        Query query = new CoreseAstQueryBuilder().toNextQuery(select);
+        QueryPlan query = new CoreseAstQueryBuilder().toNextQuery(select);
         Eval eval = Eval.create(producer, new SparqlKgramEvaluator(), new RdfTermMatcher());
 
         Mappings mappings = eval.query(query);
@@ -231,7 +231,7 @@ class StorageManagerProducerTest {
         Node s = variable("s");
         Node p = variable("p");
         Node o = variable("o");
-        Query query = selectStarSpoQuery(s, p, o);
+        QueryPlan query = selectStarSpoQuery(s, p, o);
         Environment environment = mock(Environment.class);
         when(environment.getQuery()).thenReturn(query);
 
@@ -251,7 +251,7 @@ class StorageManagerProducerTest {
         Node s = variable("s");
         Node o = variable("o");
         Node name = variable("name");
-        Query query = selectKnowsNameQuery(s, o, name);
+        QueryPlan query = selectKnowsNameQuery(s, o, name);
         Environment environment = mock(Environment.class);
         when(environment.getQuery()).thenReturn(query);
 
@@ -314,23 +314,23 @@ class StorageManagerProducerTest {
         return NodeImpl.forLiteral(label, null, null);
     }
 
-    private static Query selectStarSpoQuery(Node s, Node p, Node o) {
+    private static QueryPlan selectStarSpoQuery(Node s, Node p, Node o) {
         Exp bgp = Exp.create(Type.BGP);
         bgp.add(Exp.create(Type.EDGE, new TestQueryEdge(s, KgramNodes.rootProperty(), p, o)));
         return selectQuery(bgp);
     }
 
-    private static Query selectKnowsNameQuery(Node s, Node o, Node name) {
+    private static QueryPlan selectKnowsNameQuery(Node s, Node o, Node name) {
         Exp bgp = Exp.create(Type.BGP);
         bgp.add(Exp.create(Type.EDGE, new TestQueryEdge(s, resource(KNOWS), null, o)));
         bgp.add(Exp.create(Type.EDGE, new TestQueryEdge(o, resource(NAME), null, name)));
         return selectQuery(bgp);
     }
 
-    private static Query selectQuery(Exp bgp) {
+    private static QueryPlan selectQuery(Exp bgp) {
         Exp body = Exp.create(Type.AND);
         body.add(bgp);
-        Query query = Query.create(body);
+        QueryPlan query = QueryPlan.create(body);
         query.collect();
         List<Node> select = query.selectNodesFromPattern();
         query.setSelect(select);

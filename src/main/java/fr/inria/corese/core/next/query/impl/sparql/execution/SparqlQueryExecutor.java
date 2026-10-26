@@ -32,7 +32,7 @@ import fr.inria.corese.core.next.query.impl.engine.eval.SelectCursor;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.eval.RdfTermMatcher;
 import fr.inria.corese.core.next.query.impl.engine.eval.SparqlKgramEvaluator;
 import fr.inria.corese.core.next.query.impl.engine.model.NodeImpl;
@@ -221,7 +221,7 @@ public final class SparqlQueryExecutor {
 
     private TupleQueryResult openTuple(ExecutionRequest request, BindingSet bindings, long timeoutMillis) {
         long started = System.nanoTime();
-        Query query = resolveExecutionQuery(request);
+        QueryPlan query = resolveExecutionQuery(request);
         FallbackReason reason = SelectCursor.fallbackReason(query);
         boolean ordered = reason == FallbackReason.ORDER_BY && SelectCursor.supportsOrderedInput(query);
         if (reason == FallbackReason.NONE || ordered) {
@@ -231,13 +231,13 @@ public final class SparqlQueryExecutor {
         return materializedTuple(request, bindings, timeoutMillis, started);
     }
 
-    private Query resolveExecutionQuery(ExecutionRequest request) {
+    private QueryPlan resolveExecutionQuery(ExecutionRequest request) {
         if (request.prepared != null) {
             return resolve(request, null);
         }
         StorageManagerProducer planning = diagnostics == null
                 ? new StorageManagerProducer(storage) : new DiagnosticProducer(storage, diagnostics);
-        Query query = resolve(request, planning);
+        QueryPlan query = resolve(request, planning);
         query.complete(planning);
         return query;
     }
@@ -256,7 +256,7 @@ public final class SparqlQueryExecutor {
     }
 
     @SuppressWarnings("java:S1181") // Snapshot ownership is released on fatal setup errors before rethrowing unchanged.
-    private TupleQueryResult evaluateSnapshotTuple(Query query, BindingSet bindings,
+    private TupleQueryResult evaluateSnapshotTuple(QueryPlan query, BindingSet bindings,
             long timeoutMillis, long started, StorageManager snapshot, boolean ordered) {
         ExecutionSession session = null;
         StreamingTupleQueryResult result;
@@ -371,7 +371,7 @@ public final class SparqlQueryExecutor {
             throw new IllegalArgumentException("Graph evaluation requires a CONSTRUCT or DESCRIBE query, got: "
                     + ast.getClass().getSimpleName());
         }
-        Query kgramQuery = compile(ast);
+        QueryPlan kgramQuery = compile(ast);
         Mappings mappings = evaluate(kgramQuery, bindings, dataset, timeoutMillis);
         List<Statement> statements = buildConstructStatements(kgramQuery, mappings);
         return new CoreseGraphQueryResult(statements.iterator());
@@ -381,7 +381,7 @@ public final class SparqlQueryExecutor {
     // Internal evaluation pipeline
     // -------------------------------------------------------------------------
 
-    Query compile(QueryAst ast) {
+    QueryPlan compile(QueryAst ast) {
         if (diagnostics == null) return compileAst(ast);
         diagnostics.beginWork();
         long started = System.nanoTime();
@@ -393,7 +393,7 @@ public final class SparqlQueryExecutor {
         }
     }
 
-    private Query compileAst(QueryAst ast) {
+    private QueryPlan compileAst(QueryAst ast) {
         return switch (ast) {
             case SelectQueryAst select -> queryBuilder.toNextQuery(select);
             case AskQueryAst ask -> queryBuilder.toNextQuery(ask);
@@ -403,7 +403,7 @@ public final class SparqlQueryExecutor {
         };
     }
 
-    private Mappings evaluate(Query query, BindingSet bindings, Dataset dataset, long timeoutMillis) {
+    private Mappings evaluate(QueryPlan query, BindingSet bindings, Dataset dataset, long timeoutMillis) {
         return evaluate(new ExecutionRequest(query, dataset), bindings, timeoutMillis);
     }
 
@@ -423,7 +423,7 @@ public final class SparqlQueryExecutor {
 
     private Mappings evaluateCore(Eval eval, ExecutionRequest request, Mapping initialMapping) {
         try {
-            Query query = resolve(request, eval.getProducer());
+            QueryPlan query = resolve(request, eval.getProducer());
             if (diagnostics == null) {
                 return eval.query(null, query, initialMapping);
             }
@@ -436,7 +436,7 @@ public final class SparqlQueryExecutor {
         }
     }
 
-    private Query resolve(ExecutionRequest request, fr.inria.corese.core.next.query.impl.engine.spi.Producer producer) {
+    private QueryPlan resolve(ExecutionRequest request, fr.inria.corese.core.next.query.impl.engine.spi.Producer producer) {
         if (request.resolved) return request.query;
         if (request.prepared != null) {
             request.query = request.prepared.resolve(this, storage, request.dataset, diagnostics);
@@ -456,7 +456,7 @@ public final class SparqlQueryExecutor {
     private static final class ExecutionRequest {
         private final PreparedQueryPlan prepared;
         private final Dataset dataset;
-        private Query query;
+        private QueryPlan query;
         private boolean resolved;
 
         private ExecutionRequest(PreparedQueryPlan prepared, Dataset dataset) {
@@ -464,7 +464,7 @@ public final class SparqlQueryExecutor {
             this.dataset = dataset;
         }
 
-        private ExecutionRequest(Query query, Dataset dataset) {
+        private ExecutionRequest(QueryPlan query, Dataset dataset) {
             this.prepared = null;
             this.query = query;
             this.dataset = dataset;
@@ -565,7 +565,7 @@ public final class SparqlQueryExecutor {
      * Triples where any component is unbound or cannot be converted to a valid
      * RDF term are silently skipped, matching standard SPARQL CONSTRUCT semantics.</p>
      */
-    private List<Statement> buildConstructStatements(Query kgramQuery, Mappings mappings) {
+    private List<Statement> buildConstructStatements(QueryPlan kgramQuery, Mappings mappings) {
         Exp constructTemplate = kgramQuery.getConstruct();
         if (constructTemplate == null) {
             return List.of();
@@ -679,7 +679,7 @@ public final class SparqlQueryExecutor {
      * sets remain significant: for example, a named-only dataset has an empty
      * default graph.</p>
      */
-    void applyDataset(Query kgramQuery, Dataset dataset) {
+    void applyDataset(QueryPlan kgramQuery, Dataset dataset) {
         kgramQuery.setFrom(irisToKgramNodes(dataset.getDefaultGraphs()));
         kgramQuery.setNamed(irisToKgramNodes(dataset.getNamedGraphs()));
         kgramQuery.setDatasetSpecified(true);
@@ -701,11 +701,11 @@ public final class SparqlQueryExecutor {
 
     /**
      * Converts an API {@link BindingSet} into a KGRAM {@link Mapping} that can be
-     * passed to {@link Eval#query(Node, Query, Mapping)} as initial variable bindings.
+     * passed to {@link Eval#query(Node, QueryPlan, Mapping)} as initial variable bindings.
      *
      * <p>Each binding entry becomes a (variable-node, value-node) pair. The variable
      * node carries the variable name as its label so that
-     * {@link Query#getExtNode(String)} can look it up by name during evaluation.
+     * {@link QueryPlan#getExtNode(String)} can look it up by name during evaluation.
      * Bindings whose value cannot be converted to a KGRAM node are silently skipped.</p>
      *
      * @return a {@link Mapping} with the converted bindings, or {@code null} when the

@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.query.impl.engine.eval;
 
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
 import fr.inria.corese.core.next.query.impl.engine.solution.MappingSet;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
@@ -34,7 +34,7 @@ final class EvalJoin {
         stop = true;
     }
 
-    Query getQuery() {
+    QueryPlan getQuery() {
         return engine.getMemory().getQuery();
     }
 

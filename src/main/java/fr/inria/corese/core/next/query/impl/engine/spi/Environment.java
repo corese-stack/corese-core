@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.query.impl.engine.spi;
 import fr.inria.corese.core.next.query.impl.engine.eval.Eval;
 import fr.inria.corese.core.next.query.impl.engine.event.ProcessVisitor;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 
@@ -29,7 +29,7 @@ public interface Environment {
      * Return current query
      *
      */
-    Query getQuery();
+    QueryPlan getQuery();
 
     BindingContext getBind();
 

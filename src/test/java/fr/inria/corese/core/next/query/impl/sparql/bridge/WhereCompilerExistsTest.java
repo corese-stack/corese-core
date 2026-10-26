@@ -8,7 +8,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.NotExistsAst;
 import fr.inria.corese.core.next.query.impl.engine.model.Expr;
 import fr.inria.corese.core.next.query.impl.engine.model.ExprType;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -104,7 +104,7 @@ class WhereCompilerExistsTest {
         FilterAst filter = new FilterAst(new ExistsAst(group(bgp("s", "q", "z"))));
         Exp body = compiler.compile(group(bgp("s", "p", "o"), filter));
 
-        Query query = Query.create(body);
+        QueryPlan query = QueryPlan.create(body);
         query.collect();
 
         assertTrue(query.getPatternNodes().stream().anyMatch(n -> "o".equals(n.getLabel())));

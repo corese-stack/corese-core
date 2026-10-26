@@ -9,7 +9,7 @@ import fr.inria.corese.core.next.query.api.repository.Repository;
 import fr.inria.corese.core.next.query.impl.engine.eval.SelectCursor;
 import fr.inria.corese.core.next.query.impl.engine.model.ExpType.Type;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.sparql.execution.SparqlQueryExecutor;
 import fr.inria.corese.core.next.storage.api.StorageManager;
 import fr.inria.corese.core.next.storage.api.operations.QueryOperations;
@@ -298,9 +298,9 @@ class QueryDeliveryDiagnosticsTest {
 
     @Test
     void guardClassificationDoesNotExecuteAnUnsupportedServiceOrExtension() {
-        assertEquals(FallbackReason.SERVICE, SelectCursor.fallbackReason(Query.create(Exp.create(Type.SERVICE))));
+        assertEquals(FallbackReason.SERVICE, SelectCursor.fallbackReason(QueryPlan.create(Exp.create(Type.SERVICE))));
         var functional = Exp.create(Type.BIND);
         functional.setFunctional(true);
-        assertEquals(FallbackReason.UNSUPPORTED_OPERATOR, SelectCursor.fallbackReason(Query.create(functional)));
+        assertEquals(FallbackReason.UNSUPPORTED_OPERATOR, SelectCursor.fallbackReason(QueryPlan.create(functional)));
     }
 }
