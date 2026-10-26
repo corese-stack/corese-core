@@ -152,7 +152,7 @@ final class SolutionMaterializer {
                 kgram.getVisitor().select(kgram, filter.getExp(), value == null ? null : value.getDatatypeValue());
             }
             if (!memory.push(projection.getNode(), value)) {
-                return new ProjectionResult(false, false, previouslyBound, null);
+                return new ProjectionResult(false, false, false, null);
             }
             pushed = true;
         }

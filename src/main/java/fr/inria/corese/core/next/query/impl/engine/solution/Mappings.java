@@ -80,7 +80,7 @@ public final class Mappings extends PointerObject
     private int length = 0;
     // limit number of results to be displayed
     private int display = Integer.MAX_VALUE;
-    private static GroupAggregator groupAggregator;
+    private static volatile GroupAggregator groupAggregator;
 
     public static void setGroupAggregator(GroupAggregator aggregator) {
         groupAggregator = aggregator;

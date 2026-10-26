@@ -21,10 +21,16 @@ final class ExecutionSession implements AutoCloseable {
 
     ExecutionSession(StorageManager storage, ExecutionDiagnostics diagnostics) {
         Objects.requireNonNull(storage, "storage");
-        this.producer = diagnostics == null
+        StorageManagerProducer p = diagnostics == null
                 ? new StorageManagerProducer(storage)
                 : new DiagnosticProducer(storage, diagnostics);
-        this.eval = Eval.create(producer, new SparqlKgramEvaluator(), new RdfTermMatcher());
+        try {
+            this.eval = Eval.create(p, new SparqlKgramEvaluator(), new RdfTermMatcher());
+            this.producer = p;
+        } catch (RuntimeException | Error failure) {
+            p.close();
+            throw failure;
+        }
     }
 
     StorageManagerProducer producer() {
