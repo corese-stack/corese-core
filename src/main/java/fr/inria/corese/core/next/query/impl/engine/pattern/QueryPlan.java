@@ -177,7 +177,7 @@ public final class QueryPlan extends Exp {
         return new QueryPlan(e);
     }
 
-    /** Creates an empty compiled query. */
+    /** Creates an empty query plan. */
     public static QueryPlan create() {
         return new QueryPlan();
     }

@@ -15,7 +15,7 @@ import java.util.Objects;
  * Coordinates and dispatches execution lifecycle visitors and result listeners
  * for SPARQL evaluation in {@link Eval}.
  *
- * <p>Encapsulates the active {@link ProcessVisitor} (for LDScript and federation hooks)
+ * <p>Encapsulates the active {@link ProcessVisitor} (for query observation and reporting)
  * and the optional {@link ResultListener} (for inference rule execution).</p>
  */
 public final class EvalVisitorDispatcher {
