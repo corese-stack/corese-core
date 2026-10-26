@@ -886,87 +886,15 @@ public class Exp extends PointerObject
      *                   optional, no union
      */
     public void share(List<String> filterVar, List<String> expVar) {
-        switch (type()) {
-            case FILTER, OPT_BIND, OPTION:
-                break;
-
-            case OPTIONAL, MINUS:
-                first().share(filterVar, expVar);
-                break;
-
-            case UNION:
-                shareUnion(filterVar, expVar);
-                break;
-
-            case QUERY:
-                shareQuery(filterVar, expVar);
-                break;
-
-            case BIND:
-                // A FILTER in the same group is evaluated after a preceding BIND
-                // when it references the BIND target. If the expression errors,
-                // the target remains unbound and the relocated filter rejects the
-                // solution, as required by SPARQL's error semantics.
-                share(getNode(), filterVar, expVar);
-                break;
-
-            case EDGE:
-                for (int i = 0; i < nbNode(); i++) {
-                    Node nodePath = getNode(i);
-                    share(nodePath, filterVar, expVar);
-                }
-                break;
-
-            case NODE:
-                share(getNode(), filterVar, expVar);
-                break;
-
-            default:
-                for (Exp exp : this) {
-                    exp.share(filterVar, expVar);
-                }
-        }
+        ExpPatternScope.share(this, filterVar, expVar);
     }
 
     void share(Node node, List<String> fVar, List<String> eVar) {
-        if (node != null && node.isVariable()
-                && fVar.contains(node.getLabel())
-                && !eVar.contains(node.getLabel())) {
-            eVar.add(node.getLabel());
-        }
-    }
-
-    private void shareUnion(List<String> filterVar, List<String> expVar) {
-        ArrayList<String> lVar1 = new ArrayList<>();
-        ArrayList<String> lVar2 = new ArrayList<>();
-        first().share(filterVar, lVar1);
-        rest().share(filterVar, lVar2);
-        for (String varString : lVar1) {
-            if (lVar2.contains(varString) && !expVar.contains(varString)) {
-                expVar.add(varString);
-            }
-        }
-    }
-
-    private void shareQuery(List<String> filterVar, List<String> expVar) {
-        ArrayList<String> lVar = new ArrayList<>();
-        getQuery().getBody().share(filterVar, lVar);
-
-        for (Exp exp : getQuery().getSelectFun()) {
-            String name = exp.getNode().getLabel();
-            if ((lVar.contains(name) || exp.getFilter() != null) && !expVar.contains(name)) {
-                expVar.add(name);
-            }
-        }
+        ExpPatternScope.share(node, fVar, eVar);
     }
 
     public boolean bound(List<String> fvec, List<String> evec) {
-        for (String varString : fvec) {
-            if (!evec.contains(varString)) {
-                return false;
-            }
-        }
-        return true;
+        return ExpPatternScope.bound(fvec, evec);
     }
 
     /**
@@ -977,128 +905,7 @@ public class Exp extends PointerObject
      * optional = true :  we are inside an optional
      */
     void getNodes(ExpNodeCollector h) {
-        switch (type()) {
-            case FILTER:
-                // get exists () nodes
-                if (h.isExist()) {
-                    getExistNodes(getFilter().getExp(), h, h.getExistNodeList());
-                }
-                break;
-
-            case NODE, ACCEPT:
-                //use case: join() check connection, need all variables
-                h.add(getNode());
-                break;
-
-            case EDGE:
-                collectEdgeNodes(h);
-                break;
-
-            case XPATH, EVAL:
-                for (int i = 0; i < nbNode(); i++) {
-                    Node nodeEval = getNode(i);
-                    h.add(nodeEval);
-                }
-                break;
-
-            case VALUES:
-                for (Node varNode : getNodeList()) {
-                    h.add(varNode);
-                }
-                break;
-
-            case MINUS:
-                // second argument does not bind anything: skip it
-                if (first() != null) {
-                    first().getNodes(h);
-                }
-                break;
-
-            case OPTIONAL:
-                collectOptionalNodes(h);
-                break;
-
-            case GRAPH:
-                h.add(getGraphName());
-                if (size() > 1) {
-                    rest().getNodes(h);
-                }
-                break;
-
-            case UNION:
-                collectUnionNodes(h);
-                break;
-
-            case BIND:
-                collectBindNodes(h);
-                break;
-
-            case QUERY:
-                queryNodeList(h);
-                break;
-
-            default:
-                collectDefaultNodes(h);
-                break;
-        }
-    }
-
-    private void collectEdgeNodes(ExpNodeCollector h) {
-        Edge pathEdge = getEdge();
-        h.add(pathEdge.getNode(0));
-        if (pathEdge.getEdgeVariable() != null) {
-            h.add(pathEdge.getEdgeVariable());
-        }
-        h.add(pathEdge.getNode(1));
-        for (int i = 2; i < pathEdge.nbNode(); i++) {
-            h.add(pathEdge.getNode(i));
-        }
-    }
-
-    private void collectOptionalNodes(ExpNodeCollector h) {
-        boolean b = h.isOptional();
-        first().getNodes(h.setOptional(true));
-        if (!h.isInSubScope()) {
-            rest().getNodes(h);
-        }
-        h.setOptional(b);
-    }
-
-    private void collectUnionNodes(ExpNodeCollector h) {
-        if (h.isInSubScope()) {
-            List<Node> left = first().getTheNodes(h.copy());
-            List<Node> right = rest().getTheNodes(h.copy());
-            for (Node nodeLeft : left) {
-                if (right.contains(nodeLeft)) {
-                    h.add(nodeLeft);
-                }
-            }
-        } else {
-            for (Exp ee : this) {
-                ee.getNodes(h);
-            }
-        }
-    }
-
-    private void collectBindNodes(ExpNodeCollector h) {
-        if (h.isBind()) {
-            if (getNodeList() == null) {
-                h.add(getNode());
-            } else {
-                for (Node nodeBind : getNodeList()) {
-                    h.add(nodeBind);
-                }
-            }
-        }
-    }
-
-    private void collectDefaultNodes(ExpNodeCollector h) {
-        for (Exp ee : this) {
-            ee.getNodes(h);
-            if (h.isInSubScopeSample() && ee.isSkipStatement()) {
-                break;
-            }
-        }
+        ExpPatternScope.getNodes(this, h);
     }
 
     boolean isSkipStatement() {
@@ -1109,30 +916,6 @@ public class Exp extends PointerObject
     }
 
     /**
-     * complete handler selectList with this query selectList
-     */
-    void queryNodeList(ExpNodeCollector h) {
-        List<Node> selectList = h.getSelectNodeList();
-        List<Node> subSelectList = getQuery().getSelect();
-
-        if (h.isInSubScope()) {
-            // focus on left optional etc. in query body
-            // because select * includes right optional etc.
-            List<Node> scopeList = getQuery().getBody().getTheNodes(h.copy());
-
-            for (Node nodeScope : scopeList) {
-                if (subSelectList.contains(nodeScope)) {
-                    add(selectList, nodeScope);
-                }
-            }
-        } else {
-            for (Node nodeSubSelect : subSelectList) {
-                add(selectList, nodeSubSelect);
-            }
-        }
-    }
-
-    /**
      * For modularity reasons, Pattern is stored as ExpPattern interface
      */
     public Exp getPattern(Expr exp) {
@@ -1140,34 +923,14 @@ public class Exp extends PointerObject
     }
 
     /**
-     * This is a filter get exists{} nodes if any
-     */
-    void getExistNodes(Expr exp, ExpNodeCollector h, List<Node> lExistNode) {
-        if (exp.oper() == ExprType.EXIST) {
-            Exp pat = getPattern(exp);
-            List<Node> lNode = pat.getTheNodes(h.copy());
-            for (Node exprNode : lNode) {
-                add(lExistNode, exprNode);
-            }
-        } else {
-            for (Expr ee : exp.getExpList()) {
-                getExistNodes(ee, h, lExistNode);
-            }
-        }
-    }
-
-    /**
      * Compute inscope variables for variable binding for MappingSet
      */
     public List<Node> getRecordInScopeNodes(boolean bind) {
-        if (getInScopeNodeList() == null) {
-            setInScopeNodeList(getInScopeNodes(bind));
-        }
-        return getInScopeNodeList();
+        return ExpPatternScope.getRecordInScopeNodes(this, bind);
     }
 
     public List<Node> getRecordInScopeNodesWithoutBind() {
-        return getRecordInScopeNodes(false);
+        return ExpPatternScope.getRecordInScopeNodesWithoutBind(this);
     }
 
     /**
@@ -1175,41 +938,34 @@ public class Exp extends PointerObject
      * setAll(true) ::= for all exp in this exp
      */
     public List<Node> getAllInScopeNodes() {
-        return getTheNodes(handler(true, true).all());
+        return ExpPatternScope.getAllInScopeNodes(this);
     }
 
     /**
      * in scope + bind
      */
     public List<Node> getNodes() {
-        return getTheNodes(handler(false, true).sample());
+        return ExpPatternScope.getNodes(this);
     }
 
     /**
      * in subscope + bind
      */
     public List<Node> getInScopeNodes() {
-        return getTheNodes(handler(true, true).sample());
+        return ExpPatternScope.getInScopeNodes(this);
     }
 
     // in subscope with/without bind
     List<Node> getInScopeNodes(boolean bind) {
-        return getTheNodes(handler(true, bind).sample());
+        return ExpPatternScope.getInScopeNodes(this, true, bind);
     }
 
     public List<Node> getTheNodes(ExpNodeCollector h) {
-        getNodes(h);
-        return h.getNodes();
-    }
-
-    ExpNodeCollector handler(boolean inSubScope, boolean bind) {
-        return new ExpNodeCollector(inSubScope, bind);
+        return ExpPatternScope.getTheNodes(this, h);
     }
 
     void add(List<Node> lNode, Node node) {
-        if (node != null && node.isVariable() && !node.isBlank() && !lNode.contains(node)) {
-            lNode.add(node);
-        }
+        ExpPatternScope.add(lNode, node);
     }
 
     boolean doesNotContain(List<Exp> lExp, Node node) {
@@ -1360,100 +1116,41 @@ public class Exp extends PointerObject
      * in BGP1 before testing filter. see EvalOptional
      */
     void inscopeFilter() {
-        List<Node> l1 = first().getRecordInScopeNodesWithoutBind();
-        List<Node> l2 = rest().getRecordInScopeNodesWithoutBind();
-
-        for (Exp exp : rest()) {
-            if (exp.isFilter() && !exp.getFilter().isRecExist()) {
-                List<String> lvar = exp.getFilter().getVariables();
-                if (bind(l1, lvar) && bind(l2, lvar)) {
-                    getCreateInscopeFilter().add(exp);
-                }
-            }
-        }
+        ExpPatternScope.inscopeFilter(this);
     }
 
     boolean bind(List<Node> lnode, List<String> lvar) {
-        for (String variable : lvar) {
-            boolean suc = false;
-            for (Node bindNode : lnode) {
-                if (bindNode.getLabel().equals(variable)) {
-                    suc = true;
-                    break;
-                }
-            }
-            if (!suc) {
-                return false;
-            }
-        }
-        return true;
+        return ExpPatternScope.bind(lnode, lvar);
     }
 
     /**
      * Check if filter variables are NOT bound by triple, path, values or bind, locally in this Exp
      */
     boolean hasUnboundVariables(Filter f) {
-        List<String> varList = f.getVariables();
-        List<String> nodeList = getNodeVariables();
-
-        for (String variable : varList) {
-            if (!nodeList.contains(variable)) {
-                return true;
-            }
-        }
-
-        return false;
+        return ExpPatternScope.hasUnboundVariables(this, f);
     }
 
     /**
      * Node variables of edge, path, bind, values
      */
     List<String> getNodeVariables() {
-        List<String> list = new ArrayList<>();
-        for (Exp exp : this) {
-            switch (exp.type()) {
-                case EDGE:
-                    exp.getEdgeVariables(list);
-                    break;
-                case BIND:
-                    exp.getBindVariables(list);
-                    break;
-                case VALUES:
-                    exp.getValuesVariables(list);
-                    break;
-                default:
-                    break;
-            }
-        }
-        return list;
+        return ExpPatternScope.getNodeVariables(this);
     }
 
     void getBindVariables(List<String> list) {
-        if (getNodeList() == null) {
-            addVariable(list, getNode());
-        } else {
-            getValuesVariables(list);
-        }
+        ExpPatternScope.getBindVariables(this, list);
     }
 
     void getValuesVariables(List<String> list) {
-        for (Node valuesNode : getNodeList()) {
-            addVariable(list, valuesNode);
-        }
+        ExpPatternScope.getValuesVariables(this, list);
     }
 
     void getEdgeVariables(List<String> list) {
-        addVariable(list, getEdge().getNode(0));
-        addVariable(list, getEdge().getNode(1));
-        if (!isPath()) {
-            addVariable(list, getEdge().getProperty());
-        }
+        ExpPatternScope.getEdgeVariables(this, list);
     }
 
     void addVariable(List<String> list, Node node) {
-        if (node.isVariable() && !list.contains(node.getLabel())) {
-            list.add(node.getLabel());
-        }
+        ExpPatternScope.addVariable(list, node);
     }
 
     // optional postponed filters

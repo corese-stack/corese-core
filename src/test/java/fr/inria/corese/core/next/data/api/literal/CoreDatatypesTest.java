@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class CoreDatatypesTest {
 
     @Test
-    void testGetDatatypeFromIRI_ValidXsdDatatype() {
+    void testGetDatatypeFromIriValidXsdDatatype() {
         // Test valid XSD datatype
         IRI xsdStringIri = new SimpleIRI("http://www.w3.org/2001/XMLSchema#string");
         CoreDatatype datatype = CoreDatatypes.from(xsdStringIri);
@@ -17,7 +17,7 @@ class CoreDatatypesTest {
     }
 
     @Test
-    void testGetDatatypeFromIRI_ValidRdfDatatype() {
+    void testGetDatatypeFromIriValidRdfDatatype() {
         // Test valid RDF datatype (langString)
         IRI langStringIri = new SimpleIRI("http://www.w3.org/1999/02/22-rdf-syntax-ns#langString");
         CoreDatatype datatype = CoreDatatypes.from(langStringIri);
@@ -25,7 +25,7 @@ class CoreDatatypesTest {
     }
 
     @Test
-    void testGetDatatypeFromIRI_InvalidDatatype() {
+    void testGetDatatypeFromIriInvalidDatatype() {
         // Test unknown datatype
         IRI invalidIri = new SimpleIRI("http://example.com/unknownDatatype");
         CoreDatatype datatype = CoreDatatypes.from(invalidIri);
@@ -34,7 +34,7 @@ class CoreDatatypesTest {
     }
 
     @Test
-    void testGetDatatypeFromIRI_NullDatatype() {
+    void testGetDatatypeFromIriNullDatatype() {
         // Test passing a null IRI
         CoreDatatype datatype = CoreDatatypes.from(null);
 

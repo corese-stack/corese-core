@@ -94,14 +94,15 @@ class SparqlParserReplaceTest extends AbstractSparqlParserFeatureTest {
     @DisplayName("ORDER BY REPLACE(?label, ?pattern, ?replacement, ?missingFlags) — should reject variable not visible in WHERE")
     void shouldRejectOrderByReplaceWhenVariableNotVisibleInWhere() {
         SparqlParser parser = newParserDefault();
-
-        QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+        String query = """
                 SELECT ?label WHERE {
                   ?s ?p ?label .
                   ?s <http://example.com/pattern> ?pattern .
                   ?s <http://example.com/replacement> ?replacement .
                 } ORDER BY REPLACE(?label, ?pattern, ?replacement, ?missingFlags)
-                """));
+                """;
+
+        QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse(query));
 
         assertEquals("Variable ?missingFlags used in ORDER BY is not visible in WHERE clause", exception.getMessage());
     }

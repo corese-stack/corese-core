@@ -24,7 +24,7 @@ class TurtleSerializerOptionsTest {
     @Test
     @DisplayName("defaultConfig() should return a config with expected Turtle defaults")
     @SuppressWarnings("java:S5961")
-    void defaultConfig_shouldReturnExpectedDefaults() {
+    void defaultConfigShouldreturnexpecteddefaults() {
         TurtleSerializerOptions config = TurtleSerializerOptions.defaultConfig();
 
         assertNotNull(config, "Default config should not be null");
@@ -68,7 +68,7 @@ class TurtleSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding useCollections")
-    void builder_shouldAllowOverridingUseCollections() {
+    void builderShouldallowoverridingusecollections() {
         TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .useCollections(false)
                 .build();
@@ -77,7 +77,7 @@ class TurtleSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding blankNodeStyle")
-    void builder_shouldAllowOverridingBlankNodeStyle() {
+    void builderShouldallowoverridingblanknodestyle() {
         TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .blankNodeStyle(BlankNodeStyle.NAMED)
                 .build();
@@ -88,7 +88,7 @@ class TurtleSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding usePrefixes")
-    void builder_shouldAllowOverridingUsePrefixes() {
+    void builderShouldallowoverridinguseprefixes() {
         TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .usePrefixes(false)
                 .build();
@@ -97,7 +97,7 @@ class TurtleSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding autoDeclarePrefixes")
-    void builder_shouldAllowOverridingAutoDeclarePrefixes() {
+    void builderShouldallowoverridingautodeclareprefixes() {
         TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .autoDeclarePrefixes(false)
                 .build();
@@ -106,7 +106,7 @@ class TurtleSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding prefixOrdering")
-    void builder_shouldAllowOverridingPrefixOrdering() {
+    void builderShouldallowoverridingprefixordering() {
         TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .prefixOrdering(PrefixOrdering.USAGE_ORDER)
                 .build();
@@ -115,7 +115,7 @@ class TurtleSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding useCompactTriples")
-    void builder_shouldAllowOverridingUseCompactTriples() {
+    void builderShouldallowoverridingusecompacttriples() {
         TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .useCompactTriples(false)
                 .build();
@@ -124,7 +124,7 @@ class TurtleSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding useRdfTypeShortcut")
-    void builder_shouldAllowOverridingUseRdfTypeShortcut() {
+    void builderShouldallowoverridinguserdftypeshortcut() {
         TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .useRdfTypeShortcut(false)
                 .build();
@@ -133,7 +133,7 @@ class TurtleSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding useMultilineLiterals")
-    void builder_shouldAllowOverridingUseMultilineLiterals() {
+    void builderShouldallowoverridingusemultilineliterals() {
         TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .useMultilineLiterals(false)
                 .build();
@@ -142,7 +142,7 @@ class TurtleSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding prettyPrint")
-    void builder_shouldAllowOverridingPrettyPrint() {
+    void builderShouldallowoverridingprettyprint() {
         TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .prettyPrint(false)
                 .build();
@@ -151,7 +151,7 @@ class TurtleSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding indent")
-    void builder_shouldAllowOverridingIndent() {
+    void builderShouldallowoverridingindent() {
         String customIndent = "\t";
         TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .indent(customIndent)
@@ -161,7 +161,7 @@ class TurtleSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding maxLineLength")
-    void builder_shouldAllowOverridingMaxLineLength() {
+    void builderShouldallowoverridingmaxlinelength() {
         int customLength = 120;
         TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .maxLineLength(customLength)
@@ -171,7 +171,7 @@ class TurtleSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding groupBySubject")
-    void builder_shouldAllowOverridingGroupBySubject() {
+    void builderShouldallowoverridinggroupbysubject() {
         TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .groupBySubject(false)
                 .build();
@@ -180,7 +180,7 @@ class TurtleSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding sortSubjects")
-    void builder_shouldAllowOverridingSortSubjects() {
+    void builderShouldallowoverridingsortsubjects() {
         TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .sortSubjects(true)
                 .build();
@@ -189,7 +189,7 @@ class TurtleSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding sortPredicates")
-    void builder_shouldAllowOverridingSortPredicates() {
+    void builderShouldallowoverridingsortpredicates() {
         TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .sortPredicates(true)
                 .build();
@@ -198,7 +198,7 @@ class TurtleSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding strictMode")
-    void builder_shouldAllowOverridingStrictMode() {
+    void builderShouldallowoverridingstrictmode() {
         TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .strictMode(false)
                 .build();
@@ -208,7 +208,7 @@ class TurtleSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding literalDatatypePolicy")
-    void builder_shouldAllowOverridingLiteralDatatypePolicy() {
+    void builderShouldallowoverridingliteraldatatypepolicy() {
         TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicy.ALWAYS_TYPED)
                 .build();
@@ -217,7 +217,7 @@ class TurtleSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow setting baseIRI")
-    void builder_shouldAllowSettingBaseIRI() {
+    void builderShouldallowsettingbaseiri() {
         String testBaseIRI = "http://example.org/base/";
         TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .baseIRI(testBaseIRI)
@@ -227,7 +227,7 @@ class TurtleSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding lineEnding")
-    void builder_shouldAllowOverridingLineEnding() {
+    void builderShouldallowoverridinglineending() {
         String customLineEnding = "\r\n";
         TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .lineEnding(customLineEnding)
@@ -237,7 +237,7 @@ class TurtleSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding validateURIs")
-    void builder_shouldAllowOverridingValidateURIs() {
+    void builderShouldallowoverridingvalidateuris() {
         TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .validateURIs(true)
                 .build();
@@ -246,7 +246,7 @@ class TurtleSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding stableBlankNodeIds")
-    void builder_shouldAllowOverridingStableBlankNodeIds() {
+    void builderShouldallowoverridingstableblanknodeids() {
         TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .stableBlankNodeIds(true)
                 .build();
@@ -255,7 +255,7 @@ class TurtleSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding includeContext")
-    void builder_shouldAllowOverridingIncludeContext() {
+    void builderShouldallowoverridingincludecontext() {
         TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .includeContext(true)
                 .build();

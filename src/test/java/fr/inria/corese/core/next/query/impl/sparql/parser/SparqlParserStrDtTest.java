@@ -104,13 +104,14 @@ class SparqlParserStrDtTest extends AbstractSparqlParserFeatureTest {
     @DisplayName("ORDER BY STRDT(?missing, xsd:string) — should reject variable not visible in WHERE")
     void shouldRejectOrderByStrDtWhenVariableNotVisibleInWhere() {
         SparqlParser parser = newParserDefault();
-
-        QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+        String query = """
                 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
                 SELECT ?label WHERE {
                   ?s ?p ?label .
                 } ORDER BY STRDT(?missing, xsd:string)
-                """));
+                """;
+
+        QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse(query));
 
         assertEquals("Variable ?missing used in ORDER BY is not visible in WHERE clause", exception.getMessage());
     }

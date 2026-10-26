@@ -15,7 +15,7 @@ class NTriplesSerializerOptionsTest {
 
     @Test
     @DisplayName("defaultConfig() should return a config with expected N-Triples defaults")
-    void defaultConfig_shouldReturnExpectedDefaults() {
+    void defaultConfigShouldreturnexpecteddefaults() {
         NTriplesSerializerOptions config = NTriplesSerializerOptions.defaultConfig();
 
         assertNotNull(config, "Default config should not be null");
@@ -31,7 +31,7 @@ class NTriplesSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding includeContext")
-    void builder_shouldAllowOverridingIncludeContext() {
+    void builderShouldallowoverridingincludecontext() {
         NTriplesSerializerOptions config = NTriplesSerializerOptions.builder()
                 .includeContext(true)
                 .build();
@@ -41,7 +41,7 @@ class NTriplesSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding literalDatatypePolicy")
-    void builder_shouldAllowOverridingLiteralDatatypePolicy() {
+    void builderShouldallowoverridingliteraldatatypepolicy() {
         NTriplesSerializerOptions config = NTriplesSerializerOptions.builder()
                 .literalDatatypePolicy(LiteralDatatypePolicy.MINIMAL)
                 .build();
@@ -51,7 +51,7 @@ class NTriplesSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding escapeUnicode")
-    void builder_shouldAllowOverridingEscapeUnicode() {
+    void builderShouldallowoverridingescapeunicode() {
         NTriplesSerializerOptions config = NTriplesSerializerOptions.builder()
                 .escapeUnicode(false)
                 .build();
@@ -61,7 +61,7 @@ class NTriplesSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding strictMode")
-    void builder_shouldAllowOverridingStrictMode() {
+    void builderShouldallowoverridingstrictmode() {
         NTriplesSerializerOptions config = NTriplesSerializerOptions.builder()
                 .strictMode(false)
                 .build();
@@ -71,7 +71,7 @@ class NTriplesSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow setting baseIRI")
-    void builder_shouldAllowSettingBaseIRI() {
+    void builderShouldallowsettingbaseiri() {
         String testBaseIRI = "http://example.org/base/";
         NTriplesSerializerOptions config = NTriplesSerializerOptions.builder()
                 .baseIRI(testBaseIRI)
@@ -82,7 +82,7 @@ class NTriplesSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow setting lineEnding")
-    void builder_shouldAllowSettingLineEnding() {
+    void builderShouldallowsettinglineending() {
         String customLineEnding = "\r\n";
         NTriplesSerializerOptions config = NTriplesSerializerOptions.builder()
                 .lineEnding(customLineEnding)
@@ -93,7 +93,7 @@ class NTriplesSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding validateURIs")
-    void builder_shouldAllowOverridingValidateURIs() {
+    void builderShouldallowoverridingvalidateuris() {
         NTriplesSerializerOptions config = NTriplesSerializerOptions.builder()
                 .validateURIs(true)
                 .build();
@@ -103,7 +103,7 @@ class NTriplesSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding stableBlankNodeIds")
-    void builder_shouldAllowOverridingStableBlankNodeIds() {
+    void builderShouldallowoverridingstableblanknodeids() {
         NTriplesSerializerOptions config = NTriplesSerializerOptions.builder()
                 .stableBlankNodeIds(true)
                 .build();
@@ -113,7 +113,7 @@ class NTriplesSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should handle null values for optional fields gracefully (e.g., baseIRI)")
-    void builder_shouldHandleNullForOptionalFields() {
+    void builderShouldhandlenullforoptionalfields() {
         NTriplesSerializerOptions config = NTriplesSerializerOptions.builder()
                 .baseIRI(null)
                 .build();

@@ -52,7 +52,7 @@ class FileFormatTest {
     @ParameterizedTest(name = "Create FileFormat: {0}")
     @MethodSource("validFormats")
     @DisplayName("Constructor populates fields correctly")
-    void constructor_sets_all_fields(String name,
+    void constructorSetsAllFields(String name,
             List<String> extensions,
             List<String> mimeTypes) {
 
@@ -72,37 +72,37 @@ class FileFormatTest {
      * ----------------------------------------------------------
      */
     @Nested
-    class Constructor_argument_validation {
+    class ConstructorArgumentValidation {
 
         private final List<String> ext = List.of("ttl");
         private final List<String> mime = List.of("text/turtle");
 
         @Test
-        void null_name_throws_NPE() {
+        void nullNameThrowsNpe() {
             assertThrows(NullPointerException.class,
                     () -> new FileFormat(null, ext, mime));
         }
 
         @Test
-        void null_extensions_throws_NPE() {
+        void nullExtensionsThrowsNpe() {
             assertThrows(NullPointerException.class,
                     () -> new FileFormat("Turtle", null, mime));
         }
 
         @Test
-        void null_mimeTypes_throws_NPE() {
+        void nullMimeTypesThrowsNpe() {
             assertThrows(NullPointerException.class,
                     () -> new FileFormat("Turtle", ext, null));
         }
 
         @Test
-        void empty_extensions_throws_IAE() {
+        void emptyExtensionsThrowsIae() {
             assertThrows(IllegalArgumentException.class,
                     () -> new FileFormat("Turtle", List.of(), mime));
         }
 
         @Test
-        void empty_mimeTypes_throws_IAE() {
+        void emptyMimeTypesThrowsIae() {
             assertThrows(IllegalArgumentException.class,
                     () -> new FileFormat("Turtle", ext, List.of()));
         }
@@ -114,7 +114,7 @@ class FileFormatTest {
      * ----------------------------------------------------------
      */
     @Test
-    void internal_lists_are_immutable_and_defensively_copied() {
+    void internalListsAreImmutableAndDefensivelyCopied() {
         // Build mutable lists
         List<String> ext = new ArrayList<>(List.of("ttl"));
         List<String> mime = new ArrayList<>(List.of("text/turtle"));
@@ -144,12 +144,12 @@ class FileFormatTest {
      * ----------------------------------------------------------
      */
     @Nested
-    class Equals_and_hashCode_contract {
+    class EqualsAndHashCodeContract {
 
         private final FileFormat base = new FileFormat("Turtle", List.of("ttl"), List.of("text/turtle"));
 
         @Test
-        void symmetry_and_case_insensitivity() {
+        void symmetryAndCaseInsensitivity() {
             FileFormat sameDifferentCase = new FileFormat("tUrTlE", List.of("ttl"), List.of("text/turtle"));
 
             assertEquals(base, sameDifferentCase);
@@ -170,7 +170,7 @@ class FileFormatTest {
         }
 
         @Test
-        void inequality_when_any_field_differs() {
+        void inequalityWhenAnyFieldDiffers() {
             FileFormat diffName = new FileFormat("N-Triples", List.of("ttl"), List.of("text/turtle"));
             FileFormat diffExt = new FileFormat("Turtle", List.of("nt"), List.of("text/turtle"));
             FileFormat diffMime = new FileFormat("Turtle", List.of("ttl"), List.of("application/n-triples"));
@@ -190,7 +190,7 @@ class FileFormatTest {
      * ----------------------------------------------------------
      */
     @Test
-    void toString_contains_all_relevant_information() {
+    void toStringContainsAllRelevantInformation() {
         FileFormat format = new FileFormat("Turtle", List.of("ttl"), List.of("text/turtle"));
 
         String out = format.toString();

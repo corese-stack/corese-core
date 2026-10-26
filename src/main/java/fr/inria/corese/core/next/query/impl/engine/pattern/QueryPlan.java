@@ -1274,6 +1274,10 @@ public final class QueryPlan extends Exp {
         return getOuterQuery().newNodeIndex();
     }
 
+    public int allocateNodeIndex() {
+        return layout.allocateNodeIndex();
+    }
+
     int newNodeIndex() {
         return layout.allocateNodeIndex();
     }

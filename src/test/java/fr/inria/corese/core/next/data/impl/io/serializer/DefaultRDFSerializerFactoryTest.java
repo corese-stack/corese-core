@@ -47,7 +47,7 @@ class DefaultRDFSerializerFactoryTest {
 
     @Test
     @DisplayName("createSerializer should return TurtleSerializer for TURTLE format")
-    void createSerializer_shouldReturnTurtleSerializer_forTurtleFormat() {
+    void createSerializerShouldreturnturtleserializerForturtleformat() {
         TurtleSerializerOptions config = TurtleSerializerOptions.defaultConfig();
         try (MockedConstruction<TurtleSerializer> mockedConstruction = mockConstruction(TurtleSerializer.class)) {
             RDFSerializer serializer = factory.createSerializer(RDFFormat.TURTLE, mockModel, config);
@@ -61,7 +61,7 @@ class DefaultRDFSerializerFactoryTest {
 
     @Test
     @DisplayName("createSerializer should return NTriplesSerializer for NTRIPLES format")
-    void createSerializer_shouldReturnNTriplesSerializer_forNTriplesFormat() {
+    void createSerializerShouldreturnntriplesserializerForntriplesformat() {
         NTriplesSerializerOptions config = NTriplesSerializerOptions.defaultConfig();
         try (MockedConstruction<NTriplesSerializer> mockedConstruction = mockConstruction(NTriplesSerializer.class)) {
             RDFSerializer serializer = factory.createSerializer(RDFFormat.NTRIPLES, mockModel, config);
@@ -75,7 +75,7 @@ class DefaultRDFSerializerFactoryTest {
 
     @Test
     @DisplayName("createSerializer should return NQuadsSerializer for NQUADS format")
-    void createSerializer_shouldReturnNQuadsSerializer_forNQuadsFormat() {
+    void createSerializerShouldreturnnquadsserializerFornquadsformat() {
         NQuadsSerializerOptions config = NQuadsSerializerOptions.defaultConfig();
         try (MockedConstruction<NQuadsSerializer> mockedConstruction = mockConstruction(NQuadsSerializer.class)) {
             RDFSerializer serializer = factory.createSerializer(RDFFormat.NQUADS, mockModel, config);
@@ -89,7 +89,7 @@ class DefaultRDFSerializerFactoryTest {
 
     @Test
     @DisplayName("createSerializer should return TriGSerializer for TRIG format")
-    void createSerializer_shouldReturnTriGSerializer_forTriGFormat() {
+    void createSerializerShouldreturntrigserializerFortrigformat() {
         TriGSerializerOptions config = TriGSerializerOptions.defaultConfig();
         try (MockedConstruction<TriGSerializer> mockedConstruction = mockConstruction(TriGSerializer.class)) {
             RDFSerializer serializer = factory.createSerializer(RDFFormat.TRIG, mockModel, config);
@@ -103,7 +103,7 @@ class DefaultRDFSerializerFactoryTest {
 
     @Test
     @DisplayName("createSerializer should return XmlSerializer for RDFXML format")
-    void createSerializer_shouldReturnXmlSerializer_forRdfXmlFormat() {
+    void createSerializerShouldreturnxmlserializerForrdfxmlformat() {
         RDFXMLSerializerOptions config = RDFXMLSerializerOptions.defaultConfig();
         try (MockedConstruction<RDFXMLSerializer> mockedConstruction = mockConstruction(RDFXMLSerializer.class)) {
             RDFSerializer serializer = factory.createSerializer(RDFFormat.RDFXML, mockModel, config);
@@ -116,7 +116,7 @@ class DefaultRDFSerializerFactoryTest {
 
     @Test
     @DisplayName("createSerializer should return CanonicalSerializer for CANONICAL_RDF format")
-    void createSerializer_shouldReturnCanonicalSerializer_forCanonicalRdfFormat() {
+    void createSerializerShouldreturncanonicalserializerForcanonicalrdfformat() {
         RDFC10SerializerOptions config = RDFC10SerializerOptions.defaultConfig();
         try (MockedConstruction<RDFC10Serializer> mockedConstruction = mockConstruction(RDFC10Serializer.class)) {
             RDFSerializer serializer = factory.createSerializer(RDFFormat.RDFC_1_0, mockModel, config);
@@ -129,7 +129,7 @@ class DefaultRDFSerializerFactoryTest {
 
     @Test
     @DisplayName("createSerializer should return JSONLDSerializer for JSONLD format")
-    void createSerializer_shouldReturnJSONLDSerializer_forJSONLDFormat() {
+    void createSerializerShouldreturnjsonldserializerForjsonldformat() {
         JSONLDOptions config = new JSONLDOptions.Builder().build();
         try (MockedConstruction<JSONLDSerializer> mockedConstruction = mockConstruction(JSONLDSerializer.class)) {
             RDFSerializer serializer = factory.createSerializer(RDFFormat.JSONLD, mockModel, config);
@@ -143,7 +143,7 @@ class DefaultRDFSerializerFactoryTest {
 
     @Test
     @DisplayName("createSerializer should throw NullPointerException for a null format")
-    void createSerializer_shouldThrowNPE_forNullFormat() {
+    void createSerializerShouldthrownpeFornullformat() {
         TurtleSerializerOptions config = TurtleSerializerOptions.defaultConfig();
         assertThrows(NullPointerException.class,
                 () -> factory.createSerializer(null, mockModel, config),
@@ -152,7 +152,7 @@ class DefaultRDFSerializerFactoryTest {
 
     @Test
     @DisplayName("createSerializer should throw NullPointerException for a null model")
-    void createSerializer_shouldThrowNPE_forNullModel() {
+    void createSerializerShouldthrownpeFornullmodel() {
         TurtleSerializerOptions config = TurtleSerializerOptions.defaultConfig();
         assertThrows(NullPointerException.class,
                 () -> factory.createSerializer(RDFFormat.TURTLE, null, config),
@@ -161,7 +161,7 @@ class DefaultRDFSerializerFactoryTest {
 
     @Test
     @DisplayName("createSerializer should throw NullPointerException for a null config")
-    void createSerializer_shouldThrowNPE_forNullConfig() {
+    void createSerializerShouldthrownpeFornullconfig() {
         assertThrows(NullPointerException.class,
                 () -> factory.createSerializer(RDFFormat.TURTLE, mockModel, null),
                 "Should throw NullPointerException for null SerializationConfig");
@@ -169,7 +169,7 @@ class DefaultRDFSerializerFactoryTest {
 
     @Test
     @DisplayName("createSerializer without config should return TurtleSerializer for TURTLE format")
-    void createSerializerWithoutConfig_shouldReturnTurtleSerializer_forTurtleFormat() {
+    void createSerializerWithoutConfigShouldreturnturtleserializerForturtleformat() {
         try (MockedConstruction<TurtleSerializer> mockedConstruction = mockConstruction(TurtleSerializer.class)) {
             RDFSerializer serializer = factory.createSerializer(RDFFormat.TURTLE, mockModel);
 
@@ -182,7 +182,7 @@ class DefaultRDFSerializerFactoryTest {
 
     @Test
     @DisplayName("createSerializer without config should return NTriplesSerializer for NTRIPLES format")
-    void createSerializerWithoutConfig_shouldReturnNTriplesSerializer_forNTriplesFormat() {
+    void createSerializerWithoutConfigShouldreturnntriplesserializerForntriplesformat() {
         try (MockedConstruction<NTriplesSerializer> mockedConstruction = mockConstruction(NTriplesSerializer.class)) {
             RDFSerializer serializer = factory.createSerializer(RDFFormat.NTRIPLES, mockModel);
 
@@ -195,7 +195,7 @@ class DefaultRDFSerializerFactoryTest {
 
     @Test
     @DisplayName("createSerializer without config should return NQuadsSerializer for NQUADS format")
-    void createSerializerWithoutConfig_shouldReturnNQuadsSerializer_forNQuadsFormat() {
+    void createSerializerWithoutConfigShouldreturnnquadsserializerFornquadsformat() {
         try (MockedConstruction<NQuadsSerializer> mockedConstruction = mockConstruction(NQuadsSerializer.class)) {
             RDFSerializer serializer = factory.createSerializer(RDFFormat.NQUADS, mockModel);
 
@@ -208,7 +208,7 @@ class DefaultRDFSerializerFactoryTest {
 
     @Test
     @DisplayName("createSerializer without config should return TriGSerializer for TRIG format")
-    void createSerializerWithoutConfig_shouldReturnTriGSerializer_forTriGFormat() {
+    void createSerializerWithoutConfigShouldreturntrigserializerFortrigformat() {
         try (MockedConstruction<TriGSerializer> mockedConstruction = mockConstruction(TriGSerializer.class)) {
             RDFSerializer serializer = factory.createSerializer(RDFFormat.TRIG, mockModel);
 
@@ -221,7 +221,7 @@ class DefaultRDFSerializerFactoryTest {
 
     @Test
     @DisplayName("createSerializer without config should return XmlSerializer for RDFXML format")
-    void createSerializerWithoutConfig_shouldReturnXmlSerializer_forRdfXmlFormat() {
+    void createSerializerWithoutConfigShouldreturnxmlserializerForrdfxmlformat() {
         try (MockedConstruction<RDFXMLSerializer> mockedConstruction = mockConstruction(RDFXMLSerializer.class)) {
             RDFSerializer serializer = factory.createSerializer(RDFFormat.RDFXML, mockModel);
 
@@ -234,7 +234,7 @@ class DefaultRDFSerializerFactoryTest {
 
     @Test
     @DisplayName("createSerializer without config should return CanonicalSerializer for CANONICAL_RDF format")
-    void createSerializerWithoutConfig_shouldReturnCanonicalSerializer_forCanonicalRdfFormat() {
+    void createSerializerWithoutConfigShouldreturncanonicalserializerForcanonicalrdfformat() {
         try (MockedConstruction<RDFC10Serializer> mockedConstruction = mockConstruction(RDFC10Serializer.class)) {
             RDFSerializer serializer = factory.createSerializer(RDFFormat.RDFC_1_0, mockModel);
 
@@ -247,7 +247,7 @@ class DefaultRDFSerializerFactoryTest {
 
     @Test
     @DisplayName("createSerializer without config should return JSONLDSerializer for JSONLD format")
-    void createSerializerWithoutConfig_shouldReturnJSONLDSerializer_forJSONLDFormat() {
+    void createSerializerWithoutConfigShouldreturnjsonldserializerForjsonldformat() {
         try (MockedConstruction<JSONLDSerializer> mockedConstruction = mockConstruction(JSONLDSerializer.class)) {
             RDFSerializer serializer = factory.createSerializer(RDFFormat.JSONLD, mockModel);
 
@@ -260,7 +260,7 @@ class DefaultRDFSerializerFactoryTest {
 
     @Test
     @DisplayName("createSerializer without config should throw NullPointerException for a null format")
-    void createSerializerWithoutConfig_shouldThrowNPE_forNullFormat() {
+    void createSerializerWithoutConfigShouldthrownpeFornullformat() {
         assertThrows(NullPointerException.class,
                 () -> factory.createSerializer(null, mockModel),
                 "Should throw NullPointerException for null RDFFormat");
@@ -268,7 +268,7 @@ class DefaultRDFSerializerFactoryTest {
 
     @Test
     @DisplayName("createSerializer without config should throw NullPointerException for a null model")
-    void createSerializerWithoutConfig_shouldThrowNPE_forNullModel() {
+    void createSerializerWithoutConfigShouldthrownpeFornullmodel() {
         assertThrows(NullPointerException.class,
                 () -> factory.createSerializer(RDFFormat.TURTLE, null),
                 "Should throw NullPointerException for null Model");

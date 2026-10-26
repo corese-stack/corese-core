@@ -15,7 +15,7 @@ class NQuadsSerializerOptionsTest {
 
     @Test
     @DisplayName("defaultConfig() should return a config with expected N-Quads defaults")
-    void defaultConfig_shouldReturnExpectedDefaults() {
+    void defaultConfigShouldreturnexpecteddefaults() {
         NQuadsSerializerOptions config = NQuadsSerializerOptions.defaultConfig();
 
         assertNotNull(config, "Default config should not be null");
@@ -31,7 +31,7 @@ class NQuadsSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding includeContext")
-    void builder_shouldAllowOverridingIncludeContext() {
+    void builderShouldallowoverridingincludecontext() {
         NQuadsSerializerOptions config = NQuadsSerializerOptions.builder()
                 .includeContext(false)
                 .build();
@@ -41,7 +41,7 @@ class NQuadsSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding literalDatatypePolicy")
-    void builder_shouldAllowOverridingLiteralDatatypePolicy() {
+    void builderShouldallowoverridingliteraldatatypepolicy() {
         NQuadsSerializerOptions config = NQuadsSerializerOptions.builder()
                 .literalDatatypePolicy(LiteralDatatypePolicy.MINIMAL)
                 .build();
@@ -51,7 +51,7 @@ class NQuadsSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding escapeUnicode")
-    void builder_shouldAllowOverridingEscapeUnicode() {
+    void builderShouldallowoverridingescapeunicode() {
         NQuadsSerializerOptions config = NQuadsSerializerOptions.builder()
                 .escapeUnicode(false)
                 .build();
@@ -61,7 +61,7 @@ class NQuadsSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding strictMode")
-    void builder_shouldAllowOverridingStrictMode() {
+    void builderShouldallowoverridingstrictmode() {
         NQuadsSerializerOptions config = NQuadsSerializerOptions.builder()
                 .strictMode(false)
                 .build();
@@ -71,7 +71,7 @@ class NQuadsSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow setting baseIRI")
-    void builder_shouldAllowSettingBaseIRI() {
+    void builderShouldallowsettingbaseiri() {
         String testBaseIRI = "http://example.org/base/";
         NQuadsSerializerOptions config = NQuadsSerializerOptions.builder()
                 .baseIRI(testBaseIRI)
@@ -82,7 +82,7 @@ class NQuadsSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow setting lineEnding")
-    void builder_shouldAllowSettingLineEnding() {
+    void builderShouldallowsettinglineending() {
         String customLineEnding = "\r\n";
         NQuadsSerializerOptions config = NQuadsSerializerOptions.builder()
                 .lineEnding(customLineEnding)
@@ -93,7 +93,7 @@ class NQuadsSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding validateURIs")
-    void builder_shouldAllowOverridingValidateURIs() {
+    void builderShouldallowoverridingvalidateuris() {
         NQuadsSerializerOptions config = NQuadsSerializerOptions.builder()
                 .validateURIs(true)
                 .build();
@@ -103,7 +103,7 @@ class NQuadsSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding stableBlankNodeIds")
-    void builder_shouldAllowOverridingStableBlankNodeIds() {
+    void builderShouldallowoverridingstableblanknodeids() {
         NQuadsSerializerOptions config = NQuadsSerializerOptions.builder()
                 .stableBlankNodeIds(true)
                 .build();
@@ -113,7 +113,7 @@ class NQuadsSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should handle null values for optional fields gracefully (e.g., baseIRI)")
-    void builder_shouldHandleNullForOptionalFields() {
+    void builderShouldhandlenullforoptionalfields() {
         NQuadsSerializerOptions config = NQuadsSerializerOptions.builder()
                 .baseIRI(null)
                 .build();

@@ -235,7 +235,7 @@ public abstract class ValueFactoryTest {
 
     @Test
     void testCreateLiteralBigInteger() {
-        BigInteger bi = new BigInteger("1234567890123456789");
+        BigInteger bi = BigInteger.valueOf(1234567890123456789L);
         Literal literal = this.valueFactory.createLiteral(bi);
         assertEquals(bi, literal.integerValue());
     }

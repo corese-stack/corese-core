@@ -22,7 +22,6 @@ class CoreseRepositoryConnectionTransactionTest {
 
     private CoreseRepositoryConnection connection;
     private Transaction transaction;
-    private AtomicBoolean active;
 
     @BeforeEach
     void setUp() {
@@ -30,7 +29,7 @@ class CoreseRepositoryConnectionTransactionTest {
         StorageManager storage = mock(StorageManager.class);
         TransactionManager transactionManager = mock(TransactionManager.class);
         transaction = mock(Transaction.class);
-        active = new AtomicBoolean();
+        AtomicBoolean active = new AtomicBoolean();
 
         when(repository.isOpen()).thenReturn(true);
         when(storage.transactions()).thenReturn(transactionManager);
