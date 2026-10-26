@@ -37,6 +37,7 @@ import fr.inria.corese.core.next.query.impl.engine.eval.RdfTermMatcher;
 import fr.inria.corese.core.next.query.impl.engine.eval.SparqlKgramEvaluator;
 import fr.inria.corese.core.next.query.impl.engine.model.NodeImpl;
 import fr.inria.corese.core.next.query.impl.engine.storage.StorageManagerProducer;
+import fr.inria.corese.core.next.query.impl.sparql.bridge.DirectGroupAggregation;
 import fr.inria.corese.core.next.storage.api.StorageManager;
 import fr.inria.corese.core.next.storage.api.exception.StorageException;
 
@@ -64,6 +65,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  * task; closing the producer releases any statement cursors left by early termination.</p>
  */
 public final class SparqlQueryExecutor {
+
+    static {
+        DirectGroupAggregation.register();
+    }
 
     private static final int QUERY_RUNNING = 0;
     private static final int QUERY_COMPLETED = 1;
@@ -253,23 +258,20 @@ public final class SparqlQueryExecutor {
     @SuppressWarnings("java:S1181") // Snapshot ownership is released on fatal setup errors before rethrowing unchanged.
     private TupleQueryResult evaluateSnapshotTuple(Query query, BindingSet bindings,
             long timeoutMillis, long started, StorageManager snapshot, boolean ordered) {
-        StorageManagerProducer producer = null;
-        Eval eval;
+        ExecutionSession session = null;
         StreamingTupleQueryResult result;
         try {
-            producer = diagnostics == null
-                    ? new StorageManagerProducer(snapshot) : new DiagnosticProducer(snapshot, diagnostics);
-            eval = Eval.create(producer, new SparqlKgramEvaluator(), new RdfTermMatcher());
+            session = new ExecutionSession(snapshot, diagnostics);
             long initialization = diagnostics == null ? 0 : System.nanoTime();
             Mapping initial = buildInitialMapping(bindings);
-            SelectCursor cursor = ordered ? SelectCursor.orderedInput(eval, query, initial)
-                    : new SelectCursor(eval, query, initial);
+            SelectCursor cursor = ordered ? SelectCursor.orderedInput(session.eval(), query, initial)
+                    : new SelectCursor(session.eval(), query, initial);
             if (diagnostics != null) diagnostics.evaluationTime(System.nanoTime() - initialization);
-            result = new StreamingTupleQueryResult(cursor, query, producer, snapshot,
+            result = new StreamingTupleQueryResult(cursor, query, session.producer(), snapshot,
                     diagnostics, timeoutMillis, started);
         } catch (RuntimeException | Error failure) {
             try {
-                if (producer != null) producer.close();
+                if (session != null) session.close();
             } finally {
                 snapshot.close();
             }
@@ -277,7 +279,7 @@ public final class SparqlQueryExecutor {
         }
         if (!ordered) return result;
         try (result) {
-            return new CoreseTupleQueryResult(result.collectOrdered(new TopKSelector(query, eval)));
+            return new CoreseTupleQueryResult(result.collectOrdered(new TopKSelector(query, session.eval())));
         }
     }
 
@@ -410,14 +412,13 @@ public final class SparqlQueryExecutor {
     }
 
     private Mappings evaluate(ExecutionRequest request, BindingSet bindings, long timeoutMillis, long started) {
-        StorageManagerProducer producer = diagnostics == null
-                ? new StorageManagerProducer(storage) : new DiagnosticProducer(storage, diagnostics);
-        Eval eval = Eval.create(producer, new SparqlKgramEvaluator(), new RdfTermMatcher());
-        Mapping initialMapping = buildInitialMapping(bindings);
-        if (timeoutMillis > 0) {
-            return evaluateWithTimeout(eval, producer, request, initialMapping, timeoutMillis, started);
+        try (ExecutionSession session = new ExecutionSession(storage, diagnostics)) {
+            Mapping initialMapping = buildInitialMapping(bindings);
+            if (timeoutMillis > 0) {
+                return evaluateWithTimeout(session.eval(), session.producer(), request, initialMapping, timeoutMillis, started);
+            }
+            return evaluateCore(session.eval(), request, initialMapping);
         }
-        return evaluateCore(eval, request, initialMapping);
     }
 
     private Mappings evaluateCore(Eval eval, ExecutionRequest request, Mapping initialMapping) {

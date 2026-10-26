@@ -39,8 +39,6 @@ import java.util.Map;
  */
 public class Memory extends PointerObject implements Environment {
 
-    private static final String SERVICE_REPORT_ZERO = "?_service_report_0";
-    private static final Edge[] EMPTY_EDGES = new Edge[0];
     // number of times nodes are bound by Stack
     // decrease with backtrack
     int[] nbNodes;
@@ -74,7 +72,7 @@ public class Memory extends PointerObject implements Environment {
     int nbNode = 0;
     // service evaluation detail report
     private DatatypeValue detail;
-    private boolean isEdge;
+    boolean isEdge;
     private BindingContext bindingContext;
 
     public Memory() {
@@ -340,137 +338,7 @@ public class Memory extends PointerObject implements Environment {
      * @return captured solution, or null when a projection conflicts with a binding
      */
     public Mapping store(Query query, Producer producer, boolean subEvaluation) {
-        Node reportNode = bindServiceReport();
-        int capacity = solutionNodeCapacity(query, subEvaluation);
-        Edge[] queryEdgeCopies = isEdge ? new Edge[nbEdge] : EMPTY_EDGES;
-        Edge[] targetEdgeCopies = isEdge ? new Edge[nbEdge] : EMPTY_EDGES;
-        copySolutionEdges(producer, queryEdgeCopies, targetEdgeCopies);
-
-        Node[] queryNodeCopies = new Node[capacity];
-        Node[] targetNodeCopies = new Node[capacity];
-        int boundNodes = copySolutionNodes(queryNodeCopies, targetNodeCopies);
-        Node[] orderByNodes = new Node[query.getOrderBy().size()];
-        Node[] groupByNodes = new Node[query.getGroupBy().size()];
-
-        if (!subEvaluation && !projectSolution(query, producer, queryNodeCopies, targetNodeCopies, boundNodes)) {
-            return null;
-        }
-        Mapping solution = new Mapping(queryEdgeCopies, targetEdgeCopies, queryNodeCopies, targetNodeCopies);
-        mapping = solution;
-        if (!subEvaluation) {
-            solution.init();
-            // Ordering expressions may inspect the projected solution through the environment.
-            orderGroup(query.getOrderBy(), orderByNodes, producer);
-            orderGroup(query.getGroupBy(), groupByNodes, producer);
-            popProjectionBindings(query);
-        }
-        if (reportNode != null) {
-            pop(reportNode);
-            setReport(null);
-        }
-        solution.setOrderBy(orderByNodes);
-        solution.setGroupBy(groupByNodes);
-        clear();
-        mapping = null;
-        return solution;
-    }
-
-    private Node bindServiceReport() {
-        if (getReport() == null) {
-            return null;
-        }
-        Node reportNode = getQuery().getSelectNode(SERVICE_REPORT_ZERO);
-        if (reportNode != null) {
-            push(reportNode, (Node) getReport());
-        }
-        return reportNode;
-    }
-
-    private int solutionNodeCapacity(Query query, boolean subEvaluation) {
-        int capacity = nbNode;
-        if (!subEvaluation) {
-            for (Exp projection : query.getSelectFun()) {
-                if (projection.getFilter() != null && !isBound(projection.getNode())) {
-                    capacity++;
-                }
-            }
-        }
-        return capacity;
-    }
-
-    private void copySolutionEdges(Producer producer, Edge[] queryEdgeCopies, Edge[] targetEdgeCopies) {
-        if (!isEdge) {
-            return;
-        }
-        int targetIndex = 0;
-        for (int sourceIndex = 0; sourceIndex < qEdges.length; sourceIndex++) {
-            if (qEdges[sourceIndex] != null) {
-                queryEdgeCopies[targetIndex] = qEdges[sourceIndex];
-                targetEdgeCopies[targetIndex] = producer.copy(result[sourceIndex]);
-                targetIndex++;
-            }
-        }
-    }
-
-    private int copySolutionNodes(Node[] queryNodeCopies, Node[] targetNodeCopies) {
-        int targetIndex = 0;
-        for (int sourceIndex = 0; sourceIndex < qNodes.length; sourceIndex++) {
-            if (qNodes[sourceIndex] != null) {
-                queryNodeCopies[targetIndex] = qNodes[sourceIndex];
-                targetNodeCopies[targetIndex] = nodes[sourceIndex];
-                targetIndex++;
-            }
-        }
-        return targetIndex;
-    }
-
-    private boolean projectSolution(Query query, Producer producer, Node[] queryNodeCopies,
-                                    Node[] targetNodeCopies, int targetIndex) {
-        int pushedBindings = 0;
-        for (Exp projection : query.getSelectFun()) {
-            Filter filter = projection.getFilter();
-            if (filter == null) {
-                continue;
-            }
-            boolean previouslyBound = isBound(projection.getNode());
-            Node value = null;
-            if (!projection.isAggregate()) {
-                value = evaluateExpressionNode(filter, producer);
-                kgram.getVisitor().select(kgram, filter.getExp(), value == null ? null : value.getDatatypeValue());
-                if (!push(projection.getNode(), value)) {
-                    popProjectionPrefix(query, pushedBindings);
-                    return false;
-                }
-                pushedBindings++;
-            }
-            if (!previouslyBound) {
-                queryNodeCopies[targetIndex] = projection.getNode();
-                targetNodeCopies[targetIndex] = value;
-                targetIndex++;
-            }
-        }
-        return true;
-    }
-
-    private void popProjectionPrefix(Query query, int count) {
-        int popped = 0;
-        for (Exp projection : query.getSelectFun()) {
-            if (popped >= count) {
-                return;
-            }
-            if (projection.getFilter() != null) {
-                pop(projection.getNode());
-                popped++;
-            }
-        }
-    }
-
-    private void popProjectionBindings(Query query) {
-        for (Exp projection : query.getSelectFun()) {
-            if (projection.getFilter() != null && !projection.isAggregate()) {
-                pop(projection.getNode());
-            }
-        }
+        return new SolutionMaterializer(this).materialize(query, producer, subEvaluation);
     }
 
     @Override
@@ -497,36 +365,6 @@ public class Memory extends PointerObject implements Environment {
 
     void setMap(Map<String, DatatypeValue> m) {
         bnode = m;
-    }
-
-    void orderGroup(List<Exp> lExp, Node[] nodes, Producer p) {
-        int n = 0;
-        for (Exp e : lExp) {
-            Node qNode = e.getNode();
-            if (qNode != null) {
-                nodes[n] = getNode(qNode);
-            }
-            if (nodes[n] == null) {
-                Filter f = e.getFilter();
-                if (f != null && !e.isAggregate()) {
-                    nodes[n] = evaluateExpressionNode(f, p);
-                }
-
-            }
-            if (qNode != null && nodes[n] != null && mapping != null) {
-                mapping.setNode(qNode, nodes[n]);
-            }
-            n++;
-        }
-    }
-
-    private Node evaluateExpressionNode(Filter filter, Producer producer) {
-        try {
-            return producer.getNode(kgram.eval(filter, this, producer));
-        } catch (QueryTypeErrorException error) {
-            // A scalar type error leaves a projected value or sorting key unbound.
-            return null;
-        }
     }
 
     boolean pushNodeList(Producer p, Node node, Edge edge, int i) {

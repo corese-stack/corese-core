@@ -7,6 +7,7 @@ import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.model.NodeImpl;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.solution.GroupAggregator;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 import fr.inria.corese.core.next.query.impl.sparql.ast.AggregateAst;
@@ -29,6 +30,16 @@ import java.util.TreeMap;
  * callers requiring those facilities must use the ordinary aggregation path.</p>
  */
 public final class DirectGroupAggregation {
+
+    public static final GroupAggregator INSTANCE = DirectGroupAggregation::tryAggregate;
+
+    static {
+        register();
+    }
+
+    public static void register() {
+        Mappings.setGroupAggregator(INSTANCE);
+    }
 
     private DirectGroupAggregation() {
     }

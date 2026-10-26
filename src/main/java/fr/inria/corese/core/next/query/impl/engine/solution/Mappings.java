@@ -80,6 +80,15 @@ public final class Mappings extends PointerObject
     private int length = 0;
     // limit number of results to be displayed
     private int display = Integer.MAX_VALUE;
+    private static GroupAggregator groupAggregator;
+
+    public static void setGroupAggregator(GroupAggregator aggregator) {
+        groupAggregator = aggregator;
+    }
+
+    public static GroupAggregator getGroupAggregator() {
+        return groupAggregator;
+    }
 
     /** Copies a static VALUES table into independent row containers. */
     @Override
@@ -639,7 +648,8 @@ public final class Mappings extends PointerObject
             }
         }
 
-        if (fr.inria.corese.core.next.query.impl.sparql.bridge.DirectGroupAggregation.tryAggregate(q, this)) {
+        GroupAggregator aggregator = groupAggregator;
+        if (aggregator != null && aggregator.tryAggregate(q, this)) {
             finish(q);
             return;
         }
