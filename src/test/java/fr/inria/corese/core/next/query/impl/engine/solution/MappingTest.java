@@ -176,15 +176,6 @@ class MappingTest {
     class ComparisonTests {
 
         @Test
-        @DisplayName("Should compare mappings")
-        void testCompareMappings() {
-            Mapping other = new Mapping();
-
-            assertDoesNotThrow(() -> mapping.compare(other),
-                    "compare should not throw exception");
-        }
-
-        @Test
         @DisplayName("Mapping should equal itself")
         void testMappingEqualsItself() {
             assertEquals(mapping, mapping, "Mapping should equal itself");

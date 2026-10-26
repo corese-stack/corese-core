@@ -1,5 +1,4 @@
 package fr.inria.corese.core.next.query.impl.engine.pattern;
-import fr.inria.corese.core.next.query.impl.engine.eval.PointerObject;
 import fr.inria.corese.core.next.query.impl.engine.eval.Stack;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
@@ -11,15 +10,12 @@ import fr.inria.corese.core.next.query.impl.engine.model.Expr;
 import fr.inria.corese.core.next.query.impl.engine.model.ExprType;
 import fr.inria.corese.core.next.query.impl.engine.model.Filter;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
-import fr.inria.corese.core.next.query.impl.engine.model.PointerType;
 import fr.inria.corese.core.next.query.impl.engine.path.PropertyPathEdge;
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import static fr.inria.corese.core.next.query.impl.engine.model.PointerType.STATEMENT;
 
 /**
  * Mutable operators for compiled SPARQL graph patterns and solution modifiers.
@@ -31,7 +27,7 @@ import static fr.inria.corese.core.next.query.impl.engine.model.PointerType.STAT
  *
  * @author Olivier Corby, Edelweiss, INRIA 2010
  */
-public class Exp extends PointerObject
+public class Exp
         implements ExpType, ExpPattern, Iterable<Exp>, PlanCopyable<Exp> {
 
     public static final int SUBJECT = 0;
@@ -219,9 +215,12 @@ public class Exp extends PointerObject
         return exp;
     }
 
-    @Override
     public int size() {
         return args.size();
+    }
+
+    public QueryPlan getQuery() {
+        return null;
     }
 
     public void add(Exp e) {
@@ -511,7 +510,6 @@ public class Exp extends PointerObject
         return args.get(n);
     }
 
-    @Override
     public Edge getEdge() {
         return edge;
     }
@@ -520,7 +518,6 @@ public class Exp extends PointerObject
         edge = e;
     }
 
-    @Override
     public Mappings getMappings() {
         return map;
     }
@@ -612,7 +609,6 @@ public class Exp extends PointerObject
         return node;
     }
 
-    @Override
     public Node getNode() {
         return node;
     }
@@ -1166,28 +1162,6 @@ public class Exp extends PointerObject
         this.postpone = postpone;
     }
 
-    @Override
-    public PointerType pointerType() {
-        return STATEMENT;
-    }
-
-    @Override
-    public String getDatatypeLabel() {
-        return "[Statement]";
-    }
-
-    @Override
-    public Exp getStatement() {
-        return this;
-    }
-
-    @Override
-    public Object getValue(String variable, int n) {
-        if (n < size()) {
-            return get(n);
-        }
-        return null;
-    }
 
     public List<Exp> getInscopeFilter() {
         return inscopeFilter;

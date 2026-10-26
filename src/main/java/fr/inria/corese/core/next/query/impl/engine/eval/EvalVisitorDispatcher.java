@@ -6,7 +6,6 @@ import fr.inria.corese.core.next.query.impl.engine.event.ProcessVisitorDefault;
 import fr.inria.corese.core.next.query.impl.engine.event.ResultListener;
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.Expr;
-import fr.inria.corese.core.next.query.impl.engine.model.Loopable;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 
@@ -26,7 +25,6 @@ public final class EvalVisitorDispatcher {
 
     private boolean hasListener = false;
     private boolean hasStatement = false;
-    private boolean hasProduce = false;
     private boolean hasCandidate = false;
     private boolean hasFilter = false;
 
@@ -48,12 +46,10 @@ public final class EvalVisitorDispatcher {
     public void updateVisitorFlags() {
         if (visitor != null) {
             this.hasStatement = visitor.statement();
-            this.hasProduce = visitor.produce();
             this.hasCandidate = visitor.candidate();
             this.hasFilter = visitor.filter();
         } else {
             this.hasStatement = false;
-            this.hasProduce = false;
             this.hasCandidate = false;
             this.hasFilter = false;
         }
@@ -61,10 +57,6 @@ public final class EvalVisitorDispatcher {
 
     public boolean hasStatement() {
         return hasStatement;
-    }
-
-    public boolean hasProduce() {
-        return hasProduce;
     }
 
     public boolean hasCandidate() {
@@ -108,18 +100,5 @@ public final class EvalVisitorDispatcher {
             return listener.listen(exp, qEdge, entity);
         }
         return true;
-    }
-
-    // --- Produce helper ---
-
-    public Iterable<Edge> produce(Eval eval, Node gNode, Edge edge) {
-        DatatypeValue res = visitor.produce(eval, gNode, edge);
-        if (res instanceof Loopable<?> loopable) {
-            Iterable<?> loop = loopable.getLoop();
-            if (loop != null) {
-                return new IterableEntity(loop);
-            }
-        }
-        return null;
     }
 }

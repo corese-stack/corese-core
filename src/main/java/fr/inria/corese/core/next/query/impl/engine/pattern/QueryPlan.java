@@ -961,7 +961,6 @@ public final class QueryPlan extends Exp {
         return this;
     }
 
-    @Override
     public QueryPlan getQueryPlan() {
         return this;
     }
@@ -1446,21 +1445,12 @@ public final class QueryPlan extends Exp {
         this.number = number;
     }
 
-    @Override
-    public Iterable<Object> getLoop() {
-        return () -> getEdges().stream().map(Object.class::cast).iterator();
-    }
-
     public List<Edge> getEdges(){
         ArrayList<Edge> list = new ArrayList<>();
         getBody().getEdgeList(list);
         return list;
     }
 
-    @Override
-    public String getDatatypeLabel() {
-        return "[QueryPlan]";
-    }
 
 
     public boolean isUseBind() {
@@ -1480,7 +1470,6 @@ public final class QueryPlan extends Exp {
 
 
 
-    @Override
     public Mapping getMapping() {
         return mapping;
     }

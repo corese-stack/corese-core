@@ -10,7 +10,7 @@ import fr.inria.corese.core.next.query.impl.engine.path.Path;
  *
  * @author Olivier Corby, Edelweiss, INRIA 2010
  */
-public interface Node extends Pointerable<Object>, Comparable<Node> {
+public interface Node extends Comparable<Node> {
     String INITKEY = "";
 
     int REGEX = 2;
@@ -75,7 +75,6 @@ public interface Node extends Pointerable<Object>, Comparable<Node> {
 
     Node getGraph();
 
-    @Override
     Node getNode();
 
     Object getNodeObject();

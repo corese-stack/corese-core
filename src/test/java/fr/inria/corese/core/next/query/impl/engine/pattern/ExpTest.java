@@ -636,13 +636,6 @@ class ExpTest {
             String str = exp.toString();
             assertNotNull(str, "toString should not return null");
         }
-
-        @Test
-        @DisplayName("Should get datatype label")
-        void testGetDatatypeLabel() {
-            String label = exp.getDatatypeLabel();
-            assertNotNull(label, "Datatype label should not be null");
-        }
     }
 
     @Nested
@@ -655,13 +648,6 @@ class ExpTest {
             // Result depends on type
             assertDoesNotThrow(() -> exp.isStatement(),
                     "isStatement should not throw");
-        }
-
-        @Test
-        @DisplayName("Should get statement")
-        void testGetStatement() {
-            assertDoesNotThrow(() -> exp.getStatement(),
-                    "getStatement should not throw");
         }
     }
 

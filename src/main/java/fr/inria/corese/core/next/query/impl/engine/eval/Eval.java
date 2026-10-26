@@ -7,7 +7,6 @@ import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.ExpType;
 import fr.inria.corese.core.next.query.impl.engine.model.Expr;
 import fr.inria.corese.core.next.query.impl.engine.model.Filter;
-import fr.inria.corese.core.next.query.impl.engine.model.Loopable;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
@@ -963,16 +962,7 @@ public final class Eval implements ExpType {
             }
         }
 
-        Iterable<Edge> entities;
-        if (visitors.hasProduce()) {
-            // A query visitor may provide candidates before the producer is consulted.
-            entities = produce(graphNode, qEdge);
-            if (entities == null) {
-                entities = p.getEdges(graphNode, graphNodeList, qEdge, env);
-            }
-        } else {
-            entities = p.getEdges(graphNode, graphNodeList, qEdge, env);
-        }
+        Iterable<Edge> entities = p.getEdges(graphNode, graphNodeList, qEdge, env);
 
         try {
             for (Edge entity : entities) {
@@ -1149,13 +1139,6 @@ public final class Eval implements ExpType {
         join.setStop();
         graphEvaluator.setStop();
         optional.setStop(true);
-    }
-
-    /**
-     * Draft extension where a Visitor provides Edge iterator
-     */
-    Iterable<Edge> produce(Node gNode, Edge edge) {
-        return visitors.produce(this, gNode, edge);
     }
 
     public boolean hasFilter() {

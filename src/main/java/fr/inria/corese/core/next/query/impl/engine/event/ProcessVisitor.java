@@ -9,7 +9,6 @@ import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.Expr;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
-import fr.inria.corese.core.next.query.impl.engine.model.Pointerable;
 import fr.inria.corese.core.next.query.impl.engine.path.Path;
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 
@@ -17,7 +16,7 @@ import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 /**
  * @author Olivier Corby, Wimmics INRIA I3S, 2018
  */
-public interface ProcessVisitor extends Pointerable<Object> {
+public interface ProcessVisitor {
 
     int SLICE_DEFAULT = 20;
 

@@ -4,11 +4,9 @@ import fr.inria.corese.core.next.query.impl.engine.pattern.PlanCopy;
 import fr.inria.corese.core.next.query.impl.engine.pattern.PlanCopyable;
 import fr.inria.corese.core.next.query.api.exception.QueryTypeErrorException;
 import fr.inria.corese.core.next.query.impl.engine.eval.Eval;
-import fr.inria.corese.core.next.query.impl.engine.eval.PointerObject;
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.Filter;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
-import fr.inria.corese.core.next.query.impl.engine.model.PointerType;
 import fr.inria.corese.core.next.query.impl.engine.model.TripleStore;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Group;
@@ -25,8 +23,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static fr.inria.corese.core.next.query.impl.engine.model.PointerType.MAPPINGS;
-
 /**
  * Manage list of Mapping, result of a query
  *
@@ -35,7 +31,7 @@ import static fr.inria.corese.core.next.query.impl.engine.model.PointerType.MAPP
  *
  * @author Olivier Corby, Edelweiss, INRIA 2009
  */
-public final class Mappings extends PointerObject
+public final class Mappings
         implements Comparator<Mapping>, Iterable<Mapping>, PlanCopyable<Mappings> {
 
 
@@ -119,16 +115,6 @@ public final class Mappings extends PointerObject
         return lMap;
     }
 
-    @Override
-    @SuppressWarnings("unchecked") // Every Mapping is an Object; preserve the historical self view.
-    public Iterable<Object> getLoop() {
-        return (Iterable<Object>) (Iterable<?>) this;
-    }
-
-    @Override
-    public String getDatatypeLabel() {
-        return String.format("[Mappings: size=%s]", size());
-    }
 
     void init(QueryPlan q, boolean subEval) {
         initiate(q, !subEval && q.isDistinct() && !q.isDistinctRedundantWithGroupBy());
@@ -220,7 +206,6 @@ public final class Mappings extends PointerObject
         return getMappingList().iterator();
     }
 
-    @Override
     public int size() {
         return getMappingList().size();
     }
@@ -245,7 +230,6 @@ public final class Mappings extends PointerObject
         getMappingList().clear();
     }
 
-    @Override
     public QueryPlan getQuery() {
         return query;
     }
@@ -300,8 +284,7 @@ public final class Mappings extends PointerObject
         if (node != null) {
             sb.append(qNode).append(" = ").append(node);
             Object obj = node.getNodeObject();
-            if (ptr && obj != this
-                    && obj instanceof PointerObject) {
+            if (ptr && obj != this) {
                 sb.append(" : \n");
                 sb.append(obj);
             }
@@ -338,14 +321,6 @@ public final class Mappings extends PointerObject
         return node.getDatatypeValue();
     }
 
-    @Override
-    // PRAGMA: Do **not** take var into account
-    public Object getValue(String varString, int n) {
-        if (n >= size()) {
-            return null;
-        }
-        return get(n);
-    }
 
 
 
@@ -1196,10 +1171,6 @@ public final class Mappings extends PointerObject
         return this;
     }
 
-    @Override
-    public TripleStore getTripleStore() {
-        return null;
-    }
 
     public List<Edge> getInsert() {
         return insert;
@@ -1219,12 +1190,6 @@ public final class Mappings extends PointerObject
 
 
 
-    @Override
-    public PointerType pointerType() {
-        return MAPPINGS;
-    }
-
-    @Override
     public Mappings getMappings() {
         return this;
     }

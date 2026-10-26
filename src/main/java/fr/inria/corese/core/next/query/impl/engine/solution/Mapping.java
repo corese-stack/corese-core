@@ -8,8 +8,6 @@ import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.Expr;
 import fr.inria.corese.core.next.query.impl.engine.model.ExprType;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
-import fr.inria.corese.core.next.query.impl.engine.model.PointerType;
-import fr.inria.corese.core.next.query.impl.engine.model.Pointerable;
 import fr.inria.corese.core.next.query.impl.engine.model.TripleStore;
 import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 
@@ -25,8 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static fr.inria.corese.core.next.query.impl.engine.model.PointerType.MAPPING;
-
 /**
  * An elementary result of a query or a subquery
  * Store query/target nodes and edges
@@ -40,7 +36,7 @@ import static fr.inria.corese.core.next.query.impl.engine.model.PointerType.MAPP
  */
 public final class Mapping
         extends EnvironmentImpl
-        implements Pointerable<List<DatatypeValue>>, PlanCopyable<Mapping> {
+        implements PlanCopyable<Mapping> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Mapping.class);
 
@@ -276,10 +272,6 @@ public final class Mapping
         return getTargetNodes()[n].getPath();
     }
 
-    @Override
-    public String getDatatypeLabel() {
-        return toString(" ");
-    }
 
     @Override
     public String toString() {
@@ -501,7 +493,6 @@ public final class Mapping
      * let (((?var, ?val)) = ?m)
      * let ((?x, ?y) = ?m)
      */
-    @Override
     public Object getValue(String varString, int n) {
         if (varString == null) {
             // let (((?var, ?val)) = ?m)  -- ?m : Mapping
@@ -523,14 +514,6 @@ public final class Mapping
         return null;
     }
 
-    /**
-     * List of variable binding
-     *
-     */
-    @Override
-    public Iterable<List<DatatypeValue>> getLoop() {
-        return getList();
-    }
 
     public List<List<DatatypeValue>> getList() {
         ArrayList<List<DatatypeValue>> list = new ArrayList<>();
@@ -881,20 +864,6 @@ public final class Mapping
         return (Node) getBind().get(varExpr);
     }
 
-    @Override
-    public PointerType pointerType() {
-        return MAPPING;
-    }
-
-    @Override
-    public Edge getEdge() {
-        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
-    }
-
-    @Override
-    public TripleStore getTripleStore() {
-        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
-    }
 
     @Override
     public Node getGraphNode() {

@@ -3,7 +3,6 @@ package fr.inria.corese.core.next.query.impl.engine.solution;
 import fr.inria.corese.core.next.query.api.exception.QueryTypeErrorException;
 
 import fr.inria.corese.core.next.query.impl.engine.eval.Eval;
-import fr.inria.corese.core.next.query.impl.engine.eval.PointerObject;
 import fr.inria.corese.core.next.query.impl.engine.eval.Stack;
 import fr.inria.corese.core.next.query.impl.engine.event.ProcessVisitor;
 import fr.inria.corese.core.next.query.impl.engine.model.BindingContext;
@@ -37,7 +36,7 @@ import java.util.Map;
  *
  * @author Olivier Corby, Edelweiss, INRIA 2009
  */
-public class Memory extends PointerObject implements Environment {
+public class Memory implements Environment {
 
     // number of times nodes are bound by Stack
     // decrease with backtrack
@@ -945,15 +944,6 @@ public class Memory extends PointerObject implements Environment {
         return bindingContext != null && bindingContext.hasBind();
     }
 
-    /**
-     * List of variable binding
-     *
-     */
-    @Override
-    public Iterable<Object> getLoop() {
-        return new ArrayList<>(0);
-    }
-
     List<List<DatatypeValue>> getList() {
         ArrayList<List<DatatypeValue>> list = new ArrayList<>();
         int i = 0;
@@ -974,7 +964,6 @@ public class Memory extends PointerObject implements Environment {
      * let (((?var, ?val)) = ?m)
      * let ((?x, ?y) = ?m)
      */
-    @Override
     public Object getValue(String varString, int n) {
         if (varString == null) {
             // let (((?var, ?val)) = ?m)  -- ?m : Mapping
