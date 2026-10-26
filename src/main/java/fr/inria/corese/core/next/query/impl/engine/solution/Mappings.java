@@ -1,50 +1,39 @@
 package fr.inria.corese.core.next.query.impl.engine.solution;
 
-import fr.inria.corese.core.next.query.impl.engine.pattern.PlanCopy;
-import fr.inria.corese.core.next.query.impl.engine.pattern.PlanCopyable;
-import fr.inria.corese.core.next.query.api.exception.QueryTypeErrorException;
+import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import fr.inria.corese.core.next.query.impl.engine.eval.Eval;
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
-import fr.inria.corese.core.next.query.impl.engine.model.Filter;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
-import fr.inria.corese.core.next.query.impl.engine.model.TripleStore;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Group;
+import fr.inria.corese.core.next.query.impl.engine.pattern.PlanCopy;
+import fr.inria.corese.core.next.query.impl.engine.pattern.PlanCopyable;
 import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
-
-import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import fr.inria.corese.core.next.query.impl.engine.spi.Evaluator;
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
-import fr.inria.corese.core.next.data.api.model.DatatypeValue;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Manage list of Mapping, result of a query
- *
- * process select distinct
- * process group by, order by, limit offset, aggregates, having(?count>50)
+ * Manage list of Mapping, result of a query.
+ * Delegates sorting, distinct filtering, relational set operations, and aggregation
+ * to specialized single-responsibility components.
  *
  * @author Olivier Corby, Edelweiss, INRIA 2009
  */
 public final class Mappings
         implements Comparator<Mapping>, Iterable<Mapping>, PlanCopyable<Mappings> {
 
-
     private static final String NL = "\n";
-    private static final int SELECT = -1;
-    private static final int HAVING = -2;
-    // SPARQL: -1 (unbound first)
-    // Corese order: 1 (unbound last)
-    private static final int UNBOUND_ORDER = -1;
-    @SuppressWarnings("java:S1845") // select field holds projection nodes, distinct from SELECT constant
+
+    @SuppressWarnings("java:S1845") // select field holds projection nodes
     List<Node> select;
     boolean isDistinct = false;
-    // statisfy having(test)
+    // satisfy having(test)
     boolean isValid = true;
     // if true, store all Mapping of the group
     boolean isListGroup = false;
@@ -53,7 +42,6 @@ public final class Mappings
     private QueryPlan query;
     private final List<Mapping> list;
     // Original join Mappings
-    // use case: union manage its own way
     private Mappings joinMappings;
     // Update result
     private List<Edge> insert;
@@ -68,7 +56,6 @@ public final class Mappings
     // parse error in service result
     private boolean error = false;
     // return Binding stack as part of result to share it
-    // Federate Service manage provenance
     private Object provenance;
     // Linked Result URL List
     private final List<String> link;
@@ -76,14 +63,18 @@ public final class Mappings
     private int length = 0;
     // limit number of results to be displayed
     private int display = Integer.MAX_VALUE;
-    private static volatile GroupAggregator groupAggregator;
+
+    private final MappingsSorter sorter;
+    private final MappingsDistinctFilter distinctFilter;
+    private final MappingsRelationalOperations relationalOps;
+    private final MappingsAggregator aggregator;
 
     public static void setGroupAggregator(GroupAggregator aggregator) {
-        groupAggregator = aggregator;
+        MappingsAggregator.setGroupAggregator(aggregator);
     }
 
     public static GroupAggregator getGroupAggregator() {
-        return groupAggregator;
+        return MappingsAggregator.getGroupAggregator();
     }
 
     /** Copies a static VALUES table into independent row containers. */
@@ -91,13 +82,19 @@ public final class Mappings
     public Mappings copyPlan(PlanCopy copies) {
         Mappings target = new Mappings();
         copies.remember(this, target);
-        for (Mapping row : list) target.add(copies.copy(row));
+        for (Mapping row : list) {
+            target.add(copies.copy(row));
+        }
         return target;
     }
 
     public Mappings() {
         list = new ArrayList<>();
         link = new ArrayList<>();
+        sorter = new MappingsSorter(this);
+        distinctFilter = new MappingsDistinctFilter(this);
+        relationalOps = new MappingsRelationalOperations(this);
+        aggregator = new MappingsAggregator(this);
     }
 
     Mappings(QueryPlan q) {
@@ -111,10 +108,11 @@ public final class Mappings
 
     public static Mappings create(QueryPlan q, boolean subEval) {
         Mappings lMap = new Mappings(q);
-        lMap.init(q, subEval);
+        if (q != null) {
+            lMap.init(q, subEval);
+        }
         return lMap;
     }
-
 
     void init(QueryPlan q, boolean subEval) {
         initiate(q, !subEval && q.isDistinct() && !q.isDistinctRedundantWithGroupBy());
@@ -125,58 +123,23 @@ public final class Mappings
     }
 
     void initiate(QueryPlan q, boolean b, boolean all) {
-        this.setQuery(q);
-        isDistinct = b;
-        isListGroup = q.isListGroup();
-        setSelect(q.getSelect());
-
-        if (isDistinct) {
-            if (all) {
-                setDistinct(group(getAllExpList(q)));
-            } else {
-                setDistinct(group(q.getSelectFun()));
-            }
-            getDistinct().setDistinct(true);
-            getDistinct().setDuplicate(q.isDistribute());
-        }
+        distinctFilter.initiate(q, b, all);
     }
 
-    // use case: service require distinct mappings for bindings
-    // for variables in body of q, not for select (exp as var)
     List<Exp> getAllExpList(QueryPlan q) {
-        // variables in body of q
-        List<Node> nodesFromPattern = q.selectNodesFromPattern();
-        if (nodesFromPattern.isEmpty()) {
-            return q.getSelectFun();
-        } else {
-            return q.toExp(nodesFromPattern);
-        }
+        return distinctFilter.getAllExpList(q);
     }
 
     public Mappings distinct() {
-        Mappings res = new Mappings();
-        res.initiate(getQuery(), true, true);
-        for (Mapping m : this) {
-            res.submit(m);
-        }
-        return res;
+        return distinctFilter.distinct();
     }
 
     public Mappings distinct(List<Node> list) {
-        return distinct(getQuery().getSelect(), list);
+        return distinctFilter.distinct(list);
     }
 
     public Mappings distinct(List<Node> selectList, List<Node> distinctList) {
-        Mappings map = new Mappings(getQuery());
-        map.setSelect(selectList);
-        Group distinctListGroup = Group.create(distinctList);
-        distinctListGroup.setDistinct(true);
-        for (Mapping m : this) {
-            if (distinctListGroup.isDistinct(m)) {
-                map.add(m);
-            }
-        }
-        return map;
+        return distinctFilter.distinct(selectList, distinctList);
     }
 
     public boolean isDistinct() {
@@ -193,41 +156,42 @@ public final class Mappings
     }
 
     public List<Mapping> getList() {
-        return getMappingList();
+        return list;
     }
 
-
     public void add(Mappings lm) {
-        getMappingList().addAll(lm.getMappingList());
+        for (Mapping m : lm) {
+            add(m);
+        }
     }
 
     @Override
     public Iterator<Mapping> iterator() {
-        return getMappingList().iterator();
+        return list.iterator();
     }
 
     public int size() {
-        return getMappingList().size();
+        return list.size();
     }
 
     public boolean isEmpty() {
-        return size() == 0;
+        return list.isEmpty();
     }
 
     public Mapping get(int n) {
-        return getMappingList().get(n);
+        return list.get(n);
     }
 
     public Mapping set(int n, Mapping m) {
-        return getMappingList().set(n, m);
+        return list.set(n, m);
     }
 
     public void remove(int n) {
-        getMappingList().remove(n);
+        list.remove(n);
     }
 
     public void clear() {
-        getMappingList().clear();
+        list.clear();
     }
 
     public QueryPlan getQuery() {
@@ -241,133 +205,78 @@ public final class Mappings
 
     @Override
     public String toString() {
-        return toString(false);
+        return toString(true);
     }
 
     public String toString(boolean all) {
-        return toString(all, false, size());
+        return toString(all, false, getDisplay());
     }
 
     public String toString(boolean all, boolean ptr, int max) {
         StringBuilder sb = new StringBuilder();
-        int i = 1;
-        boolean isSelect = select != null && !all;
-
+        if (all && getSelect() != null) {
+            for (Node qNode : getSelect()) {
+                sb.append(qNode.getLabel()).append(" ");
+            }
+            sb.append(NL);
+        }
+        int i = 0;
         for (Mapping map : this) {
-            if (i > max) {
-                sb.append(String.format("# size = %s, stop after: %s", size(), (i - 1)));
-                sb.append(NL);
+            if (i++ >= max) {
                 break;
             }
-            String str = ((i < 10) ? "0" : "") + i + " ";
-            sb.append(str);
-
-            if (isSelect) {
-                for (Node qNode : select) {
-                    print(map, qNode, sb, ptr);
-
-                }
-            } else {
-                for (Node qNode : map.getQueryNodes()) {
-                    print(map, qNode, sb, ptr);
-                }
-            }
-
-            i++;
+            sb.append(map.toString());
             sb.append(NL);
         }
         return sb.toString();
-    }
-
-    void print(Mapping map, Node qNode, StringBuilder sb, boolean ptr) {
-        Node node = map.getNode(qNode);
-        if (node != null) {
-            sb.append(qNode).append(" = ").append(node);
-            Object obj = node.getNodeObject();
-            if (ptr && obj != this) {
-                sb.append(" : \n");
-                sb.append(obj);
-            }
-            sb.append("; ");
-        }
     }
 
     public List<Node> getSelect() {
         return select;
     }
 
-    void setSelect(List<Node> nodes) {
-        select = nodes;
+    void setSelect(List<Node> lNode) {
+        select = lNode;
     }
 
     public void setSelect(Node node) {
-        select = new ArrayList<>(1);
+        select = new ArrayList<>();
         select.add(node);
     }
 
     public Node getNode(String varString) {
-        if (size() == 0) {
+        if (isEmpty()) {
             return null;
         }
-        Mapping map = get(0);
-        return map.getNode(varString);
+        return get(0).getNode(varString);
     }
 
     public DatatypeValue getValue(String varString) {
         Node node = getNode(varString);
-        if (node == null) {
-            return null;
+        if (node != null) {
+            return node.getDatatypeValue();
         }
-        return node.getDatatypeValue();
+        return null;
     }
 
-
-
-
-    /**
-     * select distinct in case of aggregates, accept Mapping now, distinct will
-     * be computed below
-     */
     public void submit(Mapping a) {
-        if (a == null) {
-            return;
-        }
-        if (acceptable(a)) {
-            add(a);
-        }
+        distinctFilter.submit(a);
     }
 
     public boolean acceptable(Mapping m) {
-        return getQuery().isAggregate() || accept(m);
+        return distinctFilter.acceptable(m);
     }
 
-    /**
-     * Used for distinct on aggregates
-     */
     void submit2(Mapping a) {
-        if (getQuery().isAggregate()) {
-            if (accept(a)) {
-                add(a);
-            }
-        } else {
-            add(a);
-        }
+        distinctFilter.submit2(a);
     }
-
 
     public boolean accept(Node node) {
-        return getDistinct() == null || getDistinct().accept(node);
+        return distinctFilter.accept(node);
     }
 
-    // Note: check select == null
     public boolean accept(Mapping r) {
-        if (select == null || select.isEmpty()) {
-            return true;
-        }
-        if (isDistinct) {
-            return getDistinct().isDistinct(r);
-        }
-        return true;
+        return distinctFilter.accept(r);
     }
 
     boolean isValid() {
@@ -378,490 +287,75 @@ public final class Mappings
         isValid = b;
     }
 
-
-    /*
-     *
-     * MappingSet sort
-     *
-     ********************************/
-
     public void sort(List<String> varList) {
-        Collections.sort(getMappingList(), new VariableSorter(varList));
+        sorter.sort(varList);
     }
 
-
-    /**
-     * Is there a Mapping compatible with m
-     */
     int find(Mapping m, List<String> list) {
-        return find(m, getVariableSorter(list), 0, size() - 1);
-    }
-
-
-    VariableSorter getVariableSorter(List<String> varList) {
-        return new VariableSorter(varList);
-    }
-
-    int find(Mapping m, VariableSorter vs, int first, int last) {
-        if (first >= last) {
-            return first;
-        } else {
-            int mid = (first + last) / 2;
-            Mapping mm = get(mid);
-            int res = vs.compare(mm, m);
-            if (res >= 0) {
-                return find(m, vs, first, mid);
-            } else {
-                return find(m, vs, mid + 1, last);
-            }
-        }
+        return sorter.find(m, list);
     }
 
     boolean minusCompatible(Mapping m, List<String> list) {
-        int n = find(m, getVariableSorter(list), 0, size() - 1);
-        if (n >= 0 && n < size()) {
-            Mapping mm = get(n);
-            return m.minusCompatible(mm, list);
-        }
-        return false;
+        return sorter.minusCompatible(m, list);
     }
 
     void sort(Eval eval) {
-        this.setEval(eval);
-        sort();
-        this.setEval(null);
+        sorter.sort(eval);
     }
-
-
-    /*
-     *
-     * Standard sort
-     * order by
-     * join()
-     *
-     *****************************************/
 
     void sort() {
-        getMappingList().sort(this);
+        sorter.sort();
     }
 
-    /**
-     * Sort according to node
-     * use case: join(exp, exp)
-     */
     public void sort(Eval eval, Node node) {
-        prepare(node);
-        sort(eval);
+        sorter.sort(eval, node);
     }
 
     public void sort(Node node) {
-        prepare(node);
-        sort();
+        sorter.sort(node);
     }
 
-    void prepare(Node node) {
-        sortWithDesc = false;
-        for (Mapping m : this) {
-            m.setOrderBy(m.getNode(node));
-        }
-    }
-
-    // find index of node where qnode=node
-    // with standard sort
     public int find(Node node, Node qnode) {
-        return find(node, qnode, 0, size() - 1);
+        return sorter.find(node, qnode);
     }
 
-    /**
-     * comparator of Node for standard sort
-     * use DatatypeValue compareTo()
-     * compare with sameTerm semantics: order 1 and 01 in deterministic way
-     * authorize overload of comparator for specific datatypes using a Visitor
-     */
-    int comparator(Node n1, Node n2) {
-        if (getEval() != null) {
-            return getEval().getVisitor().compare(getEval(), n1.compare(n2), n1.getDatatypeValue(), n2.getDatatypeValue());
-        }
-        return n1.compare(n2);
-    }
-
-    // comparator of Mapping for standard sort
     @Override
     public int compare(Mapping m1, Mapping m2) {
-        Node[] order1 = m1.getOrderBy();
-        Node[] order2 = m2.getOrderBy();
-        List<Exp> orderBy = getQuery().getOrderBy();
-        int res = 0;
-
-        for (int i = 0; i < order1.length && i < order2.length && res == 0; i++) {
-            if (order1[i] != null && order2[i] != null) { // sort ?x
-                res = comparator(order1[i], order2[i]);
-            } //      unbound
-            else if (order1[i] == null) { // unbound var
-                if (order2[i] == null) {
-                    res = 0;
-                } else {
-                    res = UNBOUND_ORDER;
-                }
-            } else if (order2[i] == null) {
-                res = -UNBOUND_ORDER;
-            } else {
-                res = 0;
-            }
-            if (sortWithDesc && !orderBy.isEmpty() && orderBy.get(i).status()) {
-                res = desc(res);
-            }
-        }
-
-        return res;
+        return sorter.compare(m1, m2);
     }
 
-    int desc(int i) {
-        if (i == 0) {
-            return 0;
-        } else if (i < 0) {
-            return +1;
-        } else {
-            return -1;
-        }
-    }
-
-    // find index of node where qnode=node
-    int find(Node node, Node qnode, int first, int last) {
-        if (first >= last) {
-            return first;
-        } else {
-            int mid = (first + last) / 2;
-            Node n1 = getMappingList().get(mid).getNodeValue(qnode);
-            int res = compare(n1, node);
-            if (res >= 0) {
-                return find(node, qnode, first, mid);
-            } else {
-                return find(node, qnode, mid + 1, last);
-            }
-        }
-    }
-
-    // standard node comparator where argument may be null
-    int compare(Node n1, Node n2) {
-        int res;
-        if (n1 != null && n2 != null) { // sort ?x
-            res = comparator(n1, n2);
-        } //      unbound
-        else if (n1 == null) { // unbound var
-            if (n2 == null) {
-                res = 0;
-            } else {
-                res = UNBOUND_ORDER;
-            }
-        } else {
-            res = -UNBOUND_ORDER;
-        }
-        return res;
-    }
-
-    int genCompare(Node n1, Node n2) {
-        return compare(n1, n2);
-    }
-
-    /*
-     * Alternative sorter
-     * use case: gui
-     *
-     **************************/
-
-    /**
-     * order by limit offset
-     */
     public void complete(Eval eval) {
-        if (!getQuery().getOrderBy().isEmpty()) {
-            sort(eval);
-        }
-        limitOffset();
+        sorter.complete(eval);
     }
 
     void limitOffset() {
-        if (getQuery().getOffset() > 0) {
-            // skip offset
-            // Note: optimize this
-            for (int i = 0; i < getQuery().getOffset() && size() > 0; i++) {
-                remove(0);
-            }
-        }
-        while (size() > getQuery().getLimit()) {
-            remove(size() - 1);
-        }
+        sorter.limitOffset();
     }
 
-
-    /*
-     * *********************************************************
-     *
-     * Aggregates
-     *
-     * 1. select [distinct] var where 2. group by 3. count/min/max as var 4.
-     * order by 5. limit offset
-     *
-     * group by with aggregate return one Mapping per group where the mapping
-     * hold the result of the aggregate
-     *
-     */
-
     public void aggregate(Evaluator evaluator, Memory memory, Producer p) {
-        aggregate(getQuery(), evaluator, memory, p);
+        aggregator.aggregate(evaluator, memory, p);
     }
 
     public void aggregate(QueryPlan q, Evaluator evaluator, Memory memory, Producer p) {
-        if (size() == 0) {
-            if (q.isAggregate() && !q.hasGroupBy()) {
-                // SPARQL semantics requires that aggregate empty result set return one empty result
-                // and count() return 0
-                add(Mapping.fake(q));
-                setFake(true);
-            } else {
-                return;
-            }
-        }
-
-        GroupAggregator aggregator = groupAggregator;
-        if (aggregator != null && aggregator.tryAggregate(q, this)) {
-            finish(q);
-            return;
-        }
-
-        // select (count(?n) as ?count)
-        aggregateExpList(q, evaluator, memory, p, q.getSelectFun(), true);
-
-        // order by with aggregate count(?n)
-        aggregateExpList(q, evaluator, memory, p, q.getOrderBy(), false);
-
-        if (q.getHaving() != null) {
-            aggregateSwitch(q, evaluator, q.getHaving(), memory, p, HAVING);
-        }
-
-        finish(q);
+        aggregator.aggregate(q, evaluator, memory, p);
     }
 
-    /**
-     * list = list of select | order by
-     * select (aggregate() as ?c)
-     * order by aggregate()
-     */
-    void aggregateExpList(QueryPlan q, Evaluator evaluator, Memory memory, Producer p, List<Exp> list, boolean isSelect) {
-        int n = 0;
-        for (Exp exp : list) {
-            if (exp.isAggregate()) {
-                // perform group by and then aggregate
-                aggregateSwitch(q, evaluator, exp, memory, p, (isSelect) ? SELECT : n);
-            }
-            if (!isSelect) {
-                n++;
-            }
-        }
-    }
-
-    /**
-     * select count(?doc) as ?count group by ?person ?date order by ?count
-     */
-    private void aggregateSwitch(QueryPlan q, Evaluator eval, Exp exp, Memory mem, Producer p, int n) {
-        if (exp.isExpGroupBy()) {
-            // min(?l, groupBy(?x, ?y)) as ?min
-            evalGroupByExp(eval, exp, mem, p, n);
-        } else if (q.hasGroupBy()) {
-            // perform group by and then aggregate
-            aggregateGroupMembers(getCreateGroup(), eval, exp, mem, p, n);
-        } else {
-            aggregate(eval, exp, mem, p, n);
-        }
-    }
-
-    /**
-     * Compute select aggregate, order by aggregate and having on one group or on
-     * whole result (in both case: this Mappings)
-     */
-    private void aggregate(Evaluator eval, Exp exp, Memory memory, Producer p, int n) {
-        // get first Mapping in current group
-        Mapping firstMap = get(0);
-        // bind the Mapping in memory to retrieve group by variables
-        memory.aggregate(firstMap);
-
-        if (n == HAVING) {
-            aggregateHaving(eval, exp, memory, p);
-        } else {
-            aggregateSelectOrOrder(eval, exp, memory, p, n);
-        }
-
-        memory.pop(firstMap);
-    }
-
-    private void aggregateHaving(Evaluator eval, Exp exp, Memory memory, Producer p) {
-        boolean res = false;
-        try {
-            res = exp.getFilter().getExp().test(eval, memory.getBind(), memory, p);
-        } catch (QueryTypeErrorException ignored) {
-            res = false;
-        }
-        Eval ev = memory.getEval();
-        if (ev != null) {
-            ev.getVisitor().having(ev, exp.getFilter().getExp(), res);
-        }
-        setValid(res);
-    }
-
-    private void aggregateSelectOrOrder(Evaluator eval, Exp exp, Memory memory, Producer p, int n) {
-        Eval ev = memory.getEval();
-        Node aggregateValue;
-        if (exp.getFilter() == null) {
-            // use case: order by var
-            aggregateValue = memory.getNode(exp.getNode());
-        } else {
-            // Delegate the aggregate expression to the configured evaluator.
-            aggregateValue = eval(exp.getFilter(), eval, memory, p);
-            if (ev != null) {
-                ev.getVisitor().aggregate(ev, exp.getFilter().getExp(),
-                        (aggregateValue == null) ? null : aggregateValue.getDatatypeValue());
-            }
-        }
-
-        for (Mapping map : this) {
-            if (n == SELECT) {
-                // select (count(?x) as ?c)
-                map.setNode(exp.getNode(), aggregateValue);
-            } else {
-                // order by count(?x)
-                map.setOrderBy(n, aggregateValue);
-            }
-        }
-    }
-
-    Node eval(Filter f, Evaluator eval, Environment env, Producer p) {
-        try {
-            return p.getNode(f.getExp().evalWE(eval, env.getBind(), env, p));
-        } catch (QueryTypeErrorException e) {
-            return null;
-        }
-    }
-
-    /**
-     * Process aggregate for each group select, order by, having
-     */
-    private void aggregateGroupMembers(Group group, Evaluator eval, Exp exp, Memory mem, Producer p, int n) {
-        int mappingCount = 0;
-        for (Mappings map : group.getValues()) {
-            map.setCount(mappingCount++);
-            mem.setGroup(map);
-            map.aggregate(eval, exp, mem, p, n);
-            mem.setGroup(null);
-        }
-    }
-
-    void finish(QueryPlan qq) {
-        if (qq.hasGroupBy() && !qq.isConstruct()) {
-            // after group by (and aggregate), leave one Mapping for each group
-            // with result of the group
-            groupBy();
-        } else if (qq.getHaving() != null) {
-            // clause 'having' with no group by
-            // e.g. select (max(?x) as ?max) having(?max > 100)
-            having();
-        } else if (qq.isAggregate() && !qq.isConstruct()) {
-            clean();
-        }
-    }
-
-    void having() {
-        if (isValid()) {
-            clean();
-        } else {
-            clear();
-        }
-    }
-
-    void clean() {
-        if (size() > 1) {
-            Mapping map = get(0);
-            clear();
-            add(map);
-        }
+    void aggregate(Evaluator eval, Exp exp, Memory memory, Producer p, int n) {
+        aggregator.aggregate(eval, exp, memory, p, n);
     }
 
     public void prepareAggregate(Mapping map, QueryPlan q, Map<String, DatatypeValue> bn, int n) {
-        setCount(n);
-        // in case there is a nested aggregate, map will be an Environment
-        // it must implement aggregate() and hence must know current Mappings group
-        map.setMappings(this);
-        map.setQuery(q);
-        // share same bnode table in all Mapping of current group solution
-        map.setMap(bn);
+        aggregator.prepareAggregate(map, q, bn, n);
     }
 
-    // min(?l, groupBy(?x, ?y)) as ?min
-    void evalGroupByExp(Evaluator eval, Exp exp, Memory mem, Producer p, int n) {
-        Group g = createGroup(exp);
-        aggregateGroupMembers(g, eval, exp, mem, p, n);
-        if (exp.isHaving()) {
-            // min(?l, groupBy(?x, ?y), (?l = ?min)) as ?min
-            having(eval, exp, mem, p, g);
-            // remove global group if any
-            // may be recomputed with new Mapping list
-            setGroup(null);
-        }
-    }
-
-    /**
-     * exp : min(?l, groupBy(?x, ?y), (?l = ?min)) as ?min) test the filter,
-     * remove Mappping that fail
-     */
-    void having(Evaluator eval, Exp exp, Memory mem, Producer p, Group g) {
-        Filter f = exp.getHavingFilter();
-        clear();
-        for (Mappings lm : g.getValues()) {
-            for (Mapping map : lm) {
-                mem.push(map, -1);
-                if (f.getExp().test(eval, mem.getBind(), mem, p)) {
-                    add(map);
-                }
-                mem.pop(map);
-            }
-        }
-    }
-
-    /**
-     * process group by leave one Mapping within each group
-     */
     public void groupBy() {
-        // clear the current list
-        groupBy(getCreateGroup());
+        aggregator.groupBy();
     }
 
-    /**
-     * Generate the Mapping list according to the group PRAGMA: replace the
-     * original list by the group list
-     */
     public void groupBy(Group group) {
-        clear();
-        for (Mappings lMap : group.getValues()) {
-            if (lMap.isValid()) {
-                // clause 'having' may have tagged first mapping as not valid
-                Mapping map = lMap.get(0);
-                if (map != null) {
-                    if (isListGroup) {
-                        map.setMappings(lMap);
-                    } else {
-                        // it may have been set by aggregate (see process)
-                        map.setMappings(null);
-                    }
-                }
-                // add one element for current group
-                // check distinct if any
-                submit2(map);
-            }
-        }
+        aggregator.groupBy(group);
     }
 
-    /**
-     * Project on select variables of query Modify all the Mapping
-     */
     public Mappings project() {
         for (Mapping map : this) {
             map.project(getQuery());
@@ -880,20 +374,6 @@ public final class Mappings
         return map;
     }
 
-    /**
-     * for group by ?o1 .. ?on
-     */
-    private Group createGroup() {
-        return createGroup(getQuery().getGroupBy());
-    }
-
-    private Group getCreateGroup() {
-        if (getGroup() == null) {
-            setGroup(createGroup());
-        }
-        return getGroup();
-    }
-
     public Group getGroup() {
         return group;
     }
@@ -902,245 +382,76 @@ public final class Mappings
         group = g;
     }
 
-    /**
-     * group by
-     */
+    public Group getCreateGroup() {
+        return aggregator.getCreateGroup();
+    }
+
+    Group createGroup() {
+        return aggregator.createGroup();
+    }
+
     Group createGroup(List<Exp> list) {
-        return createGroup(list, false);
+        return aggregator.createGroup(list);
     }
 
     Group createGroup(Exp exp) {
-        return createGroup(exp.getExpGroupBy(), true);
+        return aggregator.createGroup(exp);
     }
 
     Group createGroup(List<Exp> list, boolean extend) {
-        Group gp = Group.createFromExp(list);
-        gp.setDuplicate(getQuery().isDistribute());
-        gp.setExtend(extend);
-        gp.setFake(isFake());
-
-        for (Mapping map : this) {
-            gp.add(map);
-        }
-        return gp;
+        return aggregator.createGroup(list, extend);
     }
 
-    /**
-     * for select distinct
-     */
     Group group(List<Exp> list) {
         return Group.createFromExp(list);
     }
 
     public Node max(Node qNode) {
-        return minmax(qNode, true);
+        return aggregator.max(qNode);
     }
 
     public Node min(Node qNode) {
-        return minmax(qNode, false);
+        return aggregator.min(qNode);
     }
 
-    private Node minmax(Node qNode, boolean isMax) {
-        Node res = null;
-        for (Mapping map : this) {
-            Node node = map.getNode(qNode);
-            if (res == null) {
-                res = node;
-            } else if (node != null) {
-                if (isMax) {
-                    if (node.compare(res) > 0) {
-                        res = node;
-                    }
-                } else if (node.compare(res) < 0) {
-                    res = node;
-                }
-            }
-
-        }
-        return res;
-    }
-
-    /*
-     *
-     * Pipeline Solutions implementation These operations use the select nodes
-     * if any and otherwise the query nodes
-     *
-     *
-     ********************************************************************
-     */
     public Node getCommonNode(Mappings map) {
-        if (isEmpty() || map.isEmpty()) {
-            return null;
-        }
-        return get(0).getCommonNode(map.get(0));
+        return relationalOps.getCommonNode(map);
     }
-
 
     public Mappings union(Mappings lm) {
-        Mappings res = (getQuery() == lm.getQuery()) ? Mappings.create(getQuery()) : new Mappings();
-        for (Mapping m : this) {
-            res.add(m);
-        }
-        for (Mapping m : lm) {
-            res.add(m);
-        }
-        return res;
+        return relationalOps.union(lm);
     }
 
     public Mappings and(Mappings lm) {
-        return join(lm);
+        return relationalOps.join(lm);
     }
 
     public Mappings join(Mappings lm) {
-        Mappings res = Mappings.create(getQuery());
-        for (Mapping m1 : this) {
-            for (Mapping m2 : lm) {
-                Mapping map = m1.join(m2);
-                if (map != null) {
-                    res.add(map);
-                }
-            }
-        }
-
-        return res;
+        return relationalOps.join(lm);
     }
 
     public Mappings joiner(Mappings lm) {
-        Mappings res = Mappings.create(getQuery());
-        for (Mapping m1 : this) {
-            for (Mapping m2 : lm) {
-                Mapping map = m1.merge(m2);
-                if (map != null) {
-                    res.add(map);
-                }
-            }
-        }
-        return res;
+        return relationalOps.joiner(lm);
     }
 
-    // join with cmn common variable, map2 is sorted on cmn, null value first
     public Mappings joiner(Mappings map2, Node cmn) {
-        Mappings map1 = this;
-        Mappings res = Mappings.create(map1.getQuery());
-
-        for (Mapping m1 : map1) {
-            Node val = m1.getNodeValue(cmn);
-            if (val == null) {
-                // common unbound in m1
-                joinCommonUnbound(res, m1, map2);
-            } else {
-                joinCommonBound(res, m1, map2, cmn, val);
-            }
-        }
-        return res;
-    }
-
-    private void joinCommonUnbound(Mappings res, Mapping m1, Mappings map2) {
-        for (Mapping m2 : map2) {
-            Mapping m = m1.merge(m2);
-            if (m != null) {
-                res.add(m);
-            }
-        }
-    }
-
-    private void joinCommonBound(Mappings res, Mapping m1, Mappings map2, Node cmn, Node val) {
-        joinPrefixUnbound(res, m1, map2, cmn);
-        joinMatchingRange(res, m1, map2, cmn, val);
-    }
-
-    private void joinPrefixUnbound(Mappings res, Mapping m1, Mappings map2, Node cmn) {
-        for (Mapping m2 : map2) {
-            Node val2 = m2.getNodeValue(cmn);
-            if (val2 == null) {
-                // common unbound in m2
-                Mapping m = m1.merge(m2);
-                if (m != null) {
-                    res.add(m);
-                }
-            } else {
-                break;
-            }
-        }
-    }
-
-    private void joinMatchingRange(Mappings res, Mapping m1, Mappings map2, Node cmn, Node val) {
-        // index of common value in map2
-        int index = map2.find(val, cmn);
-        if (index >= 0 && index < map2.size()) {
-            for (int i = index; i < map2.size(); i++) {
-                // get value of common in map2
-                Mapping m2 = map2.get(i);
-                Node n2 = m2.getNodeValue(cmn);
-                if (n2 == null || !val.match(n2)) {
-                    break;
-                }
-                Mapping m = m1.merge(m2);
-                if (m != null) {
-                    res.add(m);
-                }
-            }
-        }
+        return relationalOps.joiner(map2, cmn);
     }
 
     public Mappings minus(Mappings lm) {
-        Mappings res = new Mappings();
-        for (Mapping m1 : this) {
-            boolean ok = true;
-            for (Mapping m2 : lm) {
-                if (m1.compatible(m2)) {
-                    ok = false;
-                    break;
-                }
-            }
-            if (ok) {
-                res.add(m1);
-            }
-        }
-        return res;
+        return relationalOps.minus(lm);
     }
 
     public Mappings optional(Mappings lm) {
-        return option(lm);
+        return relationalOps.option(lm);
     }
 
     public Mappings option(Mappings lm) {
-        Mappings res = new Mappings();
-        for (Mapping m1 : this) {
-            boolean ok = false;
-            for (Mapping m2 : lm) {
-                Mapping map = m1.join(m2);
-                if (map != null) {
-                    ok = true;
-                    res.add(map);
-                }
-            }
-            if (!ok) {
-                res.add(m1);
-            }
-        }
-
-        return res;
+        return relationalOps.option(lm);
     }
 
-    /**
-     * Join (var = val) to each Mapping, remove those where var = something else
-     * Use case: service ?s { BGP }
-     */
     public void join(Node varNode, Node val) {
-        if (!getSelect().contains(varNode)) {
-            getSelect().add(varNode);
-        }
-        Iterator<Mapping> it = getMappingList().iterator();
-        while (it.hasNext()) {
-            Mapping m = it.next();
-            Node node = m.getNodeValue(varNode);
-            if (node == null) {
-                m.addNode(varNode, val);
-            } else if (!node.equals(val)) {
-                it.remove();
-            }
-        }
+        relationalOps.join(varNode, val);
     }
 
     public boolean inScope(Node varNode) {
@@ -1154,30 +465,19 @@ public final class Mappings
     }
 
     public List<Node> aggregate(Node varNode) {
-        List<Node> aggregateNodeList = new ArrayList<>();
-        for (Mapping m : this) {
-            Node val = m.getNodeValue(varNode);
-            if (val != null && !aggregateNodeList.contains(val)) {
-                aggregateNodeList.add(val);
-            }
-        }
-        return aggregateNodeList;
+        return aggregator.aggregate(varNode);
     }
 
-   public Mappings limit(int n) {
-        while (size() > n) {
-            remove(size() - 1);
-        }
-        return this;
+    public Mappings limit(int n) {
+        return sorter.limit(n);
     }
-
 
     public List<Edge> getInsert() {
         return insert;
     }
 
     public void setInsert(List<Edge> lInsert) {
-        this.insert = lInsert;
+        insert = lInsert;
     }
 
     public List<Edge> getDelete() {
@@ -1185,10 +485,8 @@ public final class Mappings
     }
 
     public void setDelete(List<Edge> lDelete) {
-        this.delete = lDelete;
+        delete = lDelete;
     }
-
-
 
     public Mappings getMappings() {
         return this;
@@ -1212,20 +510,16 @@ public final class Mappings
     }
 
     public boolean isNodeList() {
-        return size() != 0 && getNodeList() != null && !getNodeList().isEmpty();
+        return nodeList != null;
     }
 
     public List<Node> getNodeList() {
         return nodeList;
     }
 
-    /**
-     * @param nodeList the nodeList to set
-     */
     public void setNodeList(List<Node> nodeList) {
         this.nodeList = nodeList;
     }
-
 
     public boolean isError() {
         return error;
@@ -1244,20 +538,20 @@ public final class Mappings
     }
 
     public void setNamedGraph(Node node) {
-        for (Mapping m : this) {
-            m.setNamedGraph(node);
+        for (Mapping map : this) {
+            map.setNamedGraph(node);
         }
     }
 
-     public String getLink() {
-        if (getLinkList().isEmpty()) {
+    public String getLink() {
+        if (link.isEmpty()) {
             return null;
         }
-        return getLinkList().getFirst();
+        return link.get(0);
     }
 
     public void addLink(String link) {
-        getLinkList().add(link);
+        this.link.add(link);
     }
 
     public List<String> getLinkList() {
@@ -1299,25 +593,4 @@ public final class Mappings
     public List<Mapping> getMappingList() {
         return list;
     }
-
-    class VariableSorter implements Comparator<Mapping> {
-
-        List<String> varList;
-
-        VariableSorter(List<String> list) {
-            this.varList = list;
-        }
-
-        @Override
-        public int compare(Mapping m1, Mapping m2) {
-            int res = 0;
-            for (int i = 0; i < varList.size() && res == 0; i++) {
-                Node n1 = m1.getNodeValue(varList.get(i));
-                Node n2 = m2.getNodeValue(varList.get(i));
-                res = genCompare(n1, n2);
-            }
-            return res;
-        }
-    }
-
 }
