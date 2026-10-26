@@ -43,7 +43,6 @@ public final class QueryPlan extends Exp {
     List<Filter> funList;
 
     List<String> errors;
-    List<String> info;
     // gNode is a local graph node when subquery has no ?g in its select
     // use case: graph ?g (select where ...)
     Node gNode;
@@ -130,7 +129,6 @@ public final class QueryPlan extends Exp {
         this.failure = copies.copy(source.failure);
         this.funList = copies.copy(source.funList);
         this.errors = copies.copy(source.errors);
-        this.info = copies.copy(source.info);
         this.gNode = copies.copy(source.gNode);
         this.globalQuery = copies.copy(source.globalQuery);
         this.outerQuery = copies.copy(source.outerQuery);
@@ -281,19 +279,6 @@ public final class QueryPlan extends Exp {
                 }
             }
             errors.add(str);
-        }
-    }
-
-
-    public void addInfo(String mes, Object obj) {
-        if (info == null) {
-            info = new ArrayList<>();
-        }
-        if (obj != null) {
-            mes += obj;
-        }
-        if (!info.contains(mes)) {
-            info.add(mes);
         }
     }
 
@@ -843,11 +828,6 @@ public final class QueryPlan extends Exp {
         return this;
     }
 
-    public QueryPlan getQueryPlan() {
-        return this;
-    }
-
-
     public Node getOuterNode(Node subNode) {
         return getExtNode(subNode.getLabel());
     }
@@ -1053,10 +1033,6 @@ public final class QueryPlan extends Exp {
 
     public Filter getFilter(String name) {
         return ftable.get(name);
-    }
-
-    public Filter getGlobalFilter(String name) {
-        return getGlobalQuery().getFilter(name);
     }
 
     public void setRule(boolean rule) {

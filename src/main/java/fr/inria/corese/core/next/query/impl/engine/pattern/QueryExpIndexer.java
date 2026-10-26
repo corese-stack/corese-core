@@ -186,7 +186,7 @@ public final class QueryExpIndexer {
         for (String variable : lVar) {
             Node qNode = query.getProperAndSubSelectNode(variable);
             if (qNode == null) {
-                logger.warn(Message.Prefix.UNDEF_VAR.getString(), variable);
+                logger.warn("{}{}", Message.Prefix.UNDEF_VAR.getString(), variable);
                 queryPlan.addError(Message.Prefix.UNDEF_VAR.getString(), variable);
             } else if (!isExist && !hasExist) {
                 int n = queryPlan.index(qNode);

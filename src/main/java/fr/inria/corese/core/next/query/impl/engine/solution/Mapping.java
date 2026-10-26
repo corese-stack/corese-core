@@ -199,6 +199,7 @@ public final class Mapping
                 ltNodes.add(tNode);
             }
         }
+        this.values = null;
         init(lqNodes, ltNodes);
     }
 
@@ -334,10 +335,6 @@ public final class Mapping
 
     public Node[] getGroupNodes() {
         return getGroupAlter();
-    }
-
-    public Node getDistinctNode(int n) {
-        return getDistinctNodes()[n];
     }
 
     public Node getGroupBy(Node qNode, int n) {
@@ -487,49 +484,6 @@ public final class Mapping
         }
         return null;
     }
-
-    /**
-     * Use case:
-     * let (((?var, ?val)) = ?m)
-     * let ((?x, ?y) = ?m)
-     */
-    public Object getValue(String varString, int n) {
-        if (varString == null) {
-            // let (((?var, ?val)) = ?m)  -- ?m : Mapping
-            // compiled as: let (?vv = xt:get(?m, 0), (?var, ?val) = ?vv)
-            // xt:get(?m, 0) evaluated as xt:gget(?m, null, 0)
-            // hence var == null
-            return getBinding(n);
-        }
-        // let ((?x, ?y) = ?m) -- ?m : Mapping
-        return getValue(varString);
-    }
-
-    @SuppressWarnings("java:S1168") // Null signals an unbound index in internal evaluation
-    List<DatatypeValue> getBinding(int n) {
-        List<List<DatatypeValue>> l = getList();
-        if (n < l.size()) {
-            return l.get(n);
-        }
-        return null;
-    }
-
-
-    public List<List<DatatypeValue>> getList() {
-        ArrayList<List<DatatypeValue>> list = new ArrayList<>();
-        int i = 0;
-        for (Node n : getQueryNodes()) {
-            Node val = getNode(i++);
-            if (val != null) {
-                ArrayList<DatatypeValue> l = new ArrayList<>(2);
-                l.add(n.getDatatypeValue());
-                l.add(val.getDatatypeValue());
-                list.add(l);
-            }
-        }
-        return list;
-    }
-
 
     @Override
     public Node[] getQueryNodes() {
