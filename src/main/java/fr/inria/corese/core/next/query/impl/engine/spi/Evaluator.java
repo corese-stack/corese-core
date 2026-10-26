@@ -25,18 +25,23 @@ public interface Evaluator {
 
     void setMode(Mode mode);
 
-    void setProducer(Producer p);
+    default void setProducer(Producer p) {
+    }
 
-    void setKGRAM(Eval o);
+    default void setKGRAM(Eval o) {
+    }
 
-    void start(Environment env);
+    default void start(Environment env) {
+    }
 
-    void finish(Environment env);
+    default void finish(Environment env) {
+    }
 
-    void init(Environment env);
+    default void init(Environment env) {
+    }
 
     enum Mode {
-        KGRAM_MODE, SPARQL_MODE, CACHE_MODE, NO_CACHE_MODE
+        KGRAM_MODE, SPARQL_MODE
     }
 
 }

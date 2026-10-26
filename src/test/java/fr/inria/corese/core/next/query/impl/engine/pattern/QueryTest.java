@@ -553,13 +553,6 @@ class QueryTest {
         }
 
         @Test
-        @DisplayName("Should check if is connect")
-        void testIsConnect() {
-            boolean result = query.isConnect();
-            assertFalse(result, "Query should not be connect by default");
-        }
-
-        @Test
         @DisplayName("Should set and check map flag")
         void testSetAndIsMap() {
             query.setMap(false);

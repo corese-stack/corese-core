@@ -67,11 +67,6 @@ public final class Mappings extends PointerObject
     private Group group;
     private Group distinct;
     private Eval eval;
-    // service report if Mappings from service
-    // json object
-    // construct where result graph
-    private TripleStore graph;
-    // result of query as a template
     // fake result in case of aggregate without result
     private boolean isFake = false;
     // parse error in service result
@@ -904,14 +899,7 @@ public final class Mappings extends PointerObject
      * for group by ?o1 .. ?on
      */
     private Group createGroup() {
-        if (getQuery().isConnect()) {
-            // group by any
-            Merge newGroup = new Merge(this);
-            newGroup.merge();
-            return newGroup;
-        } else {
-            return createGroup(getQuery().getGroupBy());
-        }
+        return createGroup(getQuery().getGroupBy());
     }
 
     private Group getCreateGroup() {
@@ -1200,7 +1188,7 @@ public final class Mappings extends PointerObject
 
     @Override
     public TripleStore getTripleStore() {
-        return graph;
+        return null;
     }
 
     public List<Edge> getInsert() {

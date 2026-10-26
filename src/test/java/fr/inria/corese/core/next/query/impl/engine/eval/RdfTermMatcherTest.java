@@ -123,14 +123,6 @@ class RdfTermMatcherTest {
         assertFalse(matcher.same(null, null, a, null), "null left is not equal to anything");
     }
 
-    @Test
-    @DisplayName("Mode defaults to UNDEF and is settable")
-    void modeDefaultsToUndefAndIsSettable() {
-        assertEquals(Matcher.UNDEF, matcher.getMode());
-        matcher.setMode(Matcher.RELAX);
-        assertEquals(Matcher.RELAX, matcher.getMode());
-    }
-
     /**
      * Minimal {@link Edge} for matcher tests: carries subject/object plus the predicate as either a
      * fixed edge node or an edge variable, mirroring {@code AstBackedEdge}'s representation.

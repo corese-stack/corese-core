@@ -19,8 +19,6 @@ import fr.inria.corese.core.next.query.impl.engine.spi.Matcher;
  */
 public final class RdfTermMatcher implements Matcher {
 
-    private int mode = Matcher.UNDEF;
-
     @Override
     public boolean match(Edge query, Edge target, Environment environment) {
         return match(query.getNode(0), target.getNode(0), environment)
@@ -45,16 +43,6 @@ public final class RdfTermMatcher implements Matcher {
     public boolean same(Node queryNode, Node left, Node right, Environment environment) {
         // queryNode is unused for strict RDF-term equality, but richer matchers may need it.
         return left != null && left.same(right);
-    }
-
-    @Override
-    public int getMode() {
-        return mode;
-    }
-
-    @Override
-    public void setMode(int mode) {
-        this.mode = mode;
     }
 
     private static Node predicateNode(Edge edge) {

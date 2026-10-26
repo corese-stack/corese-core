@@ -34,29 +34,4 @@ public final class SparqlKgramEvaluator implements Evaluator {
     public void setMode(Mode mode) {
         this.mode = mode;
     }
-
-    @Override
-    public void setProducer(Producer producer) {
-        // Expression-free graph pattern execution does not need producer state here.
-    }
-
-    @Override
-    public void setKGRAM(Eval eval) {
-        // Eval is driven by the caller for the currently supported execution scope.
-    }
-
-    @Override
-    public void start(Environment environment) {
-        // Graph pattern execution currently needs no evaluator-side initialization.
-    }
-
-    @Override
-    public void finish(Environment environment) {
-        // Graph pattern execution currently needs no evaluator-side cleanup.
-    }
-
-    @Override
-    public void init(Environment environment) {
-        // All native expression state is immutable and initialized at construction.
-    }
 }

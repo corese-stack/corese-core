@@ -36,7 +36,7 @@ public final class DirectGroupAggregation {
     /** Returns whether the query can be reduced without evaluating expressions. */
     public static boolean isEligible(Query query) {
         if (!query.isSelect() || (query.isDistinct() && !query.isDistinctRedundantWithGroupBy()) || query.isListGroup()
-                || query.isConnect() || query.getGroupBy().isEmpty()
+                || query.getGroupBy().isEmpty()
                 || query.getHaving() != null || !query.getOrderBy().isEmpty()) {
             return false;
         }

@@ -13,15 +13,6 @@ import fr.inria.corese.core.next.query.impl.engine.model.Node;
 public interface Matcher {
 
     /**
-     * Match mode
-     */
-    // equality of types
-    int UNDEF = -1;
-
-    // accept any types
-    int RELAX = 4;
-
-    /**
      * Checks whether a candidate edge matches a query edge.
      * May verify that edge labels match (Producer may have done the job properly).
      * May verify edges such as rdf:type and check subsumption of type.
@@ -54,9 +45,5 @@ public interface Matcher {
      *
      */
     boolean same(Node qNode, Node n1, Node n2, Environment env);
-
-    int getMode();
-
-    void setMode(int mode);
 
 }

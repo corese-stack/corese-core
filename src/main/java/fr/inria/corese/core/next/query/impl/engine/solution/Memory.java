@@ -40,8 +40,7 @@ import java.util.Map;
 public class Memory extends PointerObject implements Environment {
 
     private static final String SERVICE_REPORT_ZERO = "?_service_report_0";
-    static final Edge[] emptyEdges = new Edge[0];
-    static final Edge[] emptyEntities = new Edge[0];
+    private static final Edge[] EMPTY_EDGES = new Edge[0];
     // number of times nodes are bound by Stack
     // decrease with backtrack
     int[] nbNodes;
@@ -343,8 +342,8 @@ public class Memory extends PointerObject implements Environment {
     public Mapping store(Query query, Producer producer, boolean subEvaluation) {
         Node reportNode = bindServiceReport();
         int capacity = solutionNodeCapacity(query, subEvaluation);
-        Edge[] queryEdgeCopies = isEdge ? new Edge[nbEdge] : emptyEdges;
-        Edge[] targetEdgeCopies = isEdge ? new Edge[nbEdge] : emptyEntities;
+        Edge[] queryEdgeCopies = isEdge ? new Edge[nbEdge] : EMPTY_EDGES;
+        Edge[] targetEdgeCopies = isEdge ? new Edge[nbEdge] : EMPTY_EDGES;
         copySolutionEdges(producer, queryEdgeCopies, targetEdgeCopies);
 
         Node[] queryNodeCopies = new Node[capacity];

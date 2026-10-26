@@ -20,6 +20,7 @@ import fr.inria.corese.core.next.query.impl.engine.spi.Evaluator;
 import fr.inria.corese.core.next.query.impl.engine.spi.Matcher;
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
 import fr.inria.corese.core.next.query.impl.engine.spi.Provider;
+import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.QueryTypeErrorException;
 
 import fr.inria.corese.core.next.data.Values;
@@ -86,7 +87,6 @@ public final class Eval implements ExpType {
     boolean isSubEval = false;
     // return only select variables in Mapping
     boolean optim = true;
-    boolean storeResult = true;
     // Edge and Node producer
     private Producer producer;
     private Stack current;
@@ -223,21 +223,12 @@ public final class Eval implements ExpType {
             // just compile and complete query
             return getResults();
         }
-        if (q.isCheck()) {
-            QueryDefinitionChecker check = QueryDefinitionChecker.create(this);
-            check.check(q);
-        }
 
         if (!q.isFail()) {
             query(gNode, q, m, map);
-
-            if (q.getQueryProfile() == Query.COUNT_PROFILE) {
-                countProfile();
-            } else {
-                aggregate();
-                // order by
-                complete();
-            }
+            aggregate();
+            // order by
+            complete();
         }
 
         getEvaluator().finish(getMemory());
@@ -295,15 +286,6 @@ public final class Eval implements ExpType {
         Stack stack = Stack.create(exp);
         set(stack);
         eval(getProducer(), gNode, stack, map, 0);
-    }
-
-    /**
-     * We just counted number of results: nbResult Just build a Mapping
-     */
-    void countProfile() {
-        Node n = NodeImpl.forValue(Values.factory().createLiteral(state.getNbResult()));
-        Mapping m = Mapping.create(getQuery().getSelectFun().getFirst().getNode(), n);
-        getResults().add(m);
     }
 
     public void setMappings(Mappings lMap) {
@@ -579,7 +561,6 @@ public final class Eval implements ExpType {
     public void init(Query q) {
         initMemory(q);
         start(q);
-        profile(q);
     }
 
     void initMemory(Query q) {
@@ -594,14 +575,6 @@ public final class Eval implements ExpType {
             memory.init(q);
             getProducer().init(q);
             evaluator.start(memory);
-        }
-    }
-
-    void profile(Query q) {
-        // select count(*) as ?c where pattern
-        // do not built Mapping, just count them
-        if (q.getQueryProfile() == Query.COUNT_PROFILE) {
-            storeResult = false;
         }
     }
 
@@ -1005,39 +978,41 @@ public final class Eval implements ExpType {
     }
 
     private int service(Producer p, Node graphNode, Exp exp, Mappings data, Stack stack, int n) {
-        int backtrack = n - 1;
         Memory env = getMemory();
         Node serv = exp.first().getNode();
-        Node node = serv;
-
-        if (serv.isVariable()) {
-            node = env.getNode(serv);
-        }
+        Node node = serv.isVariable() ? env.getNode(serv) : serv;
 
         if (getProvider() != null) {
-            // service delegated to provider
             Mappings map = getProvider().service(node, exp, selectQueryMappings(data), this);
+            return processServiceMappings(p, graphNode, stack, n, env, map);
+        } else if (exp.isSilent()) {
+            return eval(p, graphNode, stack, n + 1);
+        } else {
+            throw new QueryEvaluationException(
+                    "Federated SPARQL SERVICE execution failed: no Provider configured to query endpoint " + node);
+        }
+    }
 
-            for (Mapping m : map) {
-                if (state.isStopped()) {
-                    return STOP;
-                }
-                // push each Mapping in memory and continue
-                complete(getQuery(), m, false);
+    private int processServiceMappings(Producer p, Node graphNode, Stack stack, int n, Memory env, Mappings map) {
+        int backtrack = n - 1;
+        if (map == null) {
+            return backtrack;
+        }
+        for (Mapping m : map) {
+            if (state.isStopped()) {
+                return STOP;
+            }
+            // push each Mapping in memory and continue
+            complete(getQuery(), m, false);
 
-                if (env.push(m, n, false, false)) {
-                    backtrack = eval(p, graphNode, stack, n + 1);
-                    env.pop(m, false);
-                    if (backtrack < n) {
-                        return backtrack;
-                    }
+            if (env.push(m, n, false, false)) {
+                backtrack = eval(p, graphNode, stack, n + 1);
+                env.pop(m, false);
+                if (backtrack < n) {
+                    return backtrack;
                 }
             }
-        } else {
-            Query q = exp.rest().getQuery();
-            return query(p, graphNode, q, data, stack, n);
         }
-
         return backtrack;
     }
 
@@ -1535,7 +1510,7 @@ public final class Eval implements ExpType {
         if (store) {
             state.incrementResult();
         }
-        if (storeResult && store) {
+        if (store) {
             Mapping ans = m;
             if (m == null) {
                 ans = getMemory().store(getQuery(), p, isSubEval);
