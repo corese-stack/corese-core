@@ -16,7 +16,7 @@ import java.util.Set;
  * and {@link fr.inria.corese.core.next.storage.api.StorageManager#mutations()}).</p>
  *
  * <h2>Snapshot Isolation Semantics</h2>
- * <p>Backends supporting {@link IsolationLevel#SNAPSHOT} capture a consistent point-in-time view
+ * <p>Backends supporting snapshot isolation capture a consistent point-in-time view
  * of the database upon transaction start. Uncommitted writes within the transaction are visible
  * to the owning session but remain completely hidden from concurrent sessions until committed.</p>
  */
