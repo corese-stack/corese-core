@@ -3,12 +3,12 @@
  *
  * <h2>Three-Tier Package Architecture</h2>
  * <ul>
- *   <li>{@link fr.inria.corese.core.next.data.api}: Public API contracts (interfaces and models)
+ *   <li>{@code fr.inria.corese.core.next.data.api}: Public API contracts (interfaces and models)
  *       intended for end-users, query evaluators, and client applications. Includes {@code term},
  *       {@code model}, {@code factory}, {@code namespace}, and {@code literal}.</li>
- *   <li>{@link fr.inria.corese.core.next.data.spi}: Service-provider interfaces (SPI) intended for
+ *   <li>{@code fr.inria.corese.core.next.data.spi}: Service-provider interfaces (SPI) intended for
  *       backend implementers, custom datatypes, and parser/serializer plugins.</li>
- *   <li>{@link fr.inria.corese.core.next.data.impl}: Internal, encapsulated default implementations
+ *   <li>{@code fr.inria.corese.core.next.data.impl}: Internal, encapsulated default implementations
  *       ({@code SimpleModel}, {@code SimpleStatement}, internal dictionary encoders).</li>
  * </ul>
  *

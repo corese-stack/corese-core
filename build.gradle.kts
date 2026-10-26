@@ -330,6 +330,7 @@ tasks.build {
 // so reports are generated after tests run successfully.
 tasks.jacocoTestReport {
     dependsOn(tasks.test)
+    mustRunAfter(tasks.named("generateNextGrammarSource"))
 
     // Enable XML reporting for Jacoco to allow further processing or CI integration.
     reports {
