@@ -40,28 +40,28 @@ public class Exp extends PointerObject
 
     static final String NEWLINE = "\n";
     static final String SP = " ";
-    Type type;
+    private Type type;
     private int bindingIndex = -1;
     // optional success
-    boolean status = false;
-    boolean isFail = false;
-    boolean isAggregate = false;
-    boolean isSilent = false;
-    VExp args;
-    Edge edge;
-    Node node;
-    List<Node> lNodes;
+    private boolean status = false;
+    private boolean isFail = false;
+    private boolean isAggregate = false;
+    private boolean isSilent = false;
+    private VExp args;
+    private Edge edge;
+    private Node node;
+    private List<Node> lNodes;
     // Expression evaluation contract, independent of parser syntax types.
-    Filter filter;
-    List<Filter> lFilter;
+    private Filter filter;
+    private List<Filter> lFilter;
     // min(?l, expGroupBy(?x, ?y))
-    List<Exp> expGroupBy;
+    private List<Exp> expGroupBy;
     // for UNION
-    Stack stack;
+    private Stack stack;
     // Optimizer-specific payload, such as candidate values for an equality filter.
-    Object payload;
-    Producer producer;
-    Mappings map;
+    private Object payload;
+    private Producer producer;
+    private Mappings map;
     private boolean isPostpone = false;
     private boolean isFunctional = false;
     private boolean generated = false;
@@ -240,6 +240,10 @@ public class Exp extends PointerObject
 
     public void add(Exp e) {
         args.add(e);
+    }
+
+    public void clear() {
+        args.clear();
     }
 
     public void add(Edge e) {

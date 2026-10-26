@@ -10,7 +10,6 @@ import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
 import fr.inria.corese.core.next.query.impl.engine.spi.Provider;
 
 import fr.inria.corese.core.next.query.impl.engine.model.BindingContext;
-import fr.inria.corese.core.next.query.impl.engine.event.KgramEventDispatcher;
 import fr.inria.corese.core.next.query.impl.engine.event.ResultListener;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -218,25 +217,14 @@ class EvalTest {
     }
 
     @Nested
-    @DisplayName("Event Manager Tests")
-    class EventManagerTests {
+    @DisplayName("Visitor Dispatcher Tests")
+    class VisitorDispatcherTests {
 
         @Test
-        @DisplayName("Should set and get event manager")
-        void testSetAndGetEventManager() {
-            KgramEventDispatcher mockManager = mock(KgramEventDispatcher.class);
-            eval.setEventManager(mockManager);
-            assertEquals(mockManager, eval.getEventManager(),
-                    "Event manager should match");
-        }
-
-        @Test
-        @DisplayName("Should create event manager")
-        void testCreateEventManager() {
-            assertDoesNotThrow(() -> eval.createManager(),
-                    "Creating event manager should not throw");
-            assertNotNull(eval.getEventManager(),
-                    "Event manager should be created");
+        @DisplayName("Should expose visitor dispatcher")
+        void testVisitorDispatcher() {
+            assertNotNull(eval.getVisitorDispatcher(), "Visitor dispatcher should be initialized");
+            assertNotNull(eval.getVisitor(), "Process visitor should have default instance");
         }
     }
 

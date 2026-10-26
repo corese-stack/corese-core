@@ -18,8 +18,6 @@ import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import fr.inria.corese.core.next.query.impl.engine.spi.Evaluator;
 import fr.inria.corese.core.next.query.impl.engine.spi.Matcher;
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
-
-import fr.inria.corese.core.next.query.impl.engine.event.KgramEventDispatcher;
 import fr.inria.corese.core.next.query.impl.engine.path.Path;
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 
@@ -73,8 +71,6 @@ public class Memory extends PointerObject implements Environment {
     Mapping mapping;
     // true when processing aggregate at the end
     boolean isAggregate = false;
-    KgramEventDispatcher manager;
-    boolean hasEvent = false;
     int nbEdge = 0;
     int nbNode = 0;
     // service evaluation detail report
@@ -89,19 +85,6 @@ public class Memory extends PointerObject implements Environment {
         match = m;
         eval = e;
         bnode = new HashMap<>();
-    }
-
-    @Override
-    public KgramEventDispatcher getEventManager() {
-        if (manager == null) {
-            kgram.createManager();
-        }
-        return manager;
-    }
-
-    public void setEventManager(KgramEventDispatcher man) {
-        manager = man;
-        hasEvent = true;
     }
 
     @Override

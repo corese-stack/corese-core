@@ -394,8 +394,8 @@ public final class Query extends Exp {
     }
 
     public void setBody(Exp exp){
-        args.clear();
-        args.add(exp);
+        clear();
+        add(exp);
     }
 
     void setGlobalQuery(Query q) {

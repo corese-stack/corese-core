@@ -11,7 +11,6 @@ import fr.inria.corese.core.next.query.impl.engine.model.BindingContext;
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.Expr;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
-import fr.inria.corese.core.next.query.impl.engine.event.KgramEventDispatcher;
 import fr.inria.corese.core.next.query.impl.engine.path.Path;
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 
@@ -98,8 +97,6 @@ public interface Environment {
      */
 
     int count();
-
-    KgramEventDispatcher getEventManager();
 
     Object getObject();
 

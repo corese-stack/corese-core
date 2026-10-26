@@ -2,7 +2,6 @@ package fr.inria.corese.core.next.query.impl.engine.storage;
 
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import fr.inria.corese.core.next.query.impl.engine.eval.Eval;
-import fr.inria.corese.core.next.query.impl.engine.event.KgramEventDispatcher;
 import fr.inria.corese.core.next.query.impl.engine.event.ProcessVisitor;
 import fr.inria.corese.core.next.query.impl.engine.model.BindingContext;
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
@@ -108,11 +107,6 @@ final class StorageBindingEnvironment implements Environment {
     @Override
     public int count() {
         return delegate == null ? 0 : delegate.count();
-    }
-
-    @Override
-    public KgramEventDispatcher getEventManager() {
-        return delegate == null ? null : delegate.getEventManager();
     }
 
     @Override
