@@ -2,7 +2,6 @@ package fr.inria.corese.core.next.query.impl.engine.solution;
 
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Group;
 import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 
 import java.util.List;
@@ -31,7 +30,6 @@ public final class MappingsDistinctFilter {
                 List<Exp> expList = all ? getAllExpList(q) : q.getSelectFun();
                 Group distinctGroup = Group.createFromExp(expList);
                 distinctGroup.setDistinct(true);
-                distinctGroup.setDuplicate(q.isDistribute());
                 mappings.setDistinct(distinctGroup);
             }
         }

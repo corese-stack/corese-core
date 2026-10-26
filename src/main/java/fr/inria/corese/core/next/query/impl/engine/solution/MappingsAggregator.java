@@ -6,7 +6,6 @@ import fr.inria.corese.core.next.query.impl.engine.eval.Eval;
 import fr.inria.corese.core.next.query.impl.engine.model.Filter;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Group;
 import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import fr.inria.corese.core.next.query.impl.engine.spi.Evaluator;
@@ -259,10 +258,6 @@ public final class MappingsAggregator {
 
     public Group createGroup(List<Exp> list, boolean extend) {
         Group gp = Group.createFromExp(list);
-        QueryPlan query = mappings.getQuery();
-        if (query != null) {
-            gp.setDuplicate(query.isDistribute());
-        }
         gp.setExtend(extend);
         gp.setFake(mappings.isFake());
 

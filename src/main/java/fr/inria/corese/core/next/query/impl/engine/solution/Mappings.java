@@ -5,7 +5,6 @@ import fr.inria.corese.core.next.query.impl.engine.eval.Eval;
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Group;
 import fr.inria.corese.core.next.query.impl.engine.pattern.PlanCopy;
 import fr.inria.corese.core.next.query.impl.engine.pattern.PlanCopyable;
 import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
