@@ -7,7 +7,7 @@ import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 import fr.inria.corese.core.next.query.impl.engine.diagnostics.ExecutionDiagnostics;
 import fr.inria.corese.core.next.query.impl.engine.eval.SelectCursor;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 import fr.inria.corese.core.next.query.impl.engine.storage.StorageManagerProducer;
 import fr.inria.corese.core.next.storage.api.StorageManager;
@@ -58,7 +58,7 @@ final class StreamingTupleQueryResult implements TupleQueryResult {
     private BindingSet delivered;
     private boolean unwound;
 
-    StreamingTupleQueryResult(SelectCursor cursor, Query query,
+    StreamingTupleQueryResult(SelectCursor cursor, QueryPlan query,
             StorageManagerProducer producer, StorageManager snapshot, ExecutionDiagnostics diagnostics,
             long timeoutMillis, long started) {
         this.cursor = cursor;
@@ -162,7 +162,7 @@ final class StreamingTupleQueryResult implements TupleQueryResult {
             if (timedOut) throw new QueryTimeoutException(timeoutMillis);
             if (closed) throw new IllegalStateException("This tuple query result is closed.");
             if (exhausted) return false;
-            if (owner.isInterrupted()) throw new QueryEvaluationException("Query interrupted");
+            if (owner.isInterrupted()) throw new QueryEvaluationException("QueryPlan interrupted");
             advancing = true;
             return true;
         }
@@ -175,7 +175,7 @@ final class StreamingTupleQueryResult implements TupleQueryResult {
                 Thread.interrupted();
                 throw new QueryTimeoutException(timeoutMillis);
             }
-            if (closed) throw new QueryEvaluationException("Query cursor was cancelled");
+            if (closed) throw new QueryEvaluationException("QueryPlan cursor was cancelled");
         }
     }
 
@@ -202,7 +202,7 @@ final class StreamingTupleQueryResult implements TupleQueryResult {
 
     private void checkOwner() {
         if (Thread.currentThread() != owner) {
-            throw new IllegalStateException("Query results must be consumed on their creating thread");
+            throw new IllegalStateException("QueryPlan results must be consumed on their creating thread");
         }
     }
 

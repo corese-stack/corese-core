@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.query.impl.engine.storage;
 
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ class ContextSelectionTest {
 
     private static Environment envWith(boolean datasetSpecified) {
         Environment env = mock(Environment.class);
-        Query query = mock(Query.class);
+        QueryPlan query = mock(QueryPlan.class);
         when(env.getQuery()).thenReturn(query);
         when(query.isDatasetSpecified()).thenReturn(datasetSpecified);
         return env;

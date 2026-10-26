@@ -6,7 +6,7 @@ import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.term.SimpleIRI;
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.NodeImpl;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import fr.inria.corese.core.next.query.impl.engine.storage.StorageManagerEdge;
 import fr.inria.corese.core.next.query.impl.engine.storage.StorageManagerProducer;
@@ -38,11 +38,11 @@ class ProducerDeduplicationTest {
     private static Statement row(int i, Resource graph) {
         return Values.factory().createStatement(new SimpleIRI("urn:s" + i), new SimpleIRI("urn:p"), new SimpleIRI("urn:o"), graph);
     }
-    private static Query query(String dataset) {
+    private static QueryPlan query(String dataset) {
         return new CoreseAstQueryBuilder().toNextQuery((SelectQueryAst) new SparqlParser()
                 .parse("SELECT * " + dataset + " WHERE { ?s ?p ?o }"));
     }
-    private static Iterable<Edge> edges(StorageManagerProducer producer, Query query) {
+    private static Iterable<Edge> edges(StorageManagerProducer producer, QueryPlan query) {
         Environment env = mock(Environment.class); when(env.getQuery()).thenReturn(query);
         return producer.getEdges(null, query.getFrom(), query.getBody().first().first().getEdge(), env);
     }

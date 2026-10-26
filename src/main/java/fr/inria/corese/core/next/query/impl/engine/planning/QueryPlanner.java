@@ -5,7 +5,7 @@ import fr.inria.corese.core.next.query.impl.engine.model.ExprType;
 import fr.inria.corese.core.next.query.impl.engine.model.Filter;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
 import fr.inria.corese.core.next.query.impl.engine.filter.FilterOptimizer;
@@ -23,21 +23,21 @@ import java.util.List;
 public final class QueryPlanner implements ExpType {
 
     private final HeuristicPatternOrdering sort = new HeuristicPatternOrdering();
-    private final Query query;
+    private final QueryPlan query;
     private final FilterOptimizer compiler;
     private Producer prod;
-    private Query statisticsQuery;
+    private QueryPlan statisticsQuery;
     private Node statisticsGraph;
 
     // Assign sorter according to query plan profile
-    public QueryPlanner(Query q) {
+    public QueryPlanner(QueryPlan q) {
         query = q;
         compiler = new FilterOptimizer(q);
         statisticsQuery = q;
     }
 
     /**
-     * Contract: For each BGP: Sort Query Edges Insert Filters at first place
+     * Contract: For each BGP: Sort QueryPlan Edges Insert Filters at first place
      * where variables are bound This must be recursively done for exists {}
      * pattern in filter and bind including select, order by, group by and
      * having
@@ -58,7 +58,7 @@ public final class QueryPlanner implements ExpType {
     /**
      * FilterOptimizer additional filters that may contain exists {}.
      */
-    void modifier(Query q) {
+    void modifier(QueryPlan q) {
         compile(q.getSelectFun());
         compile(q.getOrderBy());
         compile(q.getGroupBy());
@@ -77,7 +77,7 @@ public final class QueryPlanner implements ExpType {
      * the List of variables already bound
      */
     Exp compile(Exp exp, VString varList, boolean option) {
-        Query previousQuery = statisticsQuery;
+        QueryPlan previousQuery = statisticsQuery;
         Node previousGraph = statisticsGraph;
         if (exp.isQuery() && exp.getQuery().isDatasetSpecified()) {
             statisticsQuery = exp.getQuery();
@@ -107,7 +107,7 @@ public final class QueryPlanner implements ExpType {
 
             case QUERY:
                 // match query and subquery
-                Query q = exp.getQuery();
+                QueryPlan q = exp.getQuery();
                 modifier(q);
                 if (!varList.isEmpty()) {
                     // lVar = intersection(select variables,lVar)
@@ -121,7 +121,7 @@ public final class QueryPlanner implements ExpType {
                     option = true;
                 }
 
-               // Query planning
+               // QueryPlan planning
                 exp = queryPlan(exp, varList);
 
                 int size = varList.size();
@@ -150,7 +150,7 @@ public final class QueryPlanner implements ExpType {
         return exp;
     }
 
-    VString getSelectVariables(Query q, VString lVar) {
+    VString getSelectVariables(QueryPlan q, VString lVar) {
         VString list = new VString();
         for (Exp ee : q.getSelectFun()) {
             Node node = ee.getNode();
@@ -172,11 +172,11 @@ public final class QueryPlanner implements ExpType {
             // sort edges wrt connection
             switch (getQuery().getPlanProfile()) {
 
-                case Query.QP_T0:
+                case QueryPlan.QP_T0:
                     sortFilter(exp, lVar);
                     break;
 
-                case Query.QP_BGP, Query.QP_DEFAULT, Query.QP_HEURISTICS_BASED:
+                case QueryPlan.QP_BGP, QueryPlan.QP_DEFAULT, QueryPlan.QP_HEURISTICS_BASED:
                     orderPatterns(exp, lVar, lBind);
                     // move filters
                     sortFilter(exp, lVar);
@@ -195,7 +195,7 @@ public final class QueryPlanner implements ExpType {
     private void orderPatterns(Exp exp, List<String> variables, List<Exp> bindings) {
         if (getProducer() instanceof QueryStatistics statistics) {
             sort.sort(statisticsQuery, statisticsGraph, exp, variables, bindings, statistics);
-        } else if (getQuery().getPlanProfile() == Query.QP_HEURISTICS_BASED) {
+        } else if (getQuery().getPlanProfile() == QueryPlan.QP_HEURISTICS_BASED) {
             sort.sort(exp, bindings, getProducer());
         } else {
             sort.sort(getQuery(), exp, variables, bindings);
@@ -243,7 +243,7 @@ public final class QueryPlanner implements ExpType {
        exp.setNodeList(exp.getInScopeNodes());
     }
 
-    void setBind(Query q, Exp exp){
+    void setBind(QueryPlan q, Exp exp){
         if (q.isUseBind()){
             exp.setBind();
         }
@@ -444,7 +444,7 @@ public final class QueryPlanner implements ExpType {
         }
     }
 
-    public Query getQuery() {
+    public QueryPlan getQuery() {
         return query;
     }
 

@@ -9,7 +9,7 @@ import fr.inria.corese.core.next.query.impl.engine.model.Expr;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.path.Path;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
@@ -48,7 +48,7 @@ final class StorageBindingEnvironment implements Environment {
     }
 
     @Override
-    public Query getQuery() {
+    public QueryPlan getQuery() {
         return delegate == null ? null : delegate.getQuery();
     }
 

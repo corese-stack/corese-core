@@ -6,7 +6,7 @@ import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.path.PropertyPathEdge;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.storage.api.model.PredicateStatistics;
 import fr.inria.corese.core.next.storage.api.model.StorageStatistics;
 
@@ -42,7 +42,7 @@ final class CardinalityPatternOrdering {
      * @param bindings constant-binding hints collected by the planner
      * @param statistics producer's session-visible statistics
      */
-    static void sort(Query query, Node graph, Exp expression, List<String> variables,
+    static void sort(QueryPlan query, Node graph, Exp expression, List<String> variables,
             List<Exp> bindings, QueryStatistics statistics) {
         flattenTripleGroups(expression);
         List<Node> bound = new ArrayList<>();
@@ -68,7 +68,7 @@ final class CardinalityPatternOrdering {
     }
 
     private record PlanningContext(
-            Query query,
+            QueryPlan query,
             Node graph,
             QueryStatistics statistics,
             List<Node> bound,
@@ -110,7 +110,7 @@ final class CardinalityPatternOrdering {
         return expression.isEdge() && !(expression.getEdge() instanceof PropertyPathEdge);
     }
 
-    private static long[] cardinalities(Query query, Node graph, Exp expression, int start, int end,
+    private static long[] cardinalities(QueryPlan query, Node graph, Exp expression, int start, int end,
             QueryStatistics statistics) {
         long[] counts = new long[end - start];
         for (int i = start; i < end; i++) {

@@ -26,10 +26,10 @@ class CompiledQueryPlanTest {
 
     @Test
     void captureDetachesTheCompilerAndEveryExecutionHasIndependentMutableState() {
-        Query compiler = query();
+        QueryPlan compiler = query();
         CompiledQueryPlan image = CompiledQueryPlan.capture(compiler, Map.of());
-        Query first = image.newExecution(null);
-        Query second = image.newExecution(null);
+        QueryPlan first = image.newExecution(null);
+        QueryPlan second = image.newExecution(null);
         assertNotSame(first, second);
         assertEquals(first.getSelect().size(), second.getSelect().size());
         Node firstVariable = first.getSelect().getFirst();
@@ -42,7 +42,7 @@ class CompiledQueryPlanTest {
         compiler.getSelect().clear();
         compiler.setLimit(2);
         assertEquals(compiledIndex, secondVariable.getIndex());
-        Query fresh = image.newExecution(null);
+        QueryPlan fresh = image.newExecution(null);
         assertEquals(2, fresh.getSelect().size());
         assertEquals(Integer.MAX_VALUE, fresh.getLimit());
         assertEquals(compiledIndex, fresh.getSelect().getFirst().getIndex());
@@ -52,8 +52,8 @@ class CompiledQueryPlanTest {
     @Test
     void valuesRowsAndFilterIndexesAreNotShared() {
         CompiledQueryPlan image = CompiledQueryPlan.capture(query(), Map.of());
-        Query first = image.newExecution(null);
-        Query second = image.newExecution(null);
+        QueryPlan first = image.newExecution(null);
+        QueryPlan second = image.newExecution(null);
         Exp firstValues = operators(first).stream().filter(e -> e.type() == Exp.Type.VALUES).findFirst().orElseThrow();
         Exp secondValues = operators(second).stream().filter(e -> e.type() == Exp.Type.VALUES).findFirst().orElseThrow();
         assertNotSame(firstValues.getMappings(), secondValues.getMappings());
@@ -72,7 +72,7 @@ class CompiledQueryPlanTest {
 
     @Test
     void copiesPreserveIdentityWithinAFrameAndRejectUnknownMutablePayloads() {
-        Query first = CompiledQueryPlan.capture(query(), Map.of()).newExecution(null);
+        QueryPlan first = CompiledQueryPlan.capture(query(), Map.of()).newExecution(null);
         Exp values = operators(first).stream().filter(e -> e.type() == Exp.Type.VALUES).findFirst().orElseThrow();
         Node variable = first.getSelect().getFirst();
         assertSame(variable, values.getNodeList().getFirst());
@@ -80,9 +80,9 @@ class CompiledQueryPlanTest {
         assertThrows(IllegalArgumentException.class, () -> new PlanCopy().copy(new StringBuilder()));
     }
 
-    private static Query query() {
+    private static QueryPlan query() {
         var ast = (SelectQueryAst) new SparqlParser().parse(TEXT);
-        Query query = new CoreseAstQueryBuilder().toNextQuery(ast);
+        QueryPlan query = new CoreseAstQueryBuilder().toNextQuery(ast);
         query.complete(new ProducerDefault());
         return query;
     }

@@ -17,15 +17,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Comprehensive unit tests for Query class.
+ * Comprehensive unit tests for QueryPlan class.
  * Tests KGRAM query structure including select, from, where, order by,
  * group by, having, filters, and various query types.
  *
  */
-@DisplayName("Query Tests")
-class QueryTest {
+@DisplayName("QueryPlan Tests")
+class QueryPlanTest {
 
-    private Query query;
+    private QueryPlan query;
     private Node mockNode;
     private Filter mockFilter;
 
@@ -33,18 +33,18 @@ class QueryTest {
     void setUp() {
         mockNode = mock(Node.class);
         mockFilter = mock(Filter.class);
-        query = new Query();
+        query = new QueryPlan();
     }
 
     @Nested
-    @DisplayName("Query Creation Tests")
+    @DisplayName("QueryPlan Creation Tests")
     class QueryCreationTests {
 
         @Test
         @DisplayName("Should create empty query")
         void testCreateEmptyQuery() {
-            Query q = new Query();
-            assertNotNull(q, "Query should not be null");
+            QueryPlan q = new QueryPlan();
+            assertNotNull(q, "QueryPlan should not be null");
             assertEquals(ExpType.Type.QUERY, q.type(), "Type should be QUERY");
         }
 
@@ -52,15 +52,15 @@ class QueryTest {
         @DisplayName("Should create query using factory method")
         void testCreateQueryFactory() {
             Exp exp = Exp.create(ExpType.Type.AND);
-            Query q = Query.create(exp);
-            assertNotNull(q, "Query should not be null");
+            QueryPlan q = QueryPlan.create(exp);
+            assertNotNull(q, "QueryPlan should not be null");
         }
 
         @Test
         @DisplayName("Should create an empty query")
         void testCreateQueryWithType() {
-            Query q = Query.create();
-            assertNotNull(q, "Query should not be null");
+            QueryPlan q = QueryPlan.create();
+            assertNotNull(q, "QueryPlan should not be null");
         }
     }
 
@@ -120,13 +120,13 @@ class QueryTest {
         @DisplayName("Should set and check distinct")
         void testSetAndIsDistinct() {
             query.setDistinct(true);
-            assertTrue(query.isDistinct(), "Query should be distinct");
+            assertTrue(query.isDistinct(), "QueryPlan should be distinct");
         }
 
         @Test
         @DisplayName("Should not be distinct by default")
         void testDefaultDistinct() {
-            assertFalse(query.isDistinct(), "Query should not be distinct by default");
+            assertFalse(query.isDistinct(), "QueryPlan should not be distinct by default");
         }
     }
 
@@ -194,7 +194,7 @@ class QueryTest {
         void testAskIsNotSelect() {
             query.setAsk(true);
 
-            assertTrue(query.isAsk(), "Query should be flagged as ASK");
+            assertTrue(query.isAsk(), "QueryPlan should be flagged as ASK");
             assertFalse(query.isSelect(), "ASK query should not be reported as SELECT");
         }
     }
@@ -276,7 +276,7 @@ class QueryTest {
         @Test
         @DisplayName("Should chain order by")
         void testOrderByChaining() {
-            Query result = query.orderBy(mockNode);
+            QueryPlan result = query.orderBy(mockNode);
             assertSame(query, result, "Should return same query for chaining");
         }
     }
@@ -329,7 +329,7 @@ class QueryTest {
         @Test
         @DisplayName("Should chain group by")
         void testGroupByChaining() {
-            Query result = query.groupBy(mockNode);
+            QueryPlan result = query.groupBy(mockNode);
             assertSame(query, result, "Should return same query for chaining");
         }
     }
@@ -355,7 +355,7 @@ class QueryTest {
         @DisplayName("Should set and check if is construct")
         void testSetAndIsConstruct() {
             query.setConstruct(true);
-            assertTrue(query.isConstruct(), "Query should be construct");
+            assertTrue(query.isConstruct(), "QueryPlan should be construct");
         }
 
         @Test
@@ -384,7 +384,7 @@ class QueryTest {
         @DisplayName("Should set and check if is delete")
         void testSetAndIsDelete() {
             query.setDelete(true);
-            assertTrue(query.isDelete(), "Query should be delete");
+            assertTrue(query.isDelete(), "QueryPlan should be delete");
         }
 
         @Test
@@ -404,14 +404,14 @@ class QueryTest {
         @DisplayName("Should set and check if is update")
         void testSetAndIsUpdate() {
             query.setUpdate(true);
-            assertTrue(query.isUpdate(), "Query should be update");
+            assertTrue(query.isUpdate(), "QueryPlan should be update");
         }
 
         @Test
         @DisplayName("Should set and check if is insert")
         void testSetAndIsInsert() {
             query.setInsert(true);
-            assertTrue(query.isInsert(), "Query should be insert");
+            assertTrue(query.isInsert(), "QueryPlan should be insert");
         }
     }
 
@@ -423,7 +423,7 @@ class QueryTest {
         @DisplayName("Should set and check if is aggregate")
         void testSetAndIsAggregate() {
             query.setAggregate(true);
-            assertTrue(query.isAggregate(), "Query should be aggregate");
+            assertTrue(query.isAggregate(), "QueryPlan should be aggregate");
         }
 
         @Test
@@ -469,7 +469,7 @@ class QueryTest {
         @DisplayName("Should get query nodes")
         void testGetQueryNodes() {
             List<Node> nodes = query.getQueryNodes();
-            assertNotNull(nodes, "Query nodes should not be null");
+            assertNotNull(nodes, "QueryPlan nodes should not be null");
         }
 
         @Test
@@ -514,56 +514,56 @@ class QueryTest {
     }
 
     @Nested
-    @DisplayName("Query Flags Tests")
+    @DisplayName("QueryPlan Flags Tests")
     class QueryFlagsTests {
 
         @Test
         @DisplayName("Should set and check relax flag")
         void testSetAndIsRelax() {
             query.setRelax(true);
-            assertTrue(query.isRelax(), "Query should be relax");
+            assertTrue(query.isRelax(), "QueryPlan should be relax");
         }
 
         @Test
         @DisplayName("Should set and check optimize flag")
         void testSetAndIsOptimize() {
             query.setOptimize(true);
-            assertTrue(query.isOptimize(), "Query should be optimize");
+            assertTrue(query.isOptimize(), "QueryPlan should be optimize");
         }
 
         @Test
         @DisplayName("Should set and check test flag")
         void testSetAndIsTest() {
             query.setTest(true);
-            assertTrue(query.isTest(), "Query should be test");
+            assertTrue(query.isTest(), "QueryPlan should be test");
         }
 
         @Test
         @DisplayName("Should set and check new flag")
         void testSetAndIsNew() {
             query.setNew(false);
-            assertFalse(query.isNew(), "Query should not be new");
+            assertFalse(query.isNew(), "QueryPlan should not be new");
         }
 
         @Test
         @DisplayName("Should set and check correct flag")
         void testSetAndIsCorrect() {
             query.setCorrect(false);
-            assertFalse(query.isCorrect(), "Query should not be correct");
+            assertFalse(query.isCorrect(), "QueryPlan should not be correct");
         }
 
         @Test
         @DisplayName("Should set and check map flag")
         void testSetAndIsMap() {
             query.setMap(false);
-            assertFalse(query.isMap(), "Query should not be map");
+            assertFalse(query.isMap(), "QueryPlan should not be map");
         }
 
         @Test
         @DisplayName("Should set and check rule flag")
         void testSetAndIsRule() {
             query.setRule(true);
-            assertTrue(query.isRule(), "Query should be rule");
+            assertTrue(query.isRule(), "QueryPlan should be rule");
         }
 
         @Test
@@ -590,7 +590,7 @@ class QueryTest {
         @DisplayName("Should set and check if is service")
         void testSetAndIsService() {
             query.setService(true);
-            assertTrue(query.isService(), "Query should be service");
+            assertTrue(query.isService(), "QueryPlan should be service");
         }
 
         @Test
@@ -603,20 +603,20 @@ class QueryTest {
     }
 
     @Nested
-    @DisplayName("Global Query Tests")
+    @DisplayName("Global QueryPlan Tests")
     class GlobalQueryTests {
 
         @Test
         @DisplayName("Should get global query")
         void testGetGlobalQuery() {
-            Query global = query.getGlobalQuery();
+            QueryPlan global = query.getGlobalQuery();
             assertSame(query, global, "Should return self when not subquery");
         }
 
         @Test
         @DisplayName("Should set outer query")
         void testSetOuterQuery() {
-            Query outer = new Query();
+            QueryPlan outer = new QueryPlan();
             query.setOuterQuery(outer);
             assertEquals(outer, query.getOuterQuery(), "Outer query should match");
         }
@@ -624,7 +624,7 @@ class QueryTest {
         @Test
         @DisplayName("Should get outer query")
         void testGetOuterQuery() {
-            Query outer = query.getOuterQuery();
+            QueryPlan outer = query.getOuterQuery();
             assertSame(query, outer, "Should return self when no outer query");
         }
     }
@@ -637,14 +637,14 @@ class QueryTest {
         @DisplayName("Should set and check federate flag")
         void testSetAndIsFederate() {
             query.setFederate(true);
-            assertTrue(query.isFederate(), "Query should be federate");
+            assertTrue(query.isFederate(), "QueryPlan should be federate");
         }
 
         @Test
         @DisplayName("Should set and check validate flag")
         void testSetAndIsValidate() {
             query.setValidate(true);
-            assertTrue(query.isValidate(), "Query should be validate");
+            assertTrue(query.isValidate(), "QueryPlan should be validate");
         }
     }
 
@@ -663,7 +663,7 @@ class QueryTest {
         @DisplayName("Should get datatype label")
         void testGetDatatypeLabel() {
             String label = query.getDatatypeLabel();
-            assertEquals("[Query]", label, "Datatype label should be [Query]");
+            assertEquals("[QueryPlan]", label, "Datatype label should be [QueryPlan]");
         }
     }
 

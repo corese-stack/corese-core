@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.query.impl.engine.planning;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 
@@ -19,7 +19,7 @@ public class ConnectedPatternOrdering {
 
 
     @SuppressWarnings("java:S3776")
-    public void sort(Query q, Exp exp, List<String> lVar, List<Exp> lBind) {
+    public void sort(QueryPlan q, Exp exp, List<String> lVar, List<Exp> lBind) {
 
         List<Node> lNode = new ArrayList<>();
 
@@ -67,11 +67,11 @@ public class ConnectedPatternOrdering {
      * variable node bound count 2 constant node count 1 variable node not bound
      * count 0
      */
-    boolean shift(Query q, Exp e1, Exp e2, List<Node> lNode, List<String> lVar, List<Exp> lBind) {
+    boolean shift(QueryPlan q, Exp e1, Exp e2, List<Node> lNode, List<String> lVar, List<Exp> lBind) {
         return before(q, e1, e2, lNode, lVar, lBind);
     }
 
-    protected boolean before(Query q, Exp e1, Exp e2, List<Node> lNode, List<String> lVar, List<Exp> lBind) {
+    protected boolean before(QueryPlan q, Exp e1, Exp e2, List<Node> lNode, List<String> lVar, List<Exp> lBind) {
         int n1 = e1.nBind(lNode, lVar, lBind);
         int n2 = e2.nBind(lNode, lVar, lBind);
 
@@ -86,7 +86,7 @@ public class ConnectedPatternOrdering {
     /**
      * Edge with node in bindings has advantage
      */
-    protected boolean beforeBind(Query q, Exp e2, Exp e1) {
+    protected boolean beforeBind(QueryPlan q, Exp e2, Exp e1) {
         Mappings list = q.getActualMappings();
         if (list != null && !list.isEmpty()) {
             Mapping map = list.get(0);

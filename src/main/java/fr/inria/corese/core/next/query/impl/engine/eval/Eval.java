@@ -10,7 +10,7 @@ import fr.inria.corese.core.next.query.impl.engine.model.Filter;
 import fr.inria.corese.core.next.query.impl.engine.model.Loopable;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
 import fr.inria.corese.core.next.query.impl.engine.solution.MappingSet;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
@@ -73,7 +73,7 @@ public final class Eval implements ExpType {
     Matcher match;
     // Stacks for binding edges and nodes
     Memory memory;
-    Query query;
+    QueryPlan query;
 
     Mappings results;
     // initial results to be completed
@@ -163,15 +163,15 @@ public final class Eval implements ExpType {
     /**
      * Main eval function
      */
-    public Mappings query(Query q) {
+    public Mappings query(QueryPlan q) {
         return query(null, q, null);
     }
 
-    public Mappings query(Node graphNode, Query q, Mapping m) {
+    public Mappings query(Node graphNode, QueryPlan q, Mapping m) {
         return queryBasic(graphNode, q, m);
     }
 
-    Mappings queryBasic(Node graphNode, Query q, Mapping m) {
+    Mappings queryBasic(Node graphNode, QueryPlan q, Mapping m) {
         initMemory(q);
         share(m);
         getProducer().start(q);
@@ -217,7 +217,7 @@ public final class Eval implements ExpType {
      * use case: optional(A, B) map = relevant subset of results of A
      * for main query and subquery
      */
-    Mappings eval(Node gNode, Query q, Mapping m, Mappings map) {
+    Mappings eval(Node gNode, QueryPlan q, Mapping m, Mappings map) {
         init(q);
         if (q.isValidate()) {
             // just compile and complete query
@@ -241,8 +241,8 @@ public final class Eval implements ExpType {
      * Mappings map is results or previous statement, possibly null
      * use case: optional(A, B) map = relevant subset of results of A
      */
-    @SuppressWarnings("java:S1845") // Query execution method named query by convention
-    void query(Node gNode, Query q, Mapping m, Mappings map) {
+    @SuppressWarnings("java:S1845") // QueryPlan execution method named query by convention
+    void query(Node gNode, QueryPlan q, Mapping m, Mappings map) {
         if (m != null) {
             // bind mapping variables into memory
             bind(m);
@@ -261,7 +261,7 @@ public final class Eval implements ExpType {
     /**
      * Bind external values one by one in memory and eval one by one
      */
-    void queryWithValues(Node gNode, Query q, Mappings map) {
+    void queryWithValues(Node gNode, QueryPlan q, Mappings map) {
         Exp values = q.getValues();
 
         if (!values.isPostpone()) {
@@ -279,7 +279,7 @@ public final class Eval implements ExpType {
         eval(gNode, q, map);
     }
 
-    void eval(Node gNode, Query q, Mappings map) {
+    void eval(Node gNode, QueryPlan q, Mappings map) {
         evalExp(gNode, q.getBody(), map);
     }
     void evalExp(Node gNode, Exp exp, Mappings map) {
@@ -298,7 +298,7 @@ public final class Eval implements ExpType {
      * for optional, minus, union, join, graph
      * not for subquery which has its own processing
      */
-    Mappings subEval(Query q, Node gNode, Stack stack, Mappings map, int n) {
+    Mappings subEval(QueryPlan q, Node gNode, Stack stack, Mappings map, int n) {
         setSubEval(true);
         starter(q);
         eval(getProducer(), gNode, stack, map, n);
@@ -488,7 +488,7 @@ public final class Eval implements ExpType {
      * copy memory for sub query copy sub query select variables that are
      * already bound in current memory Use case: subquery and exists
      */
-    private Memory copyMemory(Memory memory, Query query, Query sub, Exp exp) {
+    private Memory copyMemory(Memory memory, QueryPlan query, QueryPlan sub, Exp exp) {
         Memory mem = new Memory(match, evaluator);
         getEvaluator().init(mem);
         if (sub == null) {
@@ -521,7 +521,7 @@ public final class Eval implements ExpType {
         return getEnvironment().getBind();
     }
 
-    public Query getQuery() {
+    public QueryPlan getQuery() {
         return query;
     }
 
@@ -558,16 +558,16 @@ public final class Eval implements ExpType {
     }
 
     // total init (for global query)
-    public void init(Query q) {
+    public void init(QueryPlan q) {
         initMemory(q);
         start(q);
     }
 
-    void initMemory(Query q) {
+    void initMemory(QueryPlan q) {
         if (memory == null) {
             // when subquery, memory is already assigned
             // assign stack index to EDGE and NODE
-            q.complete(getProducer());//service while1 / Query
+            q.complete(getProducer());//service while1 / QueryPlan
             memory = new Memory(match, evaluator);
             memory.setEval(this);
             getEvaluator().init(memory);
@@ -579,10 +579,10 @@ public final class Eval implements ExpType {
     }
 
     // partial init (for global query and subqueries)
-    public void start(Query q) {
+    public void start(QueryPlan q) {
         state.setLimit(q.getLimitOffset());
         // ASK only needs its first solution after OFFSET. Keep the requested
-        // Query modifiers intact, and evaluate fully when sorting/grouping needs it.
+        // QueryPlan modifiers intact, and evaluate fully when sorting/grouping needs it.
         if (q.isAsk() && !q.isOrderBy() && !q.hasGroupBy() && !q.isAggregate()) {
             state.setLimit((int) Math.min(state.getLimit(), (long) q.getOffset() + 1));
         }
@@ -598,7 +598,7 @@ public final class Eval implements ExpType {
     }
 
     // for sub exp
-    private void starter(Query q) {
+    private void starter(QueryPlan q) {
         query = q;
         // create result holder
         if (initialResults != null) {
@@ -1018,7 +1018,7 @@ public final class Eval implements ExpType {
 
     // process additional variable provided by service
     // such as ?_server_0 in federated mode
-    void complete(Query q, Mapping map, boolean addNode) {
+    void complete(QueryPlan q, Mapping map, boolean addNode) {
         int i = 0;
         for (Node node : map.getQueryNodes()) {
             Node out = q.getOuterNode(node);
@@ -1291,7 +1291,7 @@ public final class Eval implements ExpType {
         Memory env = getMemory();
         // used by RuleEngine ResultWatcher ProducerImpl
         env.setExp(exp);
-        Query qq = getQuery();
+        QueryPlan qq = getQuery();
         // for default graph triple pattern, consider select from if any
         // for named graph triple pattern, from named is useless here because graphNode = URI of one named graph
         List<Node> graphNodeList = qq.getFrom(graphNode);
@@ -1395,7 +1395,7 @@ public final class Eval implements ExpType {
      */
     private int query(Producer p, Node graphNode, Exp exp, Mappings data, Stack stack, int n) {
         int backtrack = n - 1;
-        Query subQuery = exp.getQuery();
+        QueryPlan subQuery = exp.getQuery();
         Memory env = getMemory();
         getVisitor().start(subQuery);
 
@@ -1448,11 +1448,11 @@ public final class Eval implements ExpType {
      * res is a result of sub query bind the select nodes of sub query into
      * current memory retrieve outer node that correspond to sub node
      */
-    private boolean push(Query subQuery, Mapping res, int n) {
+    private boolean push(QueryPlan subQuery, Mapping res, int n) {
         int k = 0;
         Memory env = memory;
         Matcher mm = match;
-        Query qq = query;
+        QueryPlan qq = query;
 
         for (Exp exp : subQuery.getSelectFun()) {
             Node subNode = exp.getNode();
@@ -1487,9 +1487,9 @@ public final class Eval implements ExpType {
     /**
      * pop select nodes of sub query
      */
-    private void pop(Query subQuery, Mapping ans) {
+    private void pop(QueryPlan subQuery, Mapping ans) {
         Memory env = memory;
-        Query qq = query;
+        QueryPlan qq = query;
 
         for (Node subNode : subQuery.getSelect()) {
             if (ans.isBound(subNode)) {

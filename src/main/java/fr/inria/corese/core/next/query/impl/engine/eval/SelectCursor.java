@@ -8,7 +8,7 @@ import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.model.ExpType.Type;
 import fr.inria.corese.core.next.query.impl.engine.path.PropertyPathEdge;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
 import fr.inria.corese.core.next.query.impl.engine.solution.Memory;
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
@@ -35,7 +35,7 @@ public final class SelectCursor implements Iterator<Mapping>, AutoCloseable {
     private final Node scopeGraph;
     private final boolean nested;
     private final boolean applySlice;
-    private final Query query;
+    private final QueryPlan query;
     private final Memory memory;
     private final Producer producer;
     private final List<Exp> instructions = new ArrayList<>();
@@ -55,7 +55,7 @@ public final class SelectCursor implements Iterator<Mapping>, AutoCloseable {
      * @param query completed execution query
      * @return first materialization guard, or NONE for eligible algebra
      */
-    public static FallbackReason fallbackReason(Query query) {
+    public static FallbackReason fallbackReason(QueryPlan query) {
         if (!query.isSelect()) return FallbackReason.QUERY_FORM;
         if (query.isOrderBy()) return FallbackReason.ORDER_BY;
         return operatorFallbackReason(query);
@@ -68,13 +68,13 @@ public final class SelectCursor implements Iterator<Mapping>, AutoCloseable {
      * @param query completed execution query
      * @return whether ORDER BY has a finite, representable LIMIT plus OFFSET and eligible input
      */
-    public static boolean supportsOrderedInput(Query query) {
+    public static boolean supportsOrderedInput(QueryPlan query) {
         return query.isSelect() && query.isOrderBy() && query.getLimit() < Integer.MAX_VALUE
                 && (long) query.getLimit() + query.getOffset() <= Integer.MAX_VALUE
                 && operatorFallbackReason(query) == FallbackReason.NONE;
     }
 
-    private static FallbackReason operatorFallbackReason(Query query) {
+    private static FallbackReason operatorFallbackReason(QueryPlan query) {
         if (query.hasGroupBy() || query.isAggregate() || query.getHaving() != null) return FallbackReason.AGGREGATION;
         return fallbackReason(query.getBody(), query.getValues() != null && !singleton(query.getValues()));
     }
@@ -161,7 +161,7 @@ public final class SelectCursor implements Iterator<Mapping>, AutoCloseable {
      * @param query completed eligible SELECT
      * @param bindings initial parameter bindings, or null
      */
-    public SelectCursor(Eval eval, Query query, Mapping bindings) {
+    public SelectCursor(Eval eval, QueryPlan query, Mapping bindings) {
         this(null, eval, query, bindings, query.getBody(), null, true);
     }
 
@@ -171,15 +171,15 @@ public final class SelectCursor implements Iterator<Mapping>, AutoCloseable {
      * The caller owns both this cursor and its producer's stable read view.
      *
      * @param eval fresh evaluator owned by this execution
-     * @param query completed query accepted by {@link #supportsOrderedInput(Query)}
+     * @param query completed query accepted by {@link #supportsOrderedInput(QueryPlan)}
      * @param bindings initial parameter bindings, or null
      * @return unsliced input cursor
      */
-    public static SelectCursor orderedInput(Eval eval, Query query, Mapping bindings) {
+    public static SelectCursor orderedInput(Eval eval, QueryPlan query, Mapping bindings) {
         return new SelectCursor(null, eval, query, bindings, query.getBody(), null, false);
     }
 
-    private SelectCursor(SelectCursor parent, Eval eval, Query query, Mapping bindings, Exp body, Node graph,
+    private SelectCursor(SelectCursor parent, Eval eval, QueryPlan query, Mapping bindings, Exp body, Node graph,
             boolean applySlice) {
         this.eval = eval;
         this.query = query;
@@ -243,7 +243,7 @@ public final class SelectCursor implements Iterator<Mapping>, AutoCloseable {
     }
 
     private static void checkInterrupted() {
-        if (Thread.currentThread().isInterrupted()) throw new QueryEvaluationException("Query interrupted");
+        if (Thread.currentThread().isInterrupted()) throw new QueryEvaluationException("QueryPlan interrupted");
     }
 
     private boolean selectRow() {

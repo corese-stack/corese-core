@@ -9,7 +9,7 @@ import fr.inria.corese.core.next.query.impl.engine.model.Expr;
 import fr.inria.corese.core.next.query.impl.engine.model.ExprType;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -39,13 +39,13 @@ class CoreseAstQueryBuilderDescribeTest {
     }
 
     @Test
-    @DisplayName("Parser -> DescribeQueryAst -> Query lowers DESCRIBE to a construct-like query")
+    @DisplayName("Parser -> DescribeQueryAst -> QueryPlan lowers DESCRIBE to a construct-like query")
     void parserDescribeAstToQuery() {
         SparqlParser parser = new SparqlParser();
         DescribeQueryAst describe = (DescribeQueryAst) parser.parse(
                 "DESCRIBE ?x WHERE { ?x ?p ?o }");
 
-        Query query = builder.toNextQuery(describe);
+        QueryPlan query = builder.toNextQuery(describe);
 
         assertLoweredDescribeConstruct(query, 1);
         assertTrue(query.getBody().isAnd());
@@ -59,7 +59,7 @@ class CoreseAstQueryBuilderDescribeTest {
         DescribeQueryAst describe = new DescribeQueryAst(
                 DatasetClauseAst.none(), List.of(new VarAst("x")), whereBindingX());
 
-        Query query = builder.toNextQuery(describe);
+        QueryPlan query = builder.toNextQuery(describe);
 
         assertLoweredDescribeConstruct(query, 1);
         assertTrue(query.getBody().isAnd(), "WHERE compiled into the body");
@@ -75,7 +75,7 @@ class CoreseAstQueryBuilderDescribeTest {
         DescribeQueryAst describe = new DescribeQueryAst(
                 DatasetClauseAst.none(), List.of(new IriAst("<http://example.org/x>")), null);
 
-        Query query = builder.toNextQuery(describe);
+        QueryPlan query = builder.toNextQuery(describe);
 
         assertLoweredDescribeConstruct(query, 1);
         assertTrue(query.getBody().isAnd(), "body remains an AND");
@@ -89,7 +89,7 @@ class CoreseAstQueryBuilderDescribeTest {
         DescribeQueryAst describe = new DescribeQueryAst(
                 DatasetClauseAst.none(), List.of(), whereBindingX());
 
-        Query query = builder.toNextQuery(describe);
+        QueryPlan query = builder.toNextQuery(describe);
 
         assertLoweredDescribeConstruct(query, 3);
         assertEquals(3, describeOptionalCount(query));
@@ -129,7 +129,7 @@ class CoreseAstQueryBuilderDescribeTest {
         DescribeQueryAst describe = new DescribeQueryAst(
                 dataset, List.of(new VarAst("x")), whereBindingX());
 
-        Query query = builder.toNextQuery(describe);
+        QueryPlan query = builder.toNextQuery(describe);
 
         assertEquals(1, query.getFrom().size(), "FROM applied");
         assertEquals(1, query.getNamed().size(), "FROM NAMED applied");
@@ -143,7 +143,7 @@ class CoreseAstQueryBuilderDescribeTest {
         DescribeQueryAst describe = new DescribeQueryAst(
                 DatasetClauseAst.none(), List.of(new VarAst("x")), whereBindingX(), mod);
 
-        Query query = builder.toNextQuery(describe);
+        QueryPlan query = builder.toNextQuery(describe);
 
         assertEquals(5, query.getLimit(), "LIMIT applied");
         assertEquals(2, query.getOffset(), "OFFSET applied");
@@ -159,7 +159,7 @@ class CoreseAstQueryBuilderDescribeTest {
         DescribeQueryAst describe = new DescribeQueryAst(
                 DatasetClauseAst.none(), List.of(new VarAst("x")), whereBindingX(), mod);
 
-        Query query = builder.toNextQuery(describe);
+        QueryPlan query = builder.toNextQuery(describe);
 
         assertFalse(query.getOrderBy().isEmpty(), "ORDER BY applied");
     }
@@ -176,7 +176,7 @@ class CoreseAstQueryBuilderDescribeTest {
         DescribeQueryAst describe = new DescribeQueryAst(
                 DatasetClauseAst.none(), List.of(new VarAst("x")), where);
 
-        Query query = builder.toNextQuery(describe);
+        QueryPlan query = builder.toNextQuery(describe);
 
         assertLoweredDescribeConstruct(query, 1);
         Exp filterExp = findFilter(query.getBody());
@@ -198,7 +198,7 @@ class CoreseAstQueryBuilderDescribeTest {
         DescribeQueryAst describe = new DescribeQueryAst(
                 DatasetClauseAst.none(), List.of(new VarAst("x")), where);
 
-        Query query = builder.toNextQuery(describe);
+        QueryPlan query = builder.toNextQuery(describe);
 
         assertLoweredDescribeConstruct(query, 1);
         Exp filterExp = findFilter(query.getBody());
@@ -227,7 +227,7 @@ class CoreseAstQueryBuilderDescribeTest {
         DescribeQueryAst describe = new DescribeQueryAst(
                 DatasetClauseAst.none(), List.of(new VarAst("x")), whereBindingX(), null, null, values);
 
-        Query query = builder.toNextQuery(describe);
+        QueryPlan query = builder.toNextQuery(describe);
         assertTrue(query.getBody().isJoin());
         assertTrue(query.getBody().rest().isValues());
     }
@@ -249,7 +249,7 @@ class CoreseAstQueryBuilderDescribeTest {
         assertThrows(NullPointerException.class, () -> builder.toNextQuery((DescribeQueryAst) null));
     }
 
-    private static void assertLoweredDescribeConstruct(Query query, int describedNodeCount) {
+    private static void assertLoweredDescribeConstruct(QueryPlan query, int describedNodeCount) {
         assertTrue(query.isConstruct(), "DESCRIBE is lowered to the construct runtime path");
         assertFalse(query.isSelect(), "a lowered DESCRIBE must not report itself as SELECT");
         assertNotNull(query.getConstruct(), "construct template created");
@@ -262,7 +262,7 @@ class CoreseAstQueryBuilderDescribeTest {
      * Counts the DESCRIBE-generated {@code OPTIONAL { outgoing UNION incoming }} patterns directly
      * under the body — independently of how the parser shaped the original WHERE.
      */
-    private static long describeOptionalCount(Query query) {
+    private static long describeOptionalCount(QueryPlan query) {
         Exp body = query.getBody();
         long count = 0;
         for (int i = 0; i < body.size(); i++) {

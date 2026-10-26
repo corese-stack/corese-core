@@ -12,7 +12,7 @@ import fr.inria.corese.core.next.query.impl.engine.model.NodeImpl;
 import fr.inria.corese.core.next.query.impl.engine.path.NativePropertyPathEvaluator;
 import fr.inria.corese.core.next.query.impl.engine.path.PropertyPathEdge;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.planning.QueryStatistics;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
@@ -78,7 +78,7 @@ public class StorageManagerProducer extends ProducerDefault implements QueryStat
      * @return matching statement count, or unknown for paths and variable graphs
      */
     @Override
-    public long estimateCardinality(Query query, Node graphNode, Edge edge) {
+    public long estimateCardinality(QueryPlan query, Node graphNode, Edge edge) {
         if (edge instanceof PropertyPathEdge || graphNode != null && graphNode.isVariable()) {
             return UNKNOWN_CARDINALITY;
         }
@@ -99,7 +99,7 @@ public class StorageManagerProducer extends ProducerDefault implements QueryStat
     }
 
     @Override
-    public PredicateStatistics getPredicateStatistics(Query query, Node graphNode, IRI predicate) {
+    public PredicateStatistics getPredicateStatistics(QueryPlan query, Node graphNode, IRI predicate) {
         if (predicate == null || closed) {
             return null;
         }
@@ -169,7 +169,7 @@ public class StorageManagerProducer extends ProducerDefault implements QueryStat
             synchronized (cursors) {
                 checkInterrupted();
                 if (closed) {
-                    throw new QueryEvaluationException("Query producer is closed");
+                    throw new QueryEvaluationException("QueryPlan producer is closed");
                 }
                 cursor = new EdgeCursor(storage.queries().find(pattern), deduplicate);
                 cursors.add(cursor);
@@ -290,7 +290,7 @@ public class StorageManagerProducer extends ProducerDefault implements QueryStat
 
     private static void checkInterrupted() {
         if (Thread.currentThread().isInterrupted()) {
-            throw new QueryEvaluationException("Query evaluation was interrupted");
+            throw new QueryEvaluationException("QueryPlan evaluation was interrupted");
         }
     }
 
@@ -354,12 +354,12 @@ public class StorageManagerProducer extends ProducerDefault implements QueryStat
     }
 
     @Override
-    public void start(Query query) {
+    public void start(QueryPlan query) {
         // Cursors are registered when their iterators are opened.
     }
 
     @Override
-    public void finish(Query query) {
+    public void finish(QueryPlan query) {
         closeCursors(false);
     }
 

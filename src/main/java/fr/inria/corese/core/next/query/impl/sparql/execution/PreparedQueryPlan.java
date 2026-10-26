@@ -6,7 +6,7 @@ import fr.inria.corese.core.next.query.impl.engine.diagnostics.ExecutionDiagnost
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.pattern.CompiledQueryPlan;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.storage.StorageManagerProducer;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.storage.api.StorageManager;
@@ -31,7 +31,7 @@ public final class PreparedQueryPlan {
         this.ast = Objects.requireNonNull(ast, "ast");
     }
 
-    Query resolve(SparqlQueryExecutor executor, StorageManager storage, Dataset dataset,
+    QueryPlan resolve(SparqlQueryExecutor executor, StorageManager storage, Dataset dataset,
             ExecutionDiagnostics diagnostics) {
         long version = storage.queries().getDataVersion();
         CachedPlan previous = cached;
@@ -39,7 +39,7 @@ public final class PreparedQueryPlan {
                 && sameDataset(previous.dataset(), dataset)) {
             return instantiate(previous.plan(), diagnostics);
         }
-        Query compiled = executor.compile(ast);
+        QueryPlan compiled = executor.compile(ast);
         if (dataset != null) executor.applyDataset(compiled, dataset);
         RecordingProducer statistics = new RecordingProducer(storage);
         long started = diagnostics == null ? 0 : System.nanoTime();
@@ -69,9 +69,9 @@ public final class PreparedQueryPlan {
         return compiled;
     }
 
-    private static Query instantiate(CompiledQueryPlan image, ExecutionDiagnostics diagnostics) {
+    private static QueryPlan instantiate(CompiledQueryPlan image, ExecutionDiagnostics diagnostics) {
         long started = diagnostics == null ? 0 : System.nanoTime();
-        Query query = image.newExecution(diagnostics);
+        QueryPlan query = image.newExecution(diagnostics);
         if (diagnostics != null) {
             diagnostics.executionSetupTime(System.nanoTime() - started);
             diagnostics.reusedPlan(true);
@@ -105,7 +105,7 @@ public final class PreparedQueryPlan {
         }
 
         @Override
-        public long estimateCardinality(Query query, Node graph, Edge edge) {
+        public long estimateCardinality(QueryPlan query, Node graph, Edge edge) {
             long count = super.estimateCardinality(query, graph, edge);
             counts.put(edge, count);
             return count;

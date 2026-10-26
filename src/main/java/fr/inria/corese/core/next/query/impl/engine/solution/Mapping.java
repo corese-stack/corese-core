@@ -11,7 +11,7 @@ import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.model.PointerType;
 import fr.inria.corese.core.next.query.impl.engine.model.Pointerable;
 import fr.inria.corese.core.next.query.impl.engine.model.TripleStore;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 
 import fr.inria.corese.core.next.query.impl.engine.path.Path;
 import fr.inria.corese.core.next.query.impl.engine.eval.EnvironmentImpl;
@@ -100,7 +100,7 @@ public final class Mapping
         init(q, t);
     }
 
-    static Mapping fake(Query q) {
+    static Mapping fake(QueryPlan q) {
         Mapping m = new Mapping();
         m.setOrderBy(new Node[q.getOrderBy().size()]);
         m.setGroupBy(new Node[q.getGroupBy().size()]);
@@ -192,7 +192,7 @@ public final class Mapping
     /**
      * Project on select variables of query Modify this Mapping
      */
-    public void project(Query q) {
+    public void project(QueryPlan q) {
         ArrayList<Node> lqNodes = new ArrayList<>();
         ArrayList<Node> ltNodes = new ArrayList<>();
 
@@ -217,11 +217,11 @@ public final class Mapping
     }
 
     @Override
-    public Query getQuery() {
+    public QueryPlan getQuery() {
         return query;
     }
 
-    public void setQuery(Query q) {
+    public void setQuery(QueryPlan q) {
         query = q;
     }
 
@@ -384,7 +384,7 @@ public final class Mapping
     }
 
     // Note: manage Node isPath
-    public void fixQueryNodes(Query q) {
+    public void fixQueryNodes(QueryPlan q) {
         for (int i = 0; i < getQueryNodes().length; i++) {
             Node node = getQueryNodes()[i];
             Node qnode = q.getOuterNodeSelf(node);

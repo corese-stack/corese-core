@@ -7,7 +7,7 @@ import fr.inria.corese.core.next.query.impl.engine.model.Filter;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,10 +39,10 @@ import java.util.List;
  */
 public final class FilterOptimizer implements ExprType {
 
-    private Query kgramQuery;
+    private QueryPlan kgramQuery;
     private final ExpressionPatternMatcher matcher;
 
-    public FilterOptimizer(Query q){
+    public FilterOptimizer(QueryPlan q){
         kgramQuery = q;
         matcher = new ExpressionPatternMatcher();
     }
@@ -56,7 +56,7 @@ public final class FilterOptimizer implements ExprType {
      * x p t . y p z filter(y = x)
      * we can bind y = x before enumerate y p z
      */
-    public void process(Query q, Exp exp) {
+    public void process(QueryPlan q, Exp exp) {
         this.kgramQuery = q;
         Filter ff = exp.getFilter();
         Expr ee = ff.getExp();

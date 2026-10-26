@@ -12,7 +12,7 @@ import fr.inria.corese.core.next.query.impl.engine.model.PointerType;
 import fr.inria.corese.core.next.query.impl.engine.model.TripleStore;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Group;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import fr.inria.corese.core.next.query.impl.engine.spi.Evaluator;
@@ -54,7 +54,7 @@ public final class Mappings extends PointerObject
     boolean isListGroup = false;
     boolean sortWithDesc = true;
     int count = 0;
-    private Query query;
+    private QueryPlan query;
     private final List<Mapping> list;
     // Original join Mappings
     // use case: union manage its own way
@@ -104,16 +104,16 @@ public final class Mappings extends PointerObject
         link = new ArrayList<>();
     }
 
-    Mappings(Query q) {
+    Mappings(QueryPlan q) {
         this();
         query = q;
     }
 
-    public static Mappings create(Query q) {
+    public static Mappings create(QueryPlan q) {
         return create(q, false);
     }
 
-    public static Mappings create(Query q, boolean subEval) {
+    public static Mappings create(QueryPlan q, boolean subEval) {
         Mappings lMap = new Mappings(q);
         lMap.init(q, subEval);
         return lMap;
@@ -130,15 +130,15 @@ public final class Mappings extends PointerObject
         return String.format("[Mappings: size=%s]", size());
     }
 
-    void init(Query q, boolean subEval) {
+    void init(QueryPlan q, boolean subEval) {
         initiate(q, !subEval && q.isDistinct() && !q.isDistinctRedundantWithGroupBy());
     }
 
-    void initiate(Query q, boolean b) {
+    void initiate(QueryPlan q, boolean b) {
         initiate(q, b, false);
     }
 
-    void initiate(Query q, boolean b, boolean all) {
+    void initiate(QueryPlan q, boolean b, boolean all) {
         this.setQuery(q);
         isDistinct = b;
         isListGroup = q.isListGroup();
@@ -157,7 +157,7 @@ public final class Mappings extends PointerObject
 
     // use case: service require distinct mappings for bindings
     // for variables in body of q, not for select (exp as var)
-    List<Exp> getAllExpList(Query q) {
+    List<Exp> getAllExpList(QueryPlan q) {
         // variables in body of q
         List<Node> nodesFromPattern = q.selectNodesFromPattern();
         if (nodesFromPattern.isEmpty()) {
@@ -246,11 +246,11 @@ public final class Mappings extends PointerObject
     }
 
     @Override
-    public Query getQuery() {
+    public QueryPlan getQuery() {
         return query;
     }
 
-    public Mappings setQuery(Query q) {
+    public Mappings setQuery(QueryPlan q) {
         query = q;
         return this;
     }
@@ -636,7 +636,7 @@ public final class Mappings extends PointerObject
         aggregate(getQuery(), evaluator, memory, p);
     }
 
-    public void aggregate(Query q, Evaluator evaluator, Memory memory, Producer p) {
+    public void aggregate(QueryPlan q, Evaluator evaluator, Memory memory, Producer p) {
         if (size() == 0) {
             if (q.isAggregate() && !q.hasGroupBy()) {
                 // SPARQL semantics requires that aggregate empty result set return one empty result
@@ -672,7 +672,7 @@ public final class Mappings extends PointerObject
      * select (aggregate() as ?c)
      * order by aggregate()
      */
-    void aggregateExpList(Query q, Evaluator evaluator, Memory memory, Producer p, List<Exp> list, boolean isSelect) {
+    void aggregateExpList(QueryPlan q, Evaluator evaluator, Memory memory, Producer p, List<Exp> list, boolean isSelect) {
         int n = 0;
         for (Exp exp : list) {
             if (exp.isAggregate()) {
@@ -688,7 +688,7 @@ public final class Mappings extends PointerObject
     /**
      * select count(?doc) as ?count group by ?person ?date order by ?count
      */
-    private void aggregateSwitch(Query q, Evaluator eval, Exp exp, Memory mem, Producer p, int n) {
+    private void aggregateSwitch(QueryPlan q, Evaluator eval, Exp exp, Memory mem, Producer p, int n) {
         if (exp.isExpGroupBy()) {
             // min(?l, groupBy(?x, ?y)) as ?min
             evalGroupByExp(eval, exp, mem, p, n);
@@ -780,7 +780,7 @@ public final class Mappings extends PointerObject
         }
     }
 
-    void finish(Query qq) {
+    void finish(QueryPlan qq) {
         if (qq.hasGroupBy() && !qq.isConstruct()) {
             // after group by (and aggregate), leave one Mapping for each group
             // with result of the group
@@ -810,7 +810,7 @@ public final class Mappings extends PointerObject
         }
     }
 
-    public void prepareAggregate(Mapping map, Query q, Map<String, DatatypeValue> bn, int n) {
+    public void prepareAggregate(Mapping map, QueryPlan q, Map<String, DatatypeValue> bn, int n) {
         setCount(n);
         // in case there is a nested aggregate, map will be an Environment
         // it must implement aggregate() and hence must know current Mappings group

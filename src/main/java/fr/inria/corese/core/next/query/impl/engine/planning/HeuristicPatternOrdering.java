@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.query.impl.engine.planning;
 
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 
 import fr.inria.corese.core.next.query.impl.engine.model.ExpType;
@@ -32,7 +32,7 @@ public class HeuristicPatternOrdering extends ConnectedPatternOrdering {
      * @param bindings constant-binding hints
      * @param statistics producer's statistics capability
      */
-    public void sort(Query query, Node graph, Exp expression, List<String> variables,
+    public void sort(QueryPlan query, Node graph, Exp expression, List<String> variables,
             List<Exp> bindings, QueryStatistics statistics) {
         CardinalityPatternOrdering.sort(query, graph, expression, variables, bindings, statistics);
     }

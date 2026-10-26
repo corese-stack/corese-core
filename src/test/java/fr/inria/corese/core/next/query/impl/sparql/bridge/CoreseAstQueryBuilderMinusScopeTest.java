@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.query.impl.sparql.bridge;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +32,7 @@ class CoreseAstQueryBuilderMinusScopeTest {
                 bgp("s", "p", "o"),
                 new MinusAst(new GroupGraphPatternAst(List.of(bgp("s", "q", "z")))))));
 
-        Query query = Query.create(body);
+        QueryPlan query = QueryPlan.create(body);
         query.collect();
 
         // WHERE pattern variables are in scope (pattern nodes)
@@ -55,7 +55,7 @@ class CoreseAstQueryBuilderMinusScopeTest {
                 bgp("s", "p", "o"),
                 new OptionalAst(new GroupGraphPatternAst(List.of(bgp("s", "q", "z")))))));
 
-        Query query = Query.create(body);
+        QueryPlan query = QueryPlan.create(body);
         query.collect();
 
         assertTrue(hasLabel(query.getPatternNodes(), "s"), "?s from WHERE is a pattern node");

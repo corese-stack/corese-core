@@ -5,7 +5,7 @@ import fr.inria.corese.core.next.query.impl.engine.model.Filter;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.model.NodeImpl;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ASTConstants;
 import fr.inria.corese.core.next.query.impl.sparql.ast.GroupByAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.HavingAst;
@@ -41,7 +41,7 @@ final class SolutionModifierCompiler {
      * query body. An explicit projection reuses these same runtime nodes and fails
      * fast when a projected variable is not visible in the body.</p>
      */
-    static void applyProjection(Query query, ProjectionAst projection, WhereCompiler compiler) {
+    static void applyProjection(QueryPlan query, ProjectionAst projection, WhereCompiler compiler) {
         List<Exp> selectExpressions = projection.selectAll()
                 ? toNodeExpressions(query.selectNodesFromPattern())
                 : buildExplicitProjection(query, projection, compiler);
@@ -52,7 +52,7 @@ final class SolutionModifierCompiler {
     }
 
     static void applyGroupBy(
-            Query query, SolutionModifierAst solutionModifier, WhereCompiler compiler) {
+            QueryPlan query, SolutionModifierAst solutionModifier, WhereCompiler compiler) {
         if (!solutionModifier.hasGroupBy()) {
             return;
         }
@@ -68,7 +68,7 @@ final class SolutionModifierCompiler {
     }
 
     static void applyHaving(
-            Query query, SolutionModifierAst solutionModifier, WhereCompiler compiler) {
+            QueryPlan query, SolutionModifierAst solutionModifier, WhereCompiler compiler) {
         if (!solutionModifier.hasHaving()) {
             return;
         }
@@ -90,7 +90,7 @@ final class SolutionModifierCompiler {
      * filters and attached to synthetic internal nodes, just like the historical pipeline does.</p>
      */
     static void applyOrderBy(
-            Query query, SolutionModifierAst solutionModifier, WhereCompiler compiler) {
+            QueryPlan query, SolutionModifierAst solutionModifier, WhereCompiler compiler) {
         if (!solutionModifier.hasOrderBy()) {
             return;
         }
@@ -104,7 +104,7 @@ final class SolutionModifierCompiler {
         query.setOrderBy(orderByExpressions);
     }
 
-    static void applyLimitOffset(Query query, SolutionModifierAst solutionModifier) {
+    static void applyLimitOffset(QueryPlan query, SolutionModifierAst solutionModifier) {
         if (solutionModifier.hasLimit()) {
             query.setLimit(Math.toIntExact(solutionModifier.limit()));
         }
@@ -114,7 +114,7 @@ final class SolutionModifierCompiler {
     }
 
     private static List<Exp> buildExplicitProjection(
-            Query query, ProjectionAst projection, WhereCompiler compiler) {
+            QueryPlan query, ProjectionAst projection, WhereCompiler compiler) {
         List<Exp> selectExpressions = new ArrayList<>();
         for (VarAst variable : projection.variables()) {
             TermAst expression = projection.expressionTerms().get(variable.name());
@@ -136,12 +136,12 @@ final class SolutionModifierCompiler {
         return selected;
     }
 
-    private static Exp buildProjectedVariable(Query query, VarAst variable) {
+    private static Exp buildProjectedVariable(QueryPlan query, VarAst variable) {
         Node node = resolveProjectedNode(query, variable.name());
         return Exp.create(Type.NODE, node);
     }
 
-    private static Node resolveProjectedNode(Query query, String name) {
+    private static Node resolveProjectedNode(QueryPlan query, String name) {
         Node node = visibleBodyNode(query, name);
         if (node == null) {
             node = groupByNode(query, name);
@@ -180,7 +180,7 @@ final class SolutionModifierCompiler {
     }
 
     private static Exp toGroupByExpression(
-            Query query,
+            QueryPlan query,
             GroupByAst groupByAst,
             TermAst term,
             int syntheticIndex,
@@ -221,7 +221,7 @@ final class SolutionModifierCompiler {
     }
 
     private static Exp toOrderByExpression(
-            Query query,
+            QueryPlan query,
             OrderConditionAst orderCondition,
             int syntheticIndex,
             WhereCompiler compiler) {
@@ -232,7 +232,7 @@ final class SolutionModifierCompiler {
         return toOrderBySyntheticExpression(query, expression, syntheticIndex, compiler);
     }
 
-    private static Exp toOrderByVarExpression(Query query, String name) {
+    private static Exp toOrderByVarExpression(QueryPlan query, String name) {
         Exp selectExpression = query.getSelectExp(name);
         Node node = selectExpression != null ? selectExpression.getNode() : resolveOrderByFallbackNode(query, name);
         if (node == null) {
@@ -246,13 +246,13 @@ final class SolutionModifierCompiler {
         return orderExp;
     }
 
-    private static Node resolveOrderByFallbackNode(Query query, String name) {
+    private static Node resolveOrderByFallbackNode(QueryPlan query, String name) {
         Node groupNode = groupByNode(query, name);
         return groupNode != null ? groupNode : visibleBodyNode(query, name);
     }
 
     private static Exp toOrderBySyntheticExpression(
-            Query query,
+            QueryPlan query,
             TermAst expression,
             int syntheticIndex,
             WhereCompiler compiler) {
@@ -265,7 +265,7 @@ final class SolutionModifierCompiler {
         return exp;
     }
 
-    private static boolean isOrderByAggregate(Query query, TermAst expression, Filter filter) {
+    private static boolean isOrderByAggregate(QueryPlan query, TermAst expression, Filter filter) {
         if (new VariableScopeAnalyzer().containsAggregate(expression)) {
             return true;
         }
@@ -302,7 +302,7 @@ final class SolutionModifierCompiler {
         return new ArrayList<>(selectNodes);
     }
 
-    private static Node groupByNode(Query query, String name) {
+    private static Node groupByNode(QueryPlan query, String name) {
         if (query.getGroupBy() == null) {
             return null;
         }
@@ -319,7 +319,7 @@ final class SolutionModifierCompiler {
      * excludes nodes collected from MINUS/EXISTS bodies, which KGRAM stores as query
      * nodes for internal evaluation but which are not projectable SPARQL bindings.
      */
-    private static Node visibleBodyNode(Query query, String name) {
+    private static Node visibleBodyNode(QueryPlan query, String name) {
         for (Node node : query.selectNodesFromPattern()) {
             if (node.getLabel().equals(name)) {
                 return node;

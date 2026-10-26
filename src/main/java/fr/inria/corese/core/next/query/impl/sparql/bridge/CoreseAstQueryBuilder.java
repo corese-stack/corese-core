@@ -5,7 +5,7 @@ import fr.inria.corese.core.next.query.impl.engine.model.ExpType.Type;
 import fr.inria.corese.core.next.query.impl.engine.model.Filter;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.sparql.ast.AskQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ConstraintAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ConstructQueryAst;
@@ -59,12 +59,12 @@ public final class CoreseAstQueryBuilder {
      * {@code LIMIT}, {@code OFFSET}). Clauses that require dedicated aggregate or
      * values handling are rejected explicitly.</p>
      */
-    public Query toNextQuery(AskQueryAst askQueryAst) {
+    public QueryPlan toNextQuery(AskQueryAst askQueryAst) {
         Objects.requireNonNull(askQueryAst, "askQueryAst");
         rejectUnsupportedAskClauses(askQueryAst);
 
         WhereCompiler compiler = whereCompiler.withPrologue(askQueryAst.prologue());
-        Query query = createQuery(
+        QueryPlan query = createQuery(
                 askQueryAst.whereClause(),
                 askQueryAst.datasetClause(),
                 askQueryAst.solutionModifier(),
@@ -84,11 +84,11 @@ public final class CoreseAstQueryBuilder {
      * Clauses that require dedicated aggregate, alias, or values handling are rejected
      * explicitly.</p>
      */
-    public Query toNextQuery(SelectQueryAst selectQueryAst) {
+    public QueryPlan toNextQuery(SelectQueryAst selectQueryAst) {
         Objects.requireNonNull(selectQueryAst, "selectQueryAst");
 
         WhereCompiler compiler = whereCompiler.withPrologue(selectQueryAst.prologue());
-        Query query = createQuery(
+        QueryPlan query = createQuery(
                 selectQueryAst.whereClause(),
                 selectQueryAst.datasetClause(),
                 selectQueryAst.solutionModifier(),
@@ -116,12 +116,12 @@ public final class CoreseAstQueryBuilder {
      * nodes of the body, matching {@code SELECT *}. Clauses that require dedicated aggregate or
      * values handling are rejected explicitly.</p>
      */
-    public Query toNextQuery(DescribeQueryAst describeQueryAst) {
+    public QueryPlan toNextQuery(DescribeQueryAst describeQueryAst) {
         Objects.requireNonNull(describeQueryAst, "describeQueryAst");
         rejectUnsupportedDescribeClauses(describeQueryAst);
 
         WhereCompiler compiler = whereCompiler.withPrologue(describeQueryAst.prologue());
-        Query query = createQuery(
+        QueryPlan query = createQuery(
                 describeQueryAst.whereClause(),
                 describeQueryAst.datasetClause(),
                 describeQueryAst.solutionModifier(),
@@ -142,11 +142,11 @@ public final class CoreseAstQueryBuilder {
      * valid SPARQL, its triple is simply skipped at instantiation time). Clauses that require
      * dedicated aggregate or values handling are rejected explicitly.</p>
      */
-    public Query toNextQuery(ConstructQueryAst constructQueryAst) {
+    public QueryPlan toNextQuery(ConstructQueryAst constructQueryAst) {
         Objects.requireNonNull(constructQueryAst, "constructQueryAst");
 
         WhereCompiler compiler = whereCompiler.withPrologue(constructQueryAst.prologue());
-        Query query = createQuery(
+        QueryPlan query = createQuery(
                 constructQueryAst.whereClause(),
                 constructQueryAst.datasetClause(),
                 constructQueryAst.solutionModifier(),
@@ -212,7 +212,7 @@ public final class CoreseAstQueryBuilder {
      * and limit/offset information, and finally collects visible nodes so later clauses
      * can resolve variables against the runtime body.</p>
      */
-    private Query createQuery(
+    private QueryPlan createQuery(
             GroupGraphPatternAst whereClause,
             DatasetClauseAst datasetClause,
             SolutionModifierAst solutionModifier,
@@ -223,7 +223,7 @@ public final class CoreseAstQueryBuilder {
             body = Exp.create(Type.JOIN,
                     body, compiler.compileValues(valuesClause));
         }
-        Query query = Query.create(body);
+        QueryPlan query = QueryPlan.create(body);
         // Collect visible nodes once so later clauses (projection, ORDER BY, DESCRIBE)
         // can resolve variables against the compiled runtime body.
         query.collect();
@@ -232,7 +232,7 @@ public final class CoreseAstQueryBuilder {
         return query;
     }
 
-    private void applyDataset(Query query, DatasetClauseAst datasetClause, WhereCompiler compiler) {
+    private void applyDataset(QueryPlan query, DatasetClauseAst datasetClause, WhereCompiler compiler) {
         query.setFrom(toNodeList(datasetClause.graphs(), compiler));
         query.setNamed(toNodeList(datasetClause.namedGraphs(), compiler));
         query.setDatasetSpecified(

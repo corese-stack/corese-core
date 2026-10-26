@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.query.impl.engine.eval;
 
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 import fr.inria.corese.core.next.query.impl.engine.solution.Memory;
@@ -105,7 +105,7 @@ public class EvalGraph {
      */
     private Mappings graphNodes(Producer p, Exp exp, Mappings map) {
         Memory env = engine.getMemory();
-        Query qq = engine.getQuery();
+        QueryPlan qq = engine.getQuery();
         Matcher mm = engine.getMatcher();
         Node name = exp.getGraphName();
         Mappings res = null;

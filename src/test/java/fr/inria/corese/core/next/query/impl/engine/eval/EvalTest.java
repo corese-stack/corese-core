@@ -14,7 +14,7 @@ import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.model.NodeImpl;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.model.BindingContext;
 import fr.inria.corese.core.next.query.impl.engine.event.ResultListener;
 import org.junit.jupiter.api.BeforeEach;
@@ -428,7 +428,7 @@ class EvalTest {
 
             Stack stack = new Stack();
             stack.add(serviceExp);
-            Query q = Query.create();
+            QueryPlan q = QueryPlan.create();
             eval.init(q);
 
             assertThrows(QueryEvaluationException.class, () ->
@@ -445,7 +445,7 @@ class EvalTest {
 
             Stack stack = new Stack();
             stack.add(serviceExp);
-            Query q = Query.create();
+            QueryPlan q = QueryPlan.create();
             eval.init(q);
 
             assertDoesNotThrow(() -> eval.eval(mockProducer, null, stack, null, 0),

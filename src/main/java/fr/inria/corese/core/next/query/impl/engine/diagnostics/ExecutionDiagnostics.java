@@ -11,7 +11,7 @@ import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.path.PropertyPathEdge;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -120,7 +120,7 @@ public final class ExecutionDiagnostics {
      * @param query completed runtime query
      * @param nanos elapsed completion nanoseconds
      */
-    public void planned(Query query, long nanos) {
+    public void planned(QueryPlan query, long nanos) {
         planningNanos += nanos;
         visit(query, "query", null);
     }

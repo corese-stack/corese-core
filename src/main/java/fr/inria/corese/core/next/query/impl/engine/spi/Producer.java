@@ -8,7 +8,7 @@ import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 
 import java.util.List;
 
@@ -27,14 +27,14 @@ public interface Producer {
      * KGRAM calls this method before executing a query. It enables to
      * initialize the Producer
      */
-    default void init(Query q) {
+    default void init(QueryPlan q) {
         // Optional lifecycle hook for producer implementations.
     }
 
-    default void start(Query q) {
+    default void start(QueryPlan q) {
     }
 
-    default void finish(Query q) {
+    default void finish(QueryPlan q) {
     }
 
     int getMode();
@@ -134,7 +134,7 @@ public interface Producer {
     Producer getProducer(Node node, Environment env);
 
     // use case: Producer created for a specific query
-    Query getQuery();
+    QueryPlan getQuery();
 
     // May return an object that implement the RDF graph
     Graph getGraph();

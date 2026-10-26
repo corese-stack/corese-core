@@ -10,7 +10,7 @@ import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +71,7 @@ public class ProducerDefault implements Producer {
     }
 
     @Override
-    public Query getQuery() {
+    public QueryPlan getQuery() {
         return null;
     }
 
@@ -122,12 +122,12 @@ public class ProducerDefault implements Producer {
     }
 
     @Override
-    public void start(Query q) {
+    public void start(QueryPlan q) {
         throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
-    public void finish(Query q) {
+    public void finish(QueryPlan q) {
         throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 

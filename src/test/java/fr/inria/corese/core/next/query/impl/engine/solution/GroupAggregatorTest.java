@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.query.impl.engine.solution;
 
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.spi.Evaluator;
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
 import org.junit.jupiter.api.AfterEach;
@@ -35,7 +35,7 @@ class GroupAggregatorTest {
         Mappings.setGroupAggregator(mockAggregator);
 
         assertSame(mockAggregator, Mappings.getGroupAggregator());
-        assertTrue(Mappings.getGroupAggregator().tryAggregate(new Query(), new Mappings()));
+        assertTrue(Mappings.getGroupAggregator().tryAggregate(new QueryPlan(), new Mappings()));
     }
 
     @Test
@@ -43,7 +43,7 @@ class GroupAggregatorTest {
         Mappings.setGroupAggregator(null);
         assertNull(Mappings.getGroupAggregator());
 
-        Query q = new Query();
+        QueryPlan q = new QueryPlan();
         Mappings mappings = new Mappings();
         mappings.add(new Mapping());
         Evaluator eval = mock(Evaluator.class);
@@ -63,7 +63,7 @@ class GroupAggregatorTest {
             return false;
         });
 
-        Query q = new Query();
+        QueryPlan q = new QueryPlan();
         Mappings mappings = new Mappings();
         mappings.add(new Mapping());
         Evaluator eval = mock(Evaluator.class);

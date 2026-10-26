@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  * @author Olivier Corby, Edelweiss, INRIA 2009
  *
  */
-public final class Query extends Exp {
+public final class QueryPlan extends Exp {
 
 
     public static final int QP_T0 = 0; //No QP settings
@@ -38,7 +38,7 @@ public final class Query extends Exp {
     public static final int QP_HEURISTICS_BASED = 2;//Heuristics based QP
     public static final int QP_BGP = 3;//BGP based QP
 
-    private static final Logger logger = LoggerFactory.getLogger(Query.class);
+    private static final Logger logger = LoggerFactory.getLogger(QueryPlan.class);
 
     int limit = Integer.MAX_VALUE;
     int offset = 0;
@@ -47,24 +47,10 @@ public final class Query extends Exp {
 
     private int number = 0;
     private boolean distinctResults;
-    int iNode = 0;
-    int iEdge = 0;
+    private final VariableLayout layout;
     List<Node> from;
     List<Node> named;
     List<Node> selectNode;
-    // all nodes (on demand)
-
-    // std pattern but minus/exists (without select)
-    List<Node> patternNodes;
-    // std pattern but minus/exists select nodes
-    List<Node> patternSelectNodes;
-    // minus/exists (without select)
-    List<Node> queryNodes;
-    // minus/exists select nodes
-    List<Node> querySelectNodes;
-    // final query bindings nodes
-    List<Node> bindingNodes;
-    private List<Node> constructNodes;
     List<Node> relaxEdges;
     List<Exp> selectExp;
     List<Exp> orderBy;
@@ -81,8 +67,8 @@ public final class Query extends Exp {
     // use case: graph ?g (select where ...)
     Node gNode;
     // Root query whose dataset is inherited by this subquery.
-    private Query globalQuery;
-    Query outerQuery;
+    private QueryPlan globalQuery;
+    QueryPlan outerQuery;
     private Object queryObject;
 
     FilterOptimizer compiler;
@@ -96,9 +82,9 @@ public final class Query extends Exp {
     HashMap<String, Integer> ptable;
     HashMap<String, Edge> etable;
     // query for class/property definition checking
-    HashMap<Edge, Query> table;
+    HashMap<Edge, QueryPlan> table;
     // Extended queries for additional group by
-    List<Query> queries;
+    List<QueryPlan> queries;
     private boolean isCompiled = false;
     private boolean datasetSpecified;
     private boolean reportEnabled;
@@ -131,17 +117,14 @@ public final class Query extends Exp {
     private boolean isService = false;
 
 
-    private final List<Node> argList;
     private Mapping mapping;
-
-
-
 
     private String service;
 
     /** Creates an uncompiled query whose mutable containers belong to its compiler. */
-    public Query() {
+    public QueryPlan() {
         super(Type.QUERY);
+        layout = new VariableLayout();
         from = new ArrayList<>();
         named = new ArrayList<>();
         selectExp = new ArrayList<>();
@@ -157,13 +140,7 @@ public final class Query extends Exp {
         etable = new HashMap<>();
         queries = new ArrayList<>();
         selectNode = new ArrayList<>();
-        patternNodes = new ArrayList<>();
-        queryNodes = new ArrayList<>();
-        patternSelectNodes = new ArrayList<>();
-        querySelectNodes = new ArrayList<>();
-        bindingNodes = new ArrayList<>();
         relaxEdges = new ArrayList<>();
-        argList = new ArrayList<>();
         querySorter = new QueryPlanner(this);
     }
 
@@ -172,29 +149,22 @@ public final class Query extends Exp {
      * Registration precedes graph links because subqueries refer to their outer query.
      */
     @SuppressWarnings("this-escape") // PlanCopy only records identity; no execution observes the shell before construction finishes.
-    private Query(Query source, PlanCopy copies) {
+    private QueryPlan(QueryPlan source, PlanCopy copies) {
         super(Type.QUERY);
         copies.remember(source, this);
         source.copyPlanFields(this, copies);
+        layout = new VariableLayout();
+        layout.copyFrom(source.layout, copies);
         querySorter = null;
         compiler = null;
-        argList = copies.copy(source.argList);
         this.limit = source.limit;
         this.offset = source.offset;
         this.slice = source.slice;
         this.number = source.number;
         this.distinctResults = source.distinctResults;
-        this.iNode = source.iNode;
-        this.iEdge = source.iEdge;
         this.from = copies.copy(source.from);
         this.named = copies.copy(source.named);
         this.selectNode = copies.copy(source.selectNode);
-        this.patternNodes = copies.copy(source.patternNodes);
-        this.patternSelectNodes = copies.copy(source.patternSelectNodes);
-        this.queryNodes = copies.copy(source.queryNodes);
-        this.querySelectNodes = copies.copy(source.querySelectNodes);
-        this.bindingNodes = copies.copy(source.bindingNodes);
-        this.constructNodes = copies.copy(source.constructNodes);
         this.relaxEdges = copies.copy(source.relaxEdges);
         this.selectExp = copies.copy(source.selectExp);
         this.orderBy = copies.copy(source.orderBy);
@@ -246,25 +216,25 @@ public final class Query extends Exp {
 
     /** Copies a completed query, with fresh containers and no retained planning producer. */
     @Override
-    public Query copyPlan(PlanCopy copies) {
+    public QueryPlan copyPlan(PlanCopy copies) {
         if (!isCompiled) {
             throw new IllegalStateException("Only completed queries can form an execution image");
         }
-        return new Query(this, copies);
+        return new QueryPlan(this, copies);
     }
 
-    Query(Exp e) {
+    QueryPlan(Exp e) {
         this();
         add(e);
     }
 
-    public static Query create(Exp e) {
-        return new Query(e);
+    public static QueryPlan create(Exp e) {
+        return new QueryPlan(e);
     }
 
     /** Creates an empty compiled query. */
-    public static Query create() {
-        return new Query();
+    public static QueryPlan create() {
+        return new QueryPlan();
     }
 
     @Override
@@ -314,11 +284,11 @@ public final class Query extends Exp {
     }
 
 
-    public Query get(Edge e) {
+    public QueryPlan get(Edge e) {
         return table.get(e);
     }
 
-    public List<Query> getQueries() {
+    public List<QueryPlan> getQueries() {
         return queries;
     }
 
@@ -389,7 +359,7 @@ public final class Query extends Exp {
         add(exp);
     }
 
-    void setGlobalQuery(Query q) {
+    void setGlobalQuery(QueryPlan q) {
         globalQuery = q;
         inherit(q);
     }
@@ -397,7 +367,7 @@ public final class Query extends Exp {
     /**
      * inherit from and from named
      */
-    void inherit(Query q) {
+    void inherit(QueryPlan q) {
         if (!isService()) {
             setFrom(q.getFrom());
             setNamed(q.getNamed());
@@ -406,18 +376,18 @@ public final class Query extends Exp {
     }
 
 
-    public Query getGlobalQuery() {
+    public QueryPlan getGlobalQuery() {
         if (globalQuery != null) {
             return globalQuery;
         }
         return this;
     }
 
-    public void setOuterQuery(Query q) {
+    public void setOuterQuery(QueryPlan q) {
         outerQuery = q;
     }
 
-    public Query getOuterQuery() {
+    public QueryPlan getOuterQuery() {
         if (outerQuery == null) {
             return this;
         }
@@ -492,21 +462,25 @@ public final class Query extends Exp {
         return datasetSpecified;
     }
 
+    public VariableLayout getLayout() {
+        return layout;
+    }
+
     public List<Node> getPatternNodes() {
-        return patternNodes;
+        return layout.getPatternNodes();
     }
 
     public List<Node> getQueryNodes() {
-        return queryNodes;
+        return layout.getQueryNodes();
     }
 
     public List<Node> getPatternSelectNodes() {
-        return patternSelectNodes;
+        return layout.getPatternSelectNodes();
     }
 
     public List<Node> getBindingNodes() {
         if (getValues() == null) {
-            return bindingNodes;
+            return layout.getBindingNodes();
         }
         return getValues().getNodeList();
     }
@@ -553,28 +527,19 @@ public final class Query extends Exp {
     }
 
     public Node getPatternNode(String name) {
-        return get(patternNodes, name);
+        return layout.getPatternNode(name);
     }
 
     public Node getQueryNode(String name) {
-        return get(queryNodes, name);
+        return layout.getQueryNode(name);
     }
 
     public Node getPatternSelectNode(String name) {
-        return get(patternSelectNodes, name);
+        return layout.getPatternSelectNode(name);
     }
 
     public Node getQuerySelectNode(String name) {
-        return get(querySelectNodes, name);
-    }
-
-    Node get(List<Node> list, String name) {
-        for (Node node : list) {
-            if (name.equals(node.getLabel())) {
-                return node;
-            }
-        }
-        return null;
+        return layout.getQuerySelectNode(name);
     }
 
     public void setSlice(int n) {
@@ -857,11 +822,11 @@ public final class Query extends Exp {
     }
 
     public List<Node> getConstructNodes() {
-        return constructNodes;
+        return layout.getConstructNodes();
     }
 
     public void setConstructNodes(List<Node> constructNodes) {
-        this.constructNodes = constructNodes;
+        layout.setConstructNodes(constructNodes);
     }
 
     public void setDelete(Exp c) {
@@ -905,11 +870,11 @@ public final class Query extends Exp {
     }
 
     public int nbNodes() {
-        return iNode;
+        return layout.getNodeIndex();
     }
 
     public int nbEdges() {
-        return iEdge;
+        return layout.getEdgeIndex();
     }
 
 
@@ -946,7 +911,7 @@ public final class Query extends Exp {
 
         complete2();
 
-        for (Query q : getQueries()) {
+        for (QueryPlan q : getQueries()) {
             q.complete(prod);
         }
 
@@ -993,7 +958,12 @@ public final class Query extends Exp {
     }
 
     @Override
-    public Query getQuery() {
+    public QueryPlan getQuery() {
+        return this;
+    }
+
+    @Override
+    public QueryPlan getQueryPlan() {
         return this;
     }
 
@@ -1056,19 +1026,7 @@ public final class Query extends Exp {
     }
 
     void store(Node node, boolean exist, boolean select) {
-        if (select) {
-            if (exist) {
-                add(querySelectNodes, node);
-            } else {
-                add(patternSelectNodes, node);
-            }
-        } else {
-            if (exist) {
-                add(queryNodes, node);
-            } else {
-                add(patternNodes, node);
-            }
-        }
+        layout.store(node, exist, select);
     }
 
     /**
@@ -1193,7 +1151,7 @@ public final class Query extends Exp {
      * return the min of index of exp Nodes
      * query is (sub)query this is global query
      */
-    int index(Query query, Exp exp, boolean isExist, int start) {
+    int index(QueryPlan query, Exp exp, boolean isExist, int start) {
         int min = switch (exp.type()) {
             case EDGE, XPATH, EVAL -> indexEdgeExp(exp);
             case VALUES -> indexValuesExp(exp);
@@ -1214,7 +1172,7 @@ public final class Query extends Exp {
 
     private int indexEdgeExp(Exp exp) {
         Edge edge = exp.getEdge();
-        edge.setEdgeIndex(iEdge++);
+        edge.setEdgeIndex(layout.allocateEdgeIndex());
         return indexExpEdge(exp);
     }
 
@@ -1227,7 +1185,7 @@ public final class Query extends Exp {
         return min;
     }
 
-    private int indexBindExp(Query query, Exp exp, boolean isExist) {
+    private int indexBindExp(QueryPlan query, Exp exp, boolean isExist) {
         Node qn = exp.getNode();
         int min = index(qn);
         if (exp.getNodeList() != null) {
@@ -1239,7 +1197,7 @@ public final class Query extends Exp {
         return indexExpFilter(query, exp, isExist);
     }
 
-    private int indexDefaultExp(Query query, Exp exp, boolean isExist, int start) {
+    private int indexDefaultExp(QueryPlan query, Exp exp, boolean isExist, int start) {
         int min = Integer.MAX_VALUE;
         int startIndex = (start >= 0) ? start : globalNodeIndex();
         int ind = exp.isUnion() ? startIndex : -1;
@@ -1251,7 +1209,7 @@ public final class Query extends Exp {
     }
 
     // use case: index filter exists (?x ?p ?y)
-    int indexExpFilter(Query query, Exp exp, boolean isExist) {
+    int indexExpFilter(QueryPlan query, Exp exp, boolean isExist) {
         int min = Integer.MAX_VALUE;
         boolean hasExist = index(query, exp.getFilter());
         List<String> lVar = exp.getFilter().getVariables(true);
@@ -1276,9 +1234,9 @@ public final class Query extends Exp {
         return min;
     }
 
-    int indexExpQuery(Query query, Exp exp, boolean isExist) {
+    int indexExpQuery(QueryPlan query, Exp exp, boolean isExist) {
         int min = Integer.MAX_VALUE;
-        Query qq = exp.getQuery();
+        QueryPlan qq = exp.getQuery();
         qq.setCompiled();
         qq.setGlobalQuery(this);
         qq.setOuterQuery(query);
@@ -1337,7 +1295,7 @@ public final class Query extends Exp {
     }
 
     int newNodeIndex() {
-        return iNode++;
+        return layout.allocateNodeIndex();
     }
 
     int globalNodeIndex() {
@@ -1345,7 +1303,7 @@ public final class Query extends Exp {
     }
 
     int getNodeIndex() {
-        return iNode;
+        return layout.getNodeIndex();
     }
 
     /**
@@ -1361,10 +1319,8 @@ public final class Query extends Exp {
         return lExp;
     }
 
-
-
     public List<Node> getArgList() {
-        return argList;
+        return layout.getArgList();
     }
 
     /**
@@ -1392,14 +1348,14 @@ public final class Query extends Exp {
      * Dependency with filter exp for tracking filter(exists {PAT})
      *
      */
-    boolean index(Query query, Filter f) {
+    boolean index(QueryPlan query, Filter f) {
         return index(query, f.getExp());
     }
 
     /**
      * Looking for filter(exist {})
      */
-    boolean index(Query query, Expr exp) {
+    boolean index(QueryPlan query, Expr exp) {
         boolean b = false;
         if (exp.oper() == ExprType.EXIST) {
             index(query, getPattern(exp), true, -1);
@@ -1412,21 +1368,21 @@ public final class Query extends Exp {
         return b;
     }
 
-    public Query orderBy(Node node) {
+    public QueryPlan orderBy(Node node) {
         if (node != null && doesNotContain(getOrderBy(), node)) {
             addOrderBy(node);
         }
         return this;
     }
 
-    public Query groupBy(Node node) {
+    public QueryPlan groupBy(Node node) {
         if (node != null && doesNotContain(getGroupBy(), node)) {
             addGroupBy(node);
         }
         return this;
     }
 
-    void setSelect(Query q1, Query q2) {
+    void setSelect(QueryPlan q1, QueryPlan q2) {
         List<Exp> list = new ArrayList<>();
         list.addAll(q1.getSelectFun());
         for (Exp exp : q2.getSelectFun()) {
@@ -1519,7 +1475,7 @@ public final class Query extends Exp {
 
     @Override
     public String getDatatypeLabel() {
-        return "[Query]";
+        return "[QueryPlan]";
     }
 
 

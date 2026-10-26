@@ -6,7 +6,7 @@ import fr.inria.corese.core.next.query.api.exception.QueryTypeErrorException;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.model.NodeImpl;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
-import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.solution.GroupAggregator;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
@@ -45,7 +45,7 @@ public final class DirectGroupAggregation {
     }
 
     /** Returns whether the query can be reduced without evaluating expressions. */
-    public static boolean isEligible(Query query) {
+    public static boolean isEligible(QueryPlan query) {
         if (!query.isSelect() || (query.isDistinct() && !query.isDistinctRedundantWithGroupBy()) || query.isListGroup()
                 || query.getGroupBy().isEmpty()
                 || query.getHaving() != null || !query.getOrderBy().isEmpty()) {
@@ -62,7 +62,7 @@ public final class DirectGroupAggregation {
                 && expression.getFilter() == null && !expression.isExpGroupBy();
     }
 
-    private static boolean eligibleProjections(Query query) {
+    private static boolean eligibleProjections(QueryPlan query) {
         boolean hasAggregate = false;
         for (Exp projection : query.getSelectFun()) {
             if (projection.isExpGroupBy() || projection.getNode() == null) {
@@ -102,7 +102,7 @@ public final class DirectGroupAggregation {
      * @return false when ineligible, leaving input mappings untouched; true after
      *         successful reduction, including an empty grouped input
      */
-    public static boolean tryAggregate(Query query, Mappings mappings) {
+    public static boolean tryAggregate(QueryPlan query, Mappings mappings) {
         if (!isEligible(query) || mappings.isFake() || mappings.getGroup() != null) {
             return false;
         }
@@ -122,7 +122,7 @@ public final class DirectGroupAggregation {
         return true;
     }
 
-    private static List<Projection> projections(Query query) {
+    private static List<Projection> projections(QueryPlan query) {
         List<Projection> projections = new ArrayList<>();
         for (Exp expression : query.getSelectFun()) {
             if (expression.isAggregate()) {
