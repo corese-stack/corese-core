@@ -7,7 +7,7 @@ import java.util.Map;
 
 /**
  * Immutable compilation image, enforced by exclusive ownership rather than by
- * reusing an executable Query. Capture detaches every mutable component from
+ * reusing an executable QueryPlan. Capture detaches every mutable component from
  * the compiler. The private image is never evaluated or exposed; each execution
  * receives another independent graph. Only immutable syntax, RDF values and
  * private read-only prologue lookups are shared. No producer, storage cursor,

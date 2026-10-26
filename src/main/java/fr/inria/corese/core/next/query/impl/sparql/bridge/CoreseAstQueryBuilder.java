@@ -28,7 +28,7 @@ import java.util.Objects;
  * <p>This bridge sits between the parsed SPARQL AST and the KGRAM runtime query model:
  * it does not execute queries, it translates syntax-level query forms ({@code ASK},
  * {@code SELECT}, {@code DESCRIBE}, {@code CONSTRUCT}) into runtime-ready
- * {@link Query}/{@link Exp} structures.</p>
+ * {@link QueryPlan}/{@link Exp} structures.</p>
  */
 public final class CoreseAstQueryBuilder {
 
@@ -52,7 +52,7 @@ public final class CoreseAstQueryBuilder {
     }
 
     /**
-     * Builds a KGRAM {@link Query} from a SPARQL {@code ASK} query AST.
+     * Builds a KGRAM {@link QueryPlan} from a SPARQL {@code ASK} query AST.
      *
      * <p>The bridge maps the query body and the modifiers that already have a direct
      * runtime representation ({@code FROM}, {@code FROM NAMED}, {@code ORDER BY},
@@ -76,7 +76,7 @@ public final class CoreseAstQueryBuilder {
     }
 
     /**
-     * Builds a KGRAM {@link Query} from a {@link SelectQueryAst}.
+     * Builds a KGRAM {@link QueryPlan} from a {@link SelectQueryAst}.
      *
      * <p>The bridge maps the compiled {@code WHERE} body, plain projection,
      * dataset clauses, and solution modifiers that already have a direct runtime
@@ -107,7 +107,7 @@ public final class CoreseAstQueryBuilder {
     }
 
     /**
-     * Builds a KGRAM {@link Query} from a {@link DescribeQueryAst}.
+     * Builds a KGRAM {@link QueryPlan} from a {@link DescribeQueryAst}.
      *
      * <p>Reuses the shared query shell (compiled {@code WHERE} body, dataset, LIMIT/OFFSET) and
      * {@code ORDER BY} like the other forms, then lowers {@code DESCRIBE} to the construct-like
@@ -133,7 +133,7 @@ public final class CoreseAstQueryBuilder {
     }
 
     /**
-     * Builds a KGRAM {@link Query} from a {@link ConstructQueryAst}.
+     * Builds a KGRAM {@link QueryPlan} from a {@link ConstructQueryAst}.
      *
      * <p>Reuses the shared query shell (compiled {@code WHERE} body, dataset, LIMIT/OFFSET) and
      * {@code ORDER BY} like the other forms, then compiles the {@code CONSTRUCT} template into a
@@ -206,7 +206,7 @@ public final class CoreseAstQueryBuilder {
     }
 
     /**
-     * Creates the runtime {@link Query} shell shared by every query form handled here.
+     * Creates the runtime {@link QueryPlan} shell shared by every query form handled here.
      *
      * <p>The compiled {@code WHERE} body comes first, then the builder copies dataset
      * and limit/offset information, and finally collects visible nodes so later clauses

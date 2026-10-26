@@ -705,7 +705,7 @@ public final class SparqlQueryExecutor {
      *
      * <p>Each binding entry becomes a (variable-node, value-node) pair. The variable
      * node carries the variable name as its label so that
-     * {@link Query#getExtNode(String)} can look it up by name during evaluation.
+     * {@link QueryPlan#getExtNode(String)} can look it up by name during evaluation.
      * Bindings whose value cannot be converted to a KGRAM node are silently skipped.</p>
      *
      * @return a {@link Mapping} with the converted bindings, or {@code null} when the

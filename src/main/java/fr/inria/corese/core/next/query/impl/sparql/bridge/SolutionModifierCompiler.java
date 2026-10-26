@@ -27,7 +27,7 @@ import java.util.Set;
 
 /**
  * Compiles SPARQL solution modifiers (projection, GROUP BY, HAVING, ORDER BY, LIMIT/OFFSET)
- * onto a runtime {@link Query}.
+ * onto a runtime {@link QueryPlan}.
  */
 final class SolutionModifierCompiler {
 

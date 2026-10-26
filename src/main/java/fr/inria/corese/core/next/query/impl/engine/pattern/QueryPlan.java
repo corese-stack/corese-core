@@ -153,8 +153,7 @@ public final class QueryPlan extends Exp {
         super(Type.QUERY);
         copies.remember(source, this);
         source.copyPlanFields(this, copies);
-        layout = new VariableLayout();
-        layout.copyFrom(source.layout, copies);
+        layout = source.layout.copyPlan(copies);
         querySorter = null;
         compiler = null;
         this.limit = source.limit;
@@ -462,7 +461,7 @@ public final class QueryPlan extends Exp {
         return datasetSpecified;
     }
 
-    public VariableLayout getLayout() {
+    VariableLayout getLayout() {
         return layout;
     }
 
@@ -1003,26 +1002,7 @@ public final class QueryPlan extends Exp {
     }
 
     public Node getExtNode(String name, boolean select) {
-        Node node = getPatternNode(name);
-        if (node != null) {
-            return node;
-        }
-        if (select) {
-            node = getSelectNode(name);
-            if (node != null) {
-                return node;
-            }
-        }
-        node = getQueryNode(name);
-        if (node != null) {
-            return node;
-        }
-        node = getPatternSelectNode(name);
-        if (node != null) {
-            return node;
-        }
-        node = getQuerySelectNode(name);
-        return node;
+        return layout.getExtNode(name, select, select ? getSelectNode(name) : null);
     }
 
     void store(Node node, boolean exist, boolean select) {

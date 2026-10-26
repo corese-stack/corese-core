@@ -16,7 +16,7 @@ import java.util.List;
  * Filter Exp Compiler for Optimizations
  * If Filter leads to optimization, we tag the Filter Exp
  * with e.g. a BIND(?x = ?y)
- * Query.bind() will handle later this tag BIND
+ * QueryPlan.bind() will handle later this tag BIND
  * (1)
  * x p t . y p z . filter(y = x)
  * ->

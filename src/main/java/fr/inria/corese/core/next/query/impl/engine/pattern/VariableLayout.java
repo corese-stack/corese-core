@@ -25,16 +25,18 @@ public final class VariableLayout {
         // Default constructor initializing empty variable collections and layout counters.
     }
 
-    public void copyFrom(VariableLayout source, PlanCopy copies) {
-        this.nodeIndex = source.nodeIndex;
-        this.edgeIndex = source.edgeIndex;
-        this.patternNodes = copies.copy(source.patternNodes);
-        this.patternSelectNodes = copies.copy(source.patternSelectNodes);
-        this.queryNodes = copies.copy(source.queryNodes);
-        this.querySelectNodes = copies.copy(source.querySelectNodes);
-        this.bindingNodes = copies.copy(source.bindingNodes);
-        this.constructNodes = copies.copy(source.constructNodes);
-        this.argList = copies.copy(source.argList);
+    VariableLayout copyPlan(PlanCopy copies) {
+        VariableLayout copy = new VariableLayout();
+        copy.nodeIndex = this.nodeIndex;
+        copy.edgeIndex = this.edgeIndex;
+        copy.patternNodes = copies.copy(this.patternNodes);
+        copy.patternSelectNodes = copies.copy(this.patternSelectNodes);
+        copy.queryNodes = copies.copy(this.queryNodes);
+        copy.querySelectNodes = copies.copy(this.querySelectNodes);
+        copy.bindingNodes = copies.copy(this.bindingNodes);
+        copy.constructNodes = copies.copy(this.constructNodes);
+        copy.argList = copies.copy(this.argList);
+        return copy;
     }
 
     public int allocateNodeIndex() {

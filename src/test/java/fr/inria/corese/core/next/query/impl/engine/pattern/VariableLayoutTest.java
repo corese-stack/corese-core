@@ -107,8 +107,7 @@ class VariableLayoutTest {
         source.allocateEdgeIndex();
 
         PlanCopy copyContext = new PlanCopy();
-        VariableLayout target = new VariableLayout();
-        target.copyFrom(source, copyContext);
+        VariableLayout target = source.copyPlan(copyContext);
 
         assertEquals(source.getNodeIndex(), target.getNodeIndex());
         assertEquals(source.getEdgeIndex(), target.getEdgeIndex());

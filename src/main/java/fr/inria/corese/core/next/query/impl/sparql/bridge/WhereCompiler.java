@@ -96,7 +96,7 @@ public final class WhereCompiler implements PlanCopyable<WhereCompiler> {
 
     /**
      * Compiles a full SPARQL {@code WHERE} clause into the runtime body carried by a
-     * KGRAM {@link Query}.
+     * KGRAM {@link QueryPlan}.
      *
      * <p>This is the main entry point of the compiler. It expects the root
      * {@link GroupGraphPatternAst} produced by the parser for a complete

@@ -16,7 +16,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 import java.util.Objects;
 
 /**
- * Compiles a {@link ConstructQueryAst} template and modifiers into a runtime {@link Query}.
+ * Compiles a {@link ConstructQueryAst} template and modifiers into a runtime {@link QueryPlan}.
  */
 final class ConstructQueryCompiler {
 
@@ -58,7 +58,7 @@ final class ConstructQueryCompiler {
 
     /**
      * Compiles a {@code CONSTRUCT} template into a KGRAM {@link Exp} (a BGP of edges), kept separate
-     * from the {@code WHERE} body and carried by {@link Query#setConstruct(Exp)}.
+     * from the {@code WHERE} body and carried by {@link QueryPlan#setConstruct(Exp)}.
      */
     private static Exp compileConstructTemplate(
             QueryPlan query, ConstructTemplateAst template, WhereCompiler compiler) {
