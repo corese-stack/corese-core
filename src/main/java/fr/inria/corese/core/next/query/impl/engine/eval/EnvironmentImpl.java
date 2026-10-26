@@ -11,7 +11,6 @@ import fr.inria.corese.core.next.query.impl.engine.model.Expr;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import fr.inria.corese.core.next.query.impl.engine.event.ProcessVisitor;
-import fr.inria.corese.core.next.query.impl.engine.event.KgramEventDispatcher;
 import fr.inria.corese.core.next.query.impl.engine.path.Path;
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 
@@ -75,11 +74,6 @@ public class EnvironmentImpl implements Environment {
     @Override
     public Query getQuery() {
         return query;
-    }
-
-    @Override
-    public KgramEventDispatcher getEventManager() {
-        return null;
     }
 
     @Override

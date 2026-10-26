@@ -181,7 +181,7 @@ public class EvalOptional {
                 map.setBind(memory.getBind());
                 map.setEval(engine);
                 boolean b = engine.test(gNode, f.getFilter(), map, p);
-                if (engine.hasFilter) {
+                if (engine.hasFilter()) {
                     b = engine.getVisitor().filter(engine, gNode, f.getFilter().getExp(), b);
                 }
                 if (!b) {

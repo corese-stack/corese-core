@@ -28,7 +28,7 @@ public class Group implements Comparator<Mappings> {
     private List<Node> nodes;
     private boolean isFake;
 
-    /** Preserves the no-argument constructor used by Merge. */
+    /** Creates an empty group. */
     public Group() {
         this(List.of());
     }

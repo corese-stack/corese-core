@@ -38,9 +38,6 @@ public final class Query extends Exp {
     public static final int QP_HEURISTICS_BASED = 2;//Heuristics based QP
     public static final int QP_BGP = 3;//BGP based QP
 
-    public static final int STD_PROFILE = -1;
-    public static final int COUNT_PROFILE = 1;
-
     private static final Logger logger = LoggerFactory.getLogger(Query.class);
 
     int limit = Integer.MAX_VALUE;
@@ -106,7 +103,6 @@ public final class Query extends Exp {
     private boolean datasetSpecified;
     private boolean reportEnabled;
 
-    boolean isCheck = false;
     private boolean isUseBind = true;
 
     private boolean aggregateQuery;
@@ -126,13 +122,11 @@ public final class Query extends Exp {
 
     boolean
             isCorrect = true;
-    boolean isConnect = false;
     boolean isMap = true;
     boolean isRule = false;
     boolean isDetail = true;
 
     int planner = QP_DEFAULT;
-    private int queryProfile = STD_PROFILE;
 
     private boolean isService = false;
 
@@ -225,7 +219,6 @@ public final class Query extends Exp {
         this.isCompiled = source.isCompiled;
         this.datasetSpecified = source.datasetSpecified;
         this.reportEnabled = source.reportEnabled;
-        this.isCheck = source.isCheck;
         this.isUseBind = source.isUseBind;
         this.aggregateQuery = source.aggregateQuery;
         this.isRelax = source.isRelax;
@@ -242,12 +235,10 @@ public final class Query extends Exp {
         this.validate = source.validate;
         this.federate = source.federate;
         this.isCorrect = source.isCorrect;
-        this.isConnect = source.isConnect;
         this.isMap = source.isMap;
         this.isRule = source.isRule;
         this.isDetail = source.isDetail;
         this.planner = source.planner;
-        this.queryProfile = source.queryProfile;
         this.isService = source.isService;
         this.mapping = copies.copy(source.mapping);
         this.service = copies.copy(source.service);
@@ -394,8 +385,8 @@ public final class Query extends Exp {
     }
 
     public void setBody(Exp exp){
-        args.clear();
-        args.add(exp);
+        clear();
+        add(exp);
     }
 
     void setGlobalQuery(Query q) {
@@ -688,10 +679,6 @@ public final class Query extends Exp {
         return true;
     }
 
-    public boolean isCheck() {
-        return isCheck;
-    }
-
     @Override
     public boolean isAggregate() {
         return aggregateQuery;
@@ -834,7 +821,7 @@ public final class Query extends Exp {
     }
 
     public boolean hasGroupBy() {
-        return isGroupBy() || isConnect();
+        return isGroupBy();
     }
 
     public boolean isListGroup() {
@@ -847,10 +834,6 @@ public final class Query extends Exp {
 
     public void setCorrect(boolean b) {
         isCorrect = b;
-    }
-
-    public boolean isConnect() {
-        return isConnect;
     }
 
     public void setHaving(Exp f) {
@@ -1522,13 +1505,6 @@ public final class Query extends Exp {
     public void setNumber(int number) {
         this.number = number;
     }
-
-
-
-    public int getQueryProfile() {
-        return queryProfile;
-    }
-
 
     @Override
     public Iterable<Object> getLoop() {

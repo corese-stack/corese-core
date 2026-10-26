@@ -7,6 +7,7 @@ import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.model.NodeImpl;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
+import fr.inria.corese.core.next.query.impl.engine.solution.GroupAggregator;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 import fr.inria.corese.core.next.query.impl.sparql.ast.AggregateAst;
@@ -30,13 +31,23 @@ import java.util.TreeMap;
  */
 public final class DirectGroupAggregation {
 
+    public static final GroupAggregator INSTANCE = DirectGroupAggregation::tryAggregate;
+
+    static {
+        register();
+    }
+
+    public static void register() {
+        Mappings.setGroupAggregator(INSTANCE);
+    }
+
     private DirectGroupAggregation() {
     }
 
     /** Returns whether the query can be reduced without evaluating expressions. */
     public static boolean isEligible(Query query) {
         if (!query.isSelect() || (query.isDistinct() && !query.isDistinctRedundantWithGroupBy()) || query.isListGroup()
-                || query.isConnect() || query.getGroupBy().isEmpty()
+                || query.getGroupBy().isEmpty()
                 || query.getHaving() != null || !query.getOrderBy().isEmpty()) {
             return false;
         }

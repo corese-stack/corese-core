@@ -20,12 +20,10 @@ import fr.inria.corese.core.next.query.impl.engine.spi.Evaluator;
 import fr.inria.corese.core.next.query.impl.engine.spi.Matcher;
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
 import fr.inria.corese.core.next.query.impl.engine.spi.Provider;
+import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.QueryTypeErrorException;
 
 import fr.inria.corese.core.next.data.Values;
-import fr.inria.corese.core.next.query.impl.engine.event.Event;
-import fr.inria.corese.core.next.query.impl.engine.event.EventImpl;
-import fr.inria.corese.core.next.query.impl.engine.event.KgramEventDispatcher;
 import fr.inria.corese.core.next.query.impl.engine.event.ResultListener;
 import fr.inria.corese.core.next.query.impl.engine.model.NodeImpl;
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
@@ -64,8 +62,9 @@ public final class Eval implements ExpType {
     // Supply incoming mappings independently to both UNION branches.
     private boolean parameterUnionMappings = true;
 
-    KgramEventDispatcher manager;
-    boolean hasEvent = false;
+    private final EvaluationState state = new EvaluationState();
+    private final EvalVisitorDispatcher visitors = new EvalVisitorDispatcher();
+
     // Edge and Node producer
     Producer saveProducer;
     Provider provider;
@@ -83,30 +82,14 @@ public final class Eval implements ExpType {
     EvalGraph graphEvaluator;
     EvalJoin join;
     EvalOptional optional;
-    int // count number of eval() calls
-            nbEdge = 0;
-    int nbCall = 0;
-    int backjump = -1;
-    int maxLevel = -1;
-    int limit = Integer.MAX_VALUE;
     // subeval = false: eval query/subquery
     // subeval = true:  eval statement (union, optional, minus, graph, join)
     boolean isSubEval = false;
     // return only select variables in Mapping
     boolean optim = true;
-    boolean storeResult = true;
-    boolean hasFilter = false;
-    private ResultListener listener;
-    private ProcessVisitor visitor;
     // Edge and Node producer
     private Producer producer;
     private Stack current;
-    private boolean hasListener = false;
-    private int nbResult;
-    private boolean hasCandidate = false;
-    private boolean hasStatement = false;
-    private boolean hasProduce = false;
-    private volatile boolean stopped = false;
     private boolean joinMappings = true;
 
     /**
@@ -189,9 +172,6 @@ public final class Eval implements ExpType {
     }
 
     Mappings queryBasic(Node graphNode, Query q, Mapping m) {
-        if (hasEvent) {
-            send(Event.BEGIN, q);
-        }
         initMemory(q);
         share(m);
         getProducer().start(q);
@@ -202,9 +182,6 @@ public final class Eval implements ExpType {
             Mappings map = eval(graphNode, q, m, null);
             getVisitor().orderby(map);
             getVisitor().after(map);
-            if (hasEvent) {
-                send(Event.END, q, map);
-            }
             return map;
         } finally {
             getProducer().finish(q);
@@ -246,21 +223,12 @@ public final class Eval implements ExpType {
             // just compile and complete query
             return getResults();
         }
-        if (q.isCheck()) {
-            QueryDefinitionChecker check = QueryDefinitionChecker.create(this);
-            check.check(q);
-        }
 
         if (!q.isFail()) {
             query(gNode, q, m, map);
-
-            if (q.getQueryProfile() == Query.COUNT_PROFILE) {
-                countProfile();
-            } else {
-                aggregate();
-                // order by
-                complete();
-            }
+            aggregate();
+            // order by
+            complete();
         }
 
         getEvaluator().finish(getMemory());
@@ -298,7 +266,7 @@ public final class Eval implements ExpType {
 
         if (!values.isPostpone()) {
             for (Mapping m : values.getMappings()) {
-                if (stopped) {
+                if (state.isStopped()) {
                     return;
                 }
                 if (valuesBinding(values.getNodeList(), m, -1)) {
@@ -318,15 +286,6 @@ public final class Eval implements ExpType {
         Stack stack = Stack.create(exp);
         set(stack);
         eval(getProducer(), gNode, stack, map, 0);
-    }
-
-    /**
-     * We just counted number of results: nbResult Just build a Mapping
-     */
-    void countProfile() {
-        Node n = NodeImpl.forValue(Values.factory().createLiteral(nbResult));
-        Mapping m = Mapping.create(getQuery().getSelectFun().getFirst().getNode(), n);
-        getResults().add(m);
     }
 
     public void setMappings(Mappings lMap) {
@@ -522,9 +481,6 @@ public final class Eval implements ExpType {
             ev.setVisitor(getVisitor());
         }
         ev.startExtFun();
-        if (hasEvent) {
-            ev.setEventManager(manager);
-        }
         return ev;
     }
 
@@ -541,9 +497,6 @@ public final class Eval implements ExpType {
             mem.init(sub);
         }
         memory.copyInto(sub, mem, exp);
-        if (hasEvent) {
-            memory.setEventManager(manager);
-        }
         return mem;
     }
 
@@ -608,7 +561,6 @@ public final class Eval implements ExpType {
     public void init(Query q) {
         initMemory(q);
         start(q);
-        profile(q);
     }
 
     void initMemory(Query q) {
@@ -621,35 +573,28 @@ public final class Eval implements ExpType {
             getEvaluator().init(memory);
             // create memory bind stack
             memory.init(q);
-            if (hasEvent) {
-                memory.setEventManager(manager);
-            }
             getProducer().init(q);
             evaluator.start(memory);
         }
     }
 
-    void profile(Query q) {
-        // select count(*) as ?c where pattern
-        // do not built Mapping, just count them
-        if (q.getQueryProfile() == Query.COUNT_PROFILE) {
-            storeResult = false;
-        }
-    }
-
     // partial init (for global query and subqueries)
     public void start(Query q) {
-        limit = q.getLimitOffset();
+        state.setLimit(q.getLimitOffset());
         // ASK only needs its first solution after OFFSET. Keep the requested
         // Query modifiers intact, and evaluate fully when sorting/grouping needs it.
         if (q.isAsk() && !q.isOrderBy() && !q.hasGroupBy() && !q.isAggregate()) {
-            limit = (int) Math.min(limit, (long) q.getOffset() + 1);
+            state.setLimit((int) Math.min(state.getLimit(), (long) q.getOffset() + 1));
         }
         starter(q);
     }
 
     public void setLimit(int n) {
-        limit = n;
+        state.setLimit(n);
+    }
+
+    public int getLimit() {
+        return state.getLimit();
     }
 
     // for sub exp
@@ -661,9 +606,6 @@ public final class Eval implements ExpType {
         } else {
             results = Mappings.create(query, isSubEval);
         }
-        if (hasEvent) {
-            results.setEventManager(manager);
-        }
         startExtFun();
         // set new results in case of sub query (for aggregates)
         memory.setEval(this);
@@ -671,10 +613,7 @@ public final class Eval implements ExpType {
     }
 
     void startExtFun() {
-        hasStatement = getVisitor().statement();
-        hasProduce = getVisitor().produce();
-        hasCandidate = getVisitor().candidate();
-        hasFilter = getVisitor().filter();
+        visitors.updateVisitorFlags();
     }
 
     private void complete() {
@@ -713,7 +652,7 @@ public final class Eval implements ExpType {
         if (status == STOP) {
             return STOP;
         }
-        if (results.size() >= limit) {
+        if (results.size() >= state.getLimit()) {
             // backjump to send finish events to listener
             // and perform 'close instructions' if any
             return STOP;
@@ -721,12 +660,12 @@ public final class Eval implements ExpType {
         if (!getVisitor().limit(results)) {
             return STOP;
         }
-        if (backjump != -1) {
+        if (state.hasBackjump()) {
             if (!isSubEval && optim) {
                 // use case: select distinct ?x where
                 // backjump where ?x is defined to get a new one
-                backtrack = backjump;
-                backjump = -1;
+                backtrack = state.getBackjump();
+                state.clearBackjump();
             }
         } else if (query.isDistinct() && !query.isDistinctRedundantWithGroupBy() && !isSubEval && optim) {
             int index = memory.getIndex(query.getSelect());
@@ -760,34 +699,26 @@ public final class Eval implements ExpType {
     @SuppressWarnings("java:S3776") // Core KGRAM evaluation dispatch loop coordinating stack traversal and backtracking
     int eval(Producer p, Node graphNode, Stack stack, Mappings map, int n) {
         int backtrack = n - 1;
-        boolean isEvent = hasEvent;
         Memory env = getMemory();
 
-        nbCall++;
+        state.incrementCall();
 
         if (n >= stack.size()) {
             backtrack = solution(p, null, n);
             return backtrack;
         }
 
-        if (n > maxLevel) {
-            maxLevel = n;
-        }
+        state.updateMaxLevel(n);
 
         Exp exp = stack.get(n);
-        if (hasListener) {
-            // rule engine may have a ResultWatcher listener
-            exp = getListener().listen(exp, n);
-        }
-
-        if (isEvent) {
-            send(Event.START, exp, graphNode, stack);
+        if (visitors.hasListener()) {
+            exp = visitors.listen(exp, n);
         }
 
         // A false filter was detected at compile time, or this expression was
         // identified as always failing: no use to evaluate it.
         if (!exp.isFail()) {
-            if (hasStatement) {
+            if (visitors.hasStatement()) {
                 getVisitor().statement(this, getGraphNode(graphNode), exp);
             }
 
@@ -870,7 +801,7 @@ public final class Eval implements ExpType {
                         if (getResults().accept(env.getNode(exp.getNode()))) {
                             // backjump here when a mapping will be found with this node
                             // see store()
-                            backjump = n - 1;
+                            state.setBackjump(n - 1);
                             backtrack = eval(p, graphNode, stack, n + 1);
                         }
                     } else {
@@ -883,10 +814,6 @@ public final class Eval implements ExpType {
             }
         }
 
-        if (isEvent) {
-            send(Event.FINISH, exp, graphNode, stack);
-        }
-
         return backtrack;
     }
 
@@ -895,7 +822,7 @@ public final class Eval implements ExpType {
         Memory env = getMemory();
 
         Mappings map1 = subEval(p, graphNode, null, exp.first(), exp, data);
-        if (stopped) {
+        if (state.isStopped()) {
             return STOP;
         }
         if (map1.isEmpty()) {
@@ -914,7 +841,7 @@ public final class Eval implements ExpType {
         set.start();
 
         for (Mapping map : map1) {
-            if (stopped) {
+            if (state.isStopped()) {
                 return STOP;
             }
             boolean ok = !set.minusCompatible(map);
@@ -941,7 +868,7 @@ public final class Eval implements ExpType {
         // join(A, union(B, C)) ; map = eval(A).distinct(inscopenodes())
 
         Mappings map1 = unionBranch(p, graphNode, exp.first(), exp, data);
-        if (stopped) {
+        if (state.isStopped()) {
             return STOP;
         }
         Mappings map2 = unionBranch(p, graphNode, exp.rest(), exp, data);
@@ -958,7 +885,7 @@ public final class Eval implements ExpType {
             Producer p, Node graphNode, Stack stack, int n, Mappings mappings, int backtrack) {
         Memory environment = getMemory();
         for (Mapping mapping : mappings) {
-            if (stopped) {
+            if (state.isStopped()) {
                 return STOP;
             }
             if (environment.push(mapping, n, false)) {
@@ -1034,7 +961,7 @@ public final class Eval implements ExpType {
         Mappings map = p.getMappings(graphNode, from, exp, getMemory());
 
         for (Mapping m : map) {
-            if (stopped) {
+            if (state.isStopped()) {
                 return STOP;
             }
             m.fixQueryNodes(getQuery());
@@ -1051,39 +978,41 @@ public final class Eval implements ExpType {
     }
 
     private int service(Producer p, Node graphNode, Exp exp, Mappings data, Stack stack, int n) {
-        int backtrack = n - 1;
         Memory env = getMemory();
         Node serv = exp.first().getNode();
-        Node node = serv;
-
-        if (serv.isVariable()) {
-            node = env.getNode(serv);
-        }
+        Node node = serv.isVariable() ? env.getNode(serv) : serv;
 
         if (getProvider() != null) {
-            // service delegated to provider
             Mappings map = getProvider().service(node, exp, selectQueryMappings(data), this);
+            return processServiceMappings(p, graphNode, stack, n, env, map);
+        } else if (exp.isSilent()) {
+            return eval(p, graphNode, stack, n + 1);
+        } else {
+            throw new QueryEvaluationException(
+                    "Federated SPARQL SERVICE execution failed: no Provider configured to query endpoint " + node);
+        }
+    }
 
-            for (Mapping m : map) {
-                if (stopped) {
-                    return STOP;
-                }
-                // push each Mapping in memory and continue
-                complete(getQuery(), m, false);
+    private int processServiceMappings(Producer p, Node graphNode, Stack stack, int n, Memory env, Mappings map) {
+        int backtrack = n - 1;
+        if (map == null) {
+            return backtrack;
+        }
+        for (Mapping m : map) {
+            if (state.isStopped()) {
+                return STOP;
+            }
+            // push each Mapping in memory and continue
+            complete(getQuery(), m, false);
 
-                if (env.push(m, n, false, false)) {
-                    backtrack = eval(p, graphNode, stack, n + 1);
-                    env.pop(m, false);
-                    if (backtrack < n) {
-                        return backtrack;
-                    }
+            if (env.push(m, n, false, false)) {
+                backtrack = eval(p, graphNode, stack, n + 1);
+                env.pop(m, false);
+                if (backtrack < n) {
+                    return backtrack;
                 }
             }
-        } else {
-            Query q = exp.rest().getQuery();
-            return query(p, graphNode, q, data, stack, n);
         }
-
         return backtrack;
     }
 
@@ -1166,7 +1095,7 @@ public final class Eval implements ExpType {
         if (map != null) {
             HashMap<String, Node> tab = toMap(exp.getNodeList());
             for (Mapping m : map) {
-                if (stopped) {
+                if (state.isStopped()) {
                     return STOP;
                 }
                 if (env.push(tab, m, n)) {
@@ -1201,13 +1130,9 @@ public final class Eval implements ExpType {
         if (!exp.isPostpone()) {
             success = test(graphNode, exp.getFilter(), env, p);
 
-            if (hasFilter) {
+            if (visitors.hasFilter()) {
                 success = getVisitor().filter(this, getGraphNode(graphNode), exp.getFilter().getExp(), success);
             }
-        }
-
-        if (hasEvent) {
-            send(Event.FILTER, exp, success);
         }
 
         if (success) {
@@ -1267,8 +1192,8 @@ public final class Eval implements ExpType {
         int n = 1;
         Expr exp = f.getExp();
         if (exp.oper() == UNNEST) {
-            if (hasListener) {
-                listener.listen(exp);
+            if (visitors.hasListener()) {
+                visitors.listen(exp);
             }
             if (exp.arity() == 2) {
                 // unnest(exp, 2)
@@ -1293,7 +1218,7 @@ public final class Eval implements ExpType {
         getVisitor().values(this, getGraphNode(graphNode), exp, exp.getMappings());
 
         for (Mapping map : exp.getMappings()) {
-            if (stopped) {
+            if (state.isStopped()) {
                 return STOP;
             }
             if (valuesBinding(exp.getNodeList(), map, n)) {
@@ -1359,10 +1284,8 @@ public final class Eval implements ExpType {
     @SuppressWarnings("java:S3776") // Core KGRAM edge evaluation algorithm managing graph matching and backjump optimization
     private int edge(Producer p, Node graphNode, Exp exp, Mappings data, Stack stack, int n) {
         int backtrack = n - 1;
-        int evENUM = Event.ENUM;
         boolean isSuccess = false;
         boolean hasGraphNode = graphNode != null;
-        boolean isEvent = hasEvent;
         Edge qEdge = exp.getEdge();
         Node graph;
         Memory env = getMemory();
@@ -1395,7 +1318,7 @@ public final class Eval implements ExpType {
         }
 
         Iterable<Edge> entities;
-        if (hasProduce) {
+        if (visitors.hasProduce()) {
             // A query visitor may provide candidates before the producer is consulted.
             entities = produce(graphNode, qEdge);
             if (entities == null) {
@@ -1408,13 +1331,13 @@ public final class Eval implements ExpType {
         try {
             for (Edge entity : entities) {
 
-                if (stopped) {
+                if (state.isStopped()) {
                     return STOP;
                 }
 
                 if (entity != null) {
-                    nbEdge++;
-                    if (hasListener && !listener.listen(exp, qEdge, entity)) {
+                    state.incrementEdge();
+                    if (visitors.hasListener() && !visitors.listen(exp, qEdge, entity)) {
                         continue;
                     }
 
@@ -1426,7 +1349,7 @@ public final class Eval implements ExpType {
                     }
 
                     if (bmatch) {
-                        if (hasCandidate) {
+                        if (visitors.hasCandidate()) {
                             DatatypeValue dt = getVisitor().candidate(this, getGraphNode(graphNode), qEdge, entity);
                             if (dt != null) {
                                 bmatch = dt.isTrue();
@@ -1434,10 +1357,6 @@ public final class Eval implements ExpType {
                         }
 
                         bmatch &= push(p, qEdge, entity, n);
-                    }
-
-                    if (isEvent) {
-                        send(evENUM, exp, entity, bmatch);
                     }
 
                     if (bmatch) {
@@ -1476,8 +1395,6 @@ public final class Eval implements ExpType {
      */
     private int query(Producer p, Node graphNode, Exp exp, Mappings data, Stack stack, int n) {
         int backtrack = n - 1;
-        int evENUM = Event.ENUM;
-        boolean isEvent = hasEvent;
         Query subQuery = exp.getQuery();
         Memory env = getMemory();
         getVisitor().start(subQuery);
@@ -1493,14 +1410,10 @@ public final class Eval implements ExpType {
         // enumerate the result of the sub query
         // bind the select nodes into the stack
         for (Mapping map : lMap) {
-            if (stopped) {
+            if (state.isStopped()) {
                 return STOP;
             }
             boolean bmatch = push(subQuery, map, n);
-
-            if (isEvent) {
-                send(evENUM, exp, map, bmatch);
-            }
 
             if (bmatch) {
                 backtrack = eval(p, graphNode, stack, n + 1);
@@ -1595,9 +1508,9 @@ public final class Eval implements ExpType {
             store = getListener().process(getMemory());
         }
         if (store) {
-            nbResult++;
+            state.incrementResult();
         }
-        if (storeResult && store) {
+        if (store) {
             Mapping ans = m;
             if (m == null) {
                 ans = getMemory().store(getQuery(), p, isSubEval);
@@ -1609,9 +1522,6 @@ public final class Eval implements ExpType {
 
     void store(Mapping ans) {
         if (ans != null && acceptable(ans)) {
-            if (hasEvent) {
-                send(Event.RESULT, ans);
-            }
             boolean b = true;
             if (!isSubEval) {
                 b = getVisitor().distinct(this, getQuery(), ans);
@@ -1631,7 +1541,7 @@ public final class Eval implements ExpType {
 
 
     public int getCount() {
-        return nbEdge;
+        return state.getNbEdge();
     }
 
     private boolean match(Edge qEdge, Edge edge, Node gNode, Node graphNode, Memory memory) {
@@ -1650,42 +1560,6 @@ public final class Eval implements ExpType {
     }
 
 
-    public void createManager() {
-        if (manager == null) {
-            setEventManager(new KgramEventDispatcher());
-            if (memory != null) {
-                memory.setEventManager(manager);
-            }
-            if (results != null) {
-                results.setEventManager(manager);
-            }
-        }
-    }
-
-    public KgramEventDispatcher getEventManager() {
-        return manager;
-    }
-
-    public void setEventManager(KgramEventDispatcher man) {
-        manager = man;
-        hasEvent = true;
-    }
-
-    void send(int type, Object obj) {
-        Event e = EventImpl.create(type, obj);
-        manager.send(e);
-    }
-
-    void send(int type, Object obj, Object arg) {
-        Event e = EventImpl.create(type, obj, arg);
-        manager.send(e);
-    }
-
-    void send(int type, Object obj, Object arg, Object arg2) {
-        Event e = EventImpl.create(type, obj, arg, arg2);
-        manager.send(e);
-    }
-
     void set(Stack current) {
         this.current = current;
     }
@@ -1695,19 +1569,19 @@ public final class Eval implements ExpType {
     }
 
     public ProcessVisitor getVisitor() {
-        return visitor;
+        return visitors.getVisitor();
     }
 
     public void setVisitor(ProcessVisitor visitor) {
-        this.visitor = visitor;
+        visitors.setVisitor(visitor);
     }
 
     public boolean isStop() {
-        return stopped;
+        return state.isStopped();
     }
 
     public void setStop(boolean stopped) {
-        this.stopped = stopped;
+        state.setStopped(stopped);
     }
 
 
@@ -1719,7 +1593,7 @@ public final class Eval implements ExpType {
      * must only be accessed by the owning execution thread.
      */
     public void finish() {
-        setStop(true);
+        state.stop();
         join.setStop();
         graphEvaluator.setStop();
         optional.setStop(true);
@@ -1760,9 +1634,6 @@ public final class Eval implements ExpType {
             if (!env.isBound(qNode) && getProducer().isBindable(node)) {
                 // bind qNode with same index as other variable
                 env.push(qNode, node, env.getIndex(exp.get(i).getNode()));
-                if (hasEvent) {
-                    send(Event.BIND, exp, qNode, node);
-                }
                 backtrack = eval(p, gNode, stack, n + 1);
                 env.pop(qNode);
             } else {
@@ -1810,9 +1681,6 @@ public final class Eval implements ExpType {
         Memory env = memory;
         for (Node node : exp.getNodeList()) {
             env.push(qNode, node, n);
-            if (hasEvent) {
-                send(Event.BIND, exp, qNode, node);
-            }
             int backtrack = eval(p, gNode, stack, n + 1);
             env.pop(qNode);
             if (backtrack < n) {
@@ -1823,20 +1691,14 @@ public final class Eval implements ExpType {
     }
 
     /**
-     * Draf extension where a Visitor provides Edge iterator
+     * Draft extension where a Visitor provides Edge iterator
      */
     Iterable<Edge> produce(Node gNode, Edge edge) {
-        DatatypeValue res = getVisitor().produce(this, gNode, edge);
-        if (res == null) {
-            return null;
-        }
-        if (res instanceof Loopable<?> loopable) {
-            Iterable<?> loop = loopable.getLoop();
-            if (loop != null) {
-                return new IterableEntity(loop);
-            }
-        }
-        return null;
+        return visitors.produce(this, gNode, edge);
+    }
+
+    public boolean hasFilter() {
+        return visitors.hasFilter();
     }
 
     public boolean isJoinMappings() {
@@ -1844,12 +1706,19 @@ public final class Eval implements ExpType {
     }
 
     public ResultListener getListener() {
-        return listener;
+        return visitors.getListener();
     }
 
     public void setListener(ResultListener listener) {
-        this.listener = listener;
-        this.hasListener = listener != null;
+        visitors.setListener(listener);
+    }
+
+    public EvaluationState getState() {
+        return state;
+    }
+
+    public EvalVisitorDispatcher getVisitorDispatcher() {
+        return visitors;
     }
 
 }

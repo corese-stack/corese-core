@@ -17,9 +17,6 @@ import fr.inria.corese.core.next.query.impl.engine.pattern.Query;
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import fr.inria.corese.core.next.query.impl.engine.spi.Evaluator;
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
-import fr.inria.corese.core.next.query.impl.engine.event.Event;
-import fr.inria.corese.core.next.query.impl.engine.event.EventImpl;
-import fr.inria.corese.core.next.query.impl.engine.event.KgramEventDispatcher;
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,11 +50,9 @@ public final class Mappings extends PointerObject
     boolean isDistinct = false;
     // statisfy having(test)
     boolean isValid = true;
-    boolean hasEvent = false;
     // if true, store all Mapping of the group
     boolean isListGroup = false;
     boolean sortWithDesc = true;
-    KgramEventDispatcher manager;
     int count = 0;
     private Query query;
     private final List<Mapping> list;
@@ -72,11 +67,6 @@ public final class Mappings extends PointerObject
     private Group group;
     private Group distinct;
     private Eval eval;
-    // service report if Mappings from service
-    // json object
-    // construct where result graph
-    private TripleStore graph;
-    // result of query as a template
     // fake result in case of aggregate without result
     private boolean isFake = false;
     // parse error in service result
@@ -90,6 +80,15 @@ public final class Mappings extends PointerObject
     private int length = 0;
     // limit number of results to be displayed
     private int display = Integer.MAX_VALUE;
+    private static volatile GroupAggregator groupAggregator;
+
+    public static void setGroupAggregator(GroupAggregator aggregator) {
+        groupAggregator = aggregator;
+    }
+
+    public static GroupAggregator getGroupAggregator() {
+        return groupAggregator;
+    }
 
     /** Copies a static VALUES table into independent row containers. */
     @Override
@@ -118,12 +117,6 @@ public final class Mappings extends PointerObject
         Mappings lMap = new Mappings(q);
         lMap.init(q, subEval);
         return lMap;
-    }
-
-
-    public void setEventManager(KgramEventDispatcher man) {
-        manager = man;
-        hasEvent = true;
     }
 
     @Override
@@ -655,7 +648,8 @@ public final class Mappings extends PointerObject
             }
         }
 
-        if (fr.inria.corese.core.next.query.impl.sparql.bridge.DirectGroupAggregation.tryAggregate(q, this)) {
+        GroupAggregator aggregator = groupAggregator;
+        if (aggregator != null && aggregator.tryAggregate(q, this)) {
             finish(q);
             return;
         }
@@ -667,9 +661,6 @@ public final class Mappings extends PointerObject
         aggregateExpList(q, evaluator, memory, p, q.getOrderBy(), false);
 
         if (q.getHaving() != null) {
-            if (hasEvent) {
-                manager.send(EventImpl.create(Event.AGG, q.getHaving()));
-            }
             aggregateSwitch(q, evaluator, q.getHaving(), memory, p, HAVING);
         }
 
@@ -685,9 +676,6 @@ public final class Mappings extends PointerObject
         int n = 0;
         for (Exp exp : list) {
             if (exp.isAggregate()) {
-                if (hasEvent) {
-                    manager.send(EventImpl.create(Event.AGG, exp));
-                }
                 // perform group by and then aggregate
                 aggregateSwitch(q, evaluator, exp, memory, p, (isSelect) ? SELECT : n);
             }
@@ -742,9 +730,6 @@ public final class Mappings extends PointerObject
         if (ev != null) {
             ev.getVisitor().having(ev, exp.getFilter().getExp(), res);
         }
-        if (hasEvent) {
-            manager.send(EventImpl.create(Event.FILTER, exp, res));
-        }
         setValid(res);
     }
 
@@ -761,10 +746,6 @@ public final class Mappings extends PointerObject
                 ev.getVisitor().aggregate(ev, exp.getFilter().getExp(),
                         (aggregateValue == null) ? null : aggregateValue.getDatatypeValue());
             }
-        }
-
-        if (hasEvent) {
-            manager.send(EventImpl.create(Event.FILTER, exp, aggregateValue));
         }
 
         for (Mapping map : this) {
@@ -792,9 +773,6 @@ public final class Mappings extends PointerObject
     private void aggregateGroupMembers(Group group, Evaluator eval, Exp exp, Memory mem, Producer p, int n) {
         int mappingCount = 0;
         for (Mappings map : group.getValues()) {
-            if (hasEvent) {
-                map.setEventManager(manager);
-            }
             map.setCount(mappingCount++);
             mem.setGroup(map);
             map.aggregate(eval, exp, mem, p, n);
@@ -931,14 +909,7 @@ public final class Mappings extends PointerObject
      * for group by ?o1 .. ?on
      */
     private Group createGroup() {
-        if (getQuery().isConnect()) {
-            // group by any
-            Merge newGroup = new Merge(this);
-            newGroup.merge();
-            return newGroup;
-        } else {
-            return createGroup(getQuery().getGroupBy());
-        }
+        return createGroup(getQuery().getGroupBy());
     }
 
     private Group getCreateGroup() {
@@ -1227,7 +1198,7 @@ public final class Mappings extends PointerObject
 
     @Override
     public TripleStore getTripleStore() {
-        return graph;
+        return null;
     }
 
     public List<Edge> getInsert() {

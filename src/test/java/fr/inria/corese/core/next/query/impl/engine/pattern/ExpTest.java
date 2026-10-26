@@ -433,35 +433,6 @@ class ExpTest {
             exp.setSystem(true);
             assertTrue(exp.isSystem(), "System should be true");
         }
-
-        @Test
-        @DisplayName("Should set and check generated flag")
-        void testSetAndIsGenerated() {
-            exp.setGenerated(true);
-            assertTrue(exp.isGenerated(), "Generated should be true");
-        }
-
-    }
-
-
-
-    @Nested
-    @DisplayName("Level Tests")
-    class LevelTests {
-
-        @Test
-        @DisplayName("Should set and get level")
-        void testSetAndGetLevel() {
-            exp.setLevel(3);
-            assertEquals(3, exp.getLevel(), "Level should be 3");
-        }
-
-        @Test
-        @DisplayName("Should have default level -1")
-        void testDefaultLevel() {
-            Exp e = Exp.create(ExpType.Type.AND);
-            assertEquals(-1, e.getLevel(), "Default level should be -1");
-        }
     }
 
     @Nested
@@ -473,13 +444,6 @@ class ExpTest {
         void testSetAndGetNumber() {
             exp.setNumber(42);
             assertEquals(42, exp.getNumber(), "Number should be 42");
-        }
-
-        @Test
-        @DisplayName("Should set and get num")
-        void testSetAndGetNum() {
-            exp.setNum(7);
-            assertEquals(7, exp.getNum(), "Num should be 7");
         }
     }
 

@@ -40,41 +40,38 @@ public class Exp extends PointerObject
 
     static final String NEWLINE = "\n";
     static final String SP = " ";
-    Type type;
+    private Type type;
     private int bindingIndex = -1;
     // optional success
-    boolean status = false;
-    boolean isFail = false;
-    boolean isAggregate = false;
-    boolean isSilent = false;
-    VExp args;
-    Edge edge;
-    Node node;
-    List<Node> lNodes;
+    private boolean status = false;
+    private boolean isFail = false;
+    private boolean isAggregate = false;
+    private boolean isSilent = false;
+    private VExp args;
+    private Edge edge;
+    private Node node;
+    private List<Node> lNodes;
     // Expression evaluation contract, independent of parser syntax types.
-    Filter filter;
-    List<Filter> lFilter;
+    private Filter filter;
+    private List<Filter> lFilter;
     // min(?l, expGroupBy(?x, ?y))
-    List<Exp> expGroupBy;
+    private List<Exp> expGroupBy;
     // for UNION
-    Stack stack;
+    private Stack stack;
     // Optimizer-specific payload, such as candidate values for an equality filter.
-    Object payload;
-    Producer producer;
-    Mappings map;
+    private Object payload;
+    private Producer producer;
+    private Mappings map;
     private boolean isPostpone = false;
     private boolean isFunctional = false;
-    private boolean generated = false;
     //  service with several URI:
     private List<Node> simpleNodeList;
     private Exp postpone;
     private List<Exp> inscopeFilter;
     private Exp bind;
     private Exp values;
-    private int level = -1;
     // service number
     private int number = -1;
-    private int num = -1;
     private boolean isSystem = false;
     private boolean mappings = false;
 
@@ -113,15 +110,12 @@ public class Exp extends PointerObject
         target.map = copies.copy(map);
         target.isPostpone = isPostpone;
         target.isFunctional = isFunctional;
-        target.generated = generated;
         target.simpleNodeList = copies.copy(simpleNodeList);
         target.postpone = copies.copy(postpone);
         target.inscopeFilter = copies.copy(inscopeFilter);
         target.bind = copies.copy(bind);
         target.values = copies.copy(values);
-        target.level = level;
         target.number = number;
-        target.num = num;
         target.isSystem = isSystem;
         target.mappings = mappings;
         for (Exp child : args) target.args.add(copies.copy(child));
@@ -200,14 +194,6 @@ public class Exp extends PointerObject
         isSystem = b;
     }
 
-    public int getLevel() {
-        return level;
-    }
-
-    public void setLevel(int level) {
-        this.level = level;
-    }
-
     public boolean isBGP() {
         return type == Type.BGP;
     }
@@ -240,6 +226,10 @@ public class Exp extends PointerObject
 
     public void add(Exp e) {
         args.add(e);
+    }
+
+    public void clear() {
+        args.clear();
     }
 
     public void add(Edge e) {
@@ -1584,28 +1574,12 @@ public class Exp extends PointerObject
         this.mappings = mappings;
     }
 
-    public boolean isGenerated() {
-        return generated;
-    }
-
-    public void setGenerated(boolean generated) {
-        this.generated = generated;
-    }
-
     public List<Node> getInScopeNodeList() {
         return simpleNodeList;
     }
 
     public void setInScopeNodeList(List<Node> simpleNodeList) {
         this.simpleNodeList = simpleNodeList;
-    }
-
-    public int getNum() {
-        return num;
-    }
-
-    public void setNum(int num) {
-        this.num = num;
     }
 
     /**
