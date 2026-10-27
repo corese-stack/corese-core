@@ -24,7 +24,7 @@ public class HavingAstListener extends AbstractSparqlQueryAstListener {
 
     private TermAst havingConditionToTerm(SparqlParser.HavingConditionContext ctx) {
         if (ctx.constraint() != null) {
-            return builder().termFromConstraint(ctx.constraint());
+            return builder().expressions().termFromConstraint(ctx.constraint());
         }
         throw new QueryEvaluationException("Unsupported HAVING condition: " + ctx.getText());
     }

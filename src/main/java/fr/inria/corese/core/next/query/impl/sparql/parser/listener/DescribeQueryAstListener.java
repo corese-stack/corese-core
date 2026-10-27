@@ -60,9 +60,9 @@ public class DescribeQueryAstListener extends AbstractSparqlAstListener implemen
         for (SparqlParser.VarOrIriContext ref : ctx.varOrIri()) {
             String txt = ref.getText();
             if (txt.startsWith("?") || txt.startsWith("$")) {
-                queryBuilder().addDescribeResource(builder().variable(txt));
+                queryBuilder().addDescribeResource(builder().terms().variable(txt));
             } else {
-                queryBuilder().addDescribeResource(builder().iri(txt));
+                queryBuilder().addDescribeResource(builder().terms().iri(txt));
             }
         }
         queryBuilder().exitDescribeQuery();

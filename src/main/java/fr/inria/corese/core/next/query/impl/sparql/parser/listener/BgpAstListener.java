@@ -31,7 +31,7 @@ public class BgpAstListener extends AbstractSparqlAstListener {
 
     @Override
     public void enterGraphGraphPattern(SparqlParser.GraphGraphPatternContext ctx) {
-        builder().enterGraph(builder().termFromVarOrIriRef(ctx.varOrIri()));
+        builder().enterGraph(builder().terms().termFromVarOrIriRef(ctx.varOrIri()));
     }
 
     @Override
@@ -79,10 +79,10 @@ public class BgpAstListener extends AbstractSparqlAstListener {
             return;
         }
         SparqlAstBuilder b = builder();
-        TermAst subject = b.termFromVarOrTerm(ctx.varOrTerm());
+        TermAst subject = b.terms().termFromVarOrTerm(ctx.varOrTerm());
         var propertyList = ctx.propertyListNotEmpty();
         for (int verbIndex = 0; verbIndex < propertyList.verb().size(); verbIndex++) {
-            TermAst predicate = b.termFromVerb(propertyList.verb(verbIndex));
+            TermAst predicate = b.terms().termFromVerb(propertyList.verb(verbIndex));
             List<TermAst> objects = b.termListFromObjectList(propertyList.objectList(verbIndex));
             for (TermAst object : objects) {
                 b.addTriple(subject, predicate, object);
@@ -98,7 +98,7 @@ public class BgpAstListener extends AbstractSparqlAstListener {
             if (propertyList == null) {
                 return;
             }
-            b.addTriplesFromPropertyListPath(b.termFromVarOrTerm(ctx.varOrTerm()), propertyList);
+            b.addTriplesFromPropertyListPath(b.terms().termFromVarOrTerm(ctx.varOrTerm()), propertyList);
             return;
         }
         if (ctx.triplesNodePath() == null) {

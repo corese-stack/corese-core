@@ -67,7 +67,7 @@ public class ConstructQueryAstListener extends AbstractSparqlAstListener impleme
             return;
         }
         if (ctx.varOrTerm() != null && ctx.propertyListNotEmpty() != null) {
-            TermAst subject = queryBuilder().termFromVarOrTerm(ctx.varOrTerm());
+            TermAst subject = queryBuilder().terms().termFromVarOrTerm(ctx.varOrTerm());
             addConstructProperties(subject, ctx.propertyListNotEmpty(), inConstructWhere);
         } else if (ctx.triplesNode() != null) {
             TermAst subject = expandTriplesNode(ctx.triplesNode(), inConstructWhere);
@@ -93,7 +93,7 @@ public class ConstructQueryAstListener extends AbstractSparqlAstListener impleme
         if (ctx.collection() != null) {
             return expandCollection(ctx.collection(), inConstructWhere);
         }
-        return queryBuilder().iri(ctx.getText());
+        return queryBuilder().terms().iri(ctx.getText());
     }
 
     /**
@@ -103,11 +103,11 @@ public class ConstructQueryAstListener extends AbstractSparqlAstListener impleme
     private TermAst expandCollection(SparqlParser.CollectionContext ctx, boolean inConstructWhere) {
         var nodes = ctx.graphNode();
         if (nodes.isEmpty()) {
-            return queryBuilder().iri("<http://www.w3.org/1999/02/22-rdf-syntax-ns#nil>");
+            return queryBuilder().terms().iri("<http://www.w3.org/1999/02/22-rdf-syntax-ns#nil>");
         }
-        TermAst first = queryBuilder().iri("<http://www.w3.org/1999/02/22-rdf-syntax-ns#first>");
-        TermAst rest = queryBuilder().iri("<http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>");
-        TermAst nil = queryBuilder().iri("<http://www.w3.org/1999/02/22-rdf-syntax-ns#nil>");
+        TermAst first = queryBuilder().terms().iri("<http://www.w3.org/1999/02/22-rdf-syntax-ns#first>");
+        TermAst rest = queryBuilder().terms().iri("<http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>");
+        TermAst nil = queryBuilder().terms().iri("<http://www.w3.org/1999/02/22-rdf-syntax-ns#nil>");
         TermAst head = queryBuilder().newAnonymousBlankNode();
         TermAst current = head;
         for (int i = 0; i < nodes.size(); i++) {
@@ -131,7 +131,7 @@ public class ConstructQueryAstListener extends AbstractSparqlAstListener impleme
         if (ctx.triplesNode() != null) {
             return expandTriplesNode(ctx.triplesNode(), inConstructWhere);
         }
-        return queryBuilder().termFromVarOrTerm(ctx.varOrTerm());
+        return queryBuilder().terms().termFromVarOrTerm(ctx.varOrTerm());
     }
 
     private void addConstructProperties(
@@ -139,7 +139,7 @@ public class ConstructQueryAstListener extends AbstractSparqlAstListener impleme
             SparqlParser.PropertyListNotEmptyContext propertyList,
             boolean inConstructWhere) {
         for (int verbIndex = 0; verbIndex < propertyList.verb().size(); verbIndex++) {
-            TermAst predicate = queryBuilder().termFromVerb(propertyList.verb(verbIndex));
+            TermAst predicate = queryBuilder().terms().termFromVerb(propertyList.verb(verbIndex));
             for (var objectContext : propertyList.objectList(verbIndex).object_()) {
                 TermAst object = termFromConstructGraphNode(objectContext.graphNode(), inConstructWhere);
                 queryBuilder().addConstructTriple(subject, predicate, object);

@@ -194,6 +194,33 @@ public abstract class SparqlAstBuilder {
         this.expressions = new SparqlExpressionBuilder(this.terms, this::popCapturedExistsPattern);
     }
 
+    /**
+     * Term builder helper.
+     *
+     * @return active term builder
+     */
+    public SparqlTermBuilder terms() {
+        return this.terms;
+    }
+
+    /**
+     * Property-path builder helper.
+     *
+     * @return active path builder
+     */
+    public SparqlPathBuilder paths() {
+        return this.paths;
+    }
+
+    /**
+     * Expression and constraint builder helper.
+     *
+     * @return active expression builder
+     */
+    public SparqlExpressionBuilder expressions() {
+        return this.expressions;
+    }
+
     private boolean baseDeclarationSeen = false;
 
     public void reserveBlankNodeLabels(Collection<String> labels) {
@@ -606,90 +633,22 @@ public abstract class SparqlAstBuilder {
     }
 
 
-    // --- Creation Term helpers ---
-
-    /**
-     * Variable token text can be "?s" or "$s" depending on grammar.
-     */
-    public TermAst variable(String tokenText) {
-        return terms.variable(tokenText);
-    }
-
-    /**
-     * IRI term as raw text:
-     * <ul>
-     *   <li>{@code <http://...>}</li>
-     *   <li>{@code foaf:Person}</li>
-     *   <li>{@code a}</li>
-     * </ul>
-     */
-    public TermAst iri(String raw) {
-        return terms.iri(raw);
-    }
-
-    /**
-     * Literal term.
-     * - lexical should be the literal lexical form (often including quotes at this stage)
-     * - lang without '@' (e.g., "fr"), or null
-     * - datatype as IRI/QName text (e.g., "xsd:integer"), or null
-     */
-    public TermAst literal(String lexical, String lang, String datatype) {
-        return terms.literal(lexical, lang, datatype);
-    }
-
-
-
-    // ---- term helpers ----
-
-    public TermAst termFromVerb(SparqlParser.VerbContext ctx) {
-        return terms.termFromVerb(ctx);
-    }
-
-    public TermAst termFromVarOrTerm(SparqlParser.VarOrTermContext ctx) {
-        return terms.termFromVarOrTerm(ctx);
-    }
-
-    public TermAst termFromVarOrIriRef(SparqlParser.VarOrIriContext ctx) {
-        return terms.termFromVarOrIriRef(ctx);
-    }
-
     public List<TermAst> termListFromObjectList(SparqlParser.ObjectListContext ctx) {
         return terms.termListFromObjectList(ctx, this::termFromObject);
     }
 
-    public TermAst termFromObject(SparqlParser.Object_Context ctx) {
-        // object_ : graphNode
+    private TermAst termFromObject(SparqlParser.Object_Context ctx) {
         return termFromGraphNode(ctx.graphNode());
     }
 
-    public TermAst termFromGraphNode(SparqlParser.GraphNodeContext ctx) {
-        if (ctx.varOrTerm() != null) return termFromVarOrTerm(ctx.varOrTerm());
-        if (ctx.triplesNode() != null) {
-            // MVP: pas encore supporté ( [ ... ] ou ( ... ) )
-            return this.iri(ctx.triplesNode().getText());
+    private TermAst termFromGraphNode(SparqlParser.GraphNodeContext ctx) {
+        if (ctx.varOrTerm() != null) {
+            return terms.termFromVarOrTerm(ctx.varOrTerm());
         }
-
-        return this.iri(ctx.getText());
-    }
-
-    public TermAst termFromRdfLiteral(SparqlParser.RdfLiteralContext ctx) {
-        return terms.termFromRdfLiteral(ctx);
-    }
-
-    public TermAst termFromVar(SparqlParser.Var_Context ctx) {
-        return terms.termFromVar(ctx);
-    }
-
-    public TermAst termFromBooleanLiteral(SparqlParser.BooleanLiteralContext ctx) {
-        return terms.termFromBooleanLiteral(ctx);
-    }
-
-    public TermAst termFromIriRef(SparqlParser.IriRefContext ctx) {
-        return terms.termFromIriRef(ctx);
-    }
-
-    public TermAst termFromNumericLiteral(SparqlParser.NumericLiteralContext ctx) {
-        return terms.termFromNumericLiteral(ctx);
+        if (ctx.triplesNode() != null) {
+            return terms.iri(ctx.triplesNode().getText());
+        }
+        return terms.iri(ctx.getText());
     }
 
     public TermAst termFromBlankNode(SparqlParser.BlankNodeContext ctx) {
@@ -710,35 +669,7 @@ public abstract class SparqlAstBuilder {
                         "Blank node label '" + label + "' is used in more than one basic graph pattern");
             }
         }
-        return this.iri(label);
-    }
-
-    /**
-     * One {@code groupCondition}&nbsp;:&nbsp;{@code builtInCall | functionCall | ‘(‘ expression (‘AS’ var_)? ‘)’ | var_}.
-     * <p>La forme {@code (expr AS ?v)} est résolue comme l’expression de regroupement (le nom optionnel rejoint la
-     * spec en étant porté par la projection SELECT&nbsp;; l’AST minimal ne le duplique pas ici).
-     */
-    public TermAst termFromGroupCondition(SparqlParser.GroupConditionContext ctx) {
-        return expressions.termFromGroupCondition(ctx);
-    }
-
-    public TermAst termFromConstraint(SparqlParser.ConstraintContext ctx) {
-        return expressions.termFromConstraint(ctx);
-    }
-
-    public TermAst termFromExpression(SparqlParser.ExpressionContext ctx) {
-        return expressions.termFromExpression(ctx);
-    }
-
-    public TermAst termFromBrackettedExpression(SparqlParser.BrackettedExpressionContext ctx) {
-        return expressions.termFromBrackettedExpression(ctx);
-    }
-
-    /**
-     * Predicate as a SPARQL 1.1 property path.
-     */
-    public PathAst pathFromVerbPath(SparqlParser.VerbPathContext ctx) {
-        return paths.pathFromVerbPath(ctx);
+        return terms.iri(label);
     }
 
     /**
@@ -749,7 +680,7 @@ public abstract class SparqlAstBuilder {
         do {
             label = GENERATED_BLANK_NODE_PREFIX + anonymousBlankNodeCounter++;
         } while (!blankNodeLabels.add(label));
-        return iri(label);
+        return terms.iri(label);
     }
 
     /**
@@ -772,7 +703,7 @@ public abstract class SparqlAstBuilder {
                     < verbSimples.get(verbSimpleIdx).getStart().getTokenIndex());
 
             PathAst predicate = useVerbPath
-                    ? pathFromVerbPath(verbPaths.get(verbPathIdx++))
+                    ? paths.pathFromVerbPath(verbPaths.get(verbPathIdx++))
                     : new PredicatePathAst(terms.termFromVerbSimple(verbSimples.get(verbSimpleIdx++)));
 
             for (TermAst object : termListFromObjectListPath(objectList)) {
@@ -829,7 +760,7 @@ public abstract class SparqlAstBuilder {
      */
     public TermAst termFromGraphNodePath(SparqlParser.GraphNodePathContext ctx) {
         if (ctx.varOrTerm() != null) {
-            return termFromVarOrTerm(ctx.varOrTerm());
+            return terms.termFromVarOrTerm(ctx.varOrTerm());
         }
         if (ctx.triplesNodePath() != null) {
             return subjectFromTriplesNodePath(ctx.triplesNodePath());
@@ -858,7 +789,7 @@ public abstract class SparqlAstBuilder {
             return GraphRefAsts.defaultGraph();
         }
         if(ctx.iriRef() != null) {
-            IriAst graphIri = (IriAst) termFromIriRef(ctx.iriRef());
+            IriAst graphIri = (IriAst) terms.termFromIriRef(ctx.iriRef());
             return GraphRefAsts.graph(graphIri);
         }
         throw new QueryEvaluationException("Unexpected value for Graph reference or default " + ctx.getText());
@@ -866,7 +797,7 @@ public abstract class SparqlAstBuilder {
 
     public GraphRefAst graphRefFromGraphRef(SparqlParser.GraphRefContext ctx) {
         if(ctx.iriRef() != null) {
-            IriAst graphIri = (IriAst) termFromIriRef(ctx.iriRef());
+            IriAst graphIri = (IriAst) terms.termFromIriRef(ctx.iriRef());
             return GraphRefAsts.graph(graphIri);
         }
         throw new QueryEvaluationException("Unexpected value for Graph reference " + ctx.getText());

@@ -72,7 +72,7 @@ public class SparqlUpdateAstBuilder extends SparqlQueryAstBuilder{
         GraphRefAst sourceGraphAst = null;
         GraphRefAst targetGraphAst = null;
         if(ctx.iriRef() != null) {
-            sourceGraphAst = new GraphRefAst((IriAst) this.termFromIriRef(ctx.iriRef()));
+            sourceGraphAst = new GraphRefAst((IriAst) this.terms().termFromIriRef(ctx.iriRef()));
         }
         if(ctx.graphRef() != null) {
             targetGraphAst = this.graphRefFromGraphRef(ctx.graphRef());
@@ -173,14 +173,14 @@ public class SparqlUpdateAstBuilder extends SparqlQueryAstBuilder{
         Set<IriAst> defaults = new LinkedHashSet<>();
         Set<IriAst> named = new LinkedHashSet<>();
         for (SparqlParser.UsingClauseContext using : context.usingClause()) {
-            IriAst iri = (IriAst) termFromIriRef(using.iriRef());
+            IriAst iri = (IriAst) terms().termFromIriRef(using.iriRef());
             if (using.NAMED() == null) {
                 defaults.add(iri);
             } else {
                 named.add(iri);
             }
         }
-        IriAst with = context.iriRef() == null ? null : (IriAst) termFromIriRef(context.iriRef());
+        IriAst with = context.iriRef() == null ? null : (IriAst) terms().termFromIriRef(context.iriRef());
         return new ModifyRequestAst(with, delete, insert, new DatasetClauseAst(defaults, named),
                 (SelectQueryAst) super.getResult());
     }
