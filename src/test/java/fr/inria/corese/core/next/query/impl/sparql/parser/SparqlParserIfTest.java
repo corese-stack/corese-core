@@ -104,13 +104,14 @@ class SparqlParserIfTest extends AbstractSparqlParserFeatureTest {
     @DisplayName("BIND(IF(?s, IF(?p, ?p, ?o), ?o) AS ?s) — nested IF with already-declared variable should fail")
     void shouldFailNestedIfWhenBindVariableAlreadyDeclared() {
         SparqlParser parser = newParserDefault();
-
-        QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+        String query = """
                 SELECT * WHERE {
                   ?s ?p ?o .
                   BIND(IF(?s, IF(?p, ?p, ?o), ?o) AS ?s)
                 }
-                """));
+                """;
+
+        QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse(query));
 
         assertEquals("Variable ?s used in BIND is already declared in the same group graph pattern", exception.getMessage());
     }

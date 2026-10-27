@@ -25,27 +25,6 @@ class SparqlAstBuilderUnionTest {
         builder.enterSelectQuery();
     }
 
-    /**
-     * Simulates: outer group open → UNION open → branch { } → branch { } → UNION close → outer group close.
-     * Each branch is empty (no BGP inside).
-     */
-    private GroupGraphPatternAst buildTwoEmptyBranchUnion() {
-        builder.enterGroup();
-        builder.enterUnion();
-
-        builder.enterGroup();
-        builder.exitGroup();
-        builder.collectUnionBranch();
-
-        builder.enterGroup();
-        builder.exitGroup();
-        builder.collectUnionBranch();
-
-        builder.exitUnion();
-        builder.exitGroup();
-        builder.exitSelectQuery();
-        return Objects.requireNonNull((SelectQueryAst)builder.getResult()).whereClause();
-    }
 
     /**
      * Builds a BGP with a single triple ?s a <iri> inside the current group.
@@ -59,6 +38,24 @@ class SparqlAstBuilderUnionTest {
     @Nested
     @DisplayName("Two-branch UNION")
     class TwoBranchUnion {
+
+        private GroupGraphPatternAst buildTwoEmptyBranchUnion() {
+            builder.enterGroup();
+            builder.enterUnion();
+
+            builder.enterGroup();
+            builder.exitGroup();
+            builder.collectUnionBranch();
+
+            builder.enterGroup();
+            builder.exitGroup();
+            builder.collectUnionBranch();
+
+            builder.exitUnion();
+            builder.exitGroup();
+            builder.exitSelectQuery();
+            return Objects.requireNonNull((SelectQueryAst)builder.getResult()).whereClause();
+        }
 
         @Test
         @DisplayName("WHERE clause contains exactly one UnionAst")

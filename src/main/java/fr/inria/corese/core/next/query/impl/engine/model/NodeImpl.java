@@ -193,7 +193,6 @@ public final class NodeImpl implements Node, PlanCopyable<NodeImpl> {
         return payload;
     }
 
-    @Override
     public Edge getEdge() {
         return payload instanceof Edge edge ? edge : null;
     }
@@ -216,11 +215,6 @@ public final class NodeImpl implements Node, PlanCopyable<NodeImpl> {
     @Override
     public void setKey(String str) {
         key = Objects.requireNonNull(str, "str");
-    }
-
-    @Override
-    public TripleStore getTripleStore() {
-        return null;
     }
 
     @Override

@@ -36,16 +36,8 @@ public final class EvaluationState {
         return nbEdge;
     }
 
-    public void setNbEdge(int nbEdge) {
-        this.nbEdge = nbEdge;
-    }
-
     public int getNbCall() {
         return nbCall;
-    }
-
-    public void setNbCall(int nbCall) {
-        this.nbCall = nbCall;
     }
 
     public int getNbResult() {

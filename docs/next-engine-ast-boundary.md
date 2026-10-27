@@ -13,8 +13,8 @@ Previously, three source files in `next/query/impl/engine` retained AST dependen
   `AstBackedFilter` retains AST-level access internally where needed.
 - `pattern/Exp.java`: exposed `getFilterExpression()` delegating to `Filter`. Removed as it
   had no engine callers.
-- `pattern/Query.java`: retained `QueryAst ast` with `getAST()`, `getGlobalAST()`, and `setAST()`.
-  Removed from `Query`; query builder compilation produces pure engine operator trees.
+- `pattern/QueryPlan.java` (formerly `Query.java`): retained `QueryAst ast` with `getAST()`, `getGlobalAST()`, and `setAST()`.
+  Removed from `QueryPlan`; query builder compilation produces pure engine operator trees.
 
 ## Guard behavior
 

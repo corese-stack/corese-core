@@ -41,12 +41,9 @@ public interface ExprType {
     int REGEX = 29;
 
     int DATATYPE = 30;
-    int SELF = 32;
     int DEBUG = 33;
     int KGRAM = 36;
-    int SQL = 37;
     int XPATH = 38;
-    int SKIP = 39;
 
     int UNNEST = 41;
     int EXIST = 42;
@@ -66,22 +63,18 @@ public interface ExprType {
     int MINUTES = 64;
     int SECONDS = 65;
 
-
     int URI = 74;
     int TZ = 75;
-
 
     int TRIPLE = 88;
     int SUBJECT = 89;
     int PREDICATE = 90;
     int OBJECT = 91;
 
-
     int EQNE = 109;
 
     int EQ = 110;
     int NE = 111;
-    int NEQ = 111;
 
     int GL = 112;
     int LE = 113;
@@ -93,59 +86,25 @@ public interface ExprType {
     int MINUS = 118;
     int MULT = 119;
 
-    int START = 122; // ^
     int IN = 123;
     int STAR = 125;
-
-
-    int DISPLAY = 200;
 
     int NODE = 209;
 
     int LOAD = 212;
 
-    int INDEX = 221;
     int ID = 223;
     int TEST = 224;
 
-
     int TURTLE = 227;
 
-    int QNAME = 238;
-
-
     int AGGREGATE = 276;
-    int STL_FORMAT = 277;
-
-    int FORMAT = 283;
 
     int QUERY = 302;
     int EXTENSION = 303;
 
     int LIST = 309;
-    int MAP = 310;
-    int MAPLIST = 311;
-    int APPLY = 312;
-    int LET = 313;
     int ERROR = 315;
-    int MAPEVERY = 316;
-    int MAPANY = 317;
-    int MAPFIND = 318;
-    int MAPFINDLIST = 319;
-    int MAPMERGE = 320;
-    int SET = 322;
-    int SEQUENCE = 323;
-    int RETURN = 324;
     int EVAL = 325;
-    int FUNCALL = 326;
     int FOR = 327;
-    int REDUCE = 329;
-
-
-    int STATIC = 336;
-    int THROW = 338;
-
-    int SLICE = 500;
-
-
 }

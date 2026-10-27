@@ -9,15 +9,10 @@ import fr.inria.corese.core.next.query.impl.engine.planning.QueryPlanner;
 import fr.inria.corese.core.next.query.impl.engine.model.Filter;
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
 import fr.inria.corese.core.next.query.impl.engine.filter.FilterOptimizer;
-import fr.inria.corese.core.next.query.impl.engine.eval.Message;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Compiled query operators, projection, dataset and variable indexes.
@@ -38,31 +33,16 @@ public final class QueryPlan extends Exp {
     public static final int QP_HEURISTICS_BASED = 2;//Heuristics based QP
     public static final int QP_BGP = 3;//BGP based QP
 
-    private static final Logger logger = LoggerFactory.getLogger(QueryPlan.class);
-
-    int limit = Integer.MAX_VALUE;
-    int offset = 0;
-    // if slice > 0 : service gets mappings from previous pattern by slices
-    int slice = 20;
-
     private int number = 0;
-    private boolean distinctResults;
     private final VariableLayout layout;
-    List<Node> from;
-    List<Node> named;
-    List<Node> selectNode;
+    private final QueryClauses clauses;
+    private final QueryExpIndexer indexer;
+
     List<Node> relaxEdges;
-    List<Exp> selectExp;
-    List<Exp> orderBy;
-    List<Exp> groupBy;
     List<Filter> failure;
     List<Filter> funList;
 
     List<String> errors;
-    List<String> info;
-    Exp having;
-    Exp construct;
-    Exp delete;
     // gNode is a local graph node when subquery has no ?g in its select
     // use case: graph ?g (select where ...)
     Node gNode;
@@ -86,28 +66,19 @@ public final class QueryPlan extends Exp {
     // Extended queries for additional group by
     List<QueryPlan> queries;
     private boolean isCompiled = false;
-    private boolean datasetSpecified;
     private boolean reportEnabled;
 
     private boolean isUseBind = true;
 
-    private boolean aggregateQuery;
     boolean isRelax = false;
     boolean isDistribute = false;
     boolean isOptimize = false;
     boolean isTest = false;
     boolean isNew = true;
-    boolean isConstruct = false;
-    private boolean isInsert = false;
-    boolean isDelete = false;
-    boolean isUpdate = false;
-    boolean isAsk = false;
-    boolean isListGroup = false;
     private boolean validate = false;
     private boolean federate = false;
 
-    boolean
-            isCorrect = true;
+    boolean isCorrect = true;
     boolean isMap = true;
     boolean isRule = false;
     boolean isDetail = true;
@@ -115,7 +86,6 @@ public final class QueryPlan extends Exp {
     int planner = QP_DEFAULT;
 
     private boolean isService = false;
-
 
     private Mapping mapping;
 
@@ -125,11 +95,8 @@ public final class QueryPlan extends Exp {
     public QueryPlan() {
         super(Type.QUERY);
         layout = new VariableLayout();
-        from = new ArrayList<>();
-        named = new ArrayList<>();
-        selectExp = new ArrayList<>();
-        orderBy = new ArrayList<>();
-        groupBy = new ArrayList<>();
+        clauses = new QueryClauses();
+        indexer = new QueryExpIndexer(this, layout);
         failure = new ArrayList<>();
         funList = new ArrayList<>();
         compiler = new FilterOptimizer(this);
@@ -139,7 +106,6 @@ public final class QueryPlan extends Exp {
         ptable = new HashMap<>();
         etable = new HashMap<>();
         queries = new ArrayList<>();
-        selectNode = new ArrayList<>();
         relaxEdges = new ArrayList<>();
         querySorter = new QueryPlanner(this);
     }
@@ -154,27 +120,15 @@ public final class QueryPlan extends Exp {
         copies.remember(source, this);
         source.copyPlanFields(this, copies);
         layout = source.layout.copyPlan(copies);
+        clauses = source.clauses.copyPlan(copies);
+        indexer = new QueryExpIndexer(this, layout);
         querySorter = null;
         compiler = null;
-        this.limit = source.limit;
-        this.offset = source.offset;
-        this.slice = source.slice;
         this.number = source.number;
-        this.distinctResults = source.distinctResults;
-        this.from = copies.copy(source.from);
-        this.named = copies.copy(source.named);
-        this.selectNode = copies.copy(source.selectNode);
         this.relaxEdges = copies.copy(source.relaxEdges);
-        this.selectExp = copies.copy(source.selectExp);
-        this.orderBy = copies.copy(source.orderBy);
-        this.groupBy = copies.copy(source.groupBy);
         this.failure = copies.copy(source.failure);
         this.funList = copies.copy(source.funList);
         this.errors = copies.copy(source.errors);
-        this.info = copies.copy(source.info);
-        this.having = copies.copy(source.having);
-        this.construct = copies.copy(source.construct);
-        this.delete = copies.copy(source.delete);
         this.gNode = copies.copy(source.gNode);
         this.globalQuery = copies.copy(source.globalQuery);
         this.outerQuery = copies.copy(source.outerQuery);
@@ -186,21 +140,13 @@ public final class QueryPlan extends Exp {
         this.table = copies.copy(source.table);
         this.queries = copies.copy(source.queries);
         this.isCompiled = source.isCompiled;
-        this.datasetSpecified = source.datasetSpecified;
         this.reportEnabled = source.reportEnabled;
         this.isUseBind = source.isUseBind;
-        this.aggregateQuery = source.aggregateQuery;
         this.isRelax = source.isRelax;
         this.isDistribute = source.isDistribute;
         this.isOptimize = source.isOptimize;
         this.isTest = source.isTest;
         this.isNew = source.isNew;
-        this.isConstruct = source.isConstruct;
-        this.isInsert = source.isInsert;
-        this.isDelete = source.isDelete;
-        this.isUpdate = source.isUpdate;
-        this.isAsk = source.isAsk;
-        this.isListGroup = source.isListGroup;
         this.validate = source.validate;
         this.federate = source.federate;
         this.isCorrect = source.isCorrect;
@@ -231,7 +177,7 @@ public final class QueryPlan extends Exp {
         return new QueryPlan(e);
     }
 
-    /** Creates an empty compiled query. */
+    /** Creates an empty query plan. */
     public static QueryPlan create() {
         return new QueryPlan();
     }
@@ -336,19 +282,6 @@ public final class QueryPlan extends Exp {
         }
     }
 
-
-    public void addInfo(String mes, Object obj) {
-        if (info == null) {
-            info = new ArrayList<>();
-        }
-        if (obj != null) {
-            mes += obj;
-        }
-        if (!info.contains(mes)) {
-            info.add(mes);
-        }
-    }
-
     public Exp getBody() {
         return first();
     }
@@ -425,27 +358,23 @@ public final class QueryPlan extends Exp {
 
 
     public List<Node> getFrom(Node gNode) {
-        if (gNode == null) {
-            return from;
-        } else {
-            return named;
-        }
+        return clauses.getFrom(gNode);
     }
 
     public List<Node> getFrom() {
-        return from;
+        return clauses.getFrom();
     }
 
     public List<Node> getNamed() {
-        return named;
+        return clauses.getNamed();
     }
 
     public void setFrom(List<Node> l) {
-        from = l;
+        clauses.setFrom(l);
     }
 
     public void setNamed(List<Node> l) {
-        named = l;
+        clauses.setNamed(l);
     }
 
     /**
@@ -453,12 +382,12 @@ public final class QueryPlan extends Exp {
      * of its graph sets is empty.
      */
     public void setDatasetSpecified(boolean datasetSpecified) {
-        this.datasetSpecified = datasetSpecified;
+        clauses.setDatasetSpecified(datasetSpecified);
     }
 
     /** Returns whether the query has an explicit active dataset. */
     public boolean isDatasetSpecified() {
-        return datasetSpecified;
+        return clauses.isDatasetSpecified();
     }
 
     VariableLayout getLayout() {
@@ -510,11 +439,11 @@ public final class QueryPlan extends Exp {
      * computed by compiler transformer
      */
     public List<Node> getSelect() {
-        return selectNode;
+        return clauses.getSelect();
     }
 
     public void setSelect(List<Node> list) {
-        selectNode = list;
+        clauses.setSelect(list);
     }
 
     /**
@@ -522,7 +451,7 @@ public final class QueryPlan extends Exp {
      * computed by compiler transformer
      */
     public List<Exp> getSelectFun() {
-        return selectExp;
+        return clauses.getSelectFun();
     }
 
     public Node getPatternNode(String name) {
@@ -542,11 +471,11 @@ public final class QueryPlan extends Exp {
     }
 
     public void setSlice(int n) {
-        slice = n;
+        clauses.setSlice(n);
     }
 
     public int getSlice() {
-        return slice;
+        return clauses.getSlice();
     }
 
     public void setMap(boolean b) {
@@ -558,99 +487,45 @@ public final class QueryPlan extends Exp {
     }
 
     public void setLimit(int n) {
-        limit = n;
+        clauses.setLimit(n);
     }
 
     public int getLimit() {
-        return limit;
+        return clauses.getLimit();
     }
 
     public int getLimitOffset() {
-        // when order by/group by/count(), return all results, group sort agg, and then apply offset/limit
-        if (!isConstruct()
-                && (isOrderBy() || hasGroupBy() || isAggregate())) {
-            return Integer.MAX_VALUE;
-        }
-        if (limit < Integer.MAX_VALUE - offset) {
-            return limit + offset;
-        } else {
-            return limit;
-        }
+        return clauses.getLimitOffset();
     }
 
     public void setOffset(int n) {
-        offset = n;
+        clauses.setOffset(n);
     }
 
     public int getOffset() {
-        return offset;
+        return clauses.getOffset();
     }
 
     public boolean isDistinct() {
-        return distinctResults;
+        return clauses.isDistinct();
     }
 
     public void setDistinct(boolean b) {
-        distinctResults = b;
+        clauses.setDistinct(b);
     }
 
-    /**
-     * Determines whether DISTINCT is strictly redundant with GROUP BY.
-     *
-     * <p>In SPARQL 1.1, if a query uses GROUP BY and all grouping expressions are simple
-     * variables directly projected in the SELECT list, then every solution row emitted
-     * by the GROUP BY stage already possesses a unique combination of group key values.
-     * Consequently, each projected row is guaranteed to be pairwise distinct, making an
-     * additional DISTINCT deduplication pass redundant.</p>
-     *
-     * <p>A counter-example where DISTINCT is NOT redundant:
-     * {@code SELECT DISTINCT (COUNT(*) AS ?n) WHERE { ... } GROUP BY ?x}
-     * Here, two distinct groups (:a and :b) may yield the same count ?n = 1. If ?x is not
-     * projected, removing DISTINCT would erroneously return two rows instead of one.</p>
-     *
-     * @return true if DISTINCT is guaranteed to be redundant with GROUP BY
-     */
     public boolean isDistinctRedundantWithGroupBy() {
-        if (!isDistinct() || !hasGroupBy() || isListGroup()) {
-            return false;
-        }
-        List<Exp> groupList = getGroupBy();
-        List<Node> selectNodes = getSelect();
-        if (groupList == null || groupList.isEmpty() || selectNodes == null || selectNodes.isEmpty()) {
-            return false;
-        }
-        Set<String> selectVarNames = extractSelectVariableNames(selectNodes);
-        return areAllGroupKeysProjected(groupList, selectVarNames);
-    }
-
-    private static Set<String> extractSelectVariableNames(List<Node> selectNodes) {
-        return selectNodes.stream()
-                .filter(n -> n != null && n.isVariable())
-                .map(Node::getLabel)
-                .collect(Collectors.toSet());
-    }
-
-    private static boolean areAllGroupKeysProjected(List<Exp> groupList, Set<String> selectVarNames) {
-        for (Exp groupExp : groupList) {
-            if (groupExp == null || groupExp.getNode() == null || groupExp.getFilter() != null) {
-                return false;
-            }
-            Node groupNode = groupExp.getNode();
-            if (!groupNode.isVariable() || !selectVarNames.contains(groupNode.getLabel())) {
-                return false;
-            }
-        }
-        return true;
+        return clauses.isDistinctRedundantWithGroupBy();
     }
 
     @Override
     public boolean isAggregate() {
-        return aggregateQuery;
+        return clauses.isAggregate();
     }
 
     @Override
     public void setAggregate(boolean b) {
-        aggregateQuery = b;
+        clauses.setAggregate(b);
     }
 
     public boolean isRelax() {
@@ -669,41 +544,40 @@ public final class QueryPlan extends Exp {
         }
     }
 
-
-    public boolean isSelect(){
-        return ! (isConstruct() || isUpdate() || isInsert() || isDelete() || isAsk());
+    public boolean isSelect() {
+        return !(isConstruct() || isUpdate() || isInsert() || isDelete() || isAsk());
     }
 
     public boolean isConstruct() {
-        return isConstruct;
+        return clauses.isConstruct();
     }
 
     public void setConstruct(boolean b) {
-        isConstruct = b;
+        clauses.setConstruct(b);
     }
 
     public boolean isDelete() {
-        return isDelete;
+        return clauses.isDelete();
     }
 
     public void setDelete(boolean b) {
-        isDelete = b;
+        clauses.setDelete(b);
     }
 
     public boolean isUpdate() {
-        return isUpdate;
+        return clauses.isUpdate();
     }
 
     public void setUpdate(boolean b) {
-        isUpdate = b;
+        clauses.setUpdate(b);
     }
 
     public boolean isAsk() {
-        return isAsk;
+        return clauses.isAsk();
     }
 
     public void setAsk(boolean b) {
-        isAsk = b;
+        clauses.setAsk(b);
     }
 
     public boolean isTest() {
@@ -743,53 +617,56 @@ public final class QueryPlan extends Exp {
         }
     }
 
-
     public void setSelectFun(List<Exp> s) {
-        selectExp = s;
+        clauses.setSelectFun(s);
     }
 
     public void addSelect(Node node) {
-        selectExp.add(Exp.create(Type.NODE, node));
+        clauses.addSelect(node);
     }
 
     public void addOrderBy(Node node) {
-        orderBy.add(Exp.create(Type.NODE, node));
+        clauses.addOrderBy(node);
     }
 
     public void addGroupBy(Node node) {
-        groupBy.add(Exp.create(Type.NODE, node));
+        clauses.addGroupBy(node);
     }
 
     public void setOrderBy(List<Exp> s) {
-        orderBy = s;
+        clauses.setOrderBy(s);
     }
 
     public boolean isOrderBy() {
-        return !orderBy.isEmpty();
+        return clauses.isOrderBy();
     }
 
     public List<Exp> getOrderBy() {
-        return orderBy;
+        return clauses.getOrderBy();
     }
 
     public void setGroupBy(List<Exp> s) {
-        groupBy = s;
+        clauses.setGroupBy(s);
     }
 
     public List<Exp> getGroupBy() {
-        return groupBy;
+        return clauses.getGroupBy();
     }
 
     public boolean isGroupBy() {
-        return !groupBy.isEmpty();
+        return clauses.isGroupBy();
     }
 
     public boolean hasGroupBy() {
-        return isGroupBy();
+        return clauses.hasGroupBy();
     }
 
     public boolean isListGroup() {
-        return isListGroup;
+        return clauses.isListGroup();
+    }
+
+    public void setListGroup(boolean listGroup) {
+        clauses.setListGroup(listGroup);
     }
 
     public boolean isCorrect() {
@@ -801,23 +678,23 @@ public final class QueryPlan extends Exp {
     }
 
     public void setHaving(Exp f) {
-        having = f;
+        clauses.setHaving(f);
     }
 
     public Exp getHaving() {
-        return having;
+        return clauses.getHaving();
     }
 
     public void setConstruct(Exp c) {
-        construct = c;
+        clauses.setConstruct(c);
     }
 
     public Exp getConstruct() {
-        return construct;
+        return clauses.getConstruct();
     }
 
     public Exp getInsert() {
-        return construct;
+        return clauses.getInsert();
     }
 
     public List<Node> getConstructNodes() {
@@ -829,11 +706,11 @@ public final class QueryPlan extends Exp {
     }
 
     public void setDelete(Exp c) {
-        delete = c;
+        clauses.setDelete(c);
     }
 
     public Exp getDelete() {
-        return delete;
+        return clauses.getDelete();
     }
 
     @Override
@@ -851,21 +728,11 @@ public final class QueryPlan extends Exp {
     }
 
     public Exp getSelectExp(String label) {
-        for (Exp exp : getSelectFun()) {
-            Node node = exp.getNode();
-            if (node.getLabel().equals(label)) {
-                return exp;
-            }
-        }
-        return null;
+        return clauses.getSelectExp(label);
     }
 
     public Node getSelectNode(String label) {
-        Exp exp = getSelectExp(label);
-        if (exp != null) {
-            return exp.getNode();
-        }
-        return null;
+        return clauses.getSelectNode(label);
     }
 
     public int nbNodes() {
@@ -961,12 +828,6 @@ public final class QueryPlan extends Exp {
         return this;
     }
 
-    @Override
-    public QueryPlan getQueryPlan() {
-        return this;
-    }
-
-
     public Node getOuterNode(Node subNode) {
         return getExtNode(subNode.getLabel());
     }
@@ -1013,243 +874,11 @@ public final class QueryPlan extends Exp {
      * called by compiler transformer
      */
     public void collect() {
-        for (Exp ee : this) {
-            collect(ee, false);
-        }
-
-        for (Node node : getBindingNodes()) {
-            store(node, false, false);
-        }
-
-        for (Node node : getArgList()) {
-            store(node, false, false);
-        }
-
-        for (Filter f : getFunList()){
-             collectExist(f.getExp());
-        }
+        indexer.collect();
     }
 
-    // exist: inside exists ( exp )
-    // or inside    A minus ( exp )
-    void collect(Exp exp, boolean exist) {
-        switch (exp.type()) {
-
-            case FILTER:
-                collectExist(exp.getFilter().getExp());
-                break;
-
-            case NODE:
-                store(exp.getNode(), exist, false);
-                break;
-
-            case VALUES:
-                for (Node node : exp.getNodeList()) {
-                    store(node, exist, false);
-                }
-                break;
-
-            case EDGE:
-                collectEdgeNodes(exp.getEdge(), exist);
-                break;
-
-            case XPATH, EVAL:
-                for (int i = 0; i < exp.nbNode(); i++) {
-                    Node node = exp.getNode(i);
-                    store(node, exist, false);
-                }
-                break;
-
-            case MINUS:
-                collectMinusNodes(exp, exist);
-                break;
-
-            case QUERY:
-                for (Exp ee : exp.getQuery().getSelectFun()) {
-                    store(ee.getNode(), exist, true);
-                }
-                break;
-
-            case BIND:
-                collectBindNodes(exp, exist);
-                break;
-
-            default:
-                for (Exp ee : exp) {
-                    collect(ee, exist);
-                }
-        }
-
-    }
-
-    private void collectEdgeNodes(Edge edge, boolean insideExistencePattern) {
-        store(edge.getNode(0), insideExistencePattern, false);
-        if (edge.getEdgeVariable() != null) {
-            store(edge.getEdgeVariable(), insideExistencePattern, false);
-        }
-        store(edge.getNode(1), insideExistencePattern, false);
-        for (int index = 2; index < edge.nbNode(); index++) {
-            store(edge.getNode(index), insideExistencePattern, false);
-        }
-    }
-
-    private void collectMinusNodes(Exp expression, boolean insideExistencePattern) {
-        if (expression.first() != null) {
-            collect(expression.first(), insideExistencePattern);
-        }
-        // The right operand is indexed but does not introduce solution bindings.
-        if (expression.rest() != null) {
-            collect(expression.rest(), true);
-        }
-    }
-
-    private void collectBindNodes(Exp expression, boolean insideExistencePattern) {
-        collectExist(expression.getFilter().getExp());
-        store(expression.getNode(), insideExistencePattern, false);
-        if (expression.getNodeList() != null) {
-            for (Node node : expression.getNodeList()) {
-                store(node, insideExistencePattern, false);
-            }
-        }
-    }
-
-    void collectExist(Expr exp) {
-        if (exp.oper() == ExprType.EXIST) {
-            Exp pat = getPattern(exp);
-            collect(pat, true);
-        } else {
-            for (Expr ee : exp.getExpList()) {
-                collectExist(ee);
-            }
-        }
-    }
-
-    /**
-     * set Index for EDGE & NODE
-     * check if subquery is aggregate
-     * in case of UNION, start is the start index for both branches
-     * return the min of index of exp Nodes
-     * query is (sub)query this is global query
-     */
     int index(QueryPlan query, Exp exp, boolean isExist, int start) {
-        int min = switch (exp.type()) {
-            case EDGE, XPATH, EVAL -> indexEdgeExp(exp);
-            case VALUES -> indexValuesExp(exp);
-            case NODE -> index(exp.getNode());
-            case BIND -> indexBindExp(query, exp, isExist);
-            case FILTER -> indexExpFilter(query, exp, isExist);
-            case QUERY -> indexExpQuery(query, exp, isExist);
-            case OPT_BIND, ACCEPT -> Integer.MAX_VALUE;
-            default -> indexDefaultExp(query, exp, isExist, start);
-        };
-
-        if (exp.getGraphNode() != null) {
-            index(exp.getGraphNode());
-        }
-
-        return min;
-    }
-
-    private int indexEdgeExp(Exp exp) {
-        Edge edge = exp.getEdge();
-        edge.setEdgeIndex(layout.allocateEdgeIndex());
-        return indexExpEdge(exp);
-    }
-
-    private int indexValuesExp(Exp exp) {
-        int min = Integer.MAX_VALUE;
-        for (Node node : exp.getNodeList()) {
-            int n = index(node);
-            min = Math.min(min, n);
-        }
-        return min;
-    }
-
-    private int indexBindExp(QueryPlan query, Exp exp, boolean isExist) {
-        Node qn = exp.getNode();
-        int min = index(qn);
-        if (exp.getNodeList() != null) {
-            for (Node bn : exp.getNodeList()) {
-                int ii = index(bn);
-                min = Math.min(min, ii);
-            }
-        }
-        return indexExpFilter(query, exp, isExist);
-    }
-
-    private int indexDefaultExp(QueryPlan query, Exp exp, boolean isExist, int start) {
-        int min = Integer.MAX_VALUE;
-        int startIndex = (start >= 0) ? start : globalNodeIndex();
-        int ind = exp.isUnion() ? startIndex : -1;
-        for (Exp e : exp) {
-            int n = index(query, e, isExist, ind);
-            min = Math.min(min, n);
-        }
-        return min;
-    }
-
-    // use case: index filter exists (?x ?p ?y)
-    int indexExpFilter(QueryPlan query, Exp exp, boolean isExist) {
-        int min = Integer.MAX_VALUE;
-        boolean hasExist = index(query, exp.getFilter());
-        List<String> lVar = exp.getFilter().getVariables(true);
-
-        for (String variable : lVar) {
-            Node qNode = query.getProperAndSubSelectNode(variable);
-            if (qNode == null) {
-                // Note: does not work with filter in exists pattern
-                // because getProperAndSubSelectNode does not go into exists pattern
-                logger.warn(Message.Prefix.UNDEF_VAR.getString(), variable);
-                addError(Message.Prefix.UNDEF_VAR.getString(), variable);
-            } else if (!isExist && !hasExist) {
-                int n = index(qNode);
-                min = Math.min(min, n);
-            }
-        }
-        if (hasExist) {
-            // use case:
-            // exists (?x p ?y filter(?x != ?z))
-            min = -1;
-        }
-        return min;
-    }
-
-    int indexExpQuery(QueryPlan query, Exp exp, boolean isExist) {
-        int min = Integer.MAX_VALUE;
-        QueryPlan qq = exp.getQuery();
-        qq.setCompiled();
-        qq.setGlobalQuery(this);
-        qq.setOuterQuery(query);
-        qq.setAggregate();
-
-        for (Exp e : exp) {
-            // for subquery, do not consider index here
-            index(qq, e, isExist, -1);
-        }
-
-        for (Exp ee : qq.getSelectFun()) {
-            // use case: query node created to hold fun result
-            // see Transformer compiler.compileSelectFun()
-            Node sNode = ee.getNode();
-            int n = index(sNode);
-            min = Math.min(min, n);
-
-            if (ee.getFilter() != null) {
-                index(qq, ee.getFilter());
-            }
-        }
-
-        qq.complete2();
-        return min;
-    }
-
-    private int indexExpEdge(Exp exp) {
-        int min = Integer.MAX_VALUE;
-        for (int i = 0; i < exp.nbNode(); i++) {
-            int n = index(exp.getNode(i));
-            min = Math.min(min, n);
-        }
-        return min;
+        return indexer.index(query, exp, isExist, start);
     }
 
 
@@ -1272,6 +901,10 @@ public final class QueryPlan extends Exp {
      */
     int newGlobalNodeIndex() {
         return getOuterQuery().newNodeIndex();
+    }
+
+    public int allocateNodeIndex() {
+        return layout.allocateNodeIndex();
     }
 
     int newNodeIndex() {
@@ -1326,26 +959,16 @@ public final class QueryPlan extends Exp {
 
     /**
      * Dependency with filter exp for tracking filter(exists {PAT})
-     *
      */
     boolean index(QueryPlan query, Filter f) {
-        return index(query, f.getExp());
+        return indexer.index(query, f);
     }
 
     /**
      * Looking for filter(exist {})
      */
     boolean index(QueryPlan query, Expr exp) {
-        boolean b = false;
-        if (exp.oper() == ExprType.EXIST) {
-            index(query, getPattern(exp), true, -1);
-            b = true;
-        } else {
-            for (Expr ee : exp.getExpList()) {
-                b = index(query, ee) || b;
-            }
-        }
-        return b;
+        return indexer.index(query, exp);
     }
 
     public QueryPlan orderBy(Node node) {
@@ -1412,10 +1035,6 @@ public final class QueryPlan extends Exp {
         return ftable.get(name);
     }
 
-    public Filter getGlobalFilter(String name) {
-        return getGlobalQuery().getFilter(name);
-    }
-
     public void setRule(boolean rule) {
         isRule = rule;
     }
@@ -1442,21 +1061,12 @@ public final class QueryPlan extends Exp {
         this.number = number;
     }
 
-    @Override
-    public Iterable<Object> getLoop() {
-        return () -> getEdges().stream().map(Object.class::cast).iterator();
-    }
-
     public List<Edge> getEdges(){
         ArrayList<Edge> list = new ArrayList<>();
         getBody().getEdgeList(list);
         return list;
     }
 
-    @Override
-    public String getDatatypeLabel() {
-        return "[QueryPlan]";
-    }
 
 
     public boolean isUseBind() {
@@ -1476,18 +1086,17 @@ public final class QueryPlan extends Exp {
 
 
 
-    @Override
     public Mapping getMapping() {
         return mapping;
     }
 
 
     public void setInsert(boolean isInsert) {
-        this.isInsert = isInsert;
+        clauses.setInsert(isInsert);
     }
 
     public boolean isInsert() {
-        return isInsert;
+        return clauses.isInsert();
     }
 
     public boolean isFederate() {

@@ -658,13 +658,6 @@ class QueryPlanTest {
             String str = query.toString();
             assertNotNull(str, "toString should not return null");
         }
-
-        @Test
-        @DisplayName("Should get datatype label")
-        void testGetDatatypeLabel() {
-            String label = query.getDatatypeLabel();
-            assertEquals("[QueryPlan]", label, "Datatype label should be [QueryPlan]");
-        }
     }
 
     @Nested

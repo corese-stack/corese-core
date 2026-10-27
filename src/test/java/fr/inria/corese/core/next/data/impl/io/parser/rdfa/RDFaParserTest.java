@@ -32,21 +32,21 @@ class RDFaParserTest extends ParserTestBase {
 
     private final DefaultRDFParserFactory parserFactory = new DefaultRDFParserFactory();
     private final ValueFactory valueFactory = Values.factory();
-    private final String defaultTurtlePrefixes = """
-            @prefix bibo: 	<http://purl.org/ontology/bibo/> .
-            @prefix cc: 	<http://creativecommons.org/ns#> .
-            @prefix dbp: 	<http://dbpedia.org/property/> .
-            @prefix dbp-owl: 	<http://dbpedia.org/ontology/> .
-            @prefix dbr: 	<http://dbpedia.org/resource/> .
-            @prefix dc: 	<http://purl.org/dc/terms/> .
-            @prefix ex: 	<http://example.org/> .
-            @prefix foaf: 	<http://xmlns.com/foaf/0.1/> .
-            @prefix owl: 	<http://www.w3.org/2002/07/owl#> .
-            @prefix rdf: 	<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-            @prefix rdfa: 	<http://www.w3.org/ns/rdfa#> .
-            @prefix rdfs: 	<http://www.w3.org/2000/01/rdf-schema#> .
-            @prefix xhv: 	<http://www.w3.org/1999/xhtml/vocab#> .
-            @prefix xsd: 	<http://www.w3.org/2001/XMLSchema#> .
+    private static final String DEFAULT_TURTLE_PREFIXES = """
+            @prefix bibo:     <http://purl.org/ontology/bibo/> .
+            @prefix cc:       <http://creativecommons.org/ns#> .
+            @prefix dbp:      <http://dbpedia.org/property/> .
+            @prefix dbp-owl:  <http://dbpedia.org/ontology/> .
+            @prefix dbr:      <http://dbpedia.org/resource/> .
+            @prefix dc:       <http://purl.org/dc/terms/> .
+            @prefix ex:       <http://example.org/> .
+            @prefix foaf:     <http://xmlns.com/foaf/0.1/> .
+            @prefix owl:      <http://www.w3.org/2002/07/owl#> .
+            @prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+            @prefix rdfa:     <http://www.w3.org/ns/rdfa#> .
+            @prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+            @prefix xhv:      <http://www.w3.org/1999/xhtml/vocab#> .
+            @prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
             """;
 
     @Test
@@ -142,7 +142,7 @@ class RDFaParserTest extends ParserTestBase {
                 "http://example.org/document");
         Model expected = createTestModel();
         RDFParser turtle = parserFactory.createRDFParser(RDFFormat.TURTLE, expected, valueFactory);
-        turtle.parse(new ByteArrayInputStream((defaultTurtlePrefixes + expectedTurtle)
+        turtle.parse(new ByteArrayInputStream((DEFAULT_TURTLE_PREFIXES + expectedTurtle)
                 .getBytes(java.nio.charset.StandardCharsets.UTF_8)), "http://example.org/document");
         assertModelsIsomorphic(expected, actual);
     }
@@ -181,7 +181,7 @@ class RDFaParserTest extends ParserTestBase {
                   </body>
                 </html>
                 """;
-        String currentSubjectNTriples = defaultTurtlePrefixes + """
+        String currentSubjectNTriples = DEFAULT_TURTLE_PREFIXES + """
                 <http://example.org/> foaf:primaryTopic <http://example.org/#bbq> .
                 <http://example.org/> dc:creator "Jo" .
                 """;
@@ -226,7 +226,7 @@ class RDFaParserTest extends ParserTestBase {
                   </body>
                 </html>
                 """;
-        String currentSubjectNTriples = defaultTurtlePrefixes + """
+        String currentSubjectNTriples = DEFAULT_TURTLE_PREFIXES + """
                 <> dc:creator "Jo" .
                 """;
 
@@ -670,7 +670,7 @@ class RDFaParserTest extends ParserTestBase {
                 <!DOCTYPE html>
                 <html prefix="dc: http://purl.org/dc/elements/1.1/">
                   <head>
-                	<title>Test 0020</title>
+                    <title>Test 0020</title>
                   </head>
                   <body>
                     <div about="photo1.jpg">
@@ -721,7 +721,7 @@ class RDFaParserTest extends ParserTestBase {
                 <!DOCTYPE html>
                 <html prefix="dc: http://purl.org/dc/elements/1.1/ p2: https://schema.org/">
                   <head>
-                	<title>Test 0020</title>
+                    <title>Test 0020</title>
                   </head>
                   <body>
                     <div about="photo1.jpg">

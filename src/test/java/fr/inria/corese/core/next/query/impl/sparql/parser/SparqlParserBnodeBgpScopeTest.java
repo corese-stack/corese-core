@@ -20,67 +20,73 @@ class SparqlParserBnodeBgpScopeTest extends AbstractSparqlParserFeatureTest {
     @Test
     @DisplayName("same blank-node label used twice within one BGP is valid")
     void sameLabelInOneBgpIsValid() {
-        assertDoesNotThrow(() -> newParserDefault().parse("""
+        String query = """
                 SELECT * WHERE {
                   _:b <http://example.org/p> ?o .
                   _:b <http://example.org/q> ?x
                 }
-                """));
+                """;
+        assertDoesNotThrow(() -> newParserDefault().parse(query));
     }
 
     @Test
     @DisplayName("two different blank-node labels in one BGP are valid")
     void differentLabelsInOneBgpAreValid() {
-        assertDoesNotThrow(() -> newParserDefault().parse("""
+        String query = """
                 SELECT * WHERE {
                   _:b1 <http://example.org/p> _:b2 .
                   _:b1 <http://example.org/q> _:b2
                 }
-                """));
+                """;
+        assertDoesNotThrow(() -> newParserDefault().parse(query));
     }
 
     @Test
     @DisplayName("same blank-node label in main BGP and OPTIONAL body is rejected")
     void sameLabelInOptionalIsRejected() {
-        assertThrows(QuerySyntaxException.class, () -> newParserDefault().parse("""
+        String query = """
                 SELECT * WHERE {
                   _:b <http://example.org/p> ?o .
                   OPTIONAL { _:b <http://example.org/q> ?x }
                 }
-                """), "A blank-node label must not cross an OPTIONAL boundary");
+                """;
+        assertThrows(QuerySyntaxException.class, () -> newParserDefault().parse(query), "A blank-node label must not cross an OPTIONAL boundary");
     }
 
     @Test
     @DisplayName("same blank-node label in two UNION branches is rejected")
     void sameLabelInUnionBranchesIsRejected() {
-        assertThrows(QuerySyntaxException.class, () -> newParserDefault().parse("""
+        String query = """
                 SELECT * WHERE {
                   { _:b <http://example.org/p> ?o }
                   UNION
                   { _:b <http://example.org/q> ?x }
                 }
-                """), "A blank-node label must not appear in both UNION branches");
+                """;
+        assertThrows(QuerySyntaxException.class, () -> newParserDefault().parse(query), "A blank-node label must not appear in both UNION branches");
     }
 
     @Test
     @DisplayName("same blank-node label across a GRAPH boundary is rejected")
     void sameLabelAcrossGraphBoundaryIsRejected() {
-        assertThrows(QuerySyntaxException.class, () -> newParserDefault().parse("""
+        String query = """
                 SELECT * WHERE {
                   GRAPH <http://example.org/g> { _:b <http://example.org/p> ?o }
                   _:b <http://example.org/q> ?x
                 }
-                """), "A blank-node label must not cross a GRAPH clause boundary");
+                """;
+        assertThrows(QuerySyntaxException.class, () -> newParserDefault().parse(query), "A blank-node label must not cross a GRAPH clause boundary");
     }
 
     @Test
     @DisplayName("same blank-node label in WHERE BGP and MINUS body is rejected")
     void sameLabelInMinusBodyIsRejected() {
-        assertThrows(QuerySyntaxException.class, () -> newParserDefault().parse("""
+        String query = """
                 SELECT * WHERE {
                   _:b <http://example.org/p> ?o .
                   MINUS { _:b <http://example.org/q> ?x }
                 }
-                """), "A blank-node label must not cross a MINUS boundary");
+                """;
+        assertThrows(QuerySyntaxException.class, () -> newParserDefault().parse(query), "A blank-node label must not cross a MINUS boundary");
     }
 }

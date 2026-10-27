@@ -75,8 +75,8 @@ class CsvTupleResultSerializerTest extends AbstractResultSerializerTest {
         return """
                 name,desc
                 Alice,Literal with a single quote'
-                Bernard,"Literal with a quote\"\""
-                Charles,"Literal both quotes single ' and double \"\""
+                Bernard,"Literal with a quote\"""
+                Charles,"Literal both quotes single ' and double \"""
                 """;
     }
 
@@ -85,7 +85,7 @@ class CsvTupleResultSerializerTest extends AbstractResultSerializerTest {
         return """
                 x,literal
                 http://example/x,String
-                http://example/x,"String-with-dquote\"\""
+                http://example/x,"String-with-dquote\"""
                 _:blank0,Blank node
                 ,Missing 'x'
                 ,

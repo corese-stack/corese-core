@@ -86,12 +86,13 @@ class SparqlParserMinusTest extends AbstractSparqlParserFeatureTest {
     @DisplayName("SELECT projection may contain a variable declared only inside MINUS")
     void shouldAcceptProjectionOfMinusOnlyVariable() {
         SparqlParser parser = newParserDefault();
-
-        assertDoesNotThrow(() -> parser.parse("""
+        String query = """
                 SELECT ?hidden WHERE {
                   ?s ?p ?o .
                   MINUS { ?s ?q ?hidden . }
                 }
-                """));
+                """;
+
+        assertDoesNotThrow(() -> parser.parse(query));
     }
 }

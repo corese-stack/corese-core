@@ -176,15 +176,6 @@ class MappingTest {
     class ComparisonTests {
 
         @Test
-        @DisplayName("Should compare mappings")
-        void testCompareMappings() {
-            Mapping other = new Mapping();
-
-            assertDoesNotThrow(() -> mapping.compare(other),
-                    "compare should not throw exception");
-        }
-
-        @Test
         @DisplayName("Mapping should equal itself")
         void testMappingEqualsItself() {
             assertEquals(mapping, mapping, "Mapping should equal itself");
@@ -375,6 +366,41 @@ class MappingTest {
         void testIsNotBound() {
             when(mockQueryNode.getLabel()).thenReturn("?y");
             assertFalse(mapping.isBound(mockQueryNode), "Unbound node should return false");
+        }
+    }
+
+    @Nested
+    @DisplayName("Project Tests")
+    class ProjectTests {
+
+        @Test
+        @DisplayName("Projecting mapping should eliminate unselected variables from node values and variable names")
+        void testProjectRemovesUnselectedVariables() {
+            Node qx = mock(Node.class);
+            when(qx.isVariable()).thenReturn(true);
+            when(qx.getLabel()).thenReturn("?x");
+            Node qy = mock(Node.class);
+            when(qy.isVariable()).thenReturn(true);
+            when(qy.getLabel()).thenReturn("?y");
+
+            Node tx = mock(Node.class);
+            Node ty = mock(Node.class);
+
+            Mapping m = Mapping.create(List.of(qx, qy), List.of(tx, ty));
+            assertEquals(tx, m.getNode("?x"));
+            assertEquals(ty, m.getNode("?y"));
+            assertTrue(m.getVariableNames().contains("?x"));
+            assertTrue(m.getVariableNames().contains("?y"));
+
+            fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan q = mock(fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan.class);
+            when(q.getSelect()).thenReturn(List.of(qx));
+
+            m.project(q);
+
+            assertEquals(tx, m.getNode("?x"));
+            assertNull(m.getNode("?y"), "Unprojected variable ?y should be null");
+            assertTrue(m.getVariableNames().contains("?x"));
+            assertFalse(m.getVariableNames().contains("?y"), "Unprojected variable ?y should be removed from variable names");
         }
     }
 }

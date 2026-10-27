@@ -736,21 +736,6 @@ class MappingsTest {
         }
     }
 
-    @Nested
-    @DisplayName("Datatype Label Tests")
-    class DatatypeLabelTests {
-
-        @Test
-        @DisplayName("Should return datatype label with size")
-        void testGetDatatypeLabel() {
-            mappings.add(mockMapping);
-            String label = mappings.getDatatypeLabel();
-
-            assertNotNull(label, "Label should not be null");
-            assertTrue(label.contains("Mappings"), "Label should contain 'Mappings'");
-            assertTrue(label.contains("size=1"), "Label should contain size");
-        }
-    }
 
 
     @Nested
@@ -768,19 +753,6 @@ class MappingsTest {
 
             int result = mappings.compare(m1, m2);
             assertEquals(0, result, "Empty mappings should be equal");
-        }
-    }
-
-    @Nested
-    @DisplayName("Loop Interface Tests")
-    class LoopInterfaceTests {
-
-        @Test
-        @DisplayName("Should return iterable for loop")
-        void testGetLoop() {
-            Iterable<?> loop = mappings.getLoop();
-            assertNotNull(loop, "Loop should not be null");
-            assertEquals(mappings, loop, "Loop should return self");
         }
     }
 }

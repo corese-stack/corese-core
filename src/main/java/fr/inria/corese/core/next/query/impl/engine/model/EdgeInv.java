@@ -1,9 +1,6 @@
 package fr.inria.corese.core.next.query.impl.engine.model;
-import fr.inria.corese.core.next.query.impl.engine.eval.PointerObject;
 
-import static fr.inria.corese.core.next.query.impl.engine.model.PointerType.TRIPLE;
-
-public class EdgeInv extends PointerObject implements Edge {
+public class EdgeInv implements Edge {
 
     private final Edge edge;
     private final Edge ent;
@@ -81,7 +78,6 @@ public class EdgeInv extends PointerObject implements Edge {
         return edge.getProperty();
     }
 
-    @Override
     public Node getNode() {
         return null;
     }
@@ -94,15 +90,5 @@ public class EdgeInv extends PointerObject implements Edge {
     @Override
     public void setProvenance(Object obj) {
         ent.setProvenance(obj);
-    }
-
-    @Override
-    public Iterable<Object> getLoop() {
-        return ent.getLoop();
-    }
-
-    @Override
-    public PointerType pointerType() {
-        return TRIPLE;
     }
 }

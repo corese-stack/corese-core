@@ -14,7 +14,7 @@ class RDFC10SerializerOptionsTest {
 
     @Test
     @DisplayName("defaultConfig should return an instance with expected default values")
-    void defaultConfig_shouldReturnExpectedValues() {
+    void defaultConfigShouldreturnexpectedvalues() {
         RDFC10SerializerOptions config = RDFC10SerializerOptions.defaultConfig();
 
         assertNotNull(config, "Default config should not be null");
@@ -27,7 +27,7 @@ class RDFC10SerializerOptionsTest {
 
     @Test
     @DisplayName("builder should allow setting custom options")
-    void builder_shouldAllowCustomOptions() {
+    void builderShouldallowcustomoptions() {
         RDFC10SerializerOptions customConfig = RDFC10SerializerOptions.builder()
                 .strictMode(false)
                 .validateURIs(false)
@@ -46,7 +46,7 @@ class RDFC10SerializerOptionsTest {
 
     @Test
     @DisplayName("builder should use default values for un-set options")
-    void builder_shouldUseDefaultValues_forUnsetOptions() {
+    void builderShouldusedefaultvaluesForunsetoptions() {
         RDFC10SerializerOptions config = RDFC10SerializerOptions.builder()
                 .strictMode(false)
                 .build();

@@ -45,14 +45,10 @@ class JsonBooleanResultSerializerTest extends AbstractBooleanResultSerializerTes
         "}";
     }
 
-    private boolean getLinksTestResults() {
-        return true;
-    }
-
     @Test
     @DisplayName("Tests the serialization of results including several links")
     void linksTest() {
-        ResultSerializer serializer = getSerializer(getLinksTestResults(), getOptionsWithLinks());
+        ResultSerializer serializer = getSerializer(true, getOptionsWithLinks());
         StringWriter writer = new StringWriter();
         serializer.write(writer);
         assertEquals(getLinksTestResultsString(), writer.toString());

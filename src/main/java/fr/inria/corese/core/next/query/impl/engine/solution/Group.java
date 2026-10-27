@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.query.impl.engine.pattern;
+package fr.inria.corese.core.next.query.impl.engine.solution;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,8 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
-import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
-import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
+import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 
 /**
  * Groups mappings and tracks distinct solutions using immutable tuple keys.
@@ -19,7 +18,6 @@ import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
  */
 public class Group implements Comparator<Mappings> {
 
-    private static final boolean COMPARE_INDEX = false;
     private static final Mappings DISTINCT_MARKER = new Mappings();
 
     private final Map<GroupKey, Mappings> table = new LinkedHashMap<>();
@@ -35,10 +33,6 @@ public class Group implements Comparator<Mappings> {
 
     public Group(List<Node> list) {
         this.nodes = list;
-    }
-
-    public static boolean isCompareIndex() {
-        return COMPARE_INDEX;
     }
 
     public static Group create(List<Node> nodeList) {
@@ -76,11 +70,6 @@ public class Group implements Comparator<Mappings> {
 
     public void setExtend(boolean extend) {
         isExtend = extend;
-    }
-
-    @SuppressWarnings("java:S1172") // Retained for API compatibility.
-    public void setDuplicate(boolean duplicate) {
-        // Duplicates are managed by the mappings collection.
     }
 
     @SuppressWarnings("java:S1172") // Retained as an extension point.
@@ -179,9 +168,6 @@ public class Group implements Comparator<Mappings> {
             if (left == null || right == null) {
                 return false;
             }
-            if (isCompareIndex() && left.getIndex() != -1 && right.getIndex() != -1) {
-                return left.getIndex() == right.getIndex();
-            }
             // Preserve the original grouping comparator, including datatype ordering.
             return left.compare(right) == 0;
         }
@@ -189,9 +175,6 @@ public class Group implements Comparator<Mappings> {
         private static int nodeHash(Node node) {
             if (node == null) {
                 return 0;
-            }
-            if (isCompareIndex() && node.getIndex() != -1) {
-                return Integer.hashCode(node.getIndex());
             }
             return node.hashCode();
         }

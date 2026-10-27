@@ -102,13 +102,14 @@ class SparqlParserInTest extends AbstractSparqlParserFeatureTest {
     @DisplayName("ORDER BY (?label NOT IN (?altLabel, ?missing)) — should reject variable not visible in WHERE")
     void shouldRejectOrderByNotInWhenVariableNotVisibleInWhere() {
         SparqlParser parser = newParserDefault();
-
-        QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+        String query = """
                 SELECT ?label WHERE {
                   ?s ?p ?label .
                   ?s <http://example.com/altLabel> ?altLabel .
                 } ORDER BY (?label NOT IN (?altLabel, ?missing))
-                """));
+                """;
+
+        QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse(query));
 
         assertEquals("Variable ?missing used in ORDER BY is not visible in WHERE clause", exception.getMessage());
     }

@@ -7,16 +7,6 @@ package fr.inria.corese.core.next.query.impl.engine.model;
  */
 public interface ExpType {
 
-    String KGRAM = "http://ns.inria.fr/corese.core.kgram/";
-    String SPARQL = "http://ns.inria.fr/sparql-function/";
-    String STL = "http://ns.inria.fr/sparql-template/";
-    String EXT = "http://ns.inria.fr/sparql-extension/";
-    String DOM = "http://ns.inria.fr/sparql-extension/dom/";
-    String BNODE = EXT + "bnode";
-    String DT = "http://ns.inria.fr/sparql-datatype/";
-
-
-
     enum Type {
         EMPTY("EMPTY"),
         AND("AND"),

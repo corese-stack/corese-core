@@ -70,14 +70,15 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
         @DisplayName("Should reject ASK ORDER BY variable not visible in WHERE")
         void shouldRejectAskOrderByVariableNotVisibleInWhere() {
             SparqlParser parser = newParserDefault();
-
-            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+            String query = """
                     ASK
                     WHERE {
                         ?s ?p ?o
                     }
                     ORDER BY ?z
-                """));
+                """;
+
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse(query));
 
             assertEquals(ORDER_BY_SCOPE_MESSAGE, exception.getMessage());
         }
@@ -90,8 +91,7 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
         @DisplayName("Should reject CONSTRUCT ORDER BY variable not visible in WHERE")
         void shouldRejectConstructOrderByVariableNotVisibleInWhere() {
             SparqlParser parser = newParserDefault();
-
-            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+            String query = """
                         CONSTRUCT {
                             ?s ?p ?o
                         }
@@ -99,7 +99,9 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
                             ?s ?p ?o
                         }
                         ORDER BY ?z
-                    """));
+                    """;
+
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse(query));
 
             assertEquals(ORDER_BY_SCOPE_MESSAGE, exception.getMessage());
         }
@@ -112,14 +114,15 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
         @DisplayName("Should reject DESCRIBE ORDER BY variable not visible in WHERE")
         void shouldRejectDescribeOrderByVariableNotVisibleInWhere() {
             SparqlParser parser = newParserDefault();
-
-            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+            String query = """
                         DESCRIBE ?s
                         WHERE {
                             ?s ?p ?o
                         }
                         ORDER BY ?z
-                    """));
+                    """;
+
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse(query));
 
             assertEquals(ORDER_BY_SCOPE_MESSAGE, exception.getMessage());
         }
@@ -132,13 +135,14 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
         @DisplayName("Should reject BIND when variable is already introduced by a triple pattern")
         void shouldRejectBindVariableAlreadyVisibleFromTriple() {
             SparqlParser parser = newParserDefault();
-
-            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+            String query = """
                         SELECT * WHERE {
                           ?x ?p ?o .
                           BIND(?o AS ?x)
                         }
-                    """));
+                    """;
+
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse(query));
 
             assertEquals(BIND_SCOPE_MESSAGE, exception.getMessage());
         }
@@ -147,14 +151,15 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
         @DisplayName("Should reject BIND when variable is already introduced by a previous BIND")
         void shouldRejectBindVariableAlreadyVisibleFromPreviousBind() {
             SparqlParser parser = newParserDefault();
-
-            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+            String query = """
                         SELECT * WHERE {
                           ?s ?p ?o .
                           BIND(?s AS ?x)
                           BIND(?p AS ?x)
                         }
-                    """));
+                    """;
+
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse(query));
 
             assertEquals(BIND_SCOPE_MESSAGE, exception.getMessage());
         }
@@ -163,14 +168,15 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
         @DisplayName("Should reject BIND when its target is already introduced by inline VALUES")
         void shouldRejectBindVariableAlreadyVisibleFromInlineValues() {
             var parser = newParserDefault();
+            String query = """
+                    SELECT * WHERE {
+                      VALUES ?x { 1 }
+                      BIND(2 AS ?x)
+                    }
+                    """;
             QueryValidationException exception = assertThrows(
                     QueryValidationException.class,
-                    () -> parser.parse("""
-                            SELECT * WHERE {
-                              VALUES ?x { 1 }
-                              BIND(2 AS ?x)
-                            }
-                            """));
+                    () -> parser.parse(query));
 
             assertEquals(BIND_SCOPE_MESSAGE, exception.getMessage());
         }

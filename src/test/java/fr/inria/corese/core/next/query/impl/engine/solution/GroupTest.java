@@ -1,9 +1,7 @@
-package fr.inria.corese.core.next.query.impl.engine.pattern;
+package fr.inria.corese.core.next.query.impl.engine.solution;
 
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.model.NodeImpl;
-import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
-import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;

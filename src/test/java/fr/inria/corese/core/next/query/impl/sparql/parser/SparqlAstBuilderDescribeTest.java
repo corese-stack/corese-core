@@ -33,17 +33,6 @@ class SparqlAstBuilderDescribeTest {
         return (DescribeQueryAst) builder.getResult();
     }
 
-    /**
-     * Builds a DescribeQueryAst with a single triple in the WHERE clause.
-     */
-    private DescribeQueryAst buildWithWhere() {
-        builder.enterGroup();
-        builder.enterBgp();
-        builder.addTriple(builder.variable("s"), builder.iri("a"), builder.iri("foaf:Person"));
-        builder.exitBgp();
-        builder.exitGroup();
-        return (DescribeQueryAst) builder.getResult();
-    }
 
     @Nested
     @DisplayName("DESCRIBE *")
@@ -163,6 +152,15 @@ class SparqlAstBuilderDescribeTest {
     @Nested
     @DisplayName("DESCRIBE ?s WHERE { ... }")
     class DescribeWithWhereClause {
+
+        private DescribeQueryAst buildWithWhere() {
+            builder.enterGroup();
+            builder.enterBgp();
+            builder.addTriple(builder.variable("s"), builder.iri("a"), builder.iri("foaf:Person"));
+            builder.exitBgp();
+            builder.exitGroup();
+            return (DescribeQueryAst) builder.getResult();
+        }
 
         @Test
         @DisplayName("WHERE clause is present and contains expected BGP")

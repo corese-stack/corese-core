@@ -25,7 +25,7 @@ class RDFXMLSerializerOptionsTest {
 
     @Test
     @DisplayName("defaultConfig() should return a config with expected RDF/XML defaults")
-    void defaultConfig_shouldReturnExpectedDefaults() {
+    void defaultConfigShouldreturnexpecteddefaults() {
         RDFXMLSerializerOptions config = RDFXMLSerializerOptions.defaultConfig();
 
         assertNotNull(config, "Default config should not be null");
@@ -63,7 +63,7 @@ class RDFXMLSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding usePrefixes")
-    void builder_shouldAllowOverridingUsePrefixes() {
+    void builderShouldallowoverridinguseprefixes() {
         RDFXMLSerializerOptions config = new RDFXMLSerializerOptions.Builder()
                 .usePrefixes(false)
                 .build();
@@ -72,7 +72,7 @@ class RDFXMLSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding autoDeclarePrefixes")
-    void builder_shouldAllowOverridingAutoDeclarePrefixes() {
+    void builderShouldallowoverridingautodeclareprefixes() {
         RDFXMLSerializerOptions config = new RDFXMLSerializerOptions.Builder()
                 .autoDeclarePrefixes(false)
                 .build();
@@ -81,7 +81,7 @@ class RDFXMLSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding prefixOrdering")
-    void builder_shouldAllowOverridingPrefixOrdering() {
+    void builderShouldallowoverridingprefixordering() {
         RDFXMLSerializerOptions config = new RDFXMLSerializerOptions.Builder()
                 .prefixOrdering(PrefixOrdering.USAGE_ORDER)
                 .build();
@@ -90,7 +90,7 @@ class RDFXMLSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow adding custom prefixes via PrefixHandler")
-    void builder_shouldAllowAddingCustomPrefixes() {
+    void builderShouldallowaddingcustomprefixes() {
         String customPrefix = "my";
         String customNamespace = "http://my.example.org/";
 
@@ -109,7 +109,7 @@ class RDFXMLSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow setting custom PrefixHandler")
-    void builder_shouldAllowSettingCustomPrefixHandler() {
+    void builderShouldallowsettingcustomprefixhandler() {
         PrefixHandler customHandler = new PrefixHandler(false); // sans vocabulaires standards
         customHandler.setPrefix("ex", "http://example.org/");
         customHandler.setPrefix("custom", "http://custom.org/");
@@ -127,7 +127,7 @@ class RDFXMLSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow adding multiple prefixes at once")
-    void builder_shouldAllowAddingMultiplePrefixes() {
+    void builderShouldallowaddingmultipleprefixes() {
         Map<String, String> customPrefixes = new HashMap<>();
         customPrefixes.put("ex", "http://example.org/");
         customPrefixes.put("custom", "http://custom.org/");
@@ -145,7 +145,7 @@ class RDFXMLSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding prettyPrint")
-    void builder_shouldAllowOverridingPrettyPrint() {
+    void builderShouldallowoverridingprettyprint() {
         RDFXMLSerializerOptions config = new RDFXMLSerializerOptions.Builder()
                 .prettyPrint(false)
                 .build();
@@ -154,7 +154,7 @@ class RDFXMLSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding indent")
-    void builder_shouldAllowOverridingIndent() {
+    void builderShouldallowoverridingindent() {
         String customIndent = "\t";
         RDFXMLSerializerOptions config = new RDFXMLSerializerOptions.Builder()
                 .indent(customIndent)
@@ -164,7 +164,7 @@ class RDFXMLSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding maxLineLength")
-    void builder_shouldAllowOverridingMaxLineLength() {
+    void builderShouldallowoverridingmaxlinelength() {
         int customLength = 120;
         RDFXMLSerializerOptions config = new RDFXMLSerializerOptions.Builder()
                 .maxLineLength(customLength)
@@ -174,7 +174,7 @@ class RDFXMLSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding sortSubjects")
-    void builder_shouldAllowOverridingSortSubjects() {
+    void builderShouldallowoverridingsortsubjects() {
         RDFXMLSerializerOptions config = new RDFXMLSerializerOptions.Builder()
                 .sortSubjects(true)
                 .build();
@@ -183,7 +183,7 @@ class RDFXMLSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding sortPredicates")
-    void builder_shouldAllowOverridingSortPredicates() {
+    void builderShouldallowoverridingsortpredicates() {
         RDFXMLSerializerOptions config = new RDFXMLSerializerOptions.Builder()
                 .sortPredicates(true)
                 .build();
@@ -192,7 +192,7 @@ class RDFXMLSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding useMultilineLiterals")
-    void builder_shouldAllowOverridingUseMultilineLiterals() {
+    void builderShouldallowoverridingusemultilineliterals() {
         RDFXMLSerializerOptions config = new RDFXMLSerializerOptions.Builder()
                 .useMultilineLiterals(false)
                 .build();
@@ -201,7 +201,7 @@ class RDFXMLSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding strictMode")
-    void builder_shouldAllowOverridingStrictMode() {
+    void builderShouldallowoverridingstrictmode() {
         RDFXMLSerializerOptions config = new RDFXMLSerializerOptions.Builder()
                 .strictMode(false)
                 .build();
@@ -210,7 +210,7 @@ class RDFXMLSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding escapeUnicode")
-    void builder_shouldAllowOverridingEscapeUnicode() {
+    void builderShouldallowoverridingescapeunicode() {
         RDFXMLSerializerOptions config = new RDFXMLSerializerOptions.Builder()
                 .escapeUnicode(true)
                 .build();
@@ -219,7 +219,7 @@ class RDFXMLSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding literalDatatypePolicy")
-    void builder_shouldAllowOverridingLiteralDatatypePolicy() {
+    void builderShouldallowoverridingliteraldatatypepolicy() {
         RDFXMLSerializerOptions config = new RDFXMLSerializerOptions.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicy.MINIMAL)
                 .build();
@@ -228,7 +228,7 @@ class RDFXMLSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow setting baseIRI")
-    void builder_shouldAllowSettingBaseIRI() {
+    void builderShouldallowsettingbaseiri() {
         String testBaseIRI = "http://example.org/base/";
         RDFXMLSerializerOptions config = new RDFXMLSerializerOptions.Builder()
                 .baseIRI(testBaseIRI)
@@ -238,7 +238,7 @@ class RDFXMLSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding lineEnding")
-    void builder_shouldAllowOverridingLineEnding() {
+    void builderShouldallowoverridinglineending() {
         String customLineEnding = "\r\n";
         RDFXMLSerializerOptions config = new RDFXMLSerializerOptions.Builder()
                 .lineEnding(customLineEnding)
@@ -248,7 +248,7 @@ class RDFXMLSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding validateURIs")
-    void builder_shouldAllowOverridingValidateURIs() {
+    void builderShouldallowoverridingvalidateuris() {
         RDFXMLSerializerOptions config = new RDFXMLSerializerOptions.Builder()
                 .validateURIs(true)
                 .build();
@@ -257,7 +257,7 @@ class RDFXMLSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding stableBlankNodeIds")
-    void builder_shouldAllowOverridingStableBlankNodeIds() {
+    void builderShouldallowoverridingstableblanknodeids() {
         RDFXMLSerializerOptions config = new RDFXMLSerializerOptions.Builder()
                 .stableBlankNodeIds(false)
                 .build();
@@ -266,7 +266,7 @@ class RDFXMLSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding includeContext")
-    void builder_shouldAllowOverridingIncludeContext() {
+    void builderShouldallowoverridingincludecontext() {
         RDFXMLSerializerOptions config = new RDFXMLSerializerOptions.Builder()
                 .includeContext(true)
                 .build();
@@ -275,7 +275,7 @@ class RDFXMLSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should maintain default prefixes when adding custom ones")
-    void builder_shouldMaintainDefaultPrefixesWhenAddingCustomOnes() {
+    void builderShouldmaintaindefaultprefixeswhenaddingcustomones() {
         RDFXMLSerializerOptions config = new RDFXMLSerializerOptions.Builder()
                 .addPrefix("ex", "http://example.org/")
                 .build();

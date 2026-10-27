@@ -8,7 +8,7 @@ import fr.inria.corese.core.next.data.api.model.DatatypeValue;
  *
  * @author Olivier Corby, Edelweiss, INRIA 2010
  */
-public interface Edge extends Pointerable<Object> {
+public interface Edge {
 
 
     // nb nodes to consider in sparql query processing
@@ -61,7 +61,6 @@ public interface Edge extends Pointerable<Object> {
     Node getGraph();
 
 
-    @Override
     Edge getEdge();
 
     default Object getProvenance() {

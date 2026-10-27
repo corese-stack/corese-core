@@ -24,7 +24,7 @@ class TriGSerializerOptionsTest {
     @Test
     @DisplayName("defaultConfig() should return a config with expected TriG defaults")
     @SuppressWarnings("java:S5961")
-    void defaultConfig_shouldReturnExpectedDefaults() {
+    void defaultConfigShouldreturnexpecteddefaults() {
         TriGSerializerOptions config = TriGSerializerOptions.defaultConfig();
 
         assertNotNull(config, "Default config should not be null");
@@ -67,7 +67,7 @@ class TriGSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding includeContext")
-    void builder_shouldAllowOverridingIncludeContext() {
+    void builderShouldallowoverridingincludecontext() {
         TriGSerializerOptions config = TriGSerializerOptions.builder()
                 .includeContext(false)
                 .build();
@@ -76,7 +76,7 @@ class TriGSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding blankNodeStyle")
-    void builder_shouldAllowOverridingBlankNodeStyle() {
+    void builderShouldallowoverridingblanknodestyle() {
         TriGSerializerOptions config = TriGSerializerOptions.builder()
                 .blankNodeStyle(BlankNodeStyle.ANONYMOUS)
                 .build();
@@ -85,7 +85,7 @@ class TriGSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding useCollections")
-    void builder_shouldAllowOverridingUseCollections() {
+    void builderShouldallowoverridingusecollections() {
         TriGSerializerOptions config = TriGSerializerOptions.builder()
                 .useCollections(true)
                 .build();
@@ -95,7 +95,7 @@ class TriGSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding usePrefixes")
-    void builder_shouldAllowOverridingUsePrefixes() {
+    void builderShouldallowoverridinguseprefixes() {
         TriGSerializerOptions config = TriGSerializerOptions.builder()
                 .usePrefixes(false)
                 .build();
@@ -104,7 +104,7 @@ class TriGSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding autoDeclarePrefixes")
-    void builder_shouldAllowOverridingAutoDeclarePrefixes() {
+    void builderShouldallowoverridingautodeclareprefixes() {
         TriGSerializerOptions config = TriGSerializerOptions.builder()
                 .autoDeclarePrefixes(false)
                 .build();
@@ -113,7 +113,7 @@ class TriGSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding prefixOrdering")
-    void builder_shouldAllowOverridingPrefixOrdering() {
+    void builderShouldallowoverridingprefixordering() {
         TriGSerializerOptions config = TriGSerializerOptions.builder()
                 .prefixOrdering(PrefixOrdering.USAGE_ORDER)
                 .build();
@@ -122,7 +122,7 @@ class TriGSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding useCompactTriples")
-    void builder_shouldAllowOverridingUseCompactTriples() {
+    void builderShouldallowoverridingusecompacttriples() {
         TriGSerializerOptions config = TriGSerializerOptions.builder()
                 .useCompactTriples(false)
                 .build();
@@ -131,7 +131,7 @@ class TriGSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding useRdfTypeShortcut")
-    void builder_shouldAllowOverridingUseRdfTypeShortcut() {
+    void builderShouldallowoverridinguserdftypeshortcut() {
         TriGSerializerOptions config = TriGSerializerOptions.builder()
                 .useRdfTypeShortcut(false)
                 .build();
@@ -140,7 +140,7 @@ class TriGSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding useMultilineLiterals")
-    void builder_shouldAllowOverridingUseMultilineLiterals() {
+    void builderShouldallowoverridingusemultilineliterals() {
         TriGSerializerOptions config = TriGSerializerOptions.builder()
                 .useMultilineLiterals(false)
                 .build();
@@ -149,7 +149,7 @@ class TriGSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding prettyPrint")
-    void builder_shouldAllowOverridingPrettyPrint() {
+    void builderShouldallowoverridingprettyprint() {
         TriGSerializerOptions config = TriGSerializerOptions.builder()
                 .prettyPrint(false)
                 .build();
@@ -158,7 +158,7 @@ class TriGSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding indent")
-    void builder_shouldAllowOverridingIndent() {
+    void builderShouldallowoverridingindent() {
         String customIndent = "\t";
         TriGSerializerOptions config = TriGSerializerOptions.builder()
                 .indent(customIndent)
@@ -168,7 +168,7 @@ class TriGSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding maxLineLength")
-    void builder_shouldAllowOverridingMaxLineLength() {
+    void builderShouldallowoverridingmaxlinelength() {
         int customLength = 120;
         TriGSerializerOptions config = TriGSerializerOptions.builder()
                 .maxLineLength(customLength)
@@ -178,7 +178,7 @@ class TriGSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding groupBySubject")
-    void builder_shouldAllowOverridingGroupBySubject() {
+    void builderShouldallowoverridinggroupbysubject() {
         TriGSerializerOptions config = TriGSerializerOptions.builder()
                 .groupBySubject(false)
                 .build();
@@ -187,7 +187,7 @@ class TriGSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding sortSubjects")
-    void builder_shouldAllowOverridingSortSubjects() {
+    void builderShouldallowoverridingsortsubjects() {
         TriGSerializerOptions config = TriGSerializerOptions.builder()
                 .sortSubjects(true)
                 .build();
@@ -196,7 +196,7 @@ class TriGSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding sortPredicates")
-    void builder_shouldAllowOverridingSortPredicates() {
+    void builderShouldallowoverridingsortpredicates() {
         TriGSerializerOptions config = TriGSerializerOptions.builder()
                 .sortPredicates(true)
                 .build();
@@ -205,7 +205,7 @@ class TriGSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding strictMode")
-    void builder_shouldAllowOverridingStrictMode() {
+    void builderShouldallowoverridingstrictmode() {
         TriGSerializerOptions config = TriGSerializerOptions.builder()
                 .strictMode(false)
                 .build();
@@ -215,7 +215,7 @@ class TriGSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding literalDatatypePolicy")
-    void builder_shouldAllowOverridingLiteralDatatypePolicy() {
+    void builderShouldallowoverridingliteraldatatypepolicy() {
         TriGSerializerOptions config = TriGSerializerOptions.builder()
                 .literalDatatypePolicy(LiteralDatatypePolicy.ALWAYS_TYPED)
                 .build();
@@ -224,7 +224,7 @@ class TriGSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow setting baseIRI")
-    void builder_shouldAllowSettingBaseIRI() {
+    void builderShouldallowsettingbaseiri() {
         String testBaseIRI = "http://example.org/base/";
         TriGSerializerOptions config = TriGSerializerOptions.builder()
                 .baseIRI(testBaseIRI)
@@ -234,7 +234,7 @@ class TriGSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding lineEnding")
-    void builder_shouldAllowOverridingLineEnding() {
+    void builderShouldallowoverridinglineending() {
         String customLineEnding = "\r\n";
         TriGSerializerOptions config = TriGSerializerOptions.builder()
                 .lineEnding(customLineEnding)
@@ -244,7 +244,7 @@ class TriGSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding validateURIs")
-    void builder_shouldAllowOverridingValidateURIs() {
+    void builderShouldallowoverridingvalidateuris() {
         TriGSerializerOptions config = TriGSerializerOptions.builder()
                 .validateURIs(true)
                 .build();
@@ -253,7 +253,7 @@ class TriGSerializerOptionsTest {
 
     @Test
     @DisplayName("Builder should allow overriding stableBlankNodeIds")
-    void builder_shouldAllowOverridingStableBlankNodeIds() {
+    void builderShouldallowoverridingstableblanknodeids() {
         TriGSerializerOptions config = TriGSerializerOptions.builder()
                 .stableBlankNodeIds(true)
                 .build();

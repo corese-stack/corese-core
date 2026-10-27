@@ -2,8 +2,6 @@ package fr.inria.corese.core.next.query.impl.engine.path;
 
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.model.Node;
-import fr.inria.corese.core.next.query.impl.engine.model.PointerType;
-import fr.inria.corese.core.next.query.impl.engine.model.Pointerable;
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
 import fr.inria.corese.core.next.query.impl.engine.spi.Producer;
 import fr.inria.corese.core.next.query.impl.engine.model.EdgeInv;
@@ -12,15 +10,13 @@ import fr.inria.corese.core.next.query.impl.engine.storage.ProducerDefault;
 import java.util.ArrayList;
 import java.util.List;
 
-import static fr.inria.corese.core.next.query.impl.engine.model.PointerType.PATH;
-
 /**
  * List of relations between two resources found by path Can be used as a
  * Producer to enumerate path edges/nodes
  *
  * @author Olivier Corby, Edelweiss, INRIA 2010
  */
-public final class Path extends ProducerDefault implements Pointerable<Edge> {
+public final class Path extends ProducerDefault {
 
     boolean isShort = false;
     boolean isReverse = false;
@@ -43,21 +39,6 @@ public final class Path extends ProducerDefault implements Pointerable<Edge> {
         edges = new ArrayList<>(n);
     }
 
-    @Override
-    public String getDatatypeLabel() {
-        if (edges.size() == 1) {
-            return String.format("(1)[%s]", edges.getFirst());
-        }
-        if (edges.size() > 1) {
-            return String.format("(%s)[%s ...]", edges.size(), edges.getFirst());
-        }
-        return "(0)[]";
-    }
-
-    @Override
-    public PointerType pointerType() {
-        return PATH;
-    }
 
     void setIsShort(boolean b) {
         isShort = b;
@@ -129,7 +110,6 @@ public final class Path extends ProducerDefault implements Pointerable<Edge> {
         return edges.size();
     }
 
-    @Override
     public int size() {
         return edges.size();
     }
@@ -167,15 +147,5 @@ public final class Path extends ProducerDefault implements Pointerable<Edge> {
     @Override
     public Iterable<Edge> getEdges(Node gNode, List<Node> from, Edge qEdge, Environment env) {
         return edges;
-    }
-
-    @Override
-    public Iterable<Edge> getLoop() {
-        return edges;
-    }
-
-    @Override
-    public Edge getValue(String variable, int n) {
-        return edges.get(n);
     }
 }

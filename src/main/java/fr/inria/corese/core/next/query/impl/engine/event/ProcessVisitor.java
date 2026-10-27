@@ -1,56 +1,51 @@
 package fr.inria.corese.core.next.query.impl.engine.event;
 
+import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import fr.inria.corese.core.next.query.impl.engine.eval.Eval;
+import fr.inria.corese.core.next.query.impl.engine.model.Edge;
+import fr.inria.corese.core.next.query.impl.engine.model.Expr;
+import fr.inria.corese.core.next.query.impl.engine.model.Node;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mapping;
 import fr.inria.corese.core.next.query.impl.engine.solution.Mappings;
 
-import fr.inria.corese.core.next.query.impl.engine.model.Edge;
-import fr.inria.corese.core.next.query.impl.engine.model.Expr;
-import fr.inria.corese.core.next.query.impl.engine.model.Node;
-import fr.inria.corese.core.next.query.impl.engine.model.Pointerable;
-import fr.inria.corese.core.next.query.impl.engine.path.Path;
-import fr.inria.corese.core.next.data.api.model.DatatypeValue;
-
-
 /**
+ * Execution observer and lifecycle listener interface for query processing in {@link Eval}.
+ *
+ * <p>Supports life-cycle notifications (init, before, after, start, finish),
+ * solution filtering (distinct, limit, result), term comparison, and AST operator events.</p>
+ *
  * @author Olivier Corby, Wimmics INRIA I3S, 2018
  */
-public interface ProcessVisitor extends Pointerable<Object> {
-
-    int SLICE_DEFAULT = 20;
+public interface ProcessVisitor {
 
     default boolean isShareable() {
         return false;
     }
 
-    default DatatypeValue defaultValue() {
-        return null;
+    default void init(QueryPlan q) {
+        // Notification callback
     }
 
-    default DatatypeValue init(QueryPlan q) {
-        return defaultValue();
+    default void before(QueryPlan q) {
+        // Notification callback
     }
 
-    default DatatypeValue before(QueryPlan q) {
-        return defaultValue();
+    default void after(Mappings map) {
+        // Notification callback
     }
 
-    default DatatypeValue after(Mappings map) {
-        return defaultValue();
+    default void start(QueryPlan q) {
+        // Notification callback
     }
 
-    default DatatypeValue start(QueryPlan q) {
-        return defaultValue();
+    default void finish(Mappings map) {
+        // Notification callback
     }
 
-    default DatatypeValue finish(Mappings map) {
-        return defaultValue();
-    }
-
-    default DatatypeValue orderby(Mappings map) {
-        return defaultValue();
+    default void orderby(Mappings map) {
+        // Notification callback
     }
 
     default boolean distinct(Eval eval, QueryPlan q, Mapping map) {
@@ -61,93 +56,72 @@ public interface ProcessVisitor extends Pointerable<Object> {
         return true;
     }
 
-    default int slice() {
-        return SLICE_DEFAULT;
-    }
-
-    default DatatypeValue produce(Eval eval, Node g, Edge edge) {
-        return defaultValue();
-    }
-
     default DatatypeValue candidate(Eval eval, Node g, Edge q, Edge e) {
-        return defaultValue();
-    }
-
-    default DatatypeValue path(Eval eval, Node g, Edge q, Path p, Node s, Node o) {
-        return defaultValue();
-    }
-
-    default boolean step(Eval eval, Node g, Edge q, Path p, Node s, Node o) {
-        return true;
+        return null;
     }
 
     default boolean result(Eval eval, Mappings map, Mapping m) {
         return true;
     }
 
-    default DatatypeValue statement(Eval eval, Node g, Exp e) {
-        return defaultValue();
+    default void statement(Eval eval, Node g, Exp e) {
+        // Notification callback
     }
 
-
-    default DatatypeValue bgp(Eval eval, Node g, Exp e, Mappings m) {
-        return defaultValue();
+    default void bgp(Eval eval, Node g, Exp e, Mappings m) {
+        // Notification callback
     }
 
-    default DatatypeValue join(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
-        return defaultValue();
+    default void join(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
+        // Notification callback
     }
 
-    default DatatypeValue optional(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
-        return defaultValue();
+    default void optional(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
+        // Notification callback
     }
 
-    default DatatypeValue minus(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
-        return defaultValue();
+    default void minus(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
+        // Notification callback
     }
 
-    default DatatypeValue union(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
-        return defaultValue();
+    default void union(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
+        // Notification callback
     }
 
-    default DatatypeValue graph(Eval eval, Node g, Exp e, Mappings m) {
-        return defaultValue();
+    default void graph(Eval eval, Node g, Exp e, Mappings m) {
+        // Notification callback
     }
 
-    default DatatypeValue query(Eval eval, Node g, Exp e, Mappings m) {
-        return defaultValue();
+    default void query(Eval eval, Node g, Exp e, Mappings m) {
+        // Notification callback
     }
 
-    default DatatypeValue service(Eval eval, Node s, Exp e, Mappings m) {
-        return defaultValue();
+    default void service(Eval eval, Node s, Exp e, Mappings m) {
+        // Notification callback
     }
 
-    default DatatypeValue values(Eval eval, Node g, Exp e, Mappings m) {
-        return defaultValue();
+    default void values(Eval eval, Node g, Exp e, Mappings m) {
+        // Notification callback
     }
 
     default boolean filter(Eval eval, Node g, Expr e, boolean b) {
         return b;
     }
 
-    default boolean having(Eval eval, Expr e, boolean b) {
-        return b;
+    default void having(Eval eval, Expr e, boolean b) {
+        // Notification callback
     }
 
-    default DatatypeValue bind(Eval eval, Node g, Exp e, DatatypeValue val) {
-        return val;
+    default void bind(Eval eval, Node g, Exp e, DatatypeValue val) {
+        // Notification callback
     }
 
-    default DatatypeValue select(Eval eval, Expr e, DatatypeValue val) {
-        return val;
+    default void select(Eval eval, Expr e, DatatypeValue val) {
+        // Notification callback
     }
 
-    default DatatypeValue aggregate(Eval eval, Expr e, DatatypeValue val) {
-        return val;
-    }
-
-    default boolean produce() {
-        return false;
+    default void aggregate(Eval eval, Expr e, DatatypeValue val) {
+        // Notification callback
     }
 
     default boolean statement() {
