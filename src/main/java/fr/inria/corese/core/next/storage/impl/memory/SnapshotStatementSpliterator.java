@@ -24,7 +24,7 @@ final class SnapshotStatementSpliterator implements StatementSpliterator, AutoCl
     private final Object monitor;
     private PartitionState snapshot;
     private Iterator<GraphPartition> partitions;
-    private TripleIndex.Cursor rows;
+    private TripleIndexCursor rows;
     private final StatementPattern pattern;
     private final TermKey subject;
     private final TermKey predicate;
