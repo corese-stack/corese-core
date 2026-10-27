@@ -23,7 +23,6 @@ import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.QueryTypeErrorException;
 
 import fr.inria.corese.core.next.data.Values;
-import fr.inria.corese.core.next.query.impl.engine.event.ResultListener;
 import fr.inria.corese.core.next.query.impl.engine.model.NodeImpl;
 import fr.inria.corese.core.next.data.api.model.DatatypeValue;
 import org.slf4j.Logger;
@@ -724,9 +723,6 @@ public final class Eval implements ExpType {
         state.updateMaxLevel(n);
 
         Exp exp = stack.get(n);
-        if (visitors.hasListener()) {
-            exp = visitors.listen(exp, n);
-        }
 
         // A false filter was detected at compile time, or this expression was
         // identified as always failing: no use to evaluate it.
@@ -973,9 +969,6 @@ public final class Eval implements ExpType {
 
                 if (entity != null) {
                     state.incrementEdge();
-                    if (visitors.hasListener() && !visitors.listen(exp, qEdge, entity)) {
-                        continue;
-                    }
 
                     graph = entity.getGraph();
                     boolean bmatch = match(qEdge, entity, graphNode, graph, env);
@@ -1045,20 +1038,12 @@ public final class Eval implements ExpType {
      * Store a new result
      */
     private int store(Producer p, Mapping m) {
-        boolean store = true;
-        if (getListener() != null) {
-            store = getListener().process(getMemory());
+        state.incrementResult();
+        Mapping ans = m;
+        if (m == null) {
+            ans = getMemory().store(getQuery(), p, isSubEval);
         }
-        if (store) {
-            state.incrementResult();
-        }
-        if (store) {
-            Mapping ans = m;
-            if (m == null) {
-                ans = getMemory().store(getQuery(), p, isSubEval);
-            }
-            store(ans);
-        }
+        store(ans);
         return -1;
     }
 
@@ -1147,14 +1132,6 @@ public final class Eval implements ExpType {
 
     public boolean isJoinMappings() {
         return joinMappings;
-    }
-
-    public ResultListener getListener() {
-        return visitors.getListener();
-    }
-
-    public void setListener(ResultListener listener) {
-        visitors.setListener(listener);
     }
 
     public EvaluationState getState() {

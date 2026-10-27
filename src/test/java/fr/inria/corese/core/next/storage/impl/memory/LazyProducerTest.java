@@ -8,7 +8,7 @@ import fr.inria.corese.core.next.query.api.exception.QueryTimeoutException;
 import fr.inria.corese.core.next.query.impl.engine.eval.Eval;
 import fr.inria.corese.core.next.query.impl.engine.eval.RdfTermMatcher;
 import fr.inria.corese.core.next.query.impl.engine.eval.SparqlKgramEvaluator;
-import fr.inria.corese.core.next.query.impl.engine.event.ResultListener;
+import fr.inria.corese.core.next.query.impl.engine.spi.Matcher;
 import fr.inria.corese.core.next.query.impl.engine.model.Edge;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.spi.Environment;
@@ -161,16 +161,14 @@ class LazyProducerTest {
         }
     }
 
-    @Test void matcherOrListenerFailureClosesTheCurrentlySuspendedEdgeCursor() throws Exception {
+    @Test void matcherFailureClosesTheCurrentlySuspendedEdgeCursor() throws Exception {
         try (var f = new Fixture()) {
             var producer = new StorageManagerProducer(f.observed);
-            var eval = Eval.create(producer, new SparqlKgramEvaluator(), new RdfTermMatcher());
+            Matcher matcher = mock(Matcher.class);
+            when(matcher.match(any(Edge.class), any(Edge.class), any(Environment.class)))
+                    .thenThrow(new IllegalStateException("matcher failed"));
+            var eval = Eval.create(producer, new SparqlKgramEvaluator(), matcher);
             var query = new CoreseAstQueryBuilder().toNextQuery((SelectQueryAst) new SparqlParser().parse("SELECT * { ?s ?p ?o }"));
-            ResultListener listener = mock(ResultListener.class);
-            when(listener.listen(any(Exp.class), anyInt())).thenAnswer(call -> call.getArgument(0));
-            when(listener.listen(any(Exp.class), any(Edge.class), any(Edge.class)))
-                    .thenThrow(new IllegalStateException("listener failed"));
-            eval.setListener(listener);
             assertThrows(IllegalStateException.class, () -> eval.query(query));
             assertEquals(1, f.read.get()); f.assertReleased();
         }

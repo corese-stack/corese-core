@@ -16,7 +16,6 @@ import fr.inria.corese.core.next.query.impl.engine.model.NodeImpl;
 import fr.inria.corese.core.next.query.impl.engine.pattern.Exp;
 import fr.inria.corese.core.next.query.impl.engine.pattern.QueryPlan;
 import fr.inria.corese.core.next.query.impl.engine.model.BindingContext;
-import fr.inria.corese.core.next.query.impl.engine.event.ResultListener;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -231,27 +230,6 @@ class EvalTest {
         void testVisitorDispatcher() {
             assertNotNull(eval.getVisitorDispatcher(), "Visitor dispatcher should be initialized");
             assertNotNull(eval.getVisitor(), "Process visitor should have default instance");
-        }
-    }
-
-    @Nested
-    @DisplayName("Result Listener Tests")
-    class ResultListenerTests {
-
-        @Test
-        @DisplayName("Should set and get result listener")
-        void testSetAndGetResultListener() {
-            ResultListener mockListener = mock(ResultListener.class);
-            eval.setListener(mockListener);
-            assertEquals(mockListener, eval.getListener(),
-                    "Listener should match");
-        }
-
-        @Test
-        @DisplayName("Should get null listener by default")
-        void testGetListenerDefault() {
-            ResultListener listener = eval.getListener();
-            assertNull(listener, "Default listener should be null");
         }
     }
 
