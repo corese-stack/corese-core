@@ -50,15 +50,12 @@ public class SparqlUpdateAstBuilder extends SparqlQueryAstBuilder{
 
     @Override
     public void addPrefix(String prefix, String uri) {
-        String name = RdfText.stripTrailingColon(prefix);
-        prefixDeclarations.removeIf(declaration -> declaration.prefix().equals(name));
-        super.addPrefix(prefix, uri);
+        this.prologue.replacePrefix(prefix, uri);
     }
 
     @Override
     public void setBaseUri(String uri) {
-        String iri = RdfText.stripAngleBrackets(uri);
-        baseUri = IRIUtils.isAbsoluteIRI(iri) ? iri : IRIUtils.resolveIRIAgainstBase(baseUri, iri);
+        this.prologue.updateBaseUri(uri);
     }
 
     @Override
