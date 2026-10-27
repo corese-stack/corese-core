@@ -57,11 +57,6 @@ public final class QueryExpIndexer {
                 }
             }
             case EDGE -> collectEdgeNodes(exp.getEdge(), exist);
-            case XPATH, EVAL -> {
-                for (int i = 0; i < exp.nbNode(); i++) {
-                    layout.store(exp.getNode(i), exist, false);
-                }
-            }
             case MINUS -> collectMinusNodes(exp, exist);
             case QUERY -> {
                 for (Exp ee : exp.getQuery().getSelectFun()) {
@@ -123,7 +118,7 @@ public final class QueryExpIndexer {
      */
     public int index(QueryPlan query, Exp exp, boolean isExist, int start) {
         int min = switch (exp.type()) {
-            case EDGE, XPATH, EVAL -> indexEdgeExp(exp);
+            case EDGE -> indexEdgeExp(exp);
             case VALUES -> indexValuesExp(exp);
             case NODE -> queryPlan.index(exp.getNode());
             case BIND -> indexBindExp(query, exp, isExist);

@@ -58,7 +58,7 @@ final class TripleIndex {
          * @param s captured statement to index
          * @return the third permutation component, or null for a wildcard
          */
-        private Value third(final Statement s) {
+        Value third(final Statement s) {
             return switch (this) {
             case SPO -> s.getObject();
             case POS -> s.getSubject();
@@ -112,11 +112,11 @@ final class TripleIndex {
     /**
      * Component order of this triple permutation.
      */
-    private final Order order;
+    final Order order;
     /**
      * Insertion-ordered first-component branches.
      */
-    private final Map<TermKey, Branch> roots;
+    final Map<TermKey, Branch> roots;
     // Bulk-only canonicalization cache, discarded before publishing a partition.
     /**
      * Batch-private canonical dictionary, cleared before publication.
@@ -197,7 +197,7 @@ final class TripleIndex {
         final TermKey subject = stagedKey(s.getSubject());
         final TermKey predicate = stagedKey(s.getPredicate());
         final TermKey object = stagedKey(s.getObject());
-        return add(IndexedStatementStore.sharedStatement(s, subject, predicate, object, context), subject, predicate,
+        return add(StatementCapture.sharedStatement(s, subject, predicate, object, context), subject, predicate,
                 object);
     }
 
@@ -608,182 +608,9 @@ final class TripleIndex {
      * @param object    canonical object key, or null for a wildcard search
      * @return a single-consumer positional cursor
      */
-    Cursor cursor(final TermKey subject, final TermKey predicate, final TermKey object) {
-        return new Cursor(first(subject, predicate, object), second(subject, predicate, object),
+    TripleIndexCursor cursor(final TermKey subject, final TermKey predicate, final TermKey object) {
+        return new TripleIndexCursor(this, first(subject, predicate, object), second(subject, predicate, object),
                 third(subject, predicate, object));
-    }
-
-    /**
-     * Single-consumer positional cursor over an unchanged partition retained by its caller.
-     */
-    final class Cursor {
-        /**
-         * Captured first-component search key; null denotes a wildcard.
-         */
-        private final TermKey first;
-        /**
-         * Captured second-component search key; null denotes a wildcard.
-         */
-        private final TermKey second;
-        /**
-         * Captured third-component search key; null denotes a wildcard.
-         */
-        private final TermKey third;
-        /**
-         * Next root offset to inspect in the retained table.
-         */
-        private int rootPosition;
-        /**
-         * Next branch offset to inspect.
-         */
-        private int branchPosition;
-        /**
-         * Next multivalued leaf offset to inspect.
-         */
-        private int leafPosition;
-        /**
-         * Whether the explicitly selected root has already been visited.
-         */
-        private boolean selectedRoot;
-        /**
-         * Current unchanged branch retained by the enclosing snapshot.
-         */
-        private Branch branch;
-        /**
-         * Current unchanged multivalued leaf.
-         */
-        private Leaf leaf;
-
-        /**
-         * Captures the three search keys for unchanged positional traversal.
-         *
-         * @param first  first-component key; null selects all roots
-         * @param second second-component key; null selects all branch values
-         * @param third  third-component key; null selects all leaf values
-         */
-        private Cursor(final TermKey first, final TermKey second, final TermKey third) {
-            this.first = first;
-            this.second = second;
-            this.third = third;
-        }
-
-        /**
-         * Internal cursor: null marks exhaustion. The public Spliterator supplies Iterator semantics.
-         *
-         * @return the next statement, or null at exhaustion for the internal index cursor
-         */
-        Statement next() {
-            for (;;) {
-                if (leaf != null) {
-                    final Statement result = nextLeafStatement();
-                    if (result != null) {
-                        return result;
-                    }
-                }
-                if (branch != null) {
-                    final Statement result = nextBranchStatement();
-                    if (result != null) {
-                        return result;
-                    }
-                    continue;
-                }
-                if (!selectNextRoot()) {
-                    return null;
-                }
-                branchPosition = 0;
-            }
-        }
-
-        /**
-         * Reads the next match from the current leaf and drops that traversal reference on exhaustion.
-         *
-         * @return the next matching leaf statement, or null when the leaf is exhausted
-         */
-        private Statement nextLeafStatement() {
-            if (third != null) {
-                final Statement result = leaf.get(third);
-                leaf = null;
-                if (result != null) {
-                    return result;
-                }
-            } else {
-                final int position = leaf.nextIndex(leafPosition);
-                if (position >= 0) {
-                    leafPosition = position + 1;
-                    return leaf.valueAt(position);
-                }
-                leaf = null;
-            }
-            return null;
-        }
-
-        /**
-         * Reads a branch match or selects a multivalued leaf for subsequent traversal.
-         *
-         * @return a matching singleton statement, or null when traversal must continue
-         */
-        private Statement nextBranchStatement() {
-            final Object entry = nextBranchEntry();
-            if (entry instanceof Leaf values) {
-                leaf = values;
-                leafPosition = 0;
-                return null;
-            }
-            if (entry != null && (third == null || third.matches(order.third((Statement) entry)))) {
-                return (Statement) entry;
-            }
-            return null;
-        }
-
-        /**
-         * Reads a selected branch value or advances its positional traversal.
-         *
-         * @return the selected branch entry, or null when no entry remains
-         */
-        private Object nextBranchEntry() {
-            Object entry;
-            if (second != null) {
-                entry = branch.get(second);
-                branch = null;
-            } else {
-                final int position = branch.nextIndex(branchPosition);
-                if (position < 0) {
-                    branch = null;
-                    return null;
-                }
-                branchPosition = position + 1;
-                entry = branch.valueAt(position);
-            }
-            return entry;
-        }
-
-        /**
-         * Selects the next root once, preserving its encounter order.
-         *
-         * @return true when a root was selected, false at exhaustion
-         */
-        private boolean selectNextRoot() {
-            if (first != null) {
-                if (selectedRoot) {
-                    return false;
-                }
-                selectedRoot = true;
-                branch = roots.get(first);
-                if (branch == null) {
-                    return false;
-                }
-            } else {
-                var table = (DenseTermTable<Branch>) roots;
-                final int position = table.nextIndex(rootPosition);
-                if (position < 0) {
-                    return false;
-                }
-                rootPosition = position + 1;
-                branch = table.valueAt(position);
-            }
-            return true;
-        }
-
     }
 
     /**
@@ -823,72 +650,7 @@ final class TripleIndex {
      * @return predicate statistics or null if not found or not in POS order
      */
     PredicateStatistics estimatePredicateStatistics(final IRI predicate, final int maxSample) {
-        if (order != Order.POS || predicate == null) {
-            return null;
-        }
-        final TermKey pKey = new TermKey(predicate);
-        final Branch branch = roots.get(pKey);
-        if (branch == null) {
-            return null;
-        }
-        final long distinctObjects = branch.size();
-        if (distinctObjects == 0) {
-            return new PredicateStatistics(predicate, 0, 0, 0);
-        }
-
-        final PredicateSampleAccumulator accumulator = new PredicateSampleAccumulator(maxSample);
-        branch.forEach((objKey, entry) -> accumulator.accumulate(entry));
-
-        final long distinctSubjects = accumulator.estimateDistinctSubjects(distinctObjects);
-        return new PredicateStatistics(predicate, accumulator.totalCount, distinctSubjects, distinctObjects);
-    }
-
-    private static final class PredicateSampleAccumulator {
-        private final Set<TermKey> subjects = new HashSet<>();
-        private final int maxSample;
-        private long totalCount = 0;
-        private int sampled = 0;
-
-        PredicateSampleAccumulator(final int maxSample) {
-            this.maxSample = maxSample;
-        }
-
-        void accumulate(final Object entry) {
-            if (entry instanceof Leaf leaf) {
-                accumulateLeaf(leaf);
-            } else if (entry instanceof Statement statement) {
-                accumulateStatement(statement);
-            }
-        }
-
-        private void accumulateLeaf(final Leaf leaf) {
-            totalCount += leaf.size();
-            if (shouldSample()) {
-                leaf.forEach((subjKey, st) -> subjects.add(subjKey));
-                sampled++;
-            }
-        }
-
-        private void accumulateStatement(final Statement statement) {
-            totalCount++;
-            if (shouldSample()) {
-                subjects.add(new TermKey(statement.getSubject()));
-                sampled++;
-            }
-        }
-
-        private boolean shouldSample() {
-            return maxSample <= 0 || sampled < maxSample;
-        }
-
-        long estimateDistinctSubjects(final long distinctObjects) {
-            if (maxSample <= 0 || distinctObjects <= maxSample) {
-                return subjects.size();
-            }
-            final double ratio = (double) distinctObjects / Math.max(1, sampled);
-            final long estimated = Math.round(subjects.size() * ratio);
-            return Math.min(totalCount, Math.max(subjects.size(), estimated));
-        }
+        return PredicateStatisticsEstimator.estimate(this, predicate, maxSample);
     }
 
     /**
@@ -938,7 +700,7 @@ final class TripleIndex {
     }
 
     /** Root keys are also addressable as values for cross-permutation canonicalization. */
-    private static final class Branch extends CompactTermMap<Object> {
+    static final class Branch extends CompactTermMap<Object> {
         /**
          * Canonical first-component key retained by this root branch.
          */
@@ -965,7 +727,7 @@ final class TripleIndex {
     }
 
     /** Multi-statement leaf only; singleton statements live directly in their branch. */
-    private static final class Leaf extends CompactTermMap<Statement> {
+    static final class Leaf extends CompactTermMap<Statement> {
         /**
          * Creates an empty multivalued leaf or copies the source leaf container.
          */
@@ -995,7 +757,7 @@ final class TripleIndex {
      * Receives immutable SPO statements and their canonical term keys during index construction.
      */
     @FunctionalInterface
-    private interface EntryVisitor {
+    interface EntryVisitor {
         /**
          * Receives one immutable statement and its canonical SPO keys.
          *
@@ -1013,7 +775,7 @@ final class TripleIndex {
      * @param visitor non-mutating callback; true requests an early stop for predicate visitors
      * @throws IllegalStateException if the required representation, ownership or lifecycle state is not satisfied
      */
-    private void visitEntries(final EntryVisitor visitor) {
+    void visitEntries(final EntryVisitor visitor) {
         if (order != Order.SPO) {
             throw new IllegalStateException("Bulk source must be SPO");
         }
@@ -1095,36 +857,5 @@ final class TripleIndex {
         private void leaf(final TermKey object, final Statement statement) {
             visitor.accept(subject, predicate, object, statement);
         }
-    }
-
-    /**
-     * Reconstruct omitted singleton keys once while building both secondary permutations.
-     *
-     * @param source source index or container; it must remain unchanged during copying or traversal
-     * @return the completed POS and OSP permutations
-     */
-    static SecondaryIndexes buildSecondaryIndexes(final TripleIndex source) {
-        final TripleIndex pos = new TripleIndex(Order.POS);
-        final TripleIndex osp = new TripleIndex(Order.OSP);
-        source.visitEntries((subject, predicate, object, statement) -> {
-            pos.add(statement, subject, predicate, object, source);
-            osp.add(statement, subject, predicate, object, source);
-        });
-        return new SecondaryIndexes(pos, osp);
-    }
-
-    /**
-     * Completed secondary permutations sharing the SPO statements and canonical keys.
-     *
-     * @param pos completed POS permutation
-     * @param osp completed OSP permutation
-     */
-    record SecondaryIndexes(/**
-                             * Predicate/object/subject permutation of this graph.
-                             */
-    TripleIndex pos, /**
-                      * Object/subject/predicate permutation of this graph.
-                      */
-    TripleIndex osp) {
     }
 }

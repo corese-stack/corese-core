@@ -42,7 +42,7 @@ public class ServiceAstListener extends AbstractSparqlAstListener {
     @Override
     public void enterServiceGraphPattern(SparqlParser.ServiceGraphPatternContext ctx) {
         boolean silent = ctx.SILENT() != null;
-        TermAst endpoint = builder().termFromVarOrIriRef(ctx.varOrIri());
+        TermAst endpoint = builder().terms().termFromVarOrIriRef(ctx.varOrIri());
         builder().enterService(endpoint, silent);
     }
 

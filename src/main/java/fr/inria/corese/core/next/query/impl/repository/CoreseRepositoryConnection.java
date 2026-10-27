@@ -6,7 +6,10 @@ import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
 import fr.inria.corese.core.next.data.api.exception.SerializationException;
-import fr.inria.corese.core.next.io.CoreseIO;
+import fr.inria.corese.core.next.data.api.io.parser.RDFParserFactory;
+import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializerFactory;
+import fr.inria.corese.core.next.data.impl.io.parser.DefaultRDFParserFactory;
+import fr.inria.corese.core.next.data.impl.io.serializer.DefaultRDFSerializerFactory;
 import fr.inria.corese.core.next.storage.StorageModels;
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Resource;
@@ -63,6 +66,8 @@ import java.nio.file.Path;
 public final class CoreseRepositoryConnection implements RepositoryConnection {
 
     private static final String PARAM_DESTINATION = "destination";
+    private static final RDFParserFactory RDF_PARSER_FACTORY = new DefaultRDFParserFactory();
+    private static final RDFSerializerFactory RDF_SERIALIZER_FACTORY = new DefaultRDFSerializerFactory();
 
     private final Repository repository;
     private final StorageManager storage;
@@ -128,7 +133,7 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
         Objects.requireNonNull(contexts, "contexts");
         RepositoryImportModel target = new RepositoryImportModel(
                 StorageModels.create(storage), getValueFactory(), contexts);
-        RDFParser rdfParser = CoreseIO.parser(format, target, getValueFactory());
+        RDFParser rdfParser = RDF_PARSER_FACTORY.createRDFParser(format, target, getValueFactory());
         if (isActive()) {
             action.accept(rdfParser);
         } else {
@@ -161,7 +166,7 @@ public final class CoreseRepositoryConnection implements RepositoryConnection {
         try (StatementResult statements = getStatements(null, null, null, contexts)) {
             Iterable<Statement> source = format.supportsNamedGraphs()
                     ? statements : requireDefaultGraph(statements, format);
-            action.accept(CoreseIO.serializer(source, format));
+            action.accept(RDF_SERIALIZER_FACTORY.createSerializer(format, source));
         }
     }
 

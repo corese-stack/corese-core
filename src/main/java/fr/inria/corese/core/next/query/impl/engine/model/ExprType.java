@@ -42,8 +42,6 @@ public interface ExprType {
 
     int DATATYPE = 30;
     int DEBUG = 33;
-    int KGRAM = 36;
-    int XPATH = 38;
 
     int UNNEST = 41;
     int EXIST = 42;
@@ -66,11 +64,6 @@ public interface ExprType {
     int URI = 74;
     int TZ = 75;
 
-    int TRIPLE = 88;
-    int SUBJECT = 89;
-    int PREDICATE = 90;
-    int OBJECT = 91;
-
     int EQNE = 109;
 
     int EQ = 110;
@@ -91,20 +84,5 @@ public interface ExprType {
 
     int NODE = 209;
 
-    int LOAD = 212;
-
-    int ID = 223;
-    int TEST = 224;
-
-    int TURTLE = 227;
-
     int AGGREGATE = 276;
-
-    int QUERY = 302;
-    int EXTENSION = 303;
-
-    int LIST = 309;
-    int ERROR = 315;
-    int EVAL = 325;
-    int FOR = 327;
 }

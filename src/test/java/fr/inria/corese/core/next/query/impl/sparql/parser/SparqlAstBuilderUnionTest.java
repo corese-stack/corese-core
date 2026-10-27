@@ -31,7 +31,7 @@ class SparqlAstBuilderUnionTest {
      */
     private void addTriple(String object) {
         builder.enterBgp();
-        builder.addTriple(builder.variable("s"), builder.iri("a"), builder.iri(object));
+        builder.addTriple(builder.terms().variable("s"), builder.terms().iri("a"), builder.terms().iri(object));
         builder.exitBgp();
     }
 

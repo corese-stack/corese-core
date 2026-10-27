@@ -67,7 +67,7 @@ class SparqlAstBuilderDescribeTest {
         @Test
         @DisplayName("Single IRI resource is added to described list")
         void singleIriResource() {
-            builder.addDescribeResource(builder.iri("<http://example.org/person>"));
+            builder.addDescribeResource(builder.terms().iri("<http://example.org/person>"));
             DescribeQueryAst result = buildWithEmptyWhere();
 
             assertFalse(result.isDescribeAll());
@@ -78,7 +78,7 @@ class SparqlAstBuilderDescribeTest {
         @Test
         @DisplayName("IRI value is preserved exactly")
         void iriValuePreserved() {
-            builder.addDescribeResource(builder.iri("<http://example.org/person>"));
+            builder.addDescribeResource(builder.terms().iri("<http://example.org/person>"));
             DescribeQueryAst result = buildWithEmptyWhere();
 
             IriAst iri = (IriAst) result.described().getFirst();
@@ -93,7 +93,7 @@ class SparqlAstBuilderDescribeTest {
         @Test
         @DisplayName("Single variable resource is added to described list")
         void singleVariableResource() {
-            builder.addDescribeResource(builder.variable("?s"));
+            builder.addDescribeResource(builder.terms().variable("?s"));
             DescribeQueryAst result = buildWithEmptyWhere();
 
             assertFalse(result.isDescribeAll());
@@ -104,7 +104,7 @@ class SparqlAstBuilderDescribeTest {
         @Test
         @DisplayName("Variable name is stripped of ? prefix")
         void variableNameStripped() {
-            builder.addDescribeResource(builder.variable("?s"));
+            builder.addDescribeResource(builder.terms().variable("?s"));
             DescribeQueryAst result = buildWithEmptyWhere();
 
             VarAst describedVar = (VarAst) result.described().getFirst();
@@ -114,7 +114,7 @@ class SparqlAstBuilderDescribeTest {
         @Test
         @DisplayName("$ prefix is also stripped from variable name")
         void dollarPrefixStripped() {
-            builder.addDescribeResource(builder.variable("$x"));
+            builder.addDescribeResource(builder.terms().variable("$x"));
             DescribeQueryAst result = buildWithEmptyWhere();
 
             VarAst describedVar = (VarAst) result.described().getFirst();
@@ -129,9 +129,9 @@ class SparqlAstBuilderDescribeTest {
         @Test
         @DisplayName("Multiple resources are preserved in order")
         void multipleResourcesPreservedInOrder() {
-            builder.addDescribeResource(builder.variable("?s"));
-            builder.addDescribeResource(builder.iri("<http://example.org/alice>"));
-            builder.addDescribeResource(builder.iri("<http://example.org/bob>"));
+            builder.addDescribeResource(builder.terms().variable("?s"));
+            builder.addDescribeResource(builder.terms().iri("<http://example.org/alice>"));
+            builder.addDescribeResource(builder.terms().iri("<http://example.org/bob>"));
             DescribeQueryAst result = buildWithEmptyWhere();
 
             assertEquals(3, result.described().size());
@@ -143,7 +143,7 @@ class SparqlAstBuilderDescribeTest {
         @Test
         @DisplayName("isDescribeAll() is false when resources are present")
         void isDescribeAllFalseWhenResourcesPresent() {
-            builder.addDescribeResource(builder.variable("?s"));
+            builder.addDescribeResource(builder.terms().variable("?s"));
             DescribeQueryAst result = buildWithEmptyWhere();
             assertFalse(result.isDescribeAll());
         }
@@ -156,7 +156,7 @@ class SparqlAstBuilderDescribeTest {
         private DescribeQueryAst buildWithWhere() {
             builder.enterGroup();
             builder.enterBgp();
-            builder.addTriple(builder.variable("s"), builder.iri("a"), builder.iri("foaf:Person"));
+            builder.addTriple(builder.terms().variable("s"), builder.terms().iri("a"), builder.terms().iri("foaf:Person"));
             builder.exitBgp();
             builder.exitGroup();
             return (DescribeQueryAst) builder.getResult();
@@ -165,7 +165,7 @@ class SparqlAstBuilderDescribeTest {
         @Test
         @DisplayName("WHERE clause is present and contains expected BGP")
         void whereClauseContainsBgp() {
-            builder.addDescribeResource(builder.variable("?s"));
+            builder.addDescribeResource(builder.terms().variable("?s"));
             DescribeQueryAst result = buildWithWhere();
 
             assertFalse(result.whereClause().patterns().isEmpty());
@@ -175,7 +175,7 @@ class SparqlAstBuilderDescribeTest {
         @Test
         @DisplayName("BGP in WHERE clause contains the expected triple")
         void whereClauseBgpTriple() {
-            builder.addDescribeResource(builder.variable("?s"));
+            builder.addDescribeResource(builder.terms().variable("?s"));
             DescribeQueryAst result = buildWithWhere();
 
             BgpAst bgp = (BgpAst) result.whereClause().patterns().getFirst();
@@ -186,7 +186,7 @@ class SparqlAstBuilderDescribeTest {
         @Test
         @DisplayName("Resources and WHERE clause coexist correctly")
         void resourcesAndWhereClauseCoexist() {
-            builder.addDescribeResource(builder.variable("?s"));
+            builder.addDescribeResource(builder.terms().variable("?s"));
             DescribeQueryAst result = buildWithWhere();
 
             assertEquals(1, result.described().size());

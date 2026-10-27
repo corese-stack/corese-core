@@ -15,15 +15,15 @@ import java.util.List;
  * Lowers ANTLR Quad contexts into AST quad templates, including nested blank-node property lists and RDF lists.
  */
 final class SparqlQuadTemplateBuilder {
-    private final SparqlAstBuilder terms;
+    private final SparqlAstBuilder builder;
 
     /**
      * Constructs a quad template builder using term construction helpers from the AST builder.
      *
-     * @param terms the SPARQL AST builder providing term lowering
+     * @param builder the SPARQL AST builder providing term lowering
      */
-    SparqlQuadTemplateBuilder(SparqlAstBuilder terms) {
-        this.terms = terms;
+    SparqlQuadTemplateBuilder(SparqlAstBuilder builder) {
+        this.builder = builder;
     }
 
     /**
@@ -40,7 +40,7 @@ final class SparqlQuadTemplateBuilder {
             defaults.addAll(triples(template));
         }
         for (var graph : context.quadsNotTriples()) {
-            named.add(new NamedGraphQuadsAst(terms.termFromVarOrIriRef(graph.varOrIri()),
+            named.add(new NamedGraphQuadsAst(builder.terms().termFromVarOrIriRef(graph.varOrIri()),
                     triples(graph.triplesTemplate())));
         }
         return new QuadsAst(defaults, named);
@@ -51,7 +51,7 @@ final class SparqlQuadTemplateBuilder {
         for (var current = context; current != null; current = current.triplesTemplate()) {
             var triple = current.triplesSameSubject();
             if (triple.varOrTerm() != null) {
-                properties(terms.termFromVarOrTerm(triple.varOrTerm()), triple.propertyListNotEmpty(), result);
+                properties(builder.terms().termFromVarOrTerm(triple.varOrTerm()), triple.propertyListNotEmpty(), result);
             } else {
                 TermAst subject = nested(triple.triplesNode(), result);
                 properties(subject, triple.propertyList().propertyListNotEmpty(), result);
@@ -66,7 +66,7 @@ final class SparqlQuadTemplateBuilder {
             return;
         }
         for (int index = 0; index < properties.verb().size(); index++) {
-            TermAst predicate = terms.termFromVerb(properties.verb(index));
+            TermAst predicate = builder.terms().termFromVerb(properties.verb(index));
             for (var object : properties.objectList(index).object_()) {
                 result.add(new TriplePatternAst(subject, predicate, node(object.graphNode(), result)));
             }
@@ -75,11 +75,11 @@ final class SparqlQuadTemplateBuilder {
 
     private TermAst node(SparqlParser.GraphNodeContext context, List<TriplePatternAst> result) {
         return context.varOrTerm() == null ? nested(context.triplesNode(), result)
-                : terms.termFromVarOrTerm(context.varOrTerm());
+                : builder.terms().termFromVarOrTerm(context.varOrTerm());
     }
 
     private TermAst nested(SparqlParser.TriplesNodeContext context, List<TriplePatternAst> result) {
-        TermAst head = terms.newAnonymousBlankNode();
+        TermAst head = builder.newAnonymousBlankNode();
         if (context.blankNodePropertyList() != null) {
             properties(head, context.blankNodePropertyList().propertyListNotEmpty(), result);
         } else {
@@ -92,7 +92,7 @@ final class SparqlQuadTemplateBuilder {
         TermAst current = head;
         for (int index = 0; index < nodes.size(); index++) {
             result.add(new TriplePatternAst(current, rdf(RDF.first), node(nodes.get(index), result)));
-            TermAst next = index == nodes.size() - 1 ? rdf(RDF.nil) : terms.newAnonymousBlankNode();
+            TermAst next = index == nodes.size() - 1 ? rdf(RDF.nil) : builder.newAnonymousBlankNode();
             result.add(new TriplePatternAst(current, rdf(RDF.rest), next));
             current = next;
         }

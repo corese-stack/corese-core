@@ -66,7 +66,6 @@ public final class QueryPlan extends Exp {
     // Extended queries for additional group by
     List<QueryPlan> queries;
     private boolean isCompiled = false;
-    private boolean reportEnabled;
 
     private boolean isUseBind = true;
 
@@ -140,7 +139,6 @@ public final class QueryPlan extends Exp {
         this.table = copies.copy(source.table);
         this.queries = copies.copy(source.queries);
         this.isCompiled = source.isCompiled;
-        this.reportEnabled = source.reportEnabled;
         this.isUseBind = source.isUseBind;
         this.isRelax = source.isRelax;
         this.isDistribute = source.isDistribute;
@@ -1072,19 +1070,6 @@ public final class QueryPlan extends Exp {
     public boolean isUseBind() {
         return isUseBind;
     }
-
-
-
-    public boolean isReportEnabled() {
-        return getGlobalQuery().reportEnabled;
-    }
-
-    public void setReportEnabled(boolean reportEnabled) {
-        getGlobalQuery().reportEnabled = reportEnabled;
-    }
-
-
-
 
     public Mapping getMapping() {
         return mapping;

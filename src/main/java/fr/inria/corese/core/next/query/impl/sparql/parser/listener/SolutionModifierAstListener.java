@@ -26,7 +26,7 @@ public class SolutionModifierAstListener extends AbstractSparqlQueryAstListener 
         Set<String> expressionBoundVariables = new LinkedHashSet<>();
         Map<String, TermAst> expressionTerms = new LinkedHashMap<>();
         for (SparqlParser.GroupConditionContext gcc : ctx.groupCondition()) {
-            TermAst expression = builder().termFromGroupCondition(gcc);
+            TermAst expression = builder().expressions().termFromGroupCondition(gcc);
             terms.add(expression);
             if (gcc.expression() != null && gcc.var_() != null) {
                 String aliasName = normalizeVariableName(gcc.var_().getText());
@@ -69,11 +69,11 @@ public class SolutionModifierAstListener extends AbstractSparqlQueryAstListener 
 
         TermAst orderExpression;
         if(ctx.brackettedExpression() != null) {
-            orderExpression = this.builder().termFromBrackettedExpression(ctx.brackettedExpression());
+            orderExpression = this.builder().expressions().termFromBrackettedExpression(ctx.brackettedExpression());
         } else if(ctx.constraint() != null) {
-            orderExpression = builder().termFromConstraint(ctx.constraint());
+            orderExpression = builder().expressions().termFromConstraint(ctx.constraint());
         } else if(ctx.var_() != null) {
-            orderExpression = builder().termFromVar(ctx.var_());
+            orderExpression = builder().terms().termFromVar(ctx.var_());
         } else {
             throw new QueryEvaluationException("Unexpected expression in ORDER BY clause " + ctx.getText());
         }

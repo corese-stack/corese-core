@@ -238,15 +238,8 @@ public class Memory implements Environment {
         if (sub == null) {
             // exists pattern
             copyInto(mem, exp);
-        } else if (eval.getMode() != Evaluator.Mode.SPARQL_MODE) {
+        } else {
             // bind subquery select nodes
-            // take only from this memory the nodes
-            // that are select nodes of sub query
-            // hence sub query memory share only select node bindings
-            // with outer query memory
-            // use case: ?x :p ?z (select ?z where (?x :q ?z))
-            // ?x in sub query is not the same as ?x in outer query (it is not bound here)
-            // only ?z is the same
             for (Node subNode : sub.getSelect()) {
                 copyInto(subNode, mem);
             }

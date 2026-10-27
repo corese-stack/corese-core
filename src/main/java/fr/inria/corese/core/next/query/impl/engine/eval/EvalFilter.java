@@ -90,9 +90,6 @@ final class EvalFilter {
         int n = 1;
         Expr exp = f.getExp();
         if (exp.oper() == UNNEST) {
-            if (engine.getVisitorDispatcher().hasListener()) {
-                engine.getVisitorDispatcher().listen(exp);
-            }
             if (exp.arity() == 2) {
                 DatatypeValue dt = eval(exp.getExp(1), env, p);
                 if (dt == null) {

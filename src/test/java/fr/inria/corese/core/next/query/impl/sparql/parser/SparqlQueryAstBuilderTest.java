@@ -75,8 +75,8 @@ class SparqlQueryAstBuilderTest {
         b.enterSelectQuery();
         b.enterGroup();
         b.enterBgp();
-        b.addTriple(new VarAst("s"), b.iri("a"), b.iri("foaf:Person"));
-        b.addTriple(new VarAst("s"), b.iri("foaf:name"), new VarAst("n"));
+        b.addTriple(new VarAst("s"), b.terms().iri("a"), b.terms().iri("foaf:Person"));
+        b.addTriple(new VarAst("s"), b.terms().iri("foaf:name"), new VarAst("n"));
         b.exitBgp();
         b.exitGroup();
         b.exitSelectQuery();
@@ -179,13 +179,13 @@ class SparqlQueryAstBuilderTest {
         b.enterBgp();
         b.addTriple(
                 new VarAst("s"),
-                b.iri("<http://example/p>"),
-                b.literal("\"salut\"", "fr", null)
+                b.terms().iri("<http://example/p>"),
+                b.terms().literal("\"salut\"", "fr", null)
         );
         b.addTriple(
                 new VarAst("s"),
-                b.iri("<http://example/age>"),
-                b.literal("\"12\"", null, "xsd:integer")
+                b.terms().iri("<http://example/age>"),
+                b.terms().literal("\"12\"", null, "xsd:integer")
         );
         b.exitBgp();
         b.exitGroup();

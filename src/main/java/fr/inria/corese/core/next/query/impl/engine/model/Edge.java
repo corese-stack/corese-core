@@ -75,14 +75,6 @@ public interface Edge {
         return false;
     }
 
-    // nested rdf star triple <<s p o>>
-    default boolean isNested() {
-        return false;
-    }
-    default void setNested(boolean b) {
-        // RDF-star nesting is an optional capability of concrete edge implementations.
-    }
-
     default DatatypeValue getGraphValue() {
         Node node = getGraph();
         if (node == null) {

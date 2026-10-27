@@ -108,17 +108,4 @@ public interface BindingContext {
     default void setVisitor(ProcessVisitor visitor) {
         // By default, do nothing
     }
-
-    /**
-     * Visit method for reporting.
-     * Used by ProcessVisitorDefault.
-     *
-     * @param e  the expression
-     * @param g  the graph node
-     * @param m1 the mappings 1
-     * @param m2 the mappings 2
-     */
-    default void visit(Object e, Object g, Object m1, Object m2) {
-        // By default, do nothing
-    }
 }

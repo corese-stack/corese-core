@@ -45,7 +45,7 @@ public class ValuesAstListener extends AbstractSparqlQueryAstListener {
         if (ctx.var_() == null) {
             throw new QuerySyntaxException("Missing variable for solution mapping in VALUES clause");
         }
-        VarAst variable = (VarAst) builder().termFromVar(ctx.var_());
+        VarAst variable = (VarAst) builder().terms().termFromVar(ctx.var_());
         List<VarAst> header = List.of(variable);
         List<ValueMappingAst> rows = new ArrayList<>();
         for (var value : ctx.dataBlockValue()) {
@@ -67,13 +67,13 @@ public class ValuesAstListener extends AbstractSparqlQueryAstListener {
             VarAst variable = variables.get(varNum);
             SparqlParser.DataBlockValueContext dataBlockValueContext = dataBlockValueList.get(varNum);
             if(dataBlockValueContext.iriRef() != null) {
-                valuesList.put(variable, this.builder().termFromIriRef(dataBlockValueContext.iriRef()));
+                valuesList.put(variable, this.builder().terms().termFromIriRef(dataBlockValueContext.iriRef()));
             } else if(dataBlockValueContext.rdfLiteral() != null) {
-                valuesList.put(variable, this.builder().termFromRdfLiteral(dataBlockValueContext.rdfLiteral()));
+                valuesList.put(variable, this.builder().terms().termFromRdfLiteral(dataBlockValueContext.rdfLiteral()));
             } else if(dataBlockValueContext.numericLiteral() != null) {
-                valuesList.put(variable, this.builder().termFromNumericLiteral(dataBlockValueContext.numericLiteral()));
+                valuesList.put(variable, this.builder().terms().termFromNumericLiteral(dataBlockValueContext.numericLiteral()));
             } else if(dataBlockValueContext.booleanLiteral() != null) {
-                valuesList.put(variable, this.builder().termFromBooleanLiteral(dataBlockValueContext.booleanLiteral()));
+                valuesList.put(variable, this.builder().terms().termFromBooleanLiteral(dataBlockValueContext.booleanLiteral()));
             } else if(dataBlockValueContext.UNDEF() != null) {
                 valuesList.put(variable, null);
             }
@@ -85,7 +85,7 @@ public class ValuesAstListener extends AbstractSparqlQueryAstListener {
     private ValuesAst processInlineDataFull(SparqlParser.InlineDataFullContext ctx) {
         List<VarAst> varList = new ArrayList<>();
         for (var variable : ctx.var_()) {
-            varList.add((VarAst) builder().termFromVar(variable));
+            varList.add((VarAst) builder().terms().termFromVar(variable));
         }
         List<ValueMappingAst> valuesList = new ArrayList<>();
         for (var row : ctx.dataBlockValues()) {

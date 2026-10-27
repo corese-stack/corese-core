@@ -31,11 +31,6 @@ public final class ExpPatternScope {
             }
             case NODE, ACCEPT -> h.add(exp.getNode());
             case EDGE -> collectEdgeNodes(exp, h);
-            case XPATH, EVAL -> {
-                for (int i = 0; i < exp.nbNode(); i++) {
-                    h.add(exp.getNode(i));
-                }
-            }
             case VALUES -> {
                 if (exp.getNodeList() != null) {
                     for (Node varNode : exp.getNodeList()) {

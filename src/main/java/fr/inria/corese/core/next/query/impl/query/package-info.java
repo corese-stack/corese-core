@@ -6,7 +6,7 @@
  *   <li>{@link fr.inria.corese.core.next.query.impl.query.CoreseTupleQuery} — SELECT</li>
  *   <li>{@link fr.inria.corese.core.next.query.impl.query.CoreseBooleanQuery} — ASK</li>
  *   <li>{@link fr.inria.corese.core.next.query.impl.query.CoreseGraphQuery} — CONSTRUCT / DESCRIBE</li>
- *   <li>{@link fr.inria.corese.core.next.query.impl.query.CoreseUpdate} — SPARQL UPDATE (INSERT DATA / DELETE DATA)</li>
+ *   <li>{@link fr.inria.corese.core.next.query.impl.query.CoreseUpdate} — SPARQL 1.1 Update (INSERT/DELETE DATA, DELETE/INSERT WHERE, Graph Management, LOAD)</li>
  * </ul>
  *
  * <p>Prepared query classes extend

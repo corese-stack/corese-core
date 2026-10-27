@@ -11,11 +11,11 @@ public class DatasetClauseAstListener extends AbstractSparqlAstListener {
 
     @Override
     public void exitDefaultGraphClause(SparqlParser.DefaultGraphClauseContext ctx) {
-        builder().addFromGraph((IriAst) builder().termFromIriRef(ctx.sourceSelector().iriRef()));
+        builder().addFromGraph((IriAst) builder().terms().termFromIriRef(ctx.sourceSelector().iriRef()));
     }
 
     @Override
     public void exitNamedGraphClause(SparqlParser.NamedGraphClauseContext ctx) {
-        builder().addFromNamedGraph((IriAst) builder().termFromIriRef(ctx.sourceSelector().iriRef()));
+        builder().addFromNamedGraph((IriAst) builder().terms().termFromIriRef(ctx.sourceSelector().iriRef()));
     }
 }

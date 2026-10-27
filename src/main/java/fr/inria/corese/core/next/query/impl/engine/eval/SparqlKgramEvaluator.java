@@ -18,20 +18,9 @@ import java.time.ZoneOffset;
 public final class SparqlKgramEvaluator implements Evaluator {
 
     private final OffsetDateTime queryEvaluationTime = OffsetDateTime.now(ZoneOffset.UTC);
-    private Mode mode = Mode.KGRAM_MODE;
 
     @Override
     public OffsetDateTime getQueryEvaluationTime() {
         return queryEvaluationTime;
-    }
-
-    @Override
-    public Mode getMode() {
-        return mode;
-    }
-
-    @Override
-    public void setMode(Mode mode) {
-        this.mode = mode;
     }
 }

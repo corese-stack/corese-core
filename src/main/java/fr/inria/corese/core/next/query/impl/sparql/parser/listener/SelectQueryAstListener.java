@@ -99,7 +99,7 @@ public class SelectQueryAstListener extends AbstractSparqlAstListener implements
                         "Variable ?" + varName + " introduced by SELECT expression is already projected");
                 }
                 expressionBoundVars.add(varName);
-                TermAst expressionAst = builder().termFromExpression(selectVar.expression());
+                TermAst expressionAst = builder().expressions().termFromExpression(selectVar.expression());
                 expressionTerms.put(varName, expressionAst);
                 expressionReferencedVariables.put(varName, variableScopeAnalyzer.collectReferencedVariables(expressionAst));
             } else if (selectVar.var_() != null) {
