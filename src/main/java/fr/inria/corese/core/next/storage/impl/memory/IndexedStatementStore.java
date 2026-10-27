@@ -46,7 +46,7 @@ import java.util.stream.StreamSupport;
  * Session-scoped operations over a shared, partitioned in-memory database.
  *
  * <p>
- * The database monitor protects publication, transactions and partition ownership counts. Each live {@code State} owns
+ * The database monitor protects publication, transactions and partition ownership counts. Each live {@code PartitionState} owns
  * one reference to each partition in its graph registry. A transaction or lazy read captures its own state and
  * increments those references. Before mutating a shared partition, an owner copies all three index containers and
  * transfers its reference to the private copy. Immutable statements and term keys remain shared. CLEAR replaces a
@@ -91,295 +91,6 @@ final class IndexedStatementStore
      */
     private boolean loading;
 
-    /** One graph and its three permutations; references count State owners, not rows. */
-    private static final class Partition {
-        // Number of live States owning this partition, guarded by the database monitor.
-        /**
-         * Number of live State owners, guarded by the database monitor.
-         */
-        private int references = 1;
-        /**
-         * Stable graph registry position.
-         */
-        private final long ordinal;
-        /**
-         * Canonical graph identifier; null denotes the default graph.
-         */
-        private final Resource context;
-        /**
-         * Subject/predicate/object permutation of this graph.
-         */
-        private final TripleIndex spo;
-        /**
-         * Predicate/object/subject permutation of this graph.
-         */
-        private final TripleIndex pos;
-        /**
-         * Object/subject/predicate permutation of this graph.
-         */
-        private final TripleIndex osp;
-
-        /**
-         * Creates a graph partition owning the supplied permutations or empty indexes.
-         *
-         * @param context canonical graph identifier; null denotes the default graph
-         * @param ordinal stable graph registry ordinal
-         */
-        private Partition(final Resource context, final long ordinal) {
-            this(context, ordinal, new TripleIndex(TripleIndex.Order.SPO), new TripleIndex(TripleIndex.Order.POS),
-                    new TripleIndex(TripleIndex.Order.OSP));
-        }
-
-        /**
-         * Creates a graph partition owning the supplied permutations or empty indexes.
-         *
-         * @param context canonical graph identifier; null denotes the default graph
-         * @param ordinal stable graph registry ordinal
-         * @param spo     SPO index owning immutable statements and canonical keys
-         * @param pos     POS permutation of the same graph partition
-         * @param osp     OSP permutation of the same graph partition
-         */
-        private Partition(final Resource context, final long ordinal, final TripleIndex spo, final TripleIndex pos,
-                final TripleIndex osp) {
-            this.context = context;
-            this.ordinal = ordinal;
-            this.spo = spo;
-            this.pos = pos;
-            this.osp = osp;
-        }
-
-        /**
-         * Constructs a complete partition and releases its SPO staging dictionary before publication.
-         *
-         * @param spo     SPO index owning immutable statements and canonical keys
-         * @param context canonical graph identifier; null denotes the default graph
-         * @param ordinal stable graph registry ordinal
-         * @return a complete graph partition with no retained staging dictionary
-         */
-        private static Partition build(final TripleIndex spo, final Resource context, final long ordinal) {
-            final TripleIndex.SecondaryIndexes secondary = TripleIndex.buildSecondaryIndexes(spo);
-            final Partition partition = new Partition(context, ordinal, spo, secondary.pos(), secondary.osp());
-            spo.finishStaging();
-            return partition;
-        }
-
-        /**
-         * Copies owned mutable containers while sharing immutable keys and statements.
-         *
-         * @return an independently owned copy of the mutable containers
-         */
-        private Partition copy() {
-            return new Partition(context, ordinal, spo.copy(), pos.copy(), osp.copy());
-        }
-
-        /**
-         * Adds a statement or keyed value if it is absent.
-         *
-         * @param s captured statement to index
-         * @return true when an absent entry was added, false when it was already present
-         */
-        private boolean add(Statement s) {
-            final TermKey subject = key(s.getSubject(), null, null, spo, pos, osp);
-            final TermKey predicate = key(s.getPredicate(), subject, null, pos, spo, osp);
-            final TermKey object = key(s.getObject(), subject, predicate, osp, spo, pos);
-            s = StatementCapture.sharedStatement(s, subject, predicate, object, context);
-            if (!spo.add(s, subject, predicate, object, osp)) {
-                return false;
-            }
-            pos.add(s, subject, predicate, object, spo);
-            osp.add(s, subject, predicate, object, pos);
-            return true;
-        }
-
-        /**
-         * Reuses a canonical RDF term key across roles, creating one only for a previously unseen term.
-         *
-         * @param value     non-null RDF value or entry value
-         * @param subject   canonical subject key, or null for a wildcard search
-         * @param predicate canonical predicate key; null denotes a wildcard for search operations
-         * @param primary   preferred role-root index for canonical lookup
-         * @param secondary second role-root index for canonical lookup
-         * @param tertiary  third role-root index for canonical lookup
-         * @return a reusable canonical key, or a newly captured key for an unseen RDF term
-         */
-        private TermKey key(final Value value, final TermKey subject, final TermKey predicate,
-                final TripleIndex primary, final TripleIndex secondary, final TripleIndex tertiary) {
-            final int hash = TermKey.structuralHash(value);
-            if (subject != null && subject.matchesLookup(value, hash)) {
-                return subject;
-            }
-            if (predicate != null && predicate.matchesLookup(value, hash)) {
-                return predicate;
-            }
-            // Role roots retain canonical keys; absent RDF terms require a new key.
-            TermKey canonical = primary.existingKey(value, hash);
-            if (canonical == null) {
-                canonical = secondary.existingKey(value, hash);
-            }
-            if (canonical == null) {
-                canonical = tertiary.existingKey(value, hash);
-            }
-            return canonical == null ? new TermKey(value, hash) : canonical;
-        }
-
-        /**
-         * Removes matching content while preserving the order of survivors.
-         *
-         * @param s captured statement to index
-         * @return true when an entry was removed, false when it was absent
-         */
-        private boolean remove(final Statement s) {
-            final TermKey subject = new TermKey(s.getSubject());
-            final TermKey predicate = new TermKey(s.getPredicate());
-            final TermKey object = new TermKey(s.getObject());
-            if (!spo.remove(subject, predicate, object)) {
-                return false;
-            }
-            pos.remove(subject, predicate, object);
-            osp.remove(subject, predicate, object);
-            return true;
-        }
-
-        /**
-         * Removes selected index content with stable filtering and unchanged compaction rules.
-         *
-         * @param pattern captured search pattern
-         */
-        private void removeMatches(final StatementPattern pattern) {
-            final TermKey subject = TermKey.nullable(pattern.getSubject());
-            final TermKey predicate = TermKey.nullable(pattern.getPredicate());
-            final TermKey object = TermKey.nullable(pattern.getObject());
-            spo.removeMatches(subject, predicate, object);
-            pos.removeMatches(subject, predicate, object);
-            osp.removeMatches(subject, predicate, object);
-        }
-
-        /**
-         * Selects the permutation appropriate for the bound prefix of a search pattern.
-         *
-         * @param p captured search pattern
-         * @return the SPO, POS or OSP permutation selected for this pattern
-         */
-        private TripleIndex index(final StatementPattern p) {
-            if (p.getSubject() != null && (p.getPredicate() != null || p.getObject() == null)) {
-                return spo;
-            }
-            if (p.getPredicate() != null) {
-                return pos;
-            }
-            return p.getObject() != null ? osp : spo;
-        }
-
-        /**
-         * Reports whether the session-visible or retained graph content contains a match.
-         *
-         * @param statement statement whose RDF identities have been captured
-         * @return true when at least one matching statement exists
-         */
-        private boolean contains(final Statement statement) {
-            return spo.count(
-                    StatementPattern.of(statement.getSubject(), statement.getPredicate(), statement.getObject())) != 0;
-        }
-    }
-
-    /** Ordered graph registry whose partition references are acquired and released together. */
-    private static final class State {
-
-        /** Creates an empty ordered registry with exclusive ownership of its map. */
-        private State() {
-        }
-
-        // A null key is the default partition. Empty named partitions are retained until DROP.
-        /**
-         * Ordered partition registry; empty named graphs are retained until DROP.
-         */
-        private final Map<Resource, Partition> graphs = new LinkedHashMap<>();
-        /**
-         * Number of live entries or statements owned by this container.
-         */
-        private long size;
-        /**
-         * Ordinal assigned to the next created graph.
-         */
-        private long nextOrdinal;
-
-        /**
-         * Copies owned mutable containers while sharing immutable keys and statements.
-         *
-         * @return an independently owned copy of the mutable containers
-         */
-        private State copy() {
-            final State copy = new State();
-            graphs.forEach((graph, partition) -> {
-                partition.references++;
-                copy.graphs.put(graph, partition);
-            });
-            copy.size = size;
-            copy.nextOrdinal = nextOrdinal;
-            return copy;
-        }
-
-        /**
-         * Capture selected graphs only; writes to unrelated graphs need no cursor-induced COW.
-         *
-         * @param contexts selected graph identifiers; an empty array selects all graphs
-         * @return an independently owned copy of the mutable containers
-         */
-        private State copy(final Resource[] contexts) {
-            if (contexts.length == 0) return copy();
-            final State copy = new State();
-            final List<Partition> selected = new ArrayList<>();
-            for (final Resource graph : contexts) {
-                final Partition partition = graphs.get(graph);
-                if (partition != null) selected.add(partition);
-            }
-            selected.sort(Comparator.comparingLong(partition -> partition.ordinal));
-            for (final Partition partition : selected) {
-                partition.references++;
-                copy.graphs.put(partition.context, partition);
-                copy.size += partition.spo.size();
-            }
-            copy.nextOrdinal = nextOrdinal;
-            return copy;
-        }
-
-        /**
-         * Detaches only a shared partition, preserving existing readers and graph order.
-         *
-         * @param graph named graph identifier or staging registry key, according to the operation
-         * @return the exclusively owned partition, or null if the graph is absent
-         */
-        private Partition writable(final Resource graph) {
-            final Partition partition = graphs.get(graph);
-            if (partition != null && partition.references > 1) {
-                final Partition replacement = partition.copy();
-                partition.references--;
-                graphs.put(graph, replacement);
-                return replacement;
-            }
-            return partition;
-        }
-
-        /**
-         * Replaces a partition with an empty version, preserving graph identity and registry position.
-         *
-         * @param partition partition retained or exclusively owned by the supplied state
-         */
-        private void empty(final Partition partition) {
-            // Keep the graph's identity and registry position. Readers continue to own
-            // the old partition; clearing never needs to clone its three indexes.
-            final Partition replacement = new Partition(partition.context, partition.ordinal);
-            graphs.put(partition.context, replacement);
-            partition.references--;
-        }
-
-        /** Releases this state's ownership; clearing the registry makes repeated release harmless. */
-        private void release() {
-            graphs.values().forEach(partition -> partition.references--);
-            graphs.clear();
-        }
-    }
-
     /**
      * Shared database state and lifecycle monitor for all sessions.
      */
@@ -392,7 +103,7 @@ final class IndexedStatementStore
         /**
          * Committed state whose partition references are owned by the database.
          */
-        private State committed = new State();
+        private PartitionState committed = new PartitionState();
         /**
          * Committed version captured for optimistic conflict detection.
          */
@@ -434,7 +145,7 @@ final class IndexedStatementStore
                 throw new IllegalStateException("Storage is not running");
             }
             committed.release();
-            committed = new State();
+            committed = new PartitionState();
             config = null;
             lifecycleState = LifecycleState.SHUTDOWN;
         }
@@ -515,7 +226,7 @@ final class IndexedStatementStore
         synchronized (database) {
             checkAccess();
             final IndexedStatementStore snapshot = new IndexedStatementStore(database);
-            final State captured = state().copy();
+            final PartitionState captured = state().copy();
             try {
                 snapshot.transaction = snapshot.new SnapshotTransaction(captured, getDataVersion(), true);
                 return snapshot;
@@ -584,7 +295,7 @@ final class IndexedStatementStore
      *
      * @return the transaction state, or the committed state outside a transaction
      */
-    private State state() {
+    PartitionState state() {
         return transaction == null ? database.committed : transaction.state;
     }
 
@@ -637,7 +348,7 @@ final class IndexedStatementStore
         pattern = StatementCapture.immutable(pattern);
         synchronized (database) {
             checkAccess();
-            final State snapshot = state().copy(pattern.getContexts());
+            final PartitionState snapshot = state().copy(pattern.getContexts());
             try {
                 var cursor = new SnapshotCursor(snapshot, pattern);
                 return StreamSupport.stream(cursor, false).onClose(cursor::close);
@@ -658,11 +369,11 @@ final class IndexedStatementStore
         /**
          * Read state retained until this cursor is closed or exhausted.
          */
-        private State snapshot;
+        private PartitionState snapshot;
         /**
          * Ordered traversal of the retained partition registry.
          */
-        private Iterator<Partition> partitions;
+        private Iterator<GraphPartition> partitions;
         /**
          * Positional traversal of the current retained partition.
          */
@@ -702,7 +413,7 @@ final class IndexedStatementStore
          * @param snapshot retained read state
          * @param pattern  captured search pattern
          */
-        private SnapshotCursor(final State snapshot, final StatementPattern pattern) {
+        private SnapshotCursor(final PartitionState snapshot, final StatementPattern pattern) {
             this.snapshot = snapshot;
             this.pattern = pattern;
             distinctTriples = hasAtMostOnePopulatedPartition(snapshot);
@@ -847,12 +558,12 @@ final class IndexedStatementStore
      * @param snapshot retained read state
      * @return true when at most one selected partition contains statements
      */
-    private static boolean hasAtMostOnePopulatedPartition(final State snapshot) {
+    private static boolean hasAtMostOnePopulatedPartition(final PartitionState snapshot) {
         if (snapshot.graphs.size() <= 1) {
             return true;
         }
         boolean populated = false;
-        for (final Partition partition : snapshot.graphs.values()) {
+        for (final GraphPartition partition : snapshot.graphs.values()) {
             if (partition.spo.size() == 0) {
                 continue;
             }
@@ -879,18 +590,18 @@ final class IndexedStatementStore
             if (pattern.matchesAll()) {
                 return state().size;
             }
-            final State current = state();
+            final PartitionState current = state();
             if (current.graphs.isEmpty()) {
                 return 0;
             }
             final Resource[] contexts = pattern.getContexts();
             // Keep one-partition keys local to the index for JVM scalar replacement.
             if (contexts.length == 1) {
-                final Partition partition = current.graphs.get(contexts[0]);
+                final GraphPartition partition = current.graphs.get(contexts[0]);
                 return partition == null ? 0 : partition.index(pattern).count(pattern);
             }
             if (contexts.length == 0 && current.graphs.size() == 1) {
-                final Partition partition = current.graphs.values().iterator().next();
+                final GraphPartition partition = current.graphs.values().iterator().next();
                 return partition.index(pattern).count(pattern);
             }
             return countSelectedPartitions(current, contexts, pattern);
@@ -905,7 +616,7 @@ final class IndexedStatementStore
      * @param pattern  captured search pattern
      * @return number of matching statements across selected graph partitions
      */
-    private static long countSelectedPartitions(final State current, final Resource[] contexts,
+    private static long countSelectedPartitions(final PartitionState current, final Resource[] contexts,
             final StatementPattern pattern) {
         // Call-local keys: no per-partition hashing or retained query cache.
         final TermKey subject = TermKey.nullable(pattern.getSubject());
@@ -913,12 +624,12 @@ final class IndexedStatementStore
         final TermKey object = TermKey.nullable(pattern.getObject());
         long count = 0;
         if (contexts.length == 0) {
-            for (final Partition partition : current.graphs.values()) {
+            for (final GraphPartition partition : current.graphs.values()) {
                 count += partition.index(pattern).count(subject, predicate, object);
             }
         } else {
             for (final Resource context : contexts) {
-                final Partition partition = current.graphs.get(context);
+                final GraphPartition partition = current.graphs.get(context);
                 if (partition != null) {
                     count += partition.index(pattern).count(subject, predicate, object);
                 }
@@ -951,18 +662,18 @@ final class IndexedStatementStore
      * @param visitor non-mutating callback; true requests an early stop for predicate visitors
      * @return true when a matching value caused the visitor to request an early stop
      */
-    private static boolean visit(final State state, final StatementPattern pattern,
+    private static boolean visit(final PartitionState state, final StatementPattern pattern,
             final Predicate<Statement> visitor) {
         if (state.graphs.isEmpty()) {
             return false;
         }
         final Resource[] contexts = pattern.getContexts();
         if (contexts.length == 1) {
-            final Partition partition = state.graphs.get(contexts[0]);
+            final GraphPartition partition = state.graphs.get(contexts[0]);
             return partition != null && partition.index(pattern).visit(pattern, visitor);
         }
         if (contexts.length == 0 && state.graphs.size() == 1) {
-            final Partition partition = state.graphs.values().iterator().next();
+            final GraphPartition partition = state.graphs.values().iterator().next();
             return partition.index(pattern).visit(pattern, visitor);
         }
         return visitSelectedPartitions(state, pattern, visitor, contexts);
@@ -977,20 +688,20 @@ final class IndexedStatementStore
      * @param contexts selected graph identifiers; an empty array selects all graphs
      * @return true when the visitor requests an early stop on a matching statement
      */
-    private static boolean visitSelectedPartitions(final State state, final StatementPattern pattern,
+    private static boolean visitSelectedPartitions(final PartitionState state, final StatementPattern pattern,
             final Predicate<Statement> visitor, final Resource[] contexts) {
         final TermKey subject = TermKey.nullable(pattern.getSubject());
         final TermKey predicate = TermKey.nullable(pattern.getPredicate());
         final TermKey object = TermKey.nullable(pattern.getObject());
         if (contexts.length == 0) {
-            for (final Partition partition : state.graphs.values()) {
+            for (final GraphPartition partition : state.graphs.values()) {
                 if (partition.index(pattern).visit(subject, predicate, object, visitor)) {
                     return true;
                 }
             }
         } else {
-            final List<Partition> partitions = selectPartitions(state, contexts);
-            for (final Partition partition : partitions) {
+            final List<GraphPartition> partitions = selectPartitions(state, contexts);
+            for (final GraphPartition partition : partitions) {
                 if (partition.index(pattern).visit(subject, predicate, object, visitor)) {
                     return true;
                 }
@@ -1006,11 +717,11 @@ final class IndexedStatementStore
      * @param contexts selected graph identifiers; an empty array selects all graphs
      * @return existing selected partitions in stable registry order
      */
-    private static List<Partition> selectPartitions(final State state, final Resource[] contexts) {
+    private static List<GraphPartition> selectPartitions(final PartitionState state, final Resource[] contexts) {
         // Preserve registry order independently of the caller's context ordering.
-        final List<Partition> partitions = new ArrayList<>();
+        final List<GraphPartition> partitions = new ArrayList<>();
         for (final Resource context : contexts) {
-            final Partition partition = state.graphs.get(context);
+            final GraphPartition partition = state.graphs.get(context);
             if (partition != null) {
                 partitions.add(partition);
             }
@@ -1032,14 +743,14 @@ final class IndexedStatementStore
         final Statement captured = StatementCapture.immutable(statement);
         synchronized (database) {
             checkWrite();
-            final State current = state();
-            final Partition existing = current.graphs.get(captured.getContext());
+            final PartitionState current = state();
+            final GraphPartition existing = current.graphs.get(captured.getContext());
             if (existing != null && existing.references > 1 && existing.contains(captured)) {
                 return false;
             }
-            Partition partition = current.writable(captured.getContext());
+            GraphPartition partition = current.writable(captured.getContext());
             if (partition == null) {
-                partition = new Partition(captured.getContext(), current.nextOrdinal++);
+                partition = new GraphPartition(captured.getContext(), current.nextOrdinal++);
                 current.graphs.put(captured.getContext(), partition);
             }
             final boolean added = partition.add(captured);
@@ -1064,11 +775,11 @@ final class IndexedStatementStore
         final Statement captured = StatementCapture.immutable(statement);
         synchronized (database) {
             checkWrite();
-            final Partition existing = state().graphs.get(captured.getContext());
+            final GraphPartition existing = state().graphs.get(captured.getContext());
             if (existing == null || (existing.references > 1 && !existing.contains(captured))) {
                 return false;
             }
-            final Partition partition = state().writable(captured.getContext());
+            final GraphPartition partition = state().writable(captured.getContext());
             final boolean removed = partition != null && partition.remove(captured);
             if (removed) {
                 state().size--;
@@ -1091,17 +802,17 @@ final class IndexedStatementStore
         pattern = StatementCapture.immutable(pattern);
         synchronized (database) {
             checkWrite();
-            final State current = state();
+            final PartitionState current = state();
             final Resource[] contexts = pattern.getContexts();
             long removed = 0;
             if (contexts.length == 0) {
                 // Replacing an existing value does not change LinkedHashMap iteration order.
-                for (final Partition partition : current.graphs.values()) {
+                for (final GraphPartition partition : current.graphs.values()) {
                     removed += remove(current, partition, pattern);
                 }
             } else {
                 for (final Resource context : contexts) {
-                    final Partition partition = current.graphs.get(context);
+                    final GraphPartition partition = current.graphs.get(context);
                     if (partition != null) {
                         removed += remove(current, partition, pattern);
                     }
@@ -1123,7 +834,7 @@ final class IndexedStatementStore
      * @throws IllegalStateException if the session is closed or its transaction belongs to another thread, or a
      *                               conflicting batch is active
      */
-    private static long remove(final State current, final Partition partition, final StatementPattern pattern) {
+    private static long remove(final PartitionState current, final GraphPartition partition, final StatementPattern pattern) {
         final long size = partition.spo.size();
         if (size == 0) {
             return 0;
@@ -1145,7 +856,7 @@ final class IndexedStatementStore
                 matches.add(s);
                 return false;
             });
-            final Partition writable = current.writable(partition.context);
+            final GraphPartition writable = current.writable(partition.context);
             for (final Statement statement : matches) {
                 writable.remove(statement);
             }
@@ -1183,7 +894,7 @@ final class IndexedStatementStore
             if (state().graphs.containsKey(captured)) {
                 return false;
             }
-            state().graphs.put(captured, new Partition(captured, state().nextOrdinal++));
+            state().graphs.put(captured, new GraphPartition(captured, state().nextOrdinal++));
             changed(true);
             return true;
         }
@@ -1203,7 +914,7 @@ final class IndexedStatementStore
         final Resource captured = (Resource) StatementCapture.immutable(Objects.requireNonNull(graph, "graph"));
         synchronized (database) {
             checkWrite();
-            final Partition removed = state().graphs.remove(captured);
+            final GraphPartition removed = state().graphs.remove(captured);
             if (removed == null) {
                 return false;
             }
@@ -1272,8 +983,8 @@ final class IndexedStatementStore
     private long publishBatch(final Map<Resource, StagedPartition> staged) {
         synchronized (database) {
             checkAccess();
-            final State target = state();
-            final State replacement = target.copy();
+            final PartitionState target = state();
+            final PartitionState replacement = target.copy();
             boolean published = false;
             try {
                 final long[] added = { 0 };
@@ -1309,10 +1020,10 @@ final class IndexedStatementStore
      * @param stagedPartition private SPO staging for this graph
      * @return number of new statements in this graph
      */
-    private static long mergeStagedPartition(final State target, final State replacement, final Resource graph,
+    private static long mergeStagedPartition(final PartitionState target, final PartitionState replacement, final Resource graph,
             final StagedPartition stagedPartition) {
         final TripleIndex additions = stagedPartition.statements;
-        final Partition existing = target.graphs.get(graph);
+        final GraphPartition existing = target.graphs.get(graph);
         final TripleIndex merged = existing == null ? additions : existing.spo.copy();
         final long before = merged.size();
         if (existing != null) {
@@ -1323,7 +1034,7 @@ final class IndexedStatementStore
         }
         final long count = existing == null ? merged.size() : merged.size() - before;
         if (count != 0) {
-            final Partition built = Partition.build(merged, existing == null ? graph : existing.context,
+            final GraphPartition built = GraphPartition.build(merged, existing == null ? graph : existing.context,
                     existing == null ? replacement.nextOrdinal++ : existing.ordinal);
             if (existing != null) {
                 existing.references--;
@@ -1455,7 +1166,7 @@ final class IndexedStatementStore
             long distinctObjects = 0;
             boolean found = false;
 
-            for (Partition p : state().graphs.values()) {
+            for (GraphPartition p : state().graphs.values()) {
                 PredicateStatistics ps = p.pos.estimatePredicateStatistics(predicate, 512);
                 if (ps != null) {
                     found = true;
@@ -1551,7 +1262,7 @@ final class IndexedStatementStore
         /**
          * Transaction-owned state until publication or release.
          */
-        private State state;
+        private PartitionState state;
         /**
          * Whether this transaction changed its captured state.
          */
@@ -1567,11 +1278,11 @@ final class IndexedStatementStore
          * @param state   state whose ownership is guarded by the database monitor
          * @param version committed version captured for conflict detection
          */
-        private SnapshotTransaction(final State state, final long version) {
+        private SnapshotTransaction(final PartitionState state, final long version) {
             this(state, version, false);
         }
 
-        private SnapshotTransaction(final State state, final long version, final boolean readOnly) {
+        private SnapshotTransaction(final PartitionState state, final long version, final boolean readOnly) {
             this.state = state;
             this.version = version;
             this.revision = version;
