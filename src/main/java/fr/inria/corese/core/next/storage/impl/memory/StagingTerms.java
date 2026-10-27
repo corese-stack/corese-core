@@ -41,15 +41,16 @@ final class StagingTerms extends HashMap<TermKey, TermKey> {
     }
 
     /**
-     * Captures matching graph partitions immediately and returns a sequential lazy stream that must be closed.
+     * Looks up an existing canonical term key matching the given value and structural hash.
      *
      * <p>
      * The private, non-stored probe is passed to HashMap.get(Object), which compares the search object's
      * equals(storedKey). Stored keys always remain immutable TermKey instances.
+     * </p>
      *
-     * @param value non-null RDF value or entry value
-     * @param hash  cached structural hash of the captured RDF value
-     * @return a sequential stream owning its read snapshot; the caller must close it
+     * @param value non-null RDF value to look up
+     * @param hash  cached structural hash of the RDF value
+     * @return the matching canonical TermKey, or null if not found
      */
     @SuppressWarnings("java:S2175")
     TermKey find(final Value value, final int hash) {

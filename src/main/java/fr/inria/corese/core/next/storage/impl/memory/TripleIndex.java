@@ -197,7 +197,7 @@ final class TripleIndex {
         final TermKey subject = stagedKey(s.getSubject());
         final TermKey predicate = stagedKey(s.getPredicate());
         final TermKey object = stagedKey(s.getObject());
-        return add(IndexedStatementStore.sharedStatement(s, subject, predicate, object, context), subject, predicate,
+        return add(StatementCapture.sharedStatement(s, subject, predicate, object, context), subject, predicate,
                 object);
     }
 

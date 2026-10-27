@@ -1,24 +1,8 @@
 package fr.inria.corese.core.next.storage.impl.memory;
 
-import fr.inria.corese.core.next.data.Values;
-import fr.inria.corese.core.next.data.api.model.SimpleStatement;
 import fr.inria.corese.core.next.data.api.model.Statement;
-import fr.inria.corese.core.next.data.api.term.BNode;
 import fr.inria.corese.core.next.data.api.term.IRI;
-import fr.inria.corese.core.next.data.api.term.Literal;
 import fr.inria.corese.core.next.data.api.term.Resource;
-import fr.inria.corese.core.next.data.api.term.SimpleBNode;
-import fr.inria.corese.core.next.data.api.term.SimpleDate;
-import fr.inria.corese.core.next.data.api.term.SimpleDateTime;
-import fr.inria.corese.core.next.data.api.term.SimpleDecimal;
-import fr.inria.corese.core.next.data.api.term.SimpleDouble;
-import fr.inria.corese.core.next.data.api.term.SimpleDuration;
-import fr.inria.corese.core.next.data.api.term.SimpleIRI;
-import fr.inria.corese.core.next.data.api.term.SimpleInteger;
-import fr.inria.corese.core.next.data.api.term.SimpleLiteral;
-import fr.inria.corese.core.next.data.api.term.SimpleTime;
-import fr.inria.corese.core.next.data.api.term.SimpleTriple;
-import fr.inria.corese.core.next.data.api.term.Triple;
 import fr.inria.corese.core.next.data.api.term.Value;
 import fr.inria.corese.core.next.storage.api.config.StorageConfig;
 import fr.inria.corese.core.next.storage.api.exception.ErrorCode;
@@ -198,7 +182,7 @@ final class IndexedStatementStore
             final TermKey subject = key(s.getSubject(), null, null, spo, pos, osp);
             final TermKey predicate = key(s.getPredicate(), subject, null, pos, spo, osp);
             final TermKey object = key(s.getObject(), subject, predicate, osp, spo, pos);
-            s = sharedStatement(s, subject, predicate, object, context);
+            s = StatementCapture.sharedStatement(s, subject, predicate, object, context);
             if (!spo.add(s, subject, predicate, object, osp)) {
                 return false;
             }
@@ -631,171 +615,6 @@ final class IndexedStatementStore
     }
 
     /**
-     * Captures RDF identities without changing the statement or pattern semantics.
-     *
-     * @param value non-null RDF value or entry value
-     * @return the original supported native value or a captured representation of its RDF identity
-     * @throws IllegalArgumentException if a capacity, term type or requested isolation level is unsupported
-     * @throws NullPointerException     if an explicitly required argument or mapped value is null
-     */
-    private static Value immutable(final Value value) {
-        Objects.requireNonNull(value, "value");
-        if (value instanceof Literal literal && !(literal.getDatatype() instanceof SimpleIRI)) {
-            final IRI datatype = (IRI) immutable(literal.getDatatype());
-            if (value instanceof SimpleLiteral) {
-                return literal.getLanguage().map(language -> (Value) new SimpleLiteral(literal.getLabel(), language))
-                        .orElseGet(() -> new SimpleLiteral(literal.getLabel(), datatype));
-            }
-            return Values.factory().createLiteral(literal.getLabel(), datatype);
-        }
-        if (value instanceof SimpleIRI || value instanceof SimpleBNode || value instanceof SimpleLiteral
-                || value instanceof SimpleInteger || value instanceof SimpleDecimal || value instanceof SimpleDouble
-                || value instanceof SimpleDate || value instanceof SimpleDateTime || value instanceof SimpleTime
-                || value instanceof SimpleDuration) {
-            return value;
-        }
-        if (value instanceof IRI iri) {
-            return new SimpleIRI(iri.stringValue());
-        }
-        if (value instanceof BNode blank) {
-            return new SimpleBNode(blank.getID());
-        }
-        if (value instanceof Literal literal) {
-            return literal.getLanguage().map(language -> (Value) new SimpleLiteral(literal.getLabel(), language))
-                    .orElseGet(() -> new SimpleLiteral(literal.getLabel(), (IRI) immutable(literal.getDatatype())));
-        }
-        if (value instanceof Triple triple) {
-            return new SimpleTriple((Resource) immutable(triple.subject()), (IRI) immutable(triple.predicate()),
-                    immutable(triple.object()));
-        }
-        throw new IllegalArgumentException("Unsupported RDF term: " + value.getClass().getName());
-    }
-
-    /**
-     * Captures RDF identities without changing the statement or pattern semantics.
-     *
-     * @param statement statement whose RDF identities have been captured
-     * @return the original supported native value or a captured representation of its RDF identity
-     * @throws NullPointerException if an explicitly required argument or mapped value is null
-     */
-    private static Statement immutable(final Statement statement) {
-        Objects.requireNonNull(statement, "statement");
-        final Resource context = statement.getContext();
-        final Resource subject = (Resource) immutable(statement.getSubject());
-        final IRI predicate = (IRI) immutable(statement.getPredicate());
-        final Value object = immutable(statement.getObject());
-        final Resource graph = context == null ? null : (Resource) immutable(context);
-        if (statement.getClass() == SimpleStatement.class && subject == statement.getSubject()
-                && predicate == statement.getPredicate() && object == statement.getObject() && graph == context) {
-            return statement;
-        }
-        return new SimpleStatement(subject, predicate, object, graph);
-    }
-
-    /**
-     * Share safe native terms without changing lexical identity or value implementation.
-     *
-     * @param statement statement whose RDF identities have been captured
-     * @param subject   canonical subject key, or null for a wildcard search
-     * @param predicate canonical predicate key; null denotes a wildcard for search operations
-     * @param object    canonical object key, or null for a wildcard search
-     * @return the original statement when all values are already shared, otherwise a statement using compatible
-     *         canonical values
-     */
-    static Statement sharedStatement(final Statement statement, final TermKey subject, final TermKey predicate,
-            final TermKey object) {
-        return sharedStatement(statement, subject, predicate, object, statement.getContext());
-    }
-
-    /**
-     * Reuses compatible canonical RDF values without changing lexical identity or implementation type.
-     *
-     * @param statement statement whose RDF identities have been captured
-     * @param subject   canonical subject key, or null for a wildcard search
-     * @param predicate canonical predicate key; null denotes a wildcard for search operations
-     * @param object    canonical object key, or null for a wildcard search
-     * @param context   canonical graph identifier; null denotes the default graph
-     * @return the original statement when all values are already shared, otherwise a statement using compatible
-     *         canonical values
-     */
-    static Statement sharedStatement(final Statement statement, final TermKey subject, final TermKey predicate,
-            final TermKey object, final Resource context) {
-        final Resource s = (Resource) sharedValue(statement.getSubject(), subject.value());
-        final IRI p = (IRI) sharedValue(statement.getPredicate(), predicate.value());
-        final Value o = sharedValue(statement.getObject(), object.value());
-        final Resource g = context == null ? null : (Resource) sharedValue(statement.getContext(), context);
-        return s == statement.getSubject() && p == statement.getPredicate() && o == statement.getObject()
-                && g == statement.getContext() ? statement : new SimpleStatement(s, p, o, g);
-    }
-
-    /**
-     * Reuses a compatible immutable scalar value while preserving its implementation and datatype.
-     *
-     * @param original  original captured RDF value
-     * @param canonical compatible canonical RDF value
-     * @return the compatible canonical value, or the original value when pooling is unsuitable
-     */
-    private static Value sharedValue(final Value original, final Value canonical) {
-        if (original == canonical || original.getClass() != canonical.getClass()) {
-            return original;
-        }
-        if (original instanceof Literal literal && canonical instanceof Literal other
-                && !sameLiteralImplementation(literal, other)) {
-            return original;
-        }
-        if (original instanceof SimpleIRI iri && canonical instanceof SimpleIRI other) {
-            return iri.getNamespace().equals(other.getNamespace()) && iri.getLocalName().equals(other.getLocalName())
-                    ? canonical
-                    : original;
-        }
-        if (original instanceof SimpleLiteral literal && canonical instanceof SimpleLiteral other) {
-            return literal.getCoreDatatype() == other.getCoreDatatype() ? canonical : original;
-        }
-        // Calendar-backed terms and nested triples are deliberately not pooled.
-        return original instanceof SimpleBNode || original instanceof SimpleInteger || original instanceof SimpleDecimal
-                || original instanceof SimpleDouble || original instanceof SimpleDuration ? canonical : original;
-    }
-
-    /**
-     * Checks literal datatype implementation compatibility using the existing comparison order.
-     *
-     * @param literal original captured literal
-     * @param other   value or search object to compare with the stored key
-     * @return true when datatype implementation and native components permit sharing
-     */
-    private static boolean sameLiteralImplementation(final Literal literal, final Literal other) {
-        if (literal.getCoreDatatype() != other.getCoreDatatype()) {
-            return false;
-        }
-        final IRI datatype = literal.getDatatype();
-        final IRI canonicalDatatype = other.getDatatype();
-
-        return datatype == canonicalDatatype || (datatype.getClass() == canonicalDatatype.getClass()
-                && datatype.getNamespace().equals(canonicalDatatype.getNamespace())
-                && datatype.getLocalName().equals(canonicalDatatype.getLocalName()));
-    }
-
-    /**
-     * Captures RDF identities without changing the statement or pattern semantics.
-     *
-     * @param pattern captured search pattern
-     * @return the original supported native value or a captured representation of its RDF identity
-     * @throws NullPointerException if an explicitly required argument or mapped value is null
-     */
-    private static StatementPattern immutable(final StatementPattern pattern) {
-        Objects.requireNonNull(pattern, "pattern");
-        final Resource[] contexts = pattern.getContexts();
-        for (int i = 0; i < contexts.length; i++) {
-            if (contexts[i] != null) {
-                contexts[i] = (Resource) immutable(contexts[i]);
-            }
-        }
-        return StatementPattern.of(pattern.getSubject() == null ? null : (Resource) immutable(pattern.getSubject()),
-                pattern.getPredicate() == null ? null : (IRI) immutable(pattern.getPredicate()),
-                pattern.getObject() == null ? null : immutable(pattern.getObject()), contexts);
-    }
-
-    /**
      * Captures the selected partitions immediately and traverses matches lazily.
      *
      * <p>
@@ -815,7 +634,7 @@ final class IndexedStatementStore
     @SuppressWarnings("java:S1181")
     @Override
     public Stream<Statement> find(StatementPattern pattern) {
-        pattern = immutable(pattern);
+        pattern = StatementCapture.immutable(pattern);
         synchronized (database) {
             checkAccess();
             final State snapshot = state().copy(pattern.getContexts());
@@ -1054,7 +873,7 @@ final class IndexedStatementStore
      */
     @Override
     public long count(StatementPattern pattern) {
-        pattern = immutable(pattern);
+        pattern = StatementCapture.immutable(pattern);
         synchronized (database) {
             checkAccess();
             if (pattern.matchesAll()) {
@@ -1117,7 +936,7 @@ final class IndexedStatementStore
      */
     @Override
     public boolean contains(StatementPattern pattern) {
-        pattern = immutable(pattern);
+        pattern = StatementCapture.immutable(pattern);
         synchronized (database) {
             checkAccess();
             return visit(state(), pattern, s -> true);
@@ -1210,7 +1029,7 @@ final class IndexedStatementStore
      */
     @Override
     public boolean add(final Statement statement) {
-        final Statement captured = immutable(statement);
+        final Statement captured = StatementCapture.immutable(statement);
         synchronized (database) {
             checkWrite();
             final State current = state();
@@ -1242,7 +1061,7 @@ final class IndexedStatementStore
      */
     @Override
     public boolean remove(final Statement statement) {
-        final Statement captured = immutable(statement);
+        final Statement captured = StatementCapture.immutable(statement);
         synchronized (database) {
             checkWrite();
             final Partition existing = state().graphs.get(captured.getContext());
@@ -1269,7 +1088,7 @@ final class IndexedStatementStore
      */
     @Override
     public long remove(StatementPattern pattern) {
-        pattern = immutable(pattern);
+        pattern = StatementCapture.immutable(pattern);
         synchronized (database) {
             checkWrite();
             final State current = state();
@@ -1358,7 +1177,7 @@ final class IndexedStatementStore
      */
     @Override
     public boolean createGraph(final Resource graph) {
-        final Resource captured = (Resource) immutable(Objects.requireNonNull(graph, "graph"));
+        final Resource captured = (Resource) StatementCapture.immutable(Objects.requireNonNull(graph, "graph"));
         synchronized (database) {
             checkWrite();
             if (state().graphs.containsKey(captured)) {
@@ -1381,7 +1200,7 @@ final class IndexedStatementStore
      */
     @Override
     public boolean dropGraph(final Resource graph) {
-        final Resource captured = (Resource) immutable(Objects.requireNonNull(graph, "graph"));
+        final Resource captured = (Resource) StatementCapture.immutable(Objects.requireNonNull(graph, "graph"));
         synchronized (database) {
             checkWrite();
             final Partition removed = state().graphs.remove(captured);
@@ -1437,7 +1256,7 @@ final class IndexedStatementStore
         final Function<Resource, StagedPartition> newPartition = graph -> new StagedPartition(graph,
                 TripleIndex.forStaging(staged.isEmpty() ? expectedTerms : 0));
         for (final Statement statement : statements) {
-            final Statement captured = immutable(statement);
+            final Statement captured = StatementCapture.immutable(statement);
             final StagedPartition partition = staged.computeIfAbsent(captured.getContext(), newPartition);
             partition.statements.add(captured, partition.context);
         }
