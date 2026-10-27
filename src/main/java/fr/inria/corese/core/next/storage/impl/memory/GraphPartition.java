@@ -82,7 +82,7 @@ final class GraphPartition {
      * @return a complete graph partition with no retained staging dictionary
      */
     static GraphPartition build(final TripleIndex spo, final Resource context, final long ordinal) {
-        final TripleIndex.SecondaryIndexes secondary = TripleIndex.buildSecondaryIndexes(spo);
+        final SecondaryIndexBuilder.Result secondary = SecondaryIndexBuilder.build(spo);
         final GraphPartition partition = new GraphPartition(context, ordinal, spo, secondary.pos(), secondary.osp());
         spo.finishStaging();
         return partition;

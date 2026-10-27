@@ -112,11 +112,11 @@ final class TripleIndex {
     /**
      * Component order of this triple permutation.
      */
-    private final Order order;
+    final Order order;
     /**
      * Insertion-ordered first-component branches.
      */
-    private final Map<TermKey, Branch> roots;
+    final Map<TermKey, Branch> roots;
     // Bulk-only canonicalization cache, discarded before publishing a partition.
     /**
      * Batch-private canonical dictionary, cleared before publication.
@@ -823,72 +823,7 @@ final class TripleIndex {
      * @return predicate statistics or null if not found or not in POS order
      */
     PredicateStatistics estimatePredicateStatistics(final IRI predicate, final int maxSample) {
-        if (order != Order.POS || predicate == null) {
-            return null;
-        }
-        final TermKey pKey = new TermKey(predicate);
-        final Branch branch = roots.get(pKey);
-        if (branch == null) {
-            return null;
-        }
-        final long distinctObjects = branch.size();
-        if (distinctObjects == 0) {
-            return new PredicateStatistics(predicate, 0, 0, 0);
-        }
-
-        final PredicateSampleAccumulator accumulator = new PredicateSampleAccumulator(maxSample);
-        branch.forEach((objKey, entry) -> accumulator.accumulate(entry));
-
-        final long distinctSubjects = accumulator.estimateDistinctSubjects(distinctObjects);
-        return new PredicateStatistics(predicate, accumulator.totalCount, distinctSubjects, distinctObjects);
-    }
-
-    private static final class PredicateSampleAccumulator {
-        private final Set<TermKey> subjects = new HashSet<>();
-        private final int maxSample;
-        private long totalCount = 0;
-        private int sampled = 0;
-
-        PredicateSampleAccumulator(final int maxSample) {
-            this.maxSample = maxSample;
-        }
-
-        void accumulate(final Object entry) {
-            if (entry instanceof Leaf leaf) {
-                accumulateLeaf(leaf);
-            } else if (entry instanceof Statement statement) {
-                accumulateStatement(statement);
-            }
-        }
-
-        private void accumulateLeaf(final Leaf leaf) {
-            totalCount += leaf.size();
-            if (shouldSample()) {
-                leaf.forEach((subjKey, st) -> subjects.add(subjKey));
-                sampled++;
-            }
-        }
-
-        private void accumulateStatement(final Statement statement) {
-            totalCount++;
-            if (shouldSample()) {
-                subjects.add(new TermKey(statement.getSubject()));
-                sampled++;
-            }
-        }
-
-        private boolean shouldSample() {
-            return maxSample <= 0 || sampled < maxSample;
-        }
-
-        long estimateDistinctSubjects(final long distinctObjects) {
-            if (maxSample <= 0 || distinctObjects <= maxSample) {
-                return subjects.size();
-            }
-            final double ratio = (double) distinctObjects / Math.max(1, sampled);
-            final long estimated = Math.round(subjects.size() * ratio);
-            return Math.min(totalCount, Math.max(subjects.size(), estimated));
-        }
+        return PredicateStatisticsEstimator.estimate(this, predicate, maxSample);
     }
 
     /**
@@ -938,7 +873,7 @@ final class TripleIndex {
     }
 
     /** Root keys are also addressable as values for cross-permutation canonicalization. */
-    private static final class Branch extends CompactTermMap<Object> {
+    static final class Branch extends CompactTermMap<Object> {
         /**
          * Canonical first-component key retained by this root branch.
          */
@@ -965,7 +900,7 @@ final class TripleIndex {
     }
 
     /** Multi-statement leaf only; singleton statements live directly in their branch. */
-    private static final class Leaf extends CompactTermMap<Statement> {
+    static final class Leaf extends CompactTermMap<Statement> {
         /**
          * Creates an empty multivalued leaf or copies the source leaf container.
          */
@@ -995,7 +930,7 @@ final class TripleIndex {
      * Receives immutable SPO statements and their canonical term keys during index construction.
      */
     @FunctionalInterface
-    private interface EntryVisitor {
+    interface EntryVisitor {
         /**
          * Receives one immutable statement and its canonical SPO keys.
          *
@@ -1013,7 +948,7 @@ final class TripleIndex {
      * @param visitor non-mutating callback; true requests an early stop for predicate visitors
      * @throws IllegalStateException if the required representation, ownership or lifecycle state is not satisfied
      */
-    private void visitEntries(final EntryVisitor visitor) {
+    void visitEntries(final EntryVisitor visitor) {
         if (order != Order.SPO) {
             throw new IllegalStateException("Bulk source must be SPO");
         }
@@ -1095,36 +1030,5 @@ final class TripleIndex {
         private void leaf(final TermKey object, final Statement statement) {
             visitor.accept(subject, predicate, object, statement);
         }
-    }
-
-    /**
-     * Reconstruct omitted singleton keys once while building both secondary permutations.
-     *
-     * @param source source index or container; it must remain unchanged during copying or traversal
-     * @return the completed POS and OSP permutations
-     */
-    static SecondaryIndexes buildSecondaryIndexes(final TripleIndex source) {
-        final TripleIndex pos = new TripleIndex(Order.POS);
-        final TripleIndex osp = new TripleIndex(Order.OSP);
-        source.visitEntries((subject, predicate, object, statement) -> {
-            pos.add(statement, subject, predicate, object, source);
-            osp.add(statement, subject, predicate, object, source);
-        });
-        return new SecondaryIndexes(pos, osp);
-    }
-
-    /**
-     * Completed secondary permutations sharing the SPO statements and canonical keys.
-     *
-     * @param pos completed POS permutation
-     * @param osp completed OSP permutation
-     */
-    record SecondaryIndexes(/**
-                             * Predicate/object/subject permutation of this graph.
-                             */
-    TripleIndex pos, /**
-                      * Object/subject/predicate permutation of this graph.
-                      */
-    TripleIndex osp) {
     }
 }
