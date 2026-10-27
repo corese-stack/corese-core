@@ -69,6 +69,13 @@ class NextModuleBoundaryTest {
     }
 
     @Test
+    void queryMustNotDependOnIoFacade() throws IOException {
+        assertNoReferences(
+                NEXT_SOURCES.resolve("query"),
+                imported -> imported.startsWith("fr.inria.corese.core.next.io."));
+    }
+
+    @Test
     void nextMustNotDependOnAnyHistoricalCoresePackage() throws IOException {
         assertNoReferences(NEXT_SOURCES,
                 reference -> reference.startsWith("fr.inria.corese.")

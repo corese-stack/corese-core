@@ -8,7 +8,7 @@ import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.data.api.term.BNode;
 import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.term.Value;
-import fr.inria.corese.core.next.io.CoreseIO;
+import fr.inria.corese.core.next.data.impl.io.parser.DefaultRDFParserFactory;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.storage.api.StorageManager;
 
@@ -61,7 +61,7 @@ final class UpdateLoader {
                 RDFFormat format = RDFFormat.byMimeType(connection.getContentType())
                         .or(() -> RDFFormat.byExtension(extension)).orElse(RDFFormat.TURTLE);
                 Model model = Models.create();
-                CoreseIO.rdfParserFactory().createRDFParser(format, model, Values.factory()).parse(stream, source);
+                new DefaultRDFParserFactory().createRDFParser(format, model, Values.factory()).parse(stream, source);
                 return model;
             }
         } catch (IOException | IllegalArgumentException e) {

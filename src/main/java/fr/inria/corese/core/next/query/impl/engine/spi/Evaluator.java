@@ -1,7 +1,5 @@
 package fr.inria.corese.core.next.query.impl.engine.spi;
 
-import fr.inria.corese.core.next.query.impl.engine.eval.Eval;
-
 import java.time.OffsetDateTime;
 
 /**
@@ -21,16 +19,6 @@ public interface Evaluator {
      */
     OffsetDateTime getQueryEvaluationTime();
 
-    Mode getMode();
-
-    void setMode(Mode mode);
-
-    default void setProducer(Producer p) {
-    }
-
-    default void setKGRAM(Eval o) {
-    }
-
     default void start(Environment env) {
     }
 
@@ -39,9 +27,4 @@ public interface Evaluator {
 
     default void init(Environment env) {
     }
-
-    enum Mode {
-        KGRAM_MODE, SPARQL_MODE
-    }
-
 }

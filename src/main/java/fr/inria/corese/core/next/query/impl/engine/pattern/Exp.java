@@ -295,8 +295,7 @@ public class Exp
             nl(sb, 0);
             sb.append(getMappings().toString(true));
             indent(sb, n);
-        } else if (type() != Type.WATCH && type() != Type.CONTINUE && type() != Type.BACKJUMP) {
-            // Process normal types (skip WATCH, CONTINUE, BACKJUMP because of loop)
+        } else {
             appendChildren(sb, n);
         }
 
@@ -680,7 +679,7 @@ public class Exp
             for (int i = 0; i < size(); i++) {
                 Exp exp = get(i);
                 switch (exp.type()) {
-                    case EDGE, XPATH, EVAL:
+                    case EDGE:
                         if (exp.contains(qNode)) {
                             add(i + 1, Exp.create(Type.ACCEPT, qNode));
                             return true;
@@ -708,7 +707,7 @@ public class Exp
 
     boolean isSimple() {
         return switch (type) {
-            case EDGE, EVAL, OPT_BIND -> true;
+            case EDGE, OPT_BIND -> true;
             default -> false;
         };
     }
@@ -826,7 +825,7 @@ public class Exp
      */
     int nbNode() {
         switch (type) {
-            case EDGE, EVAL:
+            case EDGE:
                 if (edge.getEdgeVariable() == null) {
                     return edge.nbNode();
                 } else {
@@ -846,7 +845,7 @@ public class Exp
      */
     Node getNode(int n) {
         switch (type) {
-            case EDGE, EVAL:
+            case EDGE:
                 if (n < edge.nbNode()) {
                     return edge.getNode(n);
                 } else {

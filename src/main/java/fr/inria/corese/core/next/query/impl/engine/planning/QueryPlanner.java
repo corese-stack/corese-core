@@ -97,7 +97,7 @@ public final class QueryPlanner implements ExpType {
         Type type = exp.type();
         switch (type) {
 
-            case EDGE, XPATH, EVAL, NODE, GRAPHNODE:
+            case EDGE, NODE, GRAPHNODE:
                 break;
 
             case FILTER, BIND:

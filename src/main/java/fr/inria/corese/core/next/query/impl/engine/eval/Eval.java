@@ -108,7 +108,6 @@ public final class Eval implements ExpType {
         evaluator = e;
         match = m;
         setVisitor(new ProcessVisitorDefault());
-        e.setKGRAM(this);
         graphEvaluator = new EvalGraph(this);
         join = new EvalJoin(this);
         optional = new EvalOptional(this);
