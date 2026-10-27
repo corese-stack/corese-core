@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.StringReader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 /**
@@ -194,5 +195,37 @@ class NQuadsParserTest {
 
         parser.parse(new StringReader(nquad));
         verify(mockModel).add(mockSubjectIRI, mockPredicateIRI, mockObjectIRI, expectedGraphIRI);
+    }
+
+    @Test
+    @DisplayName("Test parsing a quad with non-ASCII Unicode characters in IRI (W3C test060 NBSP and math symbols)")
+    void testParseNonAsciiUnicodeInIRI() throws ParsingException {
+        String nquad = "<urn:ex:s:003> <urn:ex:020> <urn:ex:\\u00a0> <urn:ex:\\u221e> .";
+        IRI expectedSubject = mock(IRI.class);
+        IRI expectedPredicate = mock(IRI.class);
+        IRI expectedObject = mock(IRI.class);
+        IRI expectedGraph = mock(IRI.class);
+
+        lenient().when(mockValueFactory.createIRI(eq("urn:ex:s:003"))).thenReturn(expectedSubject);
+        lenient().when(mockValueFactory.createIRI(eq("urn:ex:020"))).thenReturn(expectedPredicate);
+        lenient().when(mockValueFactory.createIRI(eq("urn:ex:\u00a0"))).thenReturn(expectedObject);
+        lenient().when(mockValueFactory.createIRI(eq("urn:ex:\u221e"))).thenReturn(expectedGraph);
+
+        parser.parse(new StringReader(nquad));
+        verify(mockModel).add(expectedSubject, expectedPredicate, expectedObject, expectedGraph);
+    }
+
+    @Test
+    @DisplayName("Test parsing rejects relative IRIs in N-Quads")
+    void testParseRejectsRelativeIRI() {
+        String nquad = "<relative/iri> <http://example.org/p> <http://example.org/o> .";
+        assertThrows(ParsingException.class, () -> parser.parse(new StringReader(nquad)));
+    }
+
+    @Test
+    @DisplayName("Test parsing rejects IRIs without valid scheme")
+    void testParseRejectsInvalidScheme() {
+        String nquad = "<:invalidScheme> <http://example.org/p> <http://example.org/o> .";
+        assertThrows(ParsingException.class, () -> parser.parse(new StringReader(nquad)));
     }
 }

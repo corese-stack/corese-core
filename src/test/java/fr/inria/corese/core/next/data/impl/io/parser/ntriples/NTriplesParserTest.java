@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.StringReader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 /**
@@ -209,5 +210,35 @@ class NTriplesParserTest {
 
         parser.parse(new StringReader(ntriple));
         verify(mockModel).add(expectedSubjectIRI, mockPredicateIRI, mockObjectIRI);
+    }
+
+    @Test
+    @DisplayName("Test parsing a triple with non-ASCII Unicode characters in IRI (W3C test060 NBSP and math symbols)")
+    void testParseNonAsciiUnicodeInIRI() throws ParsingException {
+        String ntriple = "<urn:ex:s:003> <urn:ex:020> <urn:ex:\\u00a0> .";
+        IRI expectedSubject = mock(IRI.class);
+        IRI expectedPredicate = mock(IRI.class);
+        IRI expectedObject = mock(IRI.class);
+
+        lenient().when(mockValueFactory.createIRI(eq("urn:ex:s:003"))).thenReturn(expectedSubject);
+        lenient().when(mockValueFactory.createIRI(eq("urn:ex:020"))).thenReturn(expectedPredicate);
+        lenient().when(mockValueFactory.createIRI(eq("urn:ex:\u00a0"))).thenReturn(expectedObject);
+
+        parser.parse(new StringReader(ntriple));
+        verify(mockModel).add(expectedSubject, expectedPredicate, expectedObject);
+    }
+
+    @Test
+    @DisplayName("Test parsing rejects relative IRIs in N-Triples")
+    void testParseRejectsRelativeIRI() {
+        String ntriple = "<relative/iri> <http://example.org/p> <http://example.org/o> .";
+        assertThrows(ParsingException.class, () -> parser.parse(new StringReader(ntriple)));
+    }
+
+    @Test
+    @DisplayName("Test parsing rejects IRIs without valid scheme in N-Triples")
+    void testParseRejectsInvalidScheme() {
+        String ntriple = "<:invalidScheme> <http://example.org/p> <http://example.org/o> .";
+        assertThrows(ParsingException.class, () -> parser.parse(new StringReader(ntriple)));
     }
 }
