@@ -16,8 +16,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -182,14 +180,34 @@ public final class NTriplesParser extends AbstractRDFParser {
         }
 
         private void validateIri(String text) {
-            try {
-                URI uri = new URI(text);
-                if (!uri.isAbsolute()) {
-                    throw error("N-Triples requires an absolute IRI");
-                }
-            } catch (URISyntaxException e) {
-                throw new ParsingException(location("Invalid absolute IRI: " + e.getReason()), e);
+            if (!isAbsoluteIri(text)) {
+                throw error("N-Triples requires an absolute IRI");
             }
+        }
+
+        private static boolean isAbsoluteIri(String text) {
+            if (text == null || text.isEmpty() || !isAsciiAlpha(text.charAt(0))) {
+                return false;
+            }
+            int i = 1;
+            int length = text.length();
+            while (i < length) {
+                char c = text.charAt(i);
+                if (isSchemeChar(c)) {
+                    i++;
+                } else {
+                    break;
+                }
+            }
+            return i < length && text.charAt(i) == ':';
+        }
+
+        private static boolean isAsciiAlpha(char c) {
+            return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+        }
+
+        private static boolean isSchemeChar(char c) {
+            return isAsciiAlpha(c) || (c >= '0' && c <= '9') || c == '+' || c == '-' || c == '.';
         }
 
         private BNode blankNode() throws IOException {
