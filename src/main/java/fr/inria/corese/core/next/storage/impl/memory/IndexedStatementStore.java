@@ -4,7 +4,6 @@ import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.term.Resource;
 import fr.inria.corese.core.next.data.api.term.Value;
-import fr.inria.corese.core.next.storage.api.config.StorageConfig;
 import fr.inria.corese.core.next.storage.api.exception.ErrorCode;
 import fr.inria.corese.core.next.storage.api.exception.StorageException;
 import fr.inria.corese.core.next.storage.api.lifecycle.LifecycleState;
@@ -15,7 +14,6 @@ import fr.inria.corese.core.next.storage.api.model.StorageStatistics;
 import fr.inria.corese.core.next.storage.api.operations.MetadataOperations;
 import fr.inria.corese.core.next.storage.api.operations.MutationOperations;
 import fr.inria.corese.core.next.storage.api.operations.QueryOperations;
-import fr.inria.corese.core.next.storage.api.operations.StatementSpliterator;
 import fr.inria.corese.core.next.storage.api.transaction.IsolationLevel;
 import fr.inria.corese.core.next.storage.api.transaction.Transaction;
 import fr.inria.corese.core.next.storage.api.transaction.TransactionManager;
@@ -25,18 +23,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
-import java.util.Spliterator;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -77,7 +70,7 @@ final class IndexedStatementStore
     /**
      * Shared lifecycle monitor and committed database state.
      */
-    private final Database database;
+    final MemoryDatabase database;
     /**
      * Active transaction owned by this session, or null.
      */
@@ -92,90 +85,10 @@ final class IndexedStatementStore
     private boolean loading;
 
     /**
-     * Shared database state and lifecycle monitor for all sessions.
-     */
-    private static final class Database implements StorageLifecycle {
-
-        /** Creates an uninitialized database and its exclusively owned empty committed state. */
-        private Database() {
-        }
-
-        /**
-         * Committed state whose partition references are owned by the database.
-         */
-        private PartitionState committed = new PartitionState();
-        /**
-         * Committed version captured for optimistic conflict detection.
-         */
-        private long version;
-        /**
-         * Current shared database lifecycle status.
-         */
-        private LifecycleState lifecycleState = LifecycleState.NOT_INITIALIZED;
-        /**
-         * Configuration available during the running lifecycle.
-         */
-        private StorageConfig config;
-
-        /**
-         * {@inheritDoc}
-         *
-         * @param config storage configuration selecting this backend
-         * @throws IllegalStateException if the required representation, ownership or lifecycle state is not satisfied
-         * @throws NullPointerException  if an explicitly required argument or mapped value is null
-         */
-        @Override
-        public synchronized void initialize(final StorageConfig config) {
-            Objects.requireNonNull(config, "config");
-            if (lifecycleState != LifecycleState.NOT_INITIALIZED) {
-                throw new IllegalStateException("Already initialized");
-            }
-            this.config = config;
-            lifecycleState = LifecycleState.RUNNING;
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * @throws IllegalStateException if the required representation, ownership or lifecycle state is not satisfied
-         */
-        @Override
-        public synchronized void shutdown() {
-            if (lifecycleState != LifecycleState.RUNNING) {
-                throw new IllegalStateException("Storage is not running");
-            }
-            committed.release();
-            committed = new PartitionState();
-            config = null;
-            lifecycleState = LifecycleState.SHUTDOWN;
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * @return the current lifecycle or transaction status
-         */
-        @Override
-        public synchronized LifecycleState getState() {
-            return lifecycleState;
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * @return current configuration when the database is running
-         */
-        @Override
-        public synchronized Optional<StorageConfig> getConfig() {
-            return Optional.ofNullable(config);
-        }
-    }
-
-    /**
      * Creates session operations sharing the supplied database, or a new uninitialized database.
      */
     IndexedStatementStore() {
-        this(new Database());
+        this(new MemoryDatabase());
     }
 
     /**
@@ -183,7 +96,7 @@ final class IndexedStatementStore
      *
      * @param database shared database monitor and state
      */
-    private IndexedStatementStore(final Database database) {
+    private IndexedStatementStore(final MemoryDatabase database) {
         this.database = database;
     }
 
@@ -228,7 +141,7 @@ final class IndexedStatementStore
             final IndexedStatementStore snapshot = new IndexedStatementStore(database);
             final PartitionState captured = state().copy();
             try {
-                snapshot.transaction = snapshot.new SnapshotTransaction(captured, getDataVersion(), true);
+                snapshot.transaction = new SnapshotTransaction(database, snapshot, captured, getDataVersion(), true);
                 return snapshot;
             } catch (final RuntimeException | Error failure) {
                 captured.release();
@@ -261,12 +174,20 @@ final class IndexedStatementStore
         }
     }
 
+    boolean isLoading() {
+        return loading;
+    }
+
+    void clearTransaction() {
+        this.transaction = null;
+    }
+
     /**
      * Requires an open session and, when active, access from its transaction owner thread.
      *
      * @throws IllegalStateException if the required representation, ownership or lifecycle state is not satisfied
      */
-    private void checkAccess() {
+    void checkAccess() {
         if (!isOpen()) {
             throw new IllegalStateException("Storage session is closed");
         }
@@ -350,229 +271,13 @@ final class IndexedStatementStore
             checkAccess();
             final PartitionState snapshot = state().copy(pattern.getContexts());
             try {
-                var cursor = new SnapshotCursor(snapshot, pattern);
+                var cursor = new SnapshotStatementSpliterator(database, snapshot, pattern);
                 return StreamSupport.stream(cursor, false).onClose(cursor::close);
             } catch (final RuntimeException | Error failure) {
                 snapshot.release();
                 throw failure;
             }
         }
-    }
-
-    /**
-     * Single-consumer cursor owning a captured state until close, exhaustion or failure. Known-size traversal can
-     * release ownership before delivering the last immutable statement. Close is idempotent and clears traversal
-     * references under the monitor. No database monitor is held while visiting rows or invoking consumer code. Session
-     * and transaction closure do not invalidate this independent read snapshot.
-     */
-    private final class SnapshotCursor implements StatementSpliterator, AutoCloseable {
-        /**
-         * Read state retained until this cursor is closed or exhausted.
-         */
-        private PartitionState snapshot;
-        /**
-         * Ordered traversal of the retained partition registry.
-         */
-        private Iterator<GraphPartition> partitions;
-        /**
-         * Positional traversal of the current retained partition.
-         */
-        private TripleIndex.Cursor rows;
-        /**
-         * Captured immutable search pattern.
-         */
-        private final StatementPattern pattern;
-        /**
-         * Canonical traversal subject or current batch subject, according to the enclosing traversal.
-         */
-        private final TermKey subject;
-        /**
-         * Canonical traversal predicate or current batch predicate, according to the enclosing traversal.
-         */
-        private final TermKey predicate;
-        /**
-         * Captured object search key; null denotes a wildcard.
-         */
-        private final TermKey object;
-        /**
-         * Whether the retained match count is known exactly.
-         */
-        private final boolean sized;
-        /**
-         * Snapshot-bound guarantee of SPO uniqueness independently of context.
-         */
-        private final boolean distinctTriples;
-        /**
-         * Remaining exact count or the unsized upper bound while this cursor is open.
-         */
-        private long remaining;
-
-        /**
-         * Creates a single-consumer cursor owning the supplied retained read state.
-         *
-         * @param snapshot retained read state
-         * @param pattern  captured search pattern
-         */
-        private SnapshotCursor(final PartitionState snapshot, final StatementPattern pattern) {
-            this.snapshot = snapshot;
-            this.pattern = pattern;
-            distinctTriples = hasAtMostOnePopulatedPartition(snapshot);
-            subject = TermKey.nullable(pattern.getSubject());
-            predicate = TermKey.nullable(pattern.getPredicate());
-            object = TermKey.nullable(pattern.getObject());
-            sized = subject == null && predicate == null && object == null;
-            remaining = sized ? snapshot.size : Long.MAX_VALUE;
-            partitions = snapshot.graphs.values().iterator();
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * @param action consumer invoked outside the database monitor
-         * @return true when a statement was delivered, false when this cursor is closed or exhausted
-         * @throws NullPointerException if an explicitly required argument or mapped value is null
-         */
-        // Traversal Errors release ownership and are rethrown unchanged.
-        @SuppressWarnings("java:S1181")
-        @Override
-        public boolean tryAdvance(final Consumer<? super Statement> action) {
-            Objects.requireNonNull(action);
-            if (snapshot == null) {
-                return false;
-            }
-            try {
-                for (;;) {
-                    final Statement statement = rows == null ? null : rows.next();
-                    if (statement != null) {
-                        if (sized && --remaining == 0) {
-                            close();
-                        }
-                        action.accept(statement);
-                        return true;
-                    }
-                    if (!partitions.hasNext()) {
-                        close();
-                        return false;
-                    }
-                    rows = partitions.next().index(pattern).cursor(subject, predicate, object);
-                }
-            } catch (final RuntimeException | Error failure) {
-                close();
-                throw failure;
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * @param action consumer invoked outside the database monitor
-         * @throws NullPointerException if an explicitly required argument or mapped value is null
-         */
-        @Override
-        public void forEachRemaining(final Consumer<? super Statement> action) {
-            Objects.requireNonNull(action);
-            if (snapshot == null) {
-                return;
-            }
-            // A complete scan uses the existing bulk visitor, without per-row cursor overhead.
-            if (rows != null) {
-                StatementSpliterator.super.forEachRemaining(action);
-                return;
-            }
-            try {
-                final Predicate<Statement> visitor = statement -> {
-                    if (sized && --remaining == 0) {
-                        close();
-                    }
-                    action.accept(statement);
-                    return snapshot == null;
-                };
-                while (snapshot != null && partitions.hasNext()) {
-                    partitions.next().index(pattern).visit(subject, predicate, object, visitor);
-                }
-            } finally {
-                close();
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * @return true only when SPO uniqueness is guaranteed for this retained read
-         */
-        @Override
-        public boolean hasDistinctTriples() {
-            return distinctTriples;
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * @return null; this traversal cannot be split
-         */
-        @Override
-        public Spliterator<Statement> trySplit() {
-            return null;
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * @return remaining size estimate, or zero once the cursor is closed
-         */
-        @Override
-        public long estimateSize() {
-            return snapshot == null ? 0 : remaining;
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * @return the ORDERED, NONNULL and IMMUTABLE flags, plus SIZED and SUBSIZED when the exact count is known
-         */
-        @Override
-        public int characteristics() {
-            return ORDERED | NONNULL | IMMUTABLE | (sized ? SIZED | SUBSIZED : 0);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void close() {
-            synchronized (database) {
-                if (snapshot == null) {
-                    return;
-                }
-                snapshot.release();
-                snapshot = null;
-                partitions = null;
-                rows = null;
-            }
-        }
-    }
-
-    /**
-     * Empty named partitions survive CLEAR but cannot contribute duplicate triples.
-     *
-     * @param snapshot retained read state
-     * @return true when at most one selected partition contains statements
-     */
-    private static boolean hasAtMostOnePopulatedPartition(final PartitionState snapshot) {
-        if (snapshot.graphs.size() <= 1) {
-            return true;
-        }
-        boolean populated = false;
-        for (final GraphPartition partition : snapshot.graphs.values()) {
-            if (partition.spo.size() == 0) {
-                continue;
-            }
-            if (populated) {
-                return false;
-            }
-            populated = true;
-        }
-        return true;
     }
 
     /**
@@ -1234,180 +939,8 @@ final class IndexedStatementStore
             if (transaction != null) {
                 throw new IllegalStateException("A transaction is already active on this session");
             }
-            transaction = new SnapshotTransaction(database.committed.copy(), database.version);
+            transaction = new SnapshotTransaction(database, this, database.committed.copy(), database.version);
             return transaction;
-        }
-    }
-
-    /**
-     * Thread-owned optimistic transaction retaining a captured state until commit or rollback.
-     */
-    private final class SnapshotTransaction implements Transaction {
-        /**
-         * Stable transaction identifier.
-         */
-        private final String id = UUID.randomUUID().toString();
-        /**
-         * Owning manager flag or transaction thread, according to the enclosing class.
-         */
-        private final Thread owner = Thread.currentThread();
-        /**
-         * Committed version captured for optimistic conflict detection.
-         */
-        private final long version;
-        /** Version of the transaction's own visible content, independent of later commits. */
-        private long revision;
-        /** Independent query snapshots never publish mutations. */
-        private final boolean readOnly;
-        /**
-         * Transaction-owned state until publication or release.
-         */
-        private PartitionState state;
-        /**
-         * Whether this transaction changed its captured state.
-         */
-        private boolean dirty;
-        /**
-         * Current transaction lifecycle status.
-         */
-        private TransactionState status = TransactionState.ACTIVE;
-
-        /**
-         * Creates a thread-owned transaction for the captured committed version.
-         *
-         * @param state   state whose ownership is guarded by the database monitor
-         * @param version committed version captured for conflict detection
-         */
-        private SnapshotTransaction(final PartitionState state, final long version) {
-            this(state, version, false);
-        }
-
-        private SnapshotTransaction(final PartitionState state, final long version, final boolean readOnly) {
-            this.state = state;
-            this.version = version;
-            this.revision = version;
-            this.readOnly = readOnly;
-        }
-
-        /**
-         * Requires access from the thread that began the transaction.
-         *
-         * @throws IllegalStateException if the required representation, ownership or lifecycle state is not satisfied
-         */
-        private void checkOwner() {
-            if (Thread.currentThread() != owner) {
-                throw new IllegalStateException("Transaction belongs to another thread");
-            }
-        }
-
-        /**
-         * Requires the transaction owner, active status and no overlapping session batch.
-         *
-         * @throws IllegalStateException if the required representation, ownership or lifecycle state is not satisfied
-         */
-        private void requireActive() {
-            checkOwner();
-            if (status != TransactionState.ACTIVE) {
-                throw new IllegalStateException("Transaction is inactive");
-            }
-            if (loading) {
-                throw new IllegalStateException("A batch is active on this session");
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * @return the transaction identifier
-         */
-        @Override
-        public String getId() {
-            return id;
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * @return true while the transaction is active
-         */
-        @Override
-        public boolean isActive() {
-            synchronized (database) {
-                return status == TransactionState.ACTIVE;
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * @return the current lifecycle or transaction status
-         */
-        @Override
-        public TransactionState getState() {
-            synchronized (database) {
-                return status;
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * @throws StorageException if publication fails or a concurrent committed version prevents commit
-         */
-        @Override
-        public void commit() {
-            synchronized (database) {
-                requireActive();
-                checkAccess();
-                if (database.version != version) {
-                    throw new StorageException(ErrorCode.TRANSACTION_ERROR,
-                            "Concurrent storage modification; roll back and retry");
-                }
-                if (dirty) {
-                    database.committed.release();
-                    database.committed = state;
-                    state = null; // Ownership transferred to the committed state.
-                    database.version = revision;
-                }
-                finish(TransactionState.COMMITTED);
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void rollback() {
-            synchronized (database) {
-                requireActive();
-                finish(TransactionState.ROLLED_BACK);
-            }
-        }
-
-        /**
-         * Sets terminal transaction status and releases any state ownership not transferred at commit.
-         *
-         * @param terminal terminal transaction status
-         */
-        private void finish(final TransactionState terminal) {
-            status = terminal;
-            if (state != null) {
-                state.release();
-            }
-            state = null;
-            transaction = null;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void close() {
-            synchronized (database) {
-                if (isActive()) {
-                    rollback();
-                }
-            }
         }
     }
 
