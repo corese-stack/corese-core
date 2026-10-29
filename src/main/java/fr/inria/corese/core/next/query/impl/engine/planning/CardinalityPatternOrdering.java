@@ -119,11 +119,27 @@ final class CardinalityPatternOrdering {
         return counts;
     }
 
+    /**
+     * Returns true if the seed pattern has the minimum cardinality in the run
+     * (or is tied for it). When a filter-binding seed has higher cardinality than
+     * another pattern, the greedy loop will naturally place the cheaper pattern
+     * first and the filter is still applied as soon as its variable is bound.
+     */
+    private static boolean isCheapestOrTied(int seed, int start, int end, long[] counts) {
+        long seedCount = counts[seed - start];
+        for (int k = start; k < end; k++) {
+            if (counts[k - start] < seedCount) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private static void orderRun(Exp expression, int start, int end, long[] counts,
             PlanningContext context) {
         int first = start;
         int seed = SelectiveFilterPushdown.seed(expression, start, end);
-        if (seed >= 0) {
+        if (seed >= 0 && isCheapestOrTied(seed, start, end, counts)) {
             moveFirst(expression, counts, start, first, seed);
             recordBindings(expression.get(first), context.bound());
             first++;
