@@ -21,7 +21,7 @@ final class PredicateStatisticsEstimator {
      *
      * @param index     POS triple index
      * @param predicate the predicate IRI
-     * @param maxSample maximum number of branch entries to sample for distinct subjects
+     * @param maxSample maximum number of subjects to sample for distinct-subject estimation
      * @return predicate statistics or null if not found or not in POS order
      */
     static PredicateStatistics estimate(final TripleIndex index, final IRI predicate, final int maxSample) {
@@ -66,8 +66,11 @@ final class PredicateStatisticsEstimator {
         private void accumulateLeaf(final TripleIndex.Leaf leaf) {
             totalCount += leaf.size();
             if (shouldSample()) {
-                leaf.forEach((subjKey, st) -> subjects.add(subjKey));
-                sampled++;
+                leaf.visitMatching(null, statement -> {
+                    subjects.add(new TermKey(statement.getSubject()));
+                    sampled++;
+                    return !shouldSample(); // true = stop when subject limit reached
+                });
             }
         }
 
@@ -84,10 +87,12 @@ final class PredicateStatisticsEstimator {
         }
 
         long estimateDistinctSubjects(final long distinctObjects) {
-            if (maxSample <= 0 || distinctObjects <= maxSample) {
+            if (maxSample <= 0 || sampled < maxSample) {
+                // Processed fewer subjects than the limit: sampled everything exactly.
                 return subjects.size();
             }
-            final double ratio = (double) distinctObjects / Math.max(1, sampled);
+            // Hit the subject limit — extrapolate from the sample.
+            final double ratio = (double) totalCount / Math.max(1, sampled);
             final long estimated = Math.round(subjects.size() * ratio);
             return Math.min(totalCount, Math.max(subjects.size(), estimated));
         }

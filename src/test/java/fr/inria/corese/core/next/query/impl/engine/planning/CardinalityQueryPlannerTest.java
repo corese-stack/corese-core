@@ -387,6 +387,34 @@ class CardinalityQueryPlannerTest {
         assertEquals(List.of("urn:bench:empty", "urn:bench:probe"), predicates(query));
     }
 
+    // ── isCheapestOrTied: selective filter seed is demoted when a cheaper pattern exists ──
+
+    @Test
+    void selectiveFilterSeedDemotedWhenCheaperPatternExists() {
+        // ?seed has a FILTER binding hint but count=50, while :cheaper has count=1.
+        // Before the isCheapestOrTied fix, the seed was always placed first regardless.
+        // After the fix, :cheaper wins the first slot.
+        assertPlan("?s :seed ?y . ?s :cheaper ?z . FILTER(?y < 3)",
+                Map.of("seed", 50L, "cheaper", 1L),
+                List.of("cheaper", "seed"));
+    }
+
+    @Test
+    void selectiveFilterSeedKeptFirstWhenItIsCheapest() {
+        // Seed has FILTER binding and is also the cheapest — should remain first.
+        assertPlan("?s :seed ?y . ?s :expensive ?z . FILTER(?y < 3)",
+                Map.of("seed", 1L, "expensive", 50L),
+                List.of("seed", "expensive"));
+    }
+
+    @Test
+    void selectiveFilterSeedKeptFirstWhenTiedWithOtherPattern() {
+        // Seed has FILTER binding and is tied — should remain first (tie-keep behaviour).
+        assertPlan("?s :seed ?y . ?s :tied ?z . FILTER(?y < 3)",
+                Map.of("seed", 5L, "tied", 5L),
+                List.of("seed", "tied"));
+    }
+
     private static void assertPlan(String body, Map<String, Long> counts, List<String> expected) {
         Map<String, Long> qualified = new java.util.HashMap<>();
         counts.forEach((key, value) -> qualified.put("urn:bench:" + key, value));
