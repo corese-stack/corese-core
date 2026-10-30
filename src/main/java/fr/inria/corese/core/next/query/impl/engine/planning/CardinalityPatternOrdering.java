@@ -121,14 +121,27 @@ final class CardinalityPatternOrdering {
 
     /**
      * Returns true if the seed pattern has the minimum cardinality in the run
-     * (or is tied for it). When a filter-binding seed has higher cardinality than
-     * another pattern, the greedy loop will naturally place the cheaper pattern
-     * first and the filter is still applied as soon as its variable is bound.
+     * (or is tied for it), ignoring unavailable negative cardinalities (-1).
+     * If the seed has an unknown cardinality, it is only preserved if all other
+     * candidate patterns also have unknown cardinality; otherwise, known patterns
+     * (such as empty patterns with count 0) take precedence.
      */
     private static boolean isCheapestOrTied(int seed, int start, int end, long[] counts) {
+        if (seed < start || seed >= end) {
+            return false;
+        }
         long seedCount = counts[seed - start];
+        if (seedCount < 0) {
+            for (int k = start; k < end; k++) {
+                if (counts[k - start] >= 0) {
+                    return false;
+                }
+            }
+            return true;
+        }
         for (int k = start; k < end; k++) {
-            if (counts[k - start] < seedCount) {
+            long otherCount = counts[k - start];
+            if (otherCount >= 0 && otherCount < seedCount) {
                 return false;
             }
         }
@@ -139,7 +152,7 @@ final class CardinalityPatternOrdering {
             PlanningContext context) {
         int first = start;
         int seed = SelectiveFilterPushdown.seed(expression, start, end);
-        if (seed >= 0 && isCheapestOrTied(seed, start, end, counts)) {
+        if (seed >= start && seed < end && isCheapestOrTied(seed, start, end, counts)) {
             moveFirst(expression, counts, start, first, seed);
             recordBindings(expression.get(first), context.bound());
             first++;

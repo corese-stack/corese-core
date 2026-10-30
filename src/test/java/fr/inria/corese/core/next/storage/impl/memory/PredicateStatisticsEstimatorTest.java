@@ -130,9 +130,8 @@ class PredicateStatisticsEstimatorTest {
         assertNotNull(stats);
         assertEquals(2000, stats.count());
         assertEquals(1, stats.distinctObjects());
-        assertTrue(stats.distinctSubjects() > 0);
-        assertTrue(stats.distinctSubjects() <= stats.count(),
-                "distinctSubjects must not exceed count: " + stats.distinctSubjects() + " > " + stats.count());
+        assertEquals(2000, stats.distinctSubjects(),
+                "For a single object (distinctObjects == 1), distinctSubjects must equal totalCount exactly");
 
         storage.close();
     }

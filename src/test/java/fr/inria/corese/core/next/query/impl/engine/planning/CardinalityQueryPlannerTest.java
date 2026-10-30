@@ -415,6 +415,33 @@ class CardinalityQueryPlannerTest {
                 List.of("seed", "tied"));
     }
 
+    @Test
+    void selectiveFilterSeedDemotedWhenEmptyPatternExistsEvenIfSeedIsUnknown() {
+        // ?seed has unknown cardinality (-1), but :empty has count=0.
+        // With :empty in source position 0 and :seed as filter seed at position 1,
+        // the unknown seed must not be promoted ahead of the known empty pattern.
+        assertPlan("?s :empty ?z . ?s :seed ?y . FILTER(?y < 3)",
+                Map.of("empty", 0L),
+                List.of("empty", "seed"));
+    }
+
+    @Test
+    void selectiveFilterSeedKeptWhenOtherPatternIsUnknownAndSeedIsKnownCheapest() {
+        // Seed has count=0, while :unknown has no statistics (-1).
+        // The known cheapest seed should remain first.
+        assertPlan("?s :seed ?y . ?s :unknown ?z . FILTER(?y < 3)",
+                Map.of("seed", 0L),
+                List.of("seed", "unknown"));
+    }
+
+    @Test
+    void selectiveFilterSeedKeptWhenAllPatternsHaveUnknownCardinalities() {
+        // No statistics are available for any pattern: heuristic filter pushdown is preserved.
+        assertPlan("?s :seed ?y . ?s :other ?z . FILTER(?y < 3)",
+                Map.of(),
+                List.of("seed", "other"));
+    }
+
     private static void assertPlan(String body, Map<String, Long> counts, List<String> expected) {
         Map<String, Long> qualified = new java.util.HashMap<>();
         counts.forEach((key, value) -> qualified.put("urn:bench:" + key, value));

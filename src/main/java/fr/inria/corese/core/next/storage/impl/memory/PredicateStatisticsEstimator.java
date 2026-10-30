@@ -87,8 +87,12 @@ final class PredicateStatisticsEstimator {
         }
 
         long estimateDistinctSubjects(final long distinctObjects) {
-            if (maxSample <= 0 || sampled < maxSample) {
-                // Processed fewer subjects than the limit: sampled everything exactly.
+            if (distinctObjects == 1) {
+                // In POS permutation, all triples under a single object have distinct subjects.
+                return totalCount;
+            }
+            if (maxSample <= 0 || sampled < maxSample || sampled >= totalCount) {
+                // Processed fewer subjects than the limit or sampled everything exactly.
                 return subjects.size();
             }
             // Hit the subject limit — extrapolate from the sample.
