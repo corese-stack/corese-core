@@ -17,10 +17,10 @@ import fr.inria.corese.core.next.data.impl.io.parser.rdfa.RDFaParserOptions;
 import fr.inria.corese.core.next.data.impl.io.parser.rdfxml.RDFXMLParser;
 import fr.inria.corese.core.next.data.impl.io.parser.rdfxml.RDFXMLParserOptions;
 import fr.inria.corese.core.next.data.api.exception.ParsingException;
-import fr.inria.corese.core.next.data.impl.io.parser.turtle.TurtleParser;
 import fr.inria.corese.core.next.data.impl.io.parser.turtle.TurtleParserOptions;
-import fr.inria.corese.core.next.data.impl.io.parser.trig.TriGParser;
+import fr.inria.corese.core.next.data.impl.io.parser.turtle.TurtleScanner;
 import fr.inria.corese.core.next.data.impl.io.parser.trig.TriGParserOptions;
+import fr.inria.corese.core.next.data.impl.io.parser.trig.TriGScanner;
 import fr.inria.corese.core.next.data.api.io.JSONLDOptions;
 
 import java.util.Objects;
@@ -61,7 +61,7 @@ public class DefaultRDFParserFactory extends AbstractRDFParserFactory {
         if (RDFFormat.JSONLD.equals(format)) {
             return new JSONLDParser(model, factory, config);
         } else if (RDFFormat.TURTLE.equals(format)) {
-            return new TurtleParser(model, factory, config);
+            return new TurtleScanner(model, factory, config);
         } else if (RDFFormat.NTRIPLES.equals(format)) {
             return new NTriplesParser(model, factory, config);
         } else if (RDFFormat.NQUADS.equals(format) || RDFFormat.RDFC_1_0.equals(format)) {
@@ -69,7 +69,7 @@ public class DefaultRDFParserFactory extends AbstractRDFParserFactory {
         } else if (RDFFormat.RDFXML.equals(format)) {
             return new RDFXMLParser(model, factory, config);
         } else if (RDFFormat.TRIG.equals(format)) {
-            return new TriGParser(model, factory, config);
+            return new TriGScanner(model, factory, config);
         } else if (RDFFormat.RDFA.equals(format)) {
             return new RDFaParser(model, factory, config);
         }
@@ -91,7 +91,7 @@ public class DefaultRDFParserFactory extends AbstractRDFParserFactory {
         if (RDFFormat.JSONLD.equals(format)) {
             return new JSONLDParser(model, factory);
         } else if (RDFFormat.TURTLE.equals(format)) {
-            return new TurtleParser(model, factory);
+            return new TurtleScanner(model, factory);
         } else if (RDFFormat.NTRIPLES.equals(format)) {
             return new NTriplesParser(model, factory);
         } else if (RDFFormat.NQUADS.equals(format) || RDFFormat.RDFC_1_0.equals(format)) {
@@ -99,7 +99,7 @@ public class DefaultRDFParserFactory extends AbstractRDFParserFactory {
         } else if (RDFFormat.RDFXML.equals(format)) {
             return new RDFXMLParser(model, factory);
         } else if (RDFFormat.TRIG.equals(format)) {
-            return new TriGParser(model, factory);
+            return new TriGScanner(model, factory);
         } else if (RDFFormat.RDFA.equals(format)) {
             return new RDFaParser(model, factory);
         }
