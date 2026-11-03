@@ -69,12 +69,13 @@ public class RDFXMLSerializer implements RDFSerializer {
         this.model = Objects.requireNonNull(model, "Model cannot be null");
         this.config = Objects.requireNonNull(config, "Configuration cannot be null");
 
-        if(config instanceof UsesPrefixOptions usesPrefixOptions
-                && usesPrefixOptions.usePrefixes()) {
-            this.prefixHandler = new PrefixHandler(false);
+        this.prefixHandler = new PrefixHandler(false);
+        // Seed with namespaces declared on the model (e.g. parsed @prefix directives).
+        // Config-level prefixes and standard RDF/XML namespaces are applied afterwards and take precedence on conflict.
+        model.getNamespaces().forEach(this.prefixHandler::setNamespace);
+        if (config instanceof UsesPrefixOptions usesPrefixOptions && usesPrefixOptions.usePrefixes()) {
             this.prefixHandler.copyFrom(usesPrefixOptions.getPrefixMapping());
         } else {
-            this.prefixHandler = new PrefixHandler(false);
             // These namespaces are part of the RDF/XML standard
             this.prefixHandler.setPrefix(RDF.getVocabularyPreferredPrefix(), RDF.getVocabularyNamespace());
             this.prefixHandler.setPrefix(XSD.getVocabularyPreferredPrefix(), XSD.getVocabularyNamespace());
