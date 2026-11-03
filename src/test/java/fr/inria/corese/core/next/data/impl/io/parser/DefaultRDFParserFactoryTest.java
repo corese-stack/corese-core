@@ -8,7 +8,7 @@ import fr.inria.corese.core.next.data.api.io.parser.RDFParserOptions;
 import fr.inria.corese.core.next.data.impl.io.parser.jsonld.JSONLDParser;
 import fr.inria.corese.core.next.data.impl.io.parser.nquads.NQuadsParser;
 import fr.inria.corese.core.next.data.impl.io.parser.ntriples.NTriplesParser;
-import fr.inria.corese.core.next.data.impl.io.parser.turtle.TurtleParser;
+import fr.inria.corese.core.next.data.impl.io.parser.turtle.TurtleScanner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,11 +52,11 @@ class DefaultRDFParserFactoryTest {
     }
 
     @Test
-    @DisplayName("createRDFParser (with config) should return ANTLRTurtleParser for TURTLE format")
+    @DisplayName("createRDFParser (with config) should return TurtleScanner for TURTLE format")
     void testCreateRDFParserWithConfigTurtle() {
         RDFParser parser = parserFactory.createRDFParser(RDFFormat.TURTLE, mockModel, mockValueFactory, parserOptions);
         assertNotNull(parser);
-        assertInstanceOf(TurtleParser.class, parser);
+        assertInstanceOf(TurtleScanner.class, parser);
     }
 
     @Test
@@ -85,11 +85,11 @@ class DefaultRDFParserFactoryTest {
     }
 
     @Test
-    @DisplayName("createRDFParser (without config) should return ANTLRTurtleParser for TURTLE format")
+    @DisplayName("createRDFParser (without config) should return TurtleScanner for TURTLE format")
     void testCreateRDFParserWithoutConfigTurtle() {
         RDFParser parser = parserFactory.createRDFParser(RDFFormat.TURTLE, mockModel, mockValueFactory);
         assertNotNull(parser);
-        assertInstanceOf(TurtleParser.class, parser);
+        assertInstanceOf(TurtleScanner.class, parser);
     }
 
     @Test
