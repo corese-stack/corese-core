@@ -89,6 +89,9 @@ class IRIUtilsTest {
         assertTrue(IRIUtils.isAbsoluteIRI("http://xmlns.com/foaf/0.1/"));
         assertFalse(IRIUtils.isAbsoluteIRI("child/password@127.0.0.1:3307"));
         assertFalse(IRIUtils.isAbsoluteIRI("child/otherChild/otherotherchild/#patate"));
+        assertFalse(IRIUtils.isAbsoluteIRI(null));
+        assertFalse(IRIUtils.isAbsoluteIRI(""));
+        assertFalse(IRIUtils.isAbsoluteIRI("   "));
     }
 
     /**
