@@ -19,7 +19,7 @@ import java.util.Objects;
 /**
  * Streaming RDF 1.1 Turtle parser without tokens, parse trees, or ANTLR.
  *
- * <p>Replaces the ANTLR-based {@link TurtleParser} with a character-level FSM that
+ * <p>Uses a character-level scanner that
  * streams resolved terms directly to the model with minimal allocations.
  * IRIs are cached with a bounded cache; blank nodes are scoped to one document.
  * Memory is O(longest term + distinct blank node labels + IRI cache size).</p>
