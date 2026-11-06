@@ -19,10 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Unit tests for the ANTLRTurtle class.
- * These tests verify the parser's ability to correctly parse Turtle
- * and interact with the Model and ValueFactory, including error handling
- * and unescaping of IRIs and literals, and named graphs.
+ * Integration tests for the streaming TurtleScanner class.
  */
 class TurtleParserTest extends ParserTestBase {
 
@@ -35,17 +32,17 @@ class TurtleParserTest extends ParserTestBase {
                 ex:Alice ex:knows ex:Bob .""";
 
         Model model = createTestModel();
-        RDFParser parser = new TurtleParser(model, factory, new TurtleParserOptions.Builder().baseIRI("http://inria.fr/").build());
+        RDFParser parser = new TurtleScanner(model, factory, new TurtleParserOptions.Builder().baseIRI("http://inria.fr/").build());
         parser.parse(new StringReader(turtle));
         assertEquals(1, model.size());
-        assertEquals(1, model.getNamespaces().size()); // Should contains ex: and the relative base uri :
+        assertEquals(1, model.getNamespaces().size());
     }
 
     @ParameterizedTest
     @MethodSource("provideTripleQuoteTestCases")
     void testTripleQuoteLiteralWithDoubleQuotes(String turtleInput, String expectedLiteralValue) {
         Model model = createTestModel();
-        RDFParser parser = new TurtleParser(model, factory, new TurtleParserOptions.Builder().baseIRI("http://inria.fr/").build());
+        RDFParser parser = new TurtleScanner(model, factory, new TurtleParserOptions.Builder().baseIRI("http://inria.fr/").build());
         parser.parse(new StringReader(turtleInput));
         assertEquals(1, model.size());
         assertTrue(model.contains(factory.createIRI("http://inria.fr/#0214"), RDFS.comment.getIRI(), factory.createLiteral(expectedLiteralValue)));
@@ -57,14 +54,14 @@ class TurtleParserTest extends ParserTestBase {
                 """
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
                 <#0214>\s
-                    rdfs:comment \"""blabla"abc\\\"\""" .""",
+                    rdfs:comment \"""blabla"abc\\"\""" .""",
                 "blabla\"abc\""
             ),
             Arguments.of(
                 """
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
                 <#0214>\s
-                    rdfs:comment ""\""abc"blabla\""" .""",
+                    rdfs:comment "\"""abc"blabla\""" .""",
                 "\"abc\"blabla"
             ),
             Arguments.of(
@@ -78,7 +75,7 @@ class TurtleParserTest extends ParserTestBase {
                 """
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
                 <#0214>\s
-                    rdfs:comment ""\""abc\\\"\""" .""",
+                    rdfs:comment "\"""abc\\"\""" .""",
                 "\"abc\""
             )
         );
@@ -97,7 +94,7 @@ class TurtleParserTest extends ParserTestBase {
                  \s""";
 
         Model model = createTestModel();
-        RDFParser parser = new TurtleParser(model, factory, new TurtleParserOptions.Builder().baseIRI("http://inria.fr/").build());
+        RDFParser parser = new TurtleScanner(model, factory, new TurtleParserOptions.Builder().baseIRI("http://inria.fr/").build());
         parser.parse(new StringReader(turtle));
 
         Model refModel = createTestModel();
@@ -118,13 +115,13 @@ class TurtleParserTest extends ParserTestBase {
     void testUndeclaredEmptyPrefixThrowsParsingException() {
         String turtle = ":subject :predicate :object .";
         Model model = createTestModel();
-        RDFParser parser = new TurtleParser(model, factory);
+        RDFParser parser = new TurtleScanner(model, factory);
 
         fr.inria.corese.core.next.data.api.exception.ParsingException ex = org.junit.jupiter.api.Assertions.assertThrows(
                 fr.inria.corese.core.next.data.api.exception.ParsingException.class,
                 () -> parser.parse(new StringReader(turtle))
         );
-        assertTrue(ex.getMessage().contains("Undeclared prefix: '' (empty prefix)"));
+        assertTrue(ex.getMessage().contains("Undeclared default prefix ':'"));
     }
 
 }

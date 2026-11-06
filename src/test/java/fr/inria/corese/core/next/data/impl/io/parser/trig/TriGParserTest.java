@@ -14,7 +14,7 @@ import java.io.StringReader;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Unit tests for the ANTLRTrigParser class.
+ * Unit tests for the TriGScanner class.
  * These tests verify the parser's ability to correctly parse Trig
  * and interact with the Model and ValueFactory, including error handling
  * and unescaping of IRIs and literals, and named graphs.
@@ -33,7 +33,7 @@ class TriGParserTest extends ParserTestBase {
     private Model parseFromString(String trigData, String baseURI) {
         Model model = createTestModel();
 
-        RDFParser parser = new TriGParser(model, valueFactory);
+        RDFParser parser = new TriGScanner(model, valueFactory);
         parser.parse(new StringReader(trigData), baseURI);
         return model;
     }

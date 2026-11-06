@@ -29,10 +29,6 @@ import static org.junit.jupiter.api.Assertions.*;
  * are compatible and preserve data integrity across format transformations.
  * RDF/XML supports namespaces, so additional tests are included for prefix
  * handling.
- * NOTE: These tests are currently disabled because they cannot work yet.
- * We need to wait for the RDF/XML parser implementation from PR #176:
- * Once the parser is implemented, these tests can be enabled to verify
- * the round-trip functionality between the parser and serializer.
  */
 @DisplayName("RDF/XML Circular Integration Tests")
 class RDFXMLCircularTest extends ParserTestBase {

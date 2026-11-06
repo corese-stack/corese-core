@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.data.impl.io.serializer.rdfxml;
 
 import fr.inria.corese.core.next.data.api.model.Model;
 import fr.inria.corese.core.next.data.api.model.Statement;
+import fr.inria.corese.core.next.data.api.namespace.SimpleNamespace;
 import fr.inria.corese.core.next.data.api.io.option.IOOptions;
 import fr.inria.corese.core.next.data.api.vocabulary.XSD;
 import fr.inria.corese.core.next.data.api.exception.SerializationException;
@@ -203,7 +204,7 @@ class RDFXMLSerializerTest {
                 <?xml version="1.0" encoding="UTF-8"?>
                 <rdf:RDF xmlns:ex="http://example.org/vocabulary/" xmlns:exampleorg="http://example.org/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
                   <rdf:Description rdf:about="http://example.org/data">
-                    <ex:value rdf:datatype="xsd:integer">123</ex:value>
+                    <ex:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">123</ex:value>
                   </rdf:Description>
                 </rdf:RDF>
                 """;
@@ -410,7 +411,7 @@ class RDFXMLSerializerTest {
 
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                <rdf:RDF xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
                   <rdf:Description rdf:about="http://example.org/subject">
                     <foaf:name rdf:resource="http://example.org/object"/>
                   </rdf:Description>
@@ -444,7 +445,7 @@ class RDFXMLSerializerTest {
                 <?xml version="1.0" encoding="UTF-8"?>
                 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
                   <rdf:Description rdf:about="http://example.org/subject">
-                    <http://xmlns.com/foaf/0.1/name rdf:resource="http://example.org/object"/>
+                    <name xmlns="http://xmlns.com/foaf/0.1/" rdf:resource="http://example.org/object"/>
                   </rdf:Description>
                 </rdf:RDF>
                 """;
@@ -483,11 +484,11 @@ class RDFXMLSerializerTest {
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <rdf:RDF xmlns:ex="http://example.org/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-                  <rdf:Description rdf:nodeID="ode-abc">
+                  <rdf:Description rdf:nodeID="bnode-abc">
                     <ex:p rdf:resource="http://example.org/o"/>
                   </rdf:Description>
                   <rdf:Description rdf:about="http://example.org/s">
-                    <ex:p rdf:nodeID="ode-xyz"/>
+                    <ex:p rdf:nodeID="bnode-xyz"/>
                   </rdf:Description>
                 </rdf:RDF>
                 """;
@@ -526,4 +527,106 @@ class RDFXMLSerializerTest {
             new RDFXMLSerializer(mockModel, option);
         });
     }
+
+    @Test
+    @DisplayName("Should ignore empty default prefix and invalid prefixes when seeding from model")
+    void shouldIgnoreEmptyOrInvalidPrefixesFromModel() throws SerializationException {
+        when(mockModel.getNamespaces()).thenReturn(java.util.Set.of(
+                new SimpleNamespace("", "http://example.org/default#"),
+                new SimpleNamespace("123bad", "http://example.org/bad#"),
+                new SimpleNamespace("ex", "http://example.org/ns#")
+        ));
+        Statement stmt = factory.createStatement(
+                factory.createIRI("http://example.org/ns#subject"),
+                factory.createIRI("http://example.org/ns#predicate"),
+                factory.createIRI("http://example.org/default#object")
+        );
+        when(mockModel.stream()).thenReturn(Stream.of(stmt));
+
+        RDFXMLSerializerOptions testConfig = new RDFXMLSerializerOptions.Builder()
+                .usePrefixes(true)
+                .autoDeclarePrefixes(true)
+                .prefixOrdering(PrefixOrdering.ALPHABETICAL)
+                .build();
+
+        RDFXMLSerializer serializer = new RDFXMLSerializer(mockModel, testConfig);
+        serializer.write(writer);
+
+        String result = writer.toString();
+        assertFalse(result.contains("xmlns:="), "Should never produce xmlns:=");
+        assertFalse(result.contains("xmlns:123bad="), "Should never produce invalid XML prefix");
+        assertTrue(result.contains("xmlns:ex=\"http://example.org/ns#\""), "Should include valid prefix");
+    }
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings = {"", "xml", "XML", "xMl", "xmlns", "XMLNS", "XmlNs", "123bad"})
+    void shouldIgnoreUnsafePrefixesFromModelAndConfiguration(String prefix) throws Exception {
+        for (boolean fromModel : new boolean[] {true, false}) {
+            String namespace = "http://example.org/ns#";
+            when(mockModel.getNamespaces()).thenReturn(fromModel
+                    ? java.util.Set.of(new SimpleNamespace(prefix, namespace))
+                    : java.util.Set.of());
+            Statement statement = factory.createStatement(
+                    factory.createIRI(namespace + "subject"),
+                    factory.createIRI(namespace + "predicate"),
+                    factory.createIRI(namespace + "object"));
+            when(mockModel.stream()).thenReturn(Stream.of(statement));
+            var builder = new RDFXMLSerializerOptions.Builder().autoDeclarePrefixes(true);
+            if (!fromModel) {
+                builder.addPrefix(prefix, namespace);
+            }
+            StringWriter output = new StringWriter();
+            new RDFXMLSerializer(mockModel, builder.build()).write(output);
+            String xml = output.toString();
+            assertFalse(xml.contains("xmlns:" + prefix + "="), xml);
+            var documentBuilderFactory = javax.xml.parsers.DocumentBuilderFactory.newInstance();
+            documentBuilderFactory.setNamespaceAware(true);
+            var document = documentBuilderFactory.newDocumentBuilder().parse(
+                    new org.xml.sax.InputSource(new java.io.StringReader(xml)));
+            assertEquals(1, document.getElementsByTagNameNS(namespace, "predicate").getLength());
+        }
+    }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings = {"xml", "xmlns"})
+    void shouldNotGenerateReservedPrefixes(String segment) throws Exception {
+        String namespace = "http://example.org/" + segment + "/";
+        Statement statement = factory.createStatement(
+                factory.createIRI(namespace + "subject"),
+                factory.createIRI(namespace + "predicate"),
+                factory.createIRI(namespace + "object"));
+        when(mockModel.stream()).thenReturn(Stream.of(statement));
+        new RDFXMLSerializer(mockModel, mockConfig).write(writer);
+        assertFalse(writer.toString().contains("xmlns:" + segment + "="));
+        var xmlFactory = javax.xml.parsers.DocumentBuilderFactory.newInstance();
+        xmlFactory.setNamespaceAware(true);
+        var document = xmlFactory.newDocumentBuilder().parse(
+                new org.xml.sax.InputSource(new java.io.StringReader(writer.toString())));
+        assertEquals(1, document.getElementsByTagNameNS(namespace, "predicate").getLength());
+    }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.CsvSource({"xml, xmlns", "2020, 2021"})
+    void shouldGenerateDistinctPrefixesWhenSuggestionsCollide(String first, String second) throws Exception {
+        String firstNamespace = "http://example.org/" + first + "/";
+        String secondNamespace = "http://example.org/" + second + "/";
+        Statement firstStatement = factory.createStatement(
+                factory.createIRI("http://example.org/subject"),
+                factory.createIRI(firstNamespace + "predicate"),
+                factory.createIRI("http://example.org/object"));
+        Statement secondStatement = factory.createStatement(
+                firstStatement.getSubject(),
+                factory.createIRI(secondNamespace + "predicate"),
+                firstStatement.getObject());
+        when(mockModel.stream()).thenReturn(Stream.of(firstStatement, secondStatement));
+
+        new RDFXMLSerializer(mockModel, mockConfig).write(writer);
+
+        var xmlFactory = javax.xml.parsers.DocumentBuilderFactory.newInstance();
+        xmlFactory.setNamespaceAware(true);
+        var document = xmlFactory.newDocumentBuilder().parse(
+                new org.xml.sax.InputSource(new java.io.StringReader(writer.toString())));
+        assertEquals(1, document.getElementsByTagNameNS(firstNamespace, "predicate").getLength());
+        assertEquals(1, document.getElementsByTagNameNS(secondNamespace, "predicate").getLength());
+    }
+
 }
