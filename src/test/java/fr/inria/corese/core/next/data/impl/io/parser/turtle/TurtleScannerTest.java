@@ -11,6 +11,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -18,6 +20,7 @@ import java.io.StringReader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 /**
@@ -82,8 +85,9 @@ class TurtleScannerTest {
             };
         });
 
+        BNode additionalBNode = mock(BNode.class);
         lenient().when(mockValueFactory.createBNode())
-                 .thenReturn(mockBNode1, mockBNode2, mock(BNode.class));
+                 .thenReturn(mockBNode1, mockBNode2, additionalBNode);
 
         lenient().when(mockValueFactory.createLiteral(eq("simple string"))).thenReturn(mockSimpleLiteral);
         lenient().when(mockValueFactory.createLiteral(eq("hello"), eq("en"))).thenReturn(mockLangLiteral);
@@ -127,6 +131,16 @@ class TurtleScannerTest {
                 ex:subject ex:predicate ex:object .
                 """));
         verify(mockModel).setNamespace("ex", NS);
+        verify(mockModel).add(mockSubjectIRI, mockPredicateIRI, mockObjectIRI);
+        verifyNoMoreInteractions(mockModel);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "xml", "XML", "xmlns", "XMLNS"})
+    void testParsePrefixesReservedOnlyInXml(String prefix) {
+        parser.parse(new StringReader("@prefix " + prefix + ": <" + NS + "> .\n"
+                + prefix + ":subject " + prefix + ":predicate " + prefix + ":object ."));
+        verify(mockModel).setNamespace(prefix, NS);
         verify(mockModel).add(mockSubjectIRI, mockPredicateIRI, mockObjectIRI);
         verifyNoMoreInteractions(mockModel);
     }
@@ -401,27 +415,68 @@ class TurtleScannerTest {
         verifyNoMoreInteractions(mockModel);
     }
 
+    @Test
+    @DisplayName("Parse triple with whitespace between literal and language tag")
+    void testParseLiteralWithWhitespaceBeforeLangTag() {
+        parser.parse(new StringReader("""
+                @prefix ex: <http://example.org/> .
+                ex:subject ex:predicate "hello"  @en .
+                """));
+        verify(mockModel).add(mockSubjectIRI, mockPredicateIRI, mockLangLiteral);
+    }
+
+    @Test
+    @DisplayName("Parse triple with whitespace between literal and datatype IRI")
+    void testParseLiteralWithWhitespaceBeforeDatatype() {
+        when(mockValueFactory.createIRI("http://example.org/datatype")).thenReturn(mockDatatypeIRI);
+        parser.parse(new StringReader("""
+                @prefix ex: <http://example.org/> .
+                ex:subject ex:predicate "123"  ^^  <http://example.org/datatype> .
+                """));
+        verify(mockValueFactory).createLiteral("123", mockDatatypeIRI);
+        verify(mockModel).add(mockSubjectIRI, mockPredicateIRI, mockTypedLiteral);
+    }
+
+    @Test
+    @DisplayName("Parse triple with empty IRI <> against base with fragment")
+    void testParseEmptyIRIAgainstBaseWithFragment() {
+        IRI mockBaseDocIRI = mock(IRI.class);
+        when(mockValueFactory.createIRI("http://example.org/doc")).thenReturn(mockBaseDocIRI);
+        parser.parse(new StringReader("""
+                @base <http://example.org/doc#section> .
+                @prefix ex: <http://example.org/> .
+                <> ex:predicate ex:object .
+                """));
+        verify(mockModel).add(mockBaseDocIRI, mockPredicateIRI, mockObjectIRI);
+    }
+
+    @Test
+    void testSingleTrailingDotAfterName() {
+        parser.parse(new StringReader("<" + S + "> <" + P + "> true."));
+        verify(mockModel).add(mockSubjectIRI, mockPredicateIRI, mockBoolLiteral);
+        verifyNoMoreInteractions(mockModel);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"ex..:", "ex...:", "ex..", "ex..."})
+    void testNameWithMultipleTrailingDotsThrows(String name) {
+        StringReader reader = new StringReader(name + " <" + P + "> <" + O + "> .");
+        ParsingException ex = assertThrows(ParsingException.class, () -> parser.parse(reader));
+        assertTrue(ex.getMessage().contains("Prefix or name cannot end with multiple dots"));
+        verifyNoInteractions(mockModel);
+    }
+
     // ── Error cases ───────────────────────────────────────────────────────────
 
-    @Test
-    @DisplayName("Undeclared prefix throws ParsingException")
-    void testUndeclaredPrefixThrows() {
-        assertThrows(ParsingException.class,
-                () -> parser.parse(new StringReader("undeclared:s undeclared:p undeclared:o .")));
-    }
-
-    @Test
-    @DisplayName("Undeclared empty prefix throws ParsingException")
-    void testUndeclaredEmptyPrefixThrows() {
-        assertThrows(ParsingException.class,
-                () -> parser.parse(new StringReader(":s :p :o .")));
-    }
-
-    @Test
-    @DisplayName("Unclosed IRI throws ParsingException")
-    void testUnclosedIRIThrows() {
-        assertThrows(ParsingException.class,
-                () -> parser.parse(new StringReader(
-                        "<http://example.org/s <http://example.org/p> <http://example.org/o> .")));
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "undeclared:s undeclared:p undeclared:o .",
+            ":s :p :o .",
+            "<http://example.org/s <http://example.org/p> <http://example.org/o> ."
+    })
+    @DisplayName("Undeclared prefixes and unclosed IRIs throw ParsingException")
+    void testInvalidInputThrows(String input) {
+        StringReader reader = new StringReader(input);
+        assertThrows(ParsingException.class, () -> parser.parse(reader));
     }
 }

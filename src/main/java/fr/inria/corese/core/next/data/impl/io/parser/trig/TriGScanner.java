@@ -26,8 +26,8 @@ import java.util.Objects;
  *
  * <p>Extends the Turtle FSM with named-graph block support:
  * {@code GRAPH <label> \{ ... \}}, bare {@code <label> \{ ... \}}, and
- * anonymous {@code \{ ... \}} default-graph blocks. Inside a graph block the
- * trailing {@code .} after each triple is optional.</p>
+ * anonymous {@code \{ ... \}} default-graph blocks. Triples are separated by
+ * {@code .}; the final dot immediately before {@code \}} is optional.</p>
  *
  * <p>All Turtle features (prefixes, base, blank-node property lists, collections,
  * long literals, numeric and boolean literals) are available both at the top level
@@ -77,6 +77,9 @@ public final class TriGScanner extends AbstractRDFParser {
 
     private static final class TriGDocument extends TurtleTriGDocument {
 
+        private static final String EXPECTED_GRAPH_TRIPLE_SEPARATOR =
+                "Expected '.' between triples in graph block, got: '";
+
         /** Active named graph; {@code null} means the default graph. */
         private Resource currentGraph;
 
@@ -109,74 +112,64 @@ public final class TriGScanner extends AbstractRDFParser {
          */
         private void trigTopLevel() throws IOException {
             int c = peek();
-
-            // @prefix / @base
-            if (c == '@') { atDirective(); return; }
-
-            // Anonymous default-graph block: { triples }
-            if (c == '{') { wrappedGraph(null); return; }
-
-            // Blank node: either anonymous '[]' (valid graph label) or property list '[ ... ]' (subject only)
-            if (c == '[') {
-                expect('[');
-                ws();
-                BNode bnode = factory.createBNode();
-                boolean isEmpty = (peek() == ']');
-                if (!isEmpty) {
-                    // Non-empty property list: parse and emit its internal triples
-                    predicateObjectList(bnode);
-                    ws();
+            switch (c) {
+                case '@' -> atDirective();
+                case '{' -> wrappedGraph(null);
+                case '[' -> blankNodeTopLevel();
+                case '(' -> collectionTopLevel();
+                case '<' -> resourceTopLevel(intern(iriRefContent()));
+                case '_' -> resourceTopLevel(blankNodeLabel());
+                case ':' -> {
+                    take();
+                    resourceTopLevel(intern(lookupPrefix("") + readLocalPart()));
                 }
-                expect(']');
+                default -> namedTopLevel(c);
+            }
+        }
+
+        private void blankNodeTopLevel() throws IOException {
+            expect('[');
+            ws();
+            BNode bnode = factory.createBNode();
+            boolean isEmpty = (peek() == ']');
+            if (!isEmpty) {
+                predicateObjectList(bnode);
                 ws();
-                if (isEmpty && peek() == '{') {
-                    wrappedGraph(bnode); // [] { ... } — ANON as graph label
-                } else {
-                    if (!isEmpty && peek() == '{') {
-                        throw error("A blank node property list cannot be used as a named graph label");
-                    }
-                    if (peek() != '.' && peek() != '}' && peek() != -1) { predicateObjectList(bnode); ws(); }
-                    if (peek() == '.') take();
+            }
+            expect(']');
+            ws();
+            if (isEmpty && peek() == '{') {
+                wrappedGraph(bnode);
+            } else {
+                if (!isEmpty && peek() == '{') {
+                    throw error("A blank node property list cannot be used as a named graph label");
                 }
-                return;
+                blankNodeTriples(bnode);
             }
+        }
 
-            // Collection as subject
-            if (c == '(') {
-                Resource subj = collection();
+        private void blankNodeTriples(BNode bnode) throws IOException {
+            if (peek() != '.' && peek() != -1) {
+                predicateObjectList(bnode);
                 ws();
-                predicateObjectList(subj);
-                ws();
-                if (peek() == '.') take();
-                return;
             }
+            expect('.');
+        }
 
-            // Angle-bracket IRI: could be graph label or triple subject
-            if (c == '<') {
-                Resource res = intern(iriRefContent());
-                ws();
-                labelOrTriples(res);
-                return;
-            }
+        private void collectionTopLevel() throws IOException {
+            Resource subj = collection();
+            ws();
+            predicateObjectList(subj);
+            ws();
+            expect('.');
+        }
 
-            // Blank node label
-            if (c == '_') {
-                Resource res = blankNodeLabel();
-                ws();
-                labelOrTriples(res);
-                return;
-            }
+        private void resourceTopLevel(Resource res) throws IOException {
+            ws();
+            labelOrTriples(res);
+        }
 
-            // Default-prefix name
-            if (c == ':') {
-                take();
-                Resource res = intern(lookupPrefix("") + readLocalPart());
-                ws();
-                labelOrTriples(res);
-                return;
-            }
-
-            // Named token: SPARQL keyword, GRAPH keyword, or prefixed name
+        private void namedTopLevel(int c) throws IOException {
             if (isAsciiAlpha(c) || unicodeNameStart(c)) {
                 String name = readName();
                 if (peek() == ':') {
@@ -212,7 +205,7 @@ public final class TriGScanner extends AbstractRDFParser {
             } else {
                 predicateObjectList(res);
                 ws();
-                if (peek() == '.') take();
+                expect('.');
             }
         }
 
@@ -267,33 +260,28 @@ public final class TriGScanner extends AbstractRDFParser {
 
         /** Parses one item inside a TriG graph block. */
         private void graphBlockItem() throws IOException {
-            int c = peek();
-
-            // Blank node property list as subject
-            if (c == '[') {
+            if (peek() == '[') {
                 Resource subj = blankNodePropertyList();
                 ws();
-                if (peek() != '.' && peek() != '}') { predicateObjectList(subj); ws(); }
-                if (peek() == '.') take();
-                return;
-            }
-
-            // Collection as subject
-            if (c == '(') {
-                Resource subj = collection();
+                if (peek() != '.' && peek() != '}') {
+                    predicateObjectList(subj);
+                    ws();
+                }
+            } else {
+                Resource subj = subject();
                 ws();
                 predicateObjectList(subj);
                 ws();
-                if (peek() == '.') take();
-                return;
             }
+            graphTripleSeparator();
+        }
 
-            // Regular subject
-            Resource subj = subject();
-            ws();
-            predicateObjectList(subj);
-            ws();
-            if (peek() == '.') take();
+        private void graphTripleSeparator() throws IOException {
+            if (peek() == '.') {
+                take();
+            } else if (peek() != '}') {
+                throw error(EXPECTED_GRAPH_TRIPLE_SEPARATOR + (char) peek() + "'");
+            }
         }
 
     }

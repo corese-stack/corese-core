@@ -11,10 +11,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.StringReader;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -71,8 +75,9 @@ class TriGScannerTest {
             };
         });
 
+        BNode additionalBNode = mock(BNode.class);
         lenient().when(mockValueFactory.createBNode())
-                 .thenReturn(mockBNode1, mockBNode2, mock(BNode.class));
+                 .thenReturn(mockBNode1, mockBNode2, additionalBNode);
 
         lenient().when(mockValueFactory.createLiteral(eq("simple string"))).thenReturn(mockSimpleLiteral);
         lenient().when(mockValueFactory.createLiteral(eq("hello"), eq("en"))).thenReturn(mockLangLiteral);
@@ -89,30 +94,67 @@ class TriGScannerTest {
 
     // ── Named graph – GRAPH keyword ───────────────────────────────────────────
 
-    @Test
-    @DisplayName("Parse named graph block using GRAPH keyword with prefixed IRI label")
-    void testParseNamedGraphWithGRAPHKeyword() {
-        parser.parse(new StringReader("""
-                @prefix ex: <http://example.org/> .
-                GRAPH ex:graph {
-                  ex:subject ex:predicate ex:object .
-                }
-                """));
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("prefixedGraphCases")
+    void testParseNamedGraphWithPrefix(String description, String input) {
+        parser.parse(new StringReader(input));
         verify(mockModel).setNamespace("ex", NS);
         verify(mockModel).add(mockSubjectIRI, mockPredicateIRI, mockObjectIRI, mockGraphIRI);
         verifyNoMoreInteractions(mockModel);
     }
 
-    @Test
-    @DisplayName("Parse named graph block using GRAPH keyword with absolute IRI label")
-    void testParseNamedGraphWithAbsoluteIRI() {
-        parser.parse(new StringReader("""
-                GRAPH <http://example.org/graph> {
-                  <http://example.org/subject> <http://example.org/predicate> <http://example.org/object> .
-                }
-                """));
+    private static Stream<Arguments> prefixedGraphCases() {
+        return Stream.of(
+            Arguments.of("Parse named graph block using GRAPH keyword with prefixed IRI label", """
+                    @prefix ex: <http://example.org/> .
+                    GRAPH ex:graph {
+                      ex:subject ex:predicate ex:object .
+                    }
+                    """),
+            Arguments.of("GRAPH keyword is case-insensitive (lowercase accepted)", """
+                    @prefix ex: <http://example.org/> .
+                    graph ex:graph {
+                      ex:subject ex:predicate ex:object .
+                    }
+                    """),
+            Arguments.of("Parse named graph block using bare prefixed IRI label (no GRAPH keyword)", """
+                    @prefix ex: <http://example.org/> .
+                    ex:graph {
+                      ex:subject ex:predicate ex:object .
+                    }
+                    """),
+            Arguments.of("Parse named graph using SPARQL PREFIX directive", """
+                    PREFIX ex: <http://example.org/>
+                    GRAPH ex:graph { ex:subject ex:predicate ex:object . }
+                    """)
+        );
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("iriGraphCases")
+    void testParseNamedGraphWithIRI(String description, String input) {
+        parser.parse(new StringReader(input));
         verify(mockModel).add(mockSubjectIRI, mockPredicateIRI, mockObjectIRI, mockGraphIRI);
         verifyNoMoreInteractions(mockModel);
+    }
+
+    private static Stream<Arguments> iriGraphCases() {
+        return Stream.of(
+            Arguments.of("Parse named graph block using GRAPH keyword with absolute IRI label", """
+                    GRAPH <http://example.org/graph> {
+                      <http://example.org/subject> <http://example.org/predicate> <http://example.org/object> .
+                    }
+                    """),
+            Arguments.of("Parse named graph block using bare absolute IRI label (no GRAPH keyword)", """
+                    <http://example.org/graph> {
+                      <http://example.org/subject> <http://example.org/predicate> <http://example.org/object> .
+                    }
+                    """),
+            Arguments.of("Parse named graph using SPARQL BASE directive", """
+                    BASE <http://example.org/>
+                    <graph> { <subject> <predicate> <object> . }
+                    """)
+        );
     }
 
     @Test
@@ -129,47 +171,7 @@ class TriGScannerTest {
         verifyNoMoreInteractions(mockModel);
     }
 
-    @Test
-    @DisplayName("GRAPH keyword is case-insensitive (lowercase accepted)")
-    void testParseNamedGraphLowercaseKeyword() {
-        parser.parse(new StringReader("""
-                @prefix ex: <http://example.org/> .
-                graph ex:graph {
-                  ex:subject ex:predicate ex:object .
-                }
-                """));
-        verify(mockModel).setNamespace("ex", NS);
-        verify(mockModel).add(mockSubjectIRI, mockPredicateIRI, mockObjectIRI, mockGraphIRI);
-        verifyNoMoreInteractions(mockModel);
-    }
-
     // ── Named graph – bare label ──────────────────────────────────────────────
-
-    @Test
-    @DisplayName("Parse named graph block using bare prefixed IRI label (no GRAPH keyword)")
-    void testParseNamedGraphBarePrefixedLabel() {
-        parser.parse(new StringReader("""
-                @prefix ex: <http://example.org/> .
-                ex:graph {
-                  ex:subject ex:predicate ex:object .
-                }
-                """));
-        verify(mockModel).setNamespace("ex", NS);
-        verify(mockModel).add(mockSubjectIRI, mockPredicateIRI, mockObjectIRI, mockGraphIRI);
-        verifyNoMoreInteractions(mockModel);
-    }
-
-    @Test
-    @DisplayName("Parse named graph block using bare absolute IRI label (no GRAPH keyword)")
-    void testParseNamedGraphBareAbsoluteLabel() {
-        parser.parse(new StringReader("""
-                <http://example.org/graph> {
-                  <http://example.org/subject> <http://example.org/predicate> <http://example.org/object> .
-                }
-                """));
-        verify(mockModel).add(mockSubjectIRI, mockPredicateIRI, mockObjectIRI, mockGraphIRI);
-        verifyNoMoreInteractions(mockModel);
-    }
 
     // ── Default graph ─────────────────────────────────────────────────────────
 
@@ -287,29 +289,6 @@ class TriGScannerTest {
 
     // ── SPARQL-style directives ───────────────────────────────────────────────
 
-    @Test
-    @DisplayName("Parse named graph using SPARQL PREFIX directive")
-    void testParseSparqlPrefix() {
-        parser.parse(new StringReader("""
-                PREFIX ex: <http://example.org/>
-                GRAPH ex:graph { ex:subject ex:predicate ex:object . }
-                """));
-        verify(mockModel).setNamespace("ex", NS);
-        verify(mockModel).add(mockSubjectIRI, mockPredicateIRI, mockObjectIRI, mockGraphIRI);
-        verifyNoMoreInteractions(mockModel);
-    }
-
-    @Test
-    @DisplayName("Parse named graph using SPARQL BASE directive")
-    void testParseSparqlBase() {
-        parser.parse(new StringReader("""
-                BASE <http://example.org/>
-                <graph> { <subject> <predicate> <object> . }
-                """));
-        verify(mockModel).add(mockSubjectIRI, mockPredicateIRI, mockObjectIRI, mockGraphIRI);
-        verifyNoMoreInteractions(mockModel);
-    }
-
     // ── Blank nodes in named graphs ───────────────────────────────────────────
 
     @Test
@@ -375,47 +354,59 @@ class TriGScannerTest {
 
     // ── Error cases ───────────────────────────────────────────────────────────
 
-    @Test
-    @DisplayName("Unclosed graph block throws ParsingException")
-    void testUnclosedGraphBlockThrows() {
-        assertThrows(ParsingException.class,
-                () -> parser.parse(new StringReader("""
-                        @prefix ex: <http://example.org/> .
-                        GRAPH ex:graph {
-                          ex:subject ex:predicate ex:object .
-                        """)));
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("invalidTriGCases")
+    void testRejectInvalidTriG(String description, String input) {
+        StringReader reader = new StringReader(input);
+        assertThrows(ParsingException.class, () -> parser.parse(reader));
+    }
+
+    private static Stream<Arguments> invalidTriGCases() {
+        return Stream.of(
+            Arguments.of("Unclosed graph block throws ParsingException", """
+                    @prefix ex: <http://example.org/> .
+                    GRAPH ex:graph {
+                      ex:subject ex:predicate ex:object .
+                    """),
+            Arguments.of("Extra closing brace throws ParsingException", """
+                    @prefix ex: <http://example.org/> .
+                    GRAPH ex:graph { ex:subject ex:predicate ex:object . } }
+                    """),
+            Arguments.of("Nested graph blocks throw ParsingException", """
+                    @prefix ex: <http://example.org/> .
+                    GRAPH ex:graph {
+                      GRAPH ex:inner { ex:subject ex:predicate ex:object . }
+                    }
+                    """),
+            Arguments.of("Undeclared prefix in graph block throws ParsingException", """
+                    GRAPH <http://example.org/graph> {
+                      undeclared:s undeclared:p undeclared:o .
+                    }
+                    """),
+            Arguments.of("Missing dot between triples in graph block throws ParsingException", """
+                    @prefix ex: <http://example.org/> .
+                    GRAPH ex:graph {
+                      ex:subject ex:predicate ex:object
+                      ex:subject ex:predicate ex:object .
+                    }
+                    """),
+            Arguments.of("Missing dot between top-level triples throws ParsingException", """
+                    @prefix ex: <http://example.org/> .
+                    ex:subject ex:predicate ex:object
+                    ex:subject ex:predicate ex:object .
+                    """)
+        );
     }
 
     @Test
-    @DisplayName("Extra closing brace throws ParsingException")
-    void testExtraClosingBraceThrows() {
-        assertThrows(ParsingException.class,
-                () -> parser.parse(new StringReader("""
-                        @prefix ex: <http://example.org/> .
-                        GRAPH ex:graph { ex:subject ex:predicate ex:object . } }
-                        """)));
-    }
-
-    @Test
-    @DisplayName("Nested graph blocks throw ParsingException")
-    void testNestedGraphBlocksThrow() {
-        assertThrows(ParsingException.class,
-                () -> parser.parse(new StringReader("""
-                        @prefix ex: <http://example.org/> .
-                        GRAPH ex:graph {
-                          GRAPH ex:inner { ex:subject ex:predicate ex:object . }
-                        }
-                        """)));
-    }
-
-    @Test
-    @DisplayName("Undeclared prefix in graph block throws ParsingException")
-    void testUndeclaredPrefixInGraphThrows() {
-        assertThrows(ParsingException.class,
-                () -> parser.parse(new StringReader("""
-                        GRAPH <http://example.org/graph> {
-                          undeclared:s undeclared:p undeclared:o .
-                        }
-                        """)));
+    @DisplayName("Trailing dot is optional immediately before closing brace in graph block")
+    void testOptionalDotBeforeClosingBrace() {
+        parser.parse(new StringReader("""
+                @prefix ex: <http://example.org/> .
+                GRAPH ex:graph {
+                  ex:subject ex:predicate ex:object
+                }
+                """));
+        verify(mockModel).add(mockSubjectIRI, mockPredicateIRI, mockObjectIRI, mockGraphIRI);
     }
 }

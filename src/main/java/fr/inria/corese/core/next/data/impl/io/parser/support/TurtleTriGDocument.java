@@ -35,11 +35,20 @@ public class TurtleTriGDocument {
     static final int BUFFER_SIZE     = 64 * 1024;
     static final int IRI_CACHE_LIMIT = 4096;
     private static final int NO_PUSHBACK = Integer.MIN_VALUE;
+    private static final String RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
+    private static final String RDF_FIRST = "http://www.w3.org/1999/02/22-rdf-syntax-ns#first";
+    private static final String RDF_REST = "http://www.w3.org/1999/02/22-rdf-syntax-ns#rest";
+    private static final String RDF_NIL = "http://www.w3.org/1999/02/22-rdf-syntax-ns#nil";
+    private static final String XSD_INTEGER = "http://www.w3.org/2001/XMLSchema#integer";
+    private static final String XSD_DECIMAL = "http://www.w3.org/2001/XMLSchema#decimal";
+    private static final String XSD_DOUBLE = "http://www.w3.org/2001/XMLSchema#double";
+    private static final String XSD_BOOLEAN = "http://www.w3.org/2001/XMLSchema#boolean";
 
     // ── I/O state ──────────────────────────────────────────────────────────
     private final Reader reader;
     private final char[] buffer = new char[BUFFER_SIZE];
-    private int  bufOffset, bufLimit;
+    private int bufOffset;
+    private int bufLimit;
     private boolean eof;
     /** One-character pushback slot used for dot-in-local-name disambiguation. */
     private int  pushback = NO_PUSHBACK;
@@ -65,14 +74,14 @@ public class TurtleTriGDocument {
     protected String baseURI;
 
     // ── Pre-cached RDF / XSD constants ────────────────────────────────────
-    protected final IRI RDF_TYPE;
-    protected final IRI RDF_FIRST;
-    protected final IRI RDF_REST;
-    protected final IRI RDF_NIL;
-    protected final IRI XSD_INTEGER;
-    protected final IRI XSD_DECIMAL;
-    protected final IRI XSD_DOUBLE;
-    protected final IRI XSD_BOOLEAN;
+    private final IRI rdfType;
+    private final IRI rdfFirst;
+    private final IRI rdfRest;
+    private final IRI rdfNil;
+    private final IRI xsdInteger;
+    private final IRI xsdDecimal;
+    private final IRI xsdDouble;
+    private final IRI xsdBoolean;
 
 
     public TurtleTriGDocument(Reader reader, Model model, ValueFactory factory, String baseURI) {
@@ -80,14 +89,14 @@ public class TurtleTriGDocument {
         this.model   = model;
         this.factory = factory;
         this.baseURI = baseURI != null ? baseURI : "";
-        RDF_TYPE    = intern("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
-        RDF_FIRST   = intern("http://www.w3.org/1999/02/22-rdf-syntax-ns#first");
-        RDF_REST    = intern("http://www.w3.org/1999/02/22-rdf-syntax-ns#rest");
-        RDF_NIL     = intern("http://www.w3.org/1999/02/22-rdf-syntax-ns#nil");
-        XSD_INTEGER = intern("http://www.w3.org/2001/XMLSchema#integer");
-        XSD_DECIMAL = intern("http://www.w3.org/2001/XMLSchema#decimal");
-        XSD_DOUBLE  = intern("http://www.w3.org/2001/XMLSchema#double");
-        XSD_BOOLEAN = intern("http://www.w3.org/2001/XMLSchema#boolean");
+        rdfType    = intern(RDF_TYPE);
+        rdfFirst   = intern(RDF_FIRST);
+        rdfRest    = intern(RDF_REST);
+        rdfNil     = intern(RDF_NIL);
+        xsdInteger = intern(XSD_INTEGER);
+        xsdDecimal = intern(XSD_DECIMAL);
+        xsdDouble  = intern(XSD_DOUBLE);
+        xsdBoolean = intern(XSD_BOOLEAN);
     }
 
 
@@ -243,11 +252,12 @@ public class TurtleTriGDocument {
             ws();
             int c = peek();
             if (c == '.' || c == '}' || c == ']' || c == -1) break; // trailing semicolon is legal
-            if (c == ';') continue; // skip consecutive semicolons (;; is valid)
-            pred = verb();
-            ws();
-            objectList(subj, pred);
-            ws();
+            if (c != ';') { // Consecutive semicolons are legal.
+                pred = verb();
+                ws();
+                objectList(subj, pred);
+                ws();
+            }
         }
     }
 
@@ -271,7 +281,7 @@ public class TurtleTriGDocument {
         if (c == ':') { take(); return intern(lookupPrefix("") + readLocalPart()); }
         String name = readName();
         if (peek() == ':') { take(); return intern(lookupPrefix(name) + readLocalPart()); }
-        if (name.equals("a")) return RDF_TYPE;
+        if (name.equals("a")) return rdfType;
         throw error("Expected predicate IRI or 'a', got: '" + name + "'");
     }
 
@@ -294,22 +304,35 @@ public class TurtleTriGDocument {
 
     protected Value object() throws IOException {
         int c = peek();
-        if (c == '<')                    return intern(iriRefContent());
-        if (c == '_')                    return blankNodeLabel();
-        if (c == '[')                    return blankNodePropertyList();
-        if (c == '(')                    return collection();
-        if (c == '"' || c == '\'')       return literal();
-        if (c == '+' || c == '-' || digit(c)) return numericLiteral();
-        if (c == '.')                    return numericLeadingDot();
-        if (c == ':') { take(); return intern(lookupPrefix("") + readLocalPart()); }
-        if (isAsciiAlpha(c) || unicodeNameStart(c)) {
-            String name = readName();
-            if (peek() == ':') { take(); return intern(lookupPrefix(name) + readLocalPart()); }
-            if (name.equals("true"))  return factory.createLiteral("true",  XSD_BOOLEAN);
-            if (name.equals("false")) return factory.createLiteral("false", XSD_BOOLEAN);
-            throw error("Unexpected token in object position: '" + name + "'");
+        return switch (c) {
+            case '<' -> intern(iriRefContent());
+            case '_' -> blankNodeLabel();
+            case '[' -> blankNodePropertyList();
+            case '(' -> collection();
+            case '"', '\'' -> literal();
+            case '+', '-' -> numericLiteral();
+            case '.' -> numericLeadingDot();
+            case ':' -> {
+                take();
+                yield intern(lookupPrefix("") + readLocalPart());
+            }
+            default -> digit(c) ? numericLiteral() : namedObject(c);
+        };
+    }
+
+    private Value namedObject(int c) throws IOException {
+        if (!isAsciiAlpha(c) && !unicodeNameStart(c)) {
+            throw error("Expected object (IRI, literal, blank node, or collection), got: '" + (char) c + "'");
         }
-        throw error("Expected object (IRI, literal, blank node, or collection), got: '" + (char) c + "'");
+        String name = readName();
+        if (peek() == ':') {
+            take();
+            return intern(lookupPrefix(name) + readLocalPart());
+        }
+        return switch (name) {
+            case "true", "false" -> factory.createLiteral(name, xsdBoolean);
+            default -> throw error("Unexpected token in object position: '" + name + "'");
+        };
     }
 
 
@@ -333,7 +356,10 @@ public class TurtleTriGDocument {
     }
 
     protected String resolveIRI(String raw) {
-        if (raw.isEmpty()) return baseURI.isEmpty() ? "" : baseURI;
+        if (raw.isEmpty()) {
+            int hash = baseURI.indexOf('#');
+            return hash >= 0 ? baseURI.substring(0, hash) : baseURI;
+        }
         if (isAbsoluteIri(raw)) return raw;
         if (baseURI.isEmpty()) return raw;
         return IRIUtils.resolveIRIAgainstBase(baseURI, raw);
@@ -399,20 +425,20 @@ public class TurtleTriGDocument {
     protected Resource collection() throws IOException {
         expect('(');
         ws();
-        if (peek() == ')') { take(); return RDF_NIL; }
+        if (peek() == ')') { take(); return rdfNil; }
         BNode head    = factory.createBNode();
         BNode current = head;
         while (true) {
             Value item = object();
             ws();
-            emitTriple(current, RDF_FIRST, item);
+            emitTriple(current, rdfFirst, item);
             if (peek() == ')') {
-                emitTriple(current, RDF_REST, RDF_NIL);
+                emitTriple(current, rdfRest, rdfNil);
                 take();
                 break;
             }
             BNode next = factory.createBNode();
-            emitTriple(current, RDF_REST, next);
+            emitTriple(current, rdfRest, next);
             current = next;
         }
         return head;
@@ -434,6 +460,7 @@ public class TurtleTriGDocument {
         } else {
             label = shortStringContent((char) q);
         }
+        ws(); // Turtle permits whitespace before language tags and datatype suffixes.
         // Language tag
         if (peek() == '@') {
             take();
@@ -442,6 +469,7 @@ public class TurtleTriGDocument {
         // Datatype IRI ^^<iri> or ^^prefix:local
         if (peek() == '^') {
             expect('^'); expect('^');
+            ws();
             String dtIri;
             if (peek() == '<') {
                 dtIri = iriRefContent();
@@ -471,17 +499,27 @@ public class TurtleTriGDocument {
             int c = peek();
             if (c == -1) throw error("Unterminated long string literal");
             if ((char) c == q) {
-                take();
-                if (peek() == (int) q) {
-                    take();
-                    if (peek() == (int) q) { take(); return term.toString(); } // closing """
-                    term.append(q); // two quotes, not closing
-                }
-                term.append(q); // one quote, not closing
+                if (consumeLongStringQuotes(q)) return term.toString();
             } else {
                 term.appendCodePoint(c == '\\' ? escape(true) : scalar());
             }
         }
+    }
+
+    /** Consumes up to three quotes, appending them unless they close the string. */
+    private boolean consumeLongStringQuotes(char quote) throws IOException {
+        take();
+        if (peek() != quote) {
+            term.append(quote);
+            return false;
+        }
+        take();
+        if (peek() != quote) {
+            term.append(quote).append(quote);
+            return false;
+        }
+        take();
+        return true;
     }
 
     private String language() throws IOException {
@@ -522,39 +560,43 @@ public class TurtleTriGDocument {
     }
 
     private Literal numericBody() throws IOException {
-        boolean hasDot = false, hasExp = false;
-        // Integer part
-        while (digit(peek())) term.append((char) take());
-        // Decimal dot (only if followed by digit or exponent — e.g. "1.e5" is valid)
-        if (peek() == '.') {
-            take(); // tentatively consume
-            if (digit(peek())) {
-                term.append('.');
-                hasDot = true;
-                while (digit(peek())) term.append((char) take());
-            } else if (peek() == 'e' || peek() == 'E') {
-                // e.g. "1.e5" — empty fractional part is allowed by the grammar
-                term.append('.');
-                hasDot = true;
-            } else {
-                pushBack(); // not a decimal dot
-            }
-        }
-        // Exponent
-        int e = peek();
-        if (e == 'e' || e == 'E') {
-            take(); term.append((char) e); hasExp = true;
-            int sign = peek();
-            if (sign == '+' || sign == '-') { take(); term.append((char) sign); }
-            if (!digit(peek())) throw error("Expected digits after exponent marker");
-            while (digit(peek())) term.append((char) take());
-        }
+        appendDigits();
+        boolean hasDot = readFractionalPart();
+        boolean hasExp = readExponent();
         String text = term.toString();
-        if (text.isEmpty() || text.equals("+") || text.equals("-"))
+        if (term.isEmpty() || text.equals("+") || text.equals("-"))
             throw error("Invalid numeric literal: '" + text + "'");
-        if (hasExp) return factory.createLiteral(text, XSD_DOUBLE);
-        if (hasDot) return factory.createLiteral(text, XSD_DECIMAL);
-        return factory.createLiteral(text, XSD_INTEGER);
+        if (hasExp) return factory.createLiteral(text, xsdDouble);
+        if (hasDot) return factory.createLiteral(text, xsdDecimal);
+        return factory.createLiteral(text, xsdInteger);
+    }
+
+    private void appendDigits() throws IOException {
+        while (digit(peek())) term.append((char) take());
+    }
+
+    private boolean readFractionalPart() throws IOException {
+        // Decimal dot (only if followed by digit or exponent — e.g. "1.e5" is valid)
+        if (peek() != '.') return false;
+        take(); // tentatively consume
+        if (digit(peek()) || peek() == 'e' || peek() == 'E') {
+            term.append('.');
+            appendDigits();
+            return true;
+        }
+        pushBack(); // not a decimal dot
+        return false;
+    }
+
+    private boolean readExponent() throws IOException {
+        int e = peek();
+        if (e != 'e' && e != 'E') return false;
+        term.append((char) take());
+        int sign = peek();
+        if (sign == '+' || sign == '-') term.append((char) take());
+        if (!digit(peek())) throw error("Expected digits after exponent marker");
+        appendDigits();
+        return true;
     }
 
     /**
@@ -566,46 +608,65 @@ public class TurtleTriGDocument {
         term.setLength(0);
         // '-' is a PN_CHARS character but NOT a valid PN_LOCAL start character
         if (peek() == '-') throw error("Local name cannot begin with '-'");
-        while (true) {
-            int c = peek();
-            if (c == '%') {
-                take(); term.append('%');
-                int h1 = take(), h2 = take();
-                if (hexValue(h1) < 0 || hexValue(h2) < 0) throw error("Invalid %XX encoding in local name");
-                term.append((char) h1); term.append((char) h2);
-            } else if (c == '\\') {
-                take();
-                int esc = take();
-                if (!isLocalNameEscapeChar(esc)) throw error("Invalid '\\' escape in local name: '\\" + (char) esc + "'");
-                term.append((char) esc);
-            } else if (c == '.') {
-                // Include '.' only when followed by another local-name char
-                take();
-                int next = peek();
-                if (localNameChar(next) || next == '.' || next == '%' || next == '\\'
-                        || Character.isHighSurrogate((char) next)) {
-                    term.append('.');
-                } else {
-                    pushBack();
-                    break;
-                }
-            } else if (localNameChar(c) || Character.isHighSurrogate((char) c)) {
-                // Read full Unicode code point (handles surrogate pairs for chars > U+FFFF)
-                int cp = scalar();
-                if (!localNameChar(cp)) break;
-                term.appendCodePoint(cp);
-            } else {
-                break;
-            }
+        while (appendLocalNameCharacter()) {
+            // Each successful step appends one local-name character or escape.
         }
         return term.toString();
+    }
+
+    private boolean appendLocalNameCharacter() throws IOException {
+        int c = peek();
+        switch (c) {
+            case '%':
+                appendLocalNamePercentEncoding();
+                return true;
+            case '\\':
+                appendLocalNameEscape();
+                return true;
+            case '.':
+                return appendLocalNameDot();
+            default:
+                if (!localNameChar(c) && !Character.isHighSurrogate((char) c)) return false;
+                int cp = scalar();
+                if (!localNameChar(cp)) return false;
+                term.appendCodePoint(cp);
+                return true;
+        }
+    }
+
+    private void appendLocalNamePercentEncoding() throws IOException {
+        take();
+        term.append('%');
+        int h1 = take();
+        int h2 = take();
+        if (hexValue(h1) < 0 || hexValue(h2) < 0) throw error("Invalid %XX encoding in local name");
+        term.append((char) h1).append((char) h2);
+    }
+
+    private void appendLocalNameEscape() throws IOException {
+        take();
+        int esc = take();
+        if (!isLocalNameEscapeChar(esc)) throw error("Invalid '\\' escape in local name: '\\" + (char) esc + "'");
+        term.append((char) esc);
+    }
+
+    private boolean appendLocalNameDot() throws IOException {
+        take();
+        int next = peek();
+        if (localNameChar(next) || next == '.' || next == '%' || next == '\\'
+                || Character.isHighSurrogate((char) next)) {
+            term.append('.');
+            return true;
+        }
+        pushBack();
+        return false;
     }
 
 
     /**
      * Reads a name token (prefix label, keyword, or {@code a}).
      * Stops at {@code :}, whitespace, or non-name characters.
-     * Internal dots are included only when followed by another name character.
+     * Internal dots are included; a single trailing dot is pushed back as punctuation.
      */
     protected String readName() throws IOException {
         term.setLength(0);
@@ -618,16 +679,21 @@ public class TurtleTriGDocument {
             if (nameCharacter(c) || Character.isHighSurrogate((char) c)) {
                 term.appendCodePoint(scalar());
             } else if (c == '.') {
-                // Include '.' only if next char is also a name char (e.g. "ex.org:foo")
-                if (pushback == NO_PUSHBACK && bufOffset + 1 < bufLimit
-                        && nameCharacter(buffer[bufOffset + 1])) {
-                    take(); term.append('.');
-                } else {
-                    break;
-                }
+                take(); term.append('.');
             } else {
                 break;
             }
+        }
+        int trailingDots = 0;
+        while (!term.isEmpty() && term.charAt(term.length() - 1) == '.') {
+            term.setLength(term.length() - 1);
+            trailingDots++;
+        }
+        if (trailingDots > 1) {
+            throw error("Prefix or name cannot end with multiple dots");
+        }
+        if (trailingDots == 1) {
+            pushBack();
         }
         return term.toString();
     }
@@ -775,7 +841,8 @@ public class TurtleTriGDocument {
 
     private static boolean isAbsoluteIri(String text) {
         if (text == null || text.isEmpty() || !isAsciiAlpha(text.charAt(0))) return false;
-        int i = 1, n = text.length();
+        int i = 1;
+        int n = text.length();
         while (i < n && isSchemeChar(text.charAt(i))) i++;
         return i < n && text.charAt(i) == ':';
     }
