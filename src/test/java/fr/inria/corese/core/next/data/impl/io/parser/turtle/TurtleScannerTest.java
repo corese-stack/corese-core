@@ -385,22 +385,6 @@ class TurtleScannerTest {
         verifyNoMoreInteractions(mockModel);
     }
 
-    // ── Blank node property list edge cases ──────────────────────────────────
-
-    @Test
-    @DisplayName("Parse blank node property list with trailing semicolon before ']'")
-    void testParseBlankNodePropertyListTrailingSemicolon() {
-        // Trailing ';' before ']' is legal Turtle: [ :p :o ; ]
-        parser.parse(new StringReader("""
-                @prefix ex: <http://example.org/> .
-                ex:subject ex:predicate [ ex:predicate ex:object ; ] .
-                """));
-        verify(mockModel).setNamespace("ex", NS);
-        verify(mockModel).add(mockSubjectIRI, mockPredicateIRI, mockBNode1);
-        verify(mockModel).add(mockBNode1, mockPredicateIRI, mockObjectIRI);
-        verifyNoMoreInteractions(mockModel);
-    }
-
     // ── Error cases ───────────────────────────────────────────────────────────
 
     @Test

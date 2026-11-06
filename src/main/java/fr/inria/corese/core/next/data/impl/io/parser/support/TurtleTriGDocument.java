@@ -242,7 +242,7 @@ public class TurtleTriGDocument {
             take();
             ws();
             int c = peek();
-            if (c == '.' || c == '}' || c == ']' || c == -1) break; // trailing semicolon is legal
+            if (c == '.' || c == '}' || c == -1) break; // trailing semicolon is legal
             if (c == ';') continue; // skip consecutive semicolons (;; is valid)
             pred = verb();
             ws();
