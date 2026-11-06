@@ -1,12 +1,19 @@
 package fr.inria.corese.core.next.data.impl.io.serializer.rdfxml;
 
-import fr.inria.corese.core.next.data.api.term.*;
-import fr.inria.corese.core.next.data.api.model.*;
+import fr.inria.corese.core.next.data.api.term.IRI;
+import fr.inria.corese.core.next.data.api.term.Literal;
+import fr.inria.corese.core.next.data.api.term.Resource;
+import fr.inria.corese.core.next.data.api.term.Value;
+import fr.inria.corese.core.next.data.api.model.Model;
+import fr.inria.corese.core.next.data.api.model.Statement;
 import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 import fr.inria.corese.core.next.data.api.io.option.IOOptions;
-import fr.inria.corese.core.next.data.api.io.serializer.*;
-import fr.inria.corese.core.next.data.api.io.serializer.option.*;
-import fr.inria.corese.core.next.data.impl.io.parser.rdfxml.RDFXMLUtils;
+import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
+import fr.inria.corese.core.next.data.api.io.serializer.option.BlankNodeIdGenerationOptions;
+import fr.inria.corese.core.next.data.api.io.serializer.option.DatatypePolicyOptions;
+import fr.inria.corese.core.next.data.api.io.serializer.option.LineEndingOptions;
+import fr.inria.corese.core.next.data.api.io.serializer.option.PrettyPrintOptions;
+import fr.inria.corese.core.next.data.api.io.serializer.option.UsesPrefixOptions;
 import fr.inria.corese.core.next.data.impl.namespace.PrefixHandler;
 import fr.inria.corese.core.next.data.spi.term.IRIUtils;
 import fr.inria.corese.core.next.data.api.vocabulary.RDF;
@@ -18,10 +25,25 @@ import fr.inria.corese.core.next.data.impl.io.serializer.support.SerializationCo
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.io.Writer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
+import javax.xml.XMLConstants;
+import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
 
 /**
  * Serializes a {@link Model} to RDF/XML format.
@@ -33,7 +55,7 @@ import java.util.stream.Collectors;
  * <li>Declaration and usage of XML namespaces for IRIs.</li>
  * <li>Basic pretty-printing (indentation).</li>
  * <li>Serialization of triples as rdf:Description elements with properties.</li>
- * <li>Serialization of blank nodes using rdf:nodeID or nested elements.</li>
+ * <li>Serialization of blank nodes using rdf:nodeID identifiers.</li>
  * <li>Serialization of literals with language tags or datatypes.</li>
  * </ul>
  * <p>Advanced features such as handling XML schemata, specific RDF/XML graph structures (e.g., rdf:Bag, rdf:Seq, rdf:Alt),
@@ -41,10 +63,17 @@ import java.util.stream.Collectors;
  */
 public class RDFXMLSerializer implements RDFSerializer {
 
+    private static final Set<String> RESERVED_RDF_PROPERTIES = Set.of(
+            "RDF", "Description", "ID", "about", "parseType", "resource", "nodeID", "datatype",
+            "aboutEach", "aboutEachPrefix", "bagID", "li");
+
+    private final Map<String, QName> propertyNames = new HashMap<>();
+    private final Document nameValidator = newNameValidator();
     private final Model model;
     private final IOOptions config;
     private final PrefixHandler prefixHandler;
     private final Map<Resource, String> blankNodeIds;
+    private final Set<String> usedBlankNodeIds = new HashSet<>();
     private int blankNodeCounter = 0;
     private List<Statement> cachedStatements;
 
@@ -71,31 +100,48 @@ public class RDFXMLSerializer implements RDFSerializer {
         this.config = Objects.requireNonNull(config, "Configuration cannot be null");
 
         this.prefixHandler = new PrefixHandler(false);
-        // Seed with namespaces declared on the model (e.g. parsed @prefix directives),
-        // filtering out empty, reserved, or invalid XML prefixes.
-        // Config-level prefixes and standard RDF/XML namespaces are applied afterwards and take precedence on conflict.
-        model.getNamespaces().stream()
-                .filter(ns -> isAllowedXmlPrefix(ns.getPrefix()))
-                .forEach(this.prefixHandler::setNamespace);
-        if (config instanceof UsesPrefixOptions usesPrefixOptions && usesPrefixOptions.usePrefixes()) {
-            usesPrefixOptions.getPrefixMapping().getPrefixMap().forEach((prefix, namespace) -> {
-                if (isAllowedXmlPrefix(prefix)) {
-                    this.prefixHandler.setPrefix(prefix, namespace);
-                }
-            });
-        } else {
-            // These namespaces are part of the RDF/XML standard
-            this.prefixHandler.setPrefix(RDF.getVocabularyPreferredPrefix(), RDF.getVocabularyNamespace());
-            this.prefixHandler.setPrefix(XSD.getVocabularyPreferredPrefix(), XSD.getVocabularyNamespace());
+        if (config instanceof UsesPrefixOptions options && options.usePrefixes()) {
+            model.getNamespaces().forEach(ns -> registerPrefix(ns.getPrefix(), ns.getNamespace()));
+            options.getPrefixMapping().getPrefixMap().forEach(this::registerPrefix);
         }
+        // RDF/XML syntax and XML namespace bindings cannot be overridden by data/configuration.
+        this.prefixHandler.setPrefix(RDF.getVocabularyPreferredPrefix(), RDF.getVocabularyNamespace());
+        this.prefixHandler.setPrefix(XMLConstants.XML_NS_PREFIX, XMLConstants.XML_NS_URI);
         this.blankNodeIds = new HashMap<>();
     }
 
-    private static boolean isAllowedXmlPrefix(String prefix) {
+    private boolean isAllowedXmlPrefix(String prefix) {
         return prefix != null && !prefix.isEmpty()
                 && !"xml".equalsIgnoreCase(prefix)
                 && !"xmlns".equalsIgnoreCase(prefix)
-                && !RDFXMLUtils.isInvalidXMLName(prefix, false);
+                && isXmlName(prefix);
+    }
+
+    private static Document newNameValidator() {
+        try {
+            return DocumentBuilderFactory.newDefaultInstance().newDocumentBuilder().newDocument();
+        } catch (ParserConfigurationException e) {
+            throw new IllegalStateException("Cannot initialize XML name validation", e);
+        }
+    }
+
+    private boolean isXmlName(String name) {
+        if (name == null || name.isEmpty()) return false;
+        try {
+            // Stay compatible with runtimes implementing an older edition of XML 1.0.
+            nameValidator.createElementNS("urn:corese:xml-name", "p:" + name);
+            return true;
+        } catch (DOMException e) {
+            return false;
+        }
+    }
+
+    private void registerPrefix(String prefix, String namespace) {
+        if (isAllowedXmlPrefix(prefix) && !namespace.isEmpty()
+                && !XMLConstants.XML_NS_URI.equals(namespace)
+                && !XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(namespace)) {
+            prefixHandler.setPrefix(prefix, namespace);
+        }
     }
 
     /**
@@ -110,6 +156,9 @@ public class RDFXMLSerializer implements RDFSerializer {
         Writer bufferedWriter = new BufferedWriter(writer);
         try {
             this.cachedStatements = model.stream().toList();
+            propertyNames.clear();
+            cachedStatements.stream().map(statement -> statement.getPredicate().stringValue())
+                    .distinct().sorted().forEach(iri -> propertyNames.put(iri, resolvePropertyName(iri)));
 
             writeXmlDeclaration(bufferedWriter);
             writeRdfRootElement(bufferedWriter);
@@ -149,6 +198,8 @@ public class RDFXMLSerializer implements RDFSerializer {
     private void writeRdfRootElement(Writer writer) throws IOException {
         Set<String> actuallyUsedNamespaces = new HashSet<>();
         actuallyUsedNamespaces.add(RDF.getVocabularyNamespace());
+        propertyNames.values().stream().filter(name -> !name.getPrefix().isEmpty())
+                .map(QName::getNamespaceURI).forEach(actuallyUsedNamespaces::add);
         if (this.config instanceof UsesPrefixOptions usesPrefixOptions
                 &&  usesPrefixOptions.usePrefixes()
                 && usesPrefixOptions.autoDeclarePrefixes()) {
@@ -194,12 +245,13 @@ public class RDFXMLSerializer implements RDFSerializer {
      * @throws IOException if an I/O error occurs.
      */
     private void writeNamespaceAttributes(Writer writer, Set<String> actuallyUsedNamespaces) throws IOException {
-        ArrayList<String> namespacelist = new ArrayList<>(actuallyUsedNamespaces);
+        ArrayList<String> namespaces = new ArrayList<>(actuallyUsedNamespaces);
+        namespaces.sort(Comparator.naturalOrder());
 
         if(this.config instanceof UsesPrefixOptions usesPrefixOptions
         && usesPrefixOptions.autoDeclarePrefixes()) {
 
-            namespacelist.forEach(namespace -> {
+            namespaces.forEach(namespace -> {
                 if (! this.prefixHandler.hasNamespace(namespace)) {
                     String prefix = getSuggestedPrefix(namespace);
                     if (prefix != null) {
@@ -211,21 +263,20 @@ public class RDFXMLSerializer implements RDFSerializer {
 
         if (this.config instanceof PrettyPrintOptions prettyPrintOptions
                 && prettyPrintOptions.getPrefixOrdering() == PrefixOrdering.ALPHABETICAL) {
-            namespacelist.sort(
+            namespaces.sort(
                     (ns1, ns2) ->
                         prefixHandler.getPrefix(ns1).compareTo(prefixHandler.getPrefix(ns2))
             );
         }
 
-        for(String namespace : namespacelist) {
+        for(String namespace : namespaces) {
             String prefix = this.prefixHandler.getPrefix(namespace);
             writer.write(" " + SerializationConstants.XMLNS_PREFIX + prefix + "=\"" + escapeXmlAttribute(namespace) + "\"");
         }
     }
 
     /**
-     * Collects all namespaces used in the model (subjects, predicates, objects, contexts)
-     * and attempts to assign prefixes if auto-declaration is enabled and they are not already mapped.
+     * Collects namespaces from model IRIs when automatic prefix discovery is enabled.
      */
     private Set<String> collectUsedNamespaces() {
         // Collecting namespaces of all IRIs in the data
@@ -248,41 +299,59 @@ public class RDFXMLSerializer implements RDFSerializer {
                 .filter(Objects::nonNull)
                 .filter(Value::isIRI)
                 .map(v -> IRIUtils.guessNamespace(v.stringValue()))
+                .filter(namespace -> !namespace.isEmpty() && !XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(namespace))
                 .collect(Collectors.toSet());
     }
 
 
-    /**
-     * Retrieves the prefixed name for a given IRI string.
-     * This method now prioritizes the longest matching namespace to ensure correct prefix application.
-     *
-     * @param iriString The full IRI.
-     * @return The prefixed name (e.g., "foaf:name") or null if no suitable prefix is found.
-     */
-    private String getPrefixedNameInternal(String iriString) {
-        String longestMatchingNamespace = null;
-        String correspondingPrefix = null;
-        int longestMatchLength = -1;
-
-        for (String namespace : this.prefixHandler.getNamespaces()) {
-            if (iriString.startsWith(namespace)) {
-                String prefix = this.prefixHandler.getPrefix(namespace);
-                if (namespace.length() > longestMatchLength) {
-                    longestMatchLength = namespace.length();
-                    longestMatchingNamespace = namespace;
-                    correspondingPrefix = prefix;
-                }
+    /** Resolves a predicate to an XML name without changing its RDF IRI. */
+    private QName resolvePropertyName(String iri) {
+        if (iri.startsWith(RDF.getVocabularyNamespace())
+                && RESERVED_RDF_PROPERTIES.contains(iri.substring(RDF.getVocabularyNamespace().length()))) {
+            throw new IllegalArgumentException("Reserved RDF/XML syntax cannot be used as a property: " + iri);
+        }
+        if (config instanceof UsesPrefixOptions options && options.usePrefixes()) {
+            String namespace = prefixHandler.getNamespaces().stream()
+                    .filter(iri::startsWith)
+                    .filter(ns -> isXmlName(iri.substring(ns.length())))
+                    .max(Comparator.comparingInt(String::length)).orElse(null);
+            if (namespace != null) {
+                return new QName(namespace, iri.substring(namespace.length()), prefixHandler.getPrefix(namespace));
             }
         }
-
-        if (longestMatchingNamespace != null) {
-            String localName = iriString.substring(longestMatchingNamespace.length());
-            if (localName.isEmpty()) {
-                return correspondingPrefix + SerializationConstants.COLON;
-            }
-            return correspondingPrefix + SerializationConstants.COLON + localName;
+        String namespace = IRIUtils.guessNamespace(iri);
+        String localName = iri.substring(namespace.length());
+        if (!isXmlName(localName) || XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(namespace)) {
+            int split = propertyNameSplit(iri);
+            namespace = iri.substring(0, split);
+            localName = iri.substring(split);
         }
-        return null;
+        if (namespace.isEmpty() || XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(namespace)) {
+            throw new IllegalArgumentException("Invalid namespace for RDF/XML property: " + iri);
+        }
+        String prefix = "";
+        if (XMLConstants.XML_NS_URI.equals(namespace)) {
+            prefix = XMLConstants.XML_NS_PREFIX;
+        } else if (config instanceof UsesPrefixOptions options
+                && options.usePrefixes() && options.autoDeclarePrefixes()) {
+            prefix = getSuggestedPrefix(namespace);
+            prefixHandler.setPrefix(prefix, namespace);
+        }
+        return new QName(namespace, localName, prefix);
+    }
+
+    /** Finds an XML-compatible NCName suffix while keeping a nonempty namespace. */
+    private int propertyNameSplit(String iri) {
+        int split = Math.max(iri.lastIndexOf(':') + 1,
+                Math.max(iri.lastIndexOf('/') + 1, iri.lastIndexOf('#') + 1));
+        while (split < iri.length() && (!isXmlName(iri.substring(split))
+                || XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(iri.substring(0, split)))) {
+            split += Character.charCount(iri.codePointAt(split));
+        }
+        if (split == 0 || split == iri.length()) {
+            throw new IllegalArgumentException("Predicate IRI cannot be represented as an RDF/XML property name: " + iri);
+        }
+        return split;
     }
 
     /**
@@ -342,18 +411,15 @@ public class RDFXMLSerializer implements RDFSerializer {
      * @throws IOException if an I/O error occurs.
      */
     private void writePropertyElement(Writer writer, IRI predicate, Value object, String currentIndent) throws IOException {
-        String predicateString = predicate.stringValue();
-        String prefixedPredicateName = getPrefixedNameInternal(predicateString);
-        String elementName;
-
-        if (prefixedPredicateName != null && !prefixedPredicateName.endsWith(SerializationConstants.COLON)) {
-            elementName = prefixedPredicateName;
-        } else {
-            elementName = predicateString;
-        }
+        QName name = propertyNames.get(predicate.stringValue());
+        String elementName = name.getPrefix().isEmpty() ? name.getLocalPart()
+                : name.getPrefix() + SerializationConstants.COLON + name.getLocalPart();
 
         writer.write(currentIndent);
         writer.write("<" + elementName);
+        if (name.getPrefix().isEmpty()) {
+            writer.write(" xmlns=\"" + escapeXmlAttribute(name.getNamespaceURI()) + "\"");
+        }
 
         if (object.isIRI()) {
             writer.write(" " + SerializationConstants.RDF_RESOURCE_ATTRIBUTE + "=\"" + escapeXmlAttribute(object.stringValue()) + "\"/>");
@@ -377,15 +443,11 @@ public class RDFXMLSerializer implements RDFSerializer {
 
     private void writeLiteralAttributes(Writer writer, Literal literal) throws IOException {
         if (literal.getLanguage().isPresent()) {
-            try {
-                writer.write(" " + SerializationConstants.XML_LANG_ATTRIBUTE + "=\"" + escapeXmlAttribute(literal.getLanguage().orElseThrow()) + "\">");
-            } catch (IOException e) {
-                throw new UncheckedIOException("Failed to write xml:lang attribute", e);
-            }
+            writer.write(" " + SerializationConstants.XML_LANG_ATTRIBUTE + "=\""
+                    + escapeXmlAttribute(literal.getLanguage().orElseThrow()) + "\">");
         } else if (shouldWriteDatatype(literal)) {
             String datatypeUri = literal.getDatatype().stringValue();
-            String prefixedDatatype = getPrefixedNameInternal(datatypeUri);
-            writer.write(" " + SerializationConstants.RDF_DATATYPE_ATTRIBUTE + "=\"" + escapeXmlAttribute(prefixedDatatype != null ? prefixedDatatype : datatypeUri) + "\">");
+            writer.write(" " + SerializationConstants.RDF_DATATYPE_ATTRIBUTE + "=\"" + escapeXmlAttribute(datatypeUri) + "\">");
         } else {
             writer.write(">");
         }
@@ -395,16 +457,25 @@ public class RDFXMLSerializer implements RDFSerializer {
      * Retrieves or generates a stable blank node ID.
      *
      * @param bNode the blank node.
-     * @return a stable ID for the blank node.
+     * @return a unique XML-compatible ID for the blank node.
      */
     private String getBlankNodeId(Resource bNode) {
-        return blankNodeIds.computeIfAbsent(bNode, k -> {
-            if (this.config instanceof BlankNodeIdGenerationOptions bnGenOptions && bnGenOptions.stableBlankNodeIds()) {
-                return "b" + (blankNodeCounter++);
-            } else {
-                return bNode.stringValue().substring(2);
+        return blankNodeIds.computeIfAbsent(bNode, this::assignBlankNodeId);
+    }
+
+    private String assignBlankNodeId(Resource node) {
+        if (!(config instanceof BlankNodeIdGenerationOptions options && options.stableBlankNodeIds())) {
+            String label = node.stringValue();
+            String candidate = label.startsWith("_:") ? label.substring(2) : label;
+            if (isXmlName(candidate) && usedBlankNodeIds.add(candidate)) {
+                return candidate;
             }
-        });
+        }
+        String candidate;
+        do {
+            candidate = "b" + blankNodeCounter++;
+        } while (!usedBlankNodeIds.add(candidate));
+        return candidate;
     }
 
     /**
@@ -462,7 +533,7 @@ public class RDFXMLSerializer implements RDFSerializer {
             }
         }
 
-        base = base.replaceAll("[^a-zA-Z0-9]", SerializationConstants.EMPTY_STRING).toLowerCase();
+        base = base.replaceAll("[^a-zA-Z0-9]", SerializationConstants.EMPTY_STRING).toLowerCase(Locale.ROOT);
         if (!isAllowedXmlPrefix(base)) base = "p";
 
         String candidate = base;
@@ -481,59 +552,41 @@ public class RDFXMLSerializer implements RDFSerializer {
      * @return The escaped string.
      */
     private String escapeXmlAttribute(String value) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < value.length(); i++) {
-            char c = value.charAt(i);
-            switch (c) {
-                case '&':
-                    sb.append(SerializationConstants.AMP_ENTITY);
-                    break;
-                case '<':
-                    sb.append(SerializationConstants.LT_ENTITY);
-                    break;
-                case '>':
-                    sb.append(SerializationConstants.GT_ENTITY);
-                    break;
-                case '"':
-                    sb.append(SerializationConstants.QUOT_ENTITY);
-                    break;
-                case '\'':
-                    sb.append(SerializationConstants.APOS_ENTITY);
-                    break;
-                default:
-                    sb.append(c);
-            }
-        }
-        return sb.toString();
+        return escapeXml(value, true);
     }
 
-    /**
-     * Escapes a string for use as XML element content.
-     * Replaces characters like '&', '<', '>' with their XML entity equivalents.
-     *
-     * @param value The string to escape.
-     * @return The escaped string.
-     */
     private String escapeXmlContent(String value) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < value.length(); i++) {
-            char c = value.charAt(i);
-            switch (c) {
-                case '&':
-                    sb.append(SerializationConstants.AMP_ENTITY);
-                    break;
-                case '<':
-                    sb.append(SerializationConstants.LT_ENTITY);
-                    break;
-                case '>':
-                    sb.append(SerializationConstants.GT_ENTITY);
-                    break;
-                default:
-                    sb.append(c);
-            }
-        }
-        return sb.toString();
+        return escapeXml(value, false);
     }
 
+    /** Escapes XML markup and preserves whitespace that XML parsers would normalize. */
+    private String escapeXml(String value, boolean attribute) {
+        StringBuilder result = new StringBuilder(value.length());
+        value.codePoints().forEach(cp -> appendXmlCharacter(result, cp, attribute));
+        return result.toString();
+    }
 
+    private static void appendXmlCharacter(StringBuilder result, int cp, boolean attribute) {
+        if (!isXmlCharacter(cp)) {
+            throw new IllegalArgumentException("Character U+" + Integer.toHexString(cp) + " cannot be represented in XML 1.0");
+        }
+        switch (cp) {
+            case '&' -> result.append(SerializationConstants.AMP_ENTITY);
+            case '<' -> result.append(SerializationConstants.LT_ENTITY);
+            case '>' -> result.append(SerializationConstants.GT_ENTITY);
+            case '"' -> result.append(attribute ? SerializationConstants.QUOT_ENTITY : "\"");
+            case '\'' -> result.append(attribute ? SerializationConstants.APOS_ENTITY : "'");
+            case '\r' -> result.append("&#13;");
+            case '\n' -> result.append(attribute ? "&#10;" : "\n");
+            case '\t' -> result.append(attribute ? "&#9;" : "\t");
+            default -> result.appendCodePoint(cp);
+        }
+    }
+
+    private static boolean isXmlCharacter(int cp) {
+        return cp == '\t' || cp == '\n' || cp == '\r'
+                || (cp >= 0x20 && cp <= 0xD7FF)
+                || (cp >= 0xE000 && cp <= 0xFFFD)
+                || (cp >= 0x10000 && cp <= Character.MAX_CODE_POINT);
+    }
 }

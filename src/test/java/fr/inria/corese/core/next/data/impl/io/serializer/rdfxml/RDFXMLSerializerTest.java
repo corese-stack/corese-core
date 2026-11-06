@@ -204,7 +204,7 @@ class RDFXMLSerializerTest {
                 <?xml version="1.0" encoding="UTF-8"?>
                 <rdf:RDF xmlns:ex="http://example.org/vocabulary/" xmlns:exampleorg="http://example.org/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
                   <rdf:Description rdf:about="http://example.org/data">
-                    <ex:value rdf:datatype="xsd:integer">123</ex:value>
+                    <ex:value rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">123</ex:value>
                   </rdf:Description>
                 </rdf:RDF>
                 """;
@@ -411,7 +411,7 @@ class RDFXMLSerializerTest {
 
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                <rdf:RDF xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
                   <rdf:Description rdf:about="http://example.org/subject">
                     <foaf:name rdf:resource="http://example.org/object"/>
                   </rdf:Description>
@@ -445,7 +445,7 @@ class RDFXMLSerializerTest {
                 <?xml version="1.0" encoding="UTF-8"?>
                 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
                   <rdf:Description rdf:about="http://example.org/subject">
-                    <http://xmlns.com/foaf/0.1/name rdf:resource="http://example.org/object"/>
+                    <name xmlns="http://xmlns.com/foaf/0.1/" rdf:resource="http://example.org/object"/>
                   </rdf:Description>
                 </rdf:RDF>
                 """;
@@ -484,11 +484,11 @@ class RDFXMLSerializerTest {
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <rdf:RDF xmlns:ex="http://example.org/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-                  <rdf:Description rdf:nodeID="ode-abc">
+                  <rdf:Description rdf:nodeID="bnode-abc">
                     <ex:p rdf:resource="http://example.org/o"/>
                   </rdf:Description>
                   <rdf:Description rdf:about="http://example.org/s">
-                    <ex:p rdf:nodeID="ode-xyz"/>
+                    <ex:p rdf:nodeID="bnode-xyz"/>
                   </rdf:Description>
                 </rdf:RDF>
                 """;

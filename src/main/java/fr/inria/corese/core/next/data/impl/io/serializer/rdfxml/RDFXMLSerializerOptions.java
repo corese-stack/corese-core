@@ -23,13 +23,15 @@ import java.util.Objects;
 public class RDFXMLSerializerOptions extends AbstractSerializerOptions implements PrettyPrintOptions, UsesPrefixOptions {
 
     /**
-     * Whether prefix declarations (e.g., `xmlns:prefix="uri"`) should be used for compact IRIs.
-     * This is crucial for human-readable formats like RDF/XML.
+     * Whether property element names use namespace prefixes. When disabled,
+     * properties use local names with an inline default namespace declaration.
+     * RDF/XML syntax retains its required {@code rdf} binding.
      */
     protected final boolean usePrefixes;
     /**
-     * Whether the serializer should automatically discover and declare prefixes used in the graph.
-     * This avoids manual prefix configuration but can lead to more prefixes than strictly needed.
+     * Whether the serializer generates prefixes for namespaces discovered in the graph.
+     * Used model/configuration prefixes are always declared. If discovery is disabled,
+     * unmapped properties use an inline default namespace to keep the XML valid.
      */
     protected final boolean autoDeclarePrefixes;
     /**
@@ -96,7 +98,7 @@ public class RDFXMLSerializerOptions extends AbstractSerializerOptions implement
     }
 
     /**
-     * Checks if prefix declarations should be used for compact IRIs.
+     * Checks whether property names should use namespace prefixes.
      *
      * @return {@code true} if prefixes are used, {@code false} otherwise.
      */
@@ -106,7 +108,7 @@ public class RDFXMLSerializerOptions extends AbstractSerializerOptions implement
     }
 
     /**
-     * Checks if the serializer should automatically discover and declare prefixes.
+     * Checks whether the serializer should generate prefixes for discovered namespaces.
      *
      * @return {@code true} if auto-declaration is enabled, {@code false} otherwise.
      */
@@ -248,7 +250,7 @@ public class RDFXMLSerializerOptions extends AbstractSerializerOptions implement
         }
 
         /**
-         * Sets whether prefix declarations should be used for compact IRIs.
+         * Sets whether property names use prefixes or inline default namespaces.
          *
          * @param usePrefixes {@code true} to use prefixes, {@code false} otherwise.
          * @return The builder instance for fluent chaining.
@@ -259,7 +261,8 @@ public class RDFXMLSerializerOptions extends AbstractSerializerOptions implement
         }
 
         /**
-         * Sets whether the serializer should automatically discover and declare prefixes.
+         * Sets whether prefixes are generated for discovered namespaces.
+         * Used explicit bindings are declared even when this option is disabled.
          *
          * @param autoDeclarePrefixes {@code true} to enable auto-declaration, {@code false} otherwise.
          * @return The builder instance for fluent chaining.
