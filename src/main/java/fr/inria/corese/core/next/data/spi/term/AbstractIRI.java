@@ -3,6 +3,8 @@ package fr.inria.corese.core.next.data.spi.term;
 import fr.inria.corese.core.next.data.api.term.IRI;
 import fr.inria.corese.core.next.data.api.exception.IncorrectFormatException;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serial;
 
 /**
@@ -14,8 +16,10 @@ public abstract class AbstractIRI implements IRI, Comparable<IRI> {
     @Serial
     private static final long serialVersionUID = -1005683238501772511L;
 
+    private final String value;
     private final String namespace;
     private final String localName;
+    private transient int cachedHash;
 
     /**
      * Constructor for AbstractIRI.
@@ -27,6 +31,7 @@ public abstract class AbstractIRI implements IRI, Comparable<IRI> {
         if (!IRIUtils.isStandardIRI(fullIRI)) {
             throw new IncorrectFormatException("IRI '" + fullIRI + "' must be a valid IRI");
         }
+        this.value = fullIRI;
         this.namespace = IRIUtils.guessNamespace(fullIRI);
         this.localName = IRIUtils.guessLocalName(fullIRI);
     }
@@ -39,11 +44,20 @@ public abstract class AbstractIRI implements IRI, Comparable<IRI> {
      * @throws IncorrectFormatException if the IRI format is incorrect
      */
     protected AbstractIRI(String namespace, String localName) {
-        if (!IRIUtils.isStandardIRI(namespace + localName)) {
-            throw new IncorrectFormatException("IRI '" + namespace + localName + "' must be a valid IRI");
+        String full = namespace + localName;
+        if (!IRIUtils.isStandardIRI(full)) {
+            throw new IncorrectFormatException("IRI '" + full + "' must be a valid IRI");
         }
+        this.value = full;
         this.namespace = namespace;
         this.localName = localName;
+    }
+
+    private static int computeCanonicalHash(String ns, String ln) {
+        int hash = 7;
+        hash = 31 * hash + ns.hashCode();
+        hash = 31 * hash + ln.hashCode();
+        return hash;
     }
 
     @Override
@@ -58,7 +72,8 @@ public abstract class AbstractIRI implements IRI, Comparable<IRI> {
 
     @Override
     public String stringValue() {
-        return this.namespace + this.localName;
+        // Fallback to reconstructed string for legacy serialized streams where value was null
+        return this.value != null ? this.value : (this.namespace + this.localName);
     }
 
     @Override
@@ -68,26 +83,39 @@ public abstract class AbstractIRI implements IRI, Comparable<IRI> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (!(o instanceof IRI that))
+        }
+        if (!(o instanceof IRI that)) {
             return false;
+        }
         return this.stringValue().equals(that.stringValue());
     }
 
     @Override
     public int hashCode() {
-        String value = stringValue();
-        String canonicalNamespace = IRIUtils.guessNamespace(value);
-        String canonicalLocalName = IRIUtils.guessLocalName(value);
-        int hash = 7;
-        hash = 31 * hash + canonicalNamespace.hashCode();
-        hash = 31 * hash + canonicalLocalName.hashCode();
-        return hash;
+        int h = this.cachedHash;
+        if (h == 0) {
+            String val = stringValue();
+            String canonicalNs = IRIUtils.guessNamespace(val);
+            String canonicalLn = IRIUtils.guessLocalName(val);
+            h = computeCanonicalHash(canonicalNs, canonicalLn);
+            if (h == 0) {
+                h = 1;
+            }
+            this.cachedHash = h;
+        }
+        return h;
     }
 
     @Override
     public String toString() {
         return this.stringValue();
+    }
+
+    @Serial
+    private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+        stream.defaultReadObject();
+        // cachedHash is transient and will be lazily recomputed on first hashCode() call
     }
 }
