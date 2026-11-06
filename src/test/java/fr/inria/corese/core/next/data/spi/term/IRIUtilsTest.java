@@ -94,6 +94,29 @@ class IRIUtilsTest {
         assertFalse(IRIUtils.isAbsoluteIRI("   "));
     }
 
+    @Test
+    void testSuspiciousPatternBoundaries() {
+        // 11 consecutive suspicious characters: 1 initial + 10 repeats -> allowed
+        assertTrue(IRIUtils.isStandardIRI("http://example.org/" + ".".repeat(11)));
+        assertTrue(IRIUtils.isStandardIRI("http://example.org/" + "-".repeat(11)));
+        assertTrue(IRIUtils.isStandardIRI("http://example.org/" + "_".repeat(11)));
+
+        // 12 consecutive suspicious characters: 1 initial + 11 repeats -> rejected as suspicious
+        assertFalse(IRIUtils.isStandardIRI("http://example.org/" + ".".repeat(12)));
+        assertFalse(IRIUtils.isStandardIRI("http://example.org/" + "-".repeat(12)));
+        assertFalse(IRIUtils.isStandardIRI("http://example.org/" + "_".repeat(12)));
+
+        // Repeated non-suspicious characters -> allowed
+        assertTrue(IRIUtils.isStandardIRI("http://example.org/" + "a".repeat(50)));
+
+        // Mixed suspicious characters (not consecutive identical) -> allowed
+        assertTrue(IRIUtils.isStandardIRI("http://example.org/" + ".-_:".repeat(5)));
+
+        // Null and empty checks
+        assertFalse(IRIUtils.isStandardIRI(null));
+        assertFalse(IRIUtils.isStandardIRI(""));
+    }
+
     /**
      * Helper method to escape strings for display in test failure messages
      */

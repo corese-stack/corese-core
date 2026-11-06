@@ -2,8 +2,6 @@ package fr.inria.corese.core.next.data.spi.term;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,16 +44,10 @@ public final class IRIUtils {
             "(?<fragment>[\\w\\-\\\"\\\'_\\:\\?\\=]+)?" + // line1
             "$"
     );
-    private static final Pattern ABSOLUTE_IRI_PATTERN = Pattern.compile("^(?<root>(" +
-            "?<protocol>[\\w\\-]+)" +
-            ":(\\/\\/)?" +
-            "(?<path>([\\S\\-\\._\\:]+[\\/\\.\\:\\@\\-])?)+" +
-            "(?<query>\\?[\\S\\-\\\"\\'_\\:\\?\\=]+)?)" +
-            "(?<fragment>[\\S\\-_]+)?" +
-            "$");
+    private static final Pattern ABSOLUTE_IRI_PATTERN = Pattern.compile("^[\\w\\-]+:\\S*$");
     private static final Pattern STANDARD_IRI_PATTERN = Pattern.compile("^(([^:/?# \\t\\r\\n]+):)(\\/\\/([^/?# \\t\\r\\n]*))?([^?# \\t\\r\\n]*)(\\?([^# \\t\\r\\n]*))?(#(.*))?");
     private static final int MAX_IRI_LENGTH = 2048;
-    private static final long REGEX_TIMEOUT_MS = 100;
+    private static final int MAX_CONSECUTIVE_SUSPICIOUS_REPEATS = 10;
 
 
     /**
@@ -75,8 +67,8 @@ public final class IRIUtils {
             return "";
         }
         try {
-            Matcher matcher = matchWithTimeout(IRI_PATTERN, iri);
-            if (matcher == null || !matcher.matches()) {
+            Matcher matcher = IRI_PATTERN.matcher(iri);
+            if (!matcher.matches()) {
                 if (iri.endsWith(SLASH) || iri.endsWith(HASH)) {
                     return iri;
                 } else if (iri.contains("#")) {
@@ -84,7 +76,7 @@ public final class IRIUtils {
                 } else {
                     return iri;
                 }
-            } else if (matcher.matches()) {
+            } else {
                 // This is a blank node
                 if (matcher.group(PROTOCOL_GROUP) != null && matcher.group(PROTOCOL_GROUP).equals("_")) {
                     return "";
@@ -103,8 +95,6 @@ public final class IRIUtils {
                 }
 
                 return namespace.toString();
-            } else {
-                throw new IllegalStateException("No namespace found for the given IRI: " + iri + ".");
             }
         } catch (IllegalStateException e) {
             return "";
@@ -122,10 +112,10 @@ public final class IRIUtils {
             return "";
         }
         try {
-            Matcher matcher = matchWithTimeout(IRI_PATTERN, iri);
-            if (matcher == null || !matcher.matches()) {
+            Matcher matcher = IRI_PATTERN.matcher(iri);
+            if (!matcher.matches()) {
                 return iri;
-            } else if (matcher.matches()) {
+            } else {
                 if (matcher.group(ANCHOR_GROUP) != null) {
                     return matcher.group(FRAGMENT_GROUP) != null ? matcher.group(FRAGMENT_GROUP) : "";
                 } else if (matcher.group(FINAL_PATH_GROUP) != null) { // If the IRI has no fragment but does not end with a slash
@@ -133,8 +123,6 @@ public final class IRIUtils {
                 } else { // If the URI ends with a slash
                     return "";
                 }
-            } else {
-                return "";
             }
         } catch (IllegalStateException e) {
             return "";
@@ -148,11 +136,10 @@ public final class IRIUtils {
      * distinguish a prefix from a protocol
      */
     public static boolean isAbsoluteIRI(String iri) {
-        Matcher matcher = matchWithTimeout(ABSOLUTE_IRI_PATTERN, iri);
-        if (matcher == null || !matcher.matches()) {
+        if (iri == null || iri.isEmpty() || iri.length() > MAX_IRI_LENGTH) {
             return false;
         }
-        return matcher.matches();
+        return ABSOLUTE_IRI_PATTERN.matcher(iri).matches();
     }
 
     /**
@@ -165,8 +152,8 @@ public final class IRIUtils {
             return false;
         }
         try {
-            Matcher matcher = matchWithTimeout(STANDARD_IRI_PATTERN, iriString);
-            if (matcher != null && matcher.matches()) {
+            Matcher matcher = STANDARD_IRI_PATTERN.matcher(iriString);
+            if (matcher.matches()) {
                 return isValidURI(iriString);
             }
             return false;
@@ -184,54 +171,23 @@ public final class IRIUtils {
                 input.length() <= MAX_IRI_LENGTH &&
                 !containsSuspiciousPatterns(input);
     }
-
-    /**
-     * Executes regex matching with timeout protection.
-     */
-    private static Matcher matchWithTimeout(Pattern pattern, String input) {
-        long startTime = System.nanoTime();
-
-        try {
-            Matcher matcher = pattern.matcher(input);
-
-            // Check timeout before and during matching
-            if (System.nanoTime() - startTime > TimeUnit.MILLISECONDS.toNanos(REGEX_TIMEOUT_MS)) {
-                return null;
-            }
-
-            // For very long strings, check timeout periodically
-            if (input.length() > 100 && System.nanoTime() - startTime > TimeUnit.MILLISECONDS.toNanos(REGEX_TIMEOUT_MS / 2)) {
-                return null;
-            }
-
-            return matcher;
-
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    /**
-     * Validates input string for basic security checks.
-     */
     private static boolean isInvalidInput(String input) {
-        return input == null ||
-                input.isEmpty() ||
-                input.length() > MAX_IRI_LENGTH ||
-                containsSuspiciousPatterns(input);
+        return !isValidInput(input);
     }
 
     /**
      * Checks for patterns that might cause ReDoS attacks.
+     * Zero-allocation primitive scan over characters without heap object creation.
      */
     private static boolean containsSuspiciousPatterns(String input) {
-        final Set<Character> suspiciousChars = Set.of('.', '-', '_', ':');
         int consecutiveRepeats = 0;
         char lastChar = 0;
+        int len = input.length();
 
-        for (char c : input.toCharArray()) {
-            if (c == lastChar && suspiciousChars.contains(c)) {
-                if (++consecutiveRepeats > 10) {
+        for (int i = 0; i < len; i++) {
+            char c = input.charAt(i);
+            if (c == lastChar && isSuspiciousChar(c)) {
+                if (++consecutiveRepeats > MAX_CONSECUTIVE_SUSPICIOUS_REPEATS) {
                     return true;
                 }
             } else {
@@ -240,6 +196,10 @@ public final class IRIUtils {
             lastChar = c;
         }
         return false;
+    }
+
+    private static boolean isSuspiciousChar(char c) {
+        return c == '.' || c == '-' || c == '_' || c == ':';
     }
 
     /**
