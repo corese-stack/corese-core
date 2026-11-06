@@ -3,7 +3,6 @@ package fr.inria.corese.core.next.data.spi.term;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -189,23 +188,8 @@ public final class IRIUtils {
      * Executes regex matching with timeout protection.
      */
     private static Matcher matchWithTimeout(Pattern pattern, String input) {
-        long startTime = System.nanoTime();
-
         try {
-            Matcher matcher = pattern.matcher(input);
-
-            // Check timeout before and during matching
-            if (System.nanoTime() - startTime > TimeUnit.MILLISECONDS.toNanos(REGEX_TIMEOUT_MS)) {
-                return null;
-            }
-
-            // For very long strings, check timeout periodically
-            if (input.length() > 100 && System.nanoTime() - startTime > TimeUnit.MILLISECONDS.toNanos(REGEX_TIMEOUT_MS / 2)) {
-                return null;
-            }
-
-            return matcher;
-
+            return pattern.matcher(input);
         } catch (Exception e) {
             return null;
         }
