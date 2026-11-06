@@ -6,6 +6,7 @@ import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 import fr.inria.corese.core.next.data.api.io.option.IOOptions;
 import fr.inria.corese.core.next.data.api.io.serializer.*;
 import fr.inria.corese.core.next.data.api.io.serializer.option.*;
+import fr.inria.corese.core.next.data.impl.io.parser.rdfxml.RDFXMLUtils;
 import fr.inria.corese.core.next.data.impl.namespace.PrefixHandler;
 import fr.inria.corese.core.next.data.spi.term.IRIUtils;
 import fr.inria.corese.core.next.data.api.vocabulary.RDF;
@@ -70,17 +71,31 @@ public class RDFXMLSerializer implements RDFSerializer {
         this.config = Objects.requireNonNull(config, "Configuration cannot be null");
 
         this.prefixHandler = new PrefixHandler(false);
-        // Seed with namespaces declared on the model (e.g. parsed @prefix directives).
+        // Seed with namespaces declared on the model (e.g. parsed @prefix directives),
+        // filtering out empty, reserved, or invalid XML prefixes.
         // Config-level prefixes and standard RDF/XML namespaces are applied afterwards and take precedence on conflict.
-        model.getNamespaces().forEach(this.prefixHandler::setNamespace);
+        model.getNamespaces().stream()
+                .filter(ns -> isAllowedXmlPrefix(ns.getPrefix()))
+                .forEach(this.prefixHandler::setNamespace);
         if (config instanceof UsesPrefixOptions usesPrefixOptions && usesPrefixOptions.usePrefixes()) {
-            this.prefixHandler.copyFrom(usesPrefixOptions.getPrefixMapping());
+            usesPrefixOptions.getPrefixMapping().getPrefixMap().forEach((prefix, namespace) -> {
+                if (isAllowedXmlPrefix(prefix)) {
+                    this.prefixHandler.setPrefix(prefix, namespace);
+                }
+            });
         } else {
             // These namespaces are part of the RDF/XML standard
             this.prefixHandler.setPrefix(RDF.getVocabularyPreferredPrefix(), RDF.getVocabularyNamespace());
             this.prefixHandler.setPrefix(XSD.getVocabularyPreferredPrefix(), XSD.getVocabularyNamespace());
         }
         this.blankNodeIds = new HashMap<>();
+    }
+
+    private static boolean isAllowedXmlPrefix(String prefix) {
+        return prefix != null && !prefix.isEmpty()
+                && !"xml".equalsIgnoreCase(prefix)
+                && !"xmlns".equalsIgnoreCase(prefix)
+                && !RDFXMLUtils.isInvalidXMLName(prefix, false);
     }
 
     /**
@@ -204,7 +219,7 @@ public class RDFXMLSerializer implements RDFSerializer {
 
         for(String namespace : namespacelist) {
             String prefix = this.prefixHandler.getPrefix(namespace);
-            writer.write(String.format(" %s%s=\"%s\"", SerializationConstants.XMLNS_PREFIX, prefix, escapeXmlAttribute(namespace)));
+            writer.write(" " + SerializationConstants.XMLNS_PREFIX + prefix + "=\"" + escapeXmlAttribute(namespace) + "\"");
         }
     }
 
@@ -288,9 +303,9 @@ public class RDFXMLSerializer implements RDFSerializer {
 
         writer.write(currentIndent);
         if (subject.isIRI()) {
-            writer.write(String.format("%s %s=\"%s\">", SerializationConstants.RDF_DESCRIPTION_START, SerializationConstants.RDF_ABOUT_ATTRIBUTE, escapeXmlAttribute(subject.stringValue())));
+            writer.write(SerializationConstants.RDF_DESCRIPTION_START + " " + SerializationConstants.RDF_ABOUT_ATTRIBUTE + "=\"" + escapeXmlAttribute(subject.stringValue()) + "\">");
         } else if (subject.isBNode()) {
-            writer.write(String.format("%s %s=\"%s\">", SerializationConstants.RDF_DESCRIPTION_START, SerializationConstants.RDF_NODEID_ATTRIBUTE, getBlankNodeId(subject)));
+            writer.write(SerializationConstants.RDF_DESCRIPTION_START + " " + SerializationConstants.RDF_NODEID_ATTRIBUTE + "=\"" + getBlankNodeId(subject) + "\">");
         }
         if(this.config instanceof LineEndingOptions lineEndingOptions) {
             writer.write(lineEndingOptions.getLineEnding());
@@ -326,7 +341,6 @@ public class RDFXMLSerializer implements RDFSerializer {
      * @param currentIndent the current indentation string.
      * @throws IOException if an I/O error occurs.
      */
-    @SuppressWarnings("java:S3776")
     private void writePropertyElement(Writer writer, IRI predicate, Value object, String currentIndent) throws IOException {
         String predicateString = predicate.stringValue();
         String prefixedPredicateName = getPrefixedNameInternal(predicateString);
@@ -342,42 +356,38 @@ public class RDFXMLSerializer implements RDFSerializer {
         writer.write("<" + elementName);
 
         if (object.isIRI()) {
-            writer.write(String.format(" %s=\"%s\"/>", SerializationConstants.RDF_RESOURCE_ATTRIBUTE, escapeXmlAttribute(object.stringValue())));
-            if(this.config instanceof LineEndingOptions lineEndingOptions) {
-                writer.write(lineEndingOptions.getLineEnding());
-            }
+            writer.write(" " + SerializationConstants.RDF_RESOURCE_ATTRIBUTE + "=\"" + escapeXmlAttribute(object.stringValue()) + "\"/>");
         } else if (object.isBNode()) {
-            writer.write(String.format(" %s=\"%s\"/>", SerializationConstants.RDF_NODEID_ATTRIBUTE, getBlankNodeId((Resource) object)));
-            if(this.config instanceof LineEndingOptions lineEndingOptions) {
-                writer.write(lineEndingOptions.getLineEnding());
-            }
+            writer.write(" " + SerializationConstants.RDF_NODEID_ATTRIBUTE + "=\"" + getBlankNodeId((Resource) object) + "\"/>");
         } else if (object.isLiteral()) {
-            Literal literal = (Literal) object;
-
-            literal.getLanguage().ifPresent(lang -> {
-                try {
-                    writer.write(String.format(" %s=\"%s\">", SerializationConstants.XML_LANG_ATTRIBUTE, escapeXmlAttribute(lang)));
-                } catch (IOException e) {
-                    throw new UncheckedIOException("Failed to write xml:lang attribute", e);
-                }
-            });
-
-            if (!literal.getLanguage().isPresent() && shouldWriteDatatype(literal)) {
-                String datatypeUri = literal.getDatatype().stringValue();
-                String prefixedDatatype = getPrefixedNameInternal(datatypeUri);
-                writer.write(String.format(" %s=\"%s\">", SerializationConstants.RDF_DATATYPE_ATTRIBUTE, escapeXmlAttribute(prefixedDatatype != null ? prefixedDatatype : datatypeUri)));
-            } else if (!literal.getLanguage().isPresent()) {
-                writer.write(">");
-            }
-
-            writer.write(escapeXmlContent(literal.stringValue()));
-
-            writer.write("</" + elementName + ">");
-            if(this.config instanceof LineEndingOptions lineEndingOptions) {
-                writer.write(lineEndingOptions.getLineEnding());
-            }
+            writeLiteralElement(writer, (Literal) object, elementName);
         } else {
             throw new IllegalArgumentException("Unsupported value type for RDF/XML serialization: " + object.getClass().getName());
+        }
+        if (this.config instanceof LineEndingOptions lineEndingOptions) {
+            writer.write(lineEndingOptions.getLineEnding());
+        }
+    }
+
+    private void writeLiteralElement(Writer writer, Literal literal, String elementName) throws IOException {
+        writeLiteralAttributes(writer, literal);
+        writer.write(escapeXmlContent(literal.stringValue()));
+        writer.write("</" + elementName + ">");
+    }
+
+    private void writeLiteralAttributes(Writer writer, Literal literal) throws IOException {
+        if (literal.getLanguage().isPresent()) {
+            try {
+                writer.write(" " + SerializationConstants.XML_LANG_ATTRIBUTE + "=\"" + escapeXmlAttribute(literal.getLanguage().orElseThrow()) + "\">");
+            } catch (IOException e) {
+                throw new UncheckedIOException("Failed to write xml:lang attribute", e);
+            }
+        } else if (shouldWriteDatatype(literal)) {
+            String datatypeUri = literal.getDatatype().stringValue();
+            String prefixedDatatype = getPrefixedNameInternal(datatypeUri);
+            writer.write(" " + SerializationConstants.RDF_DATATYPE_ATTRIBUTE + "=\"" + escapeXmlAttribute(prefixedDatatype != null ? prefixedDatatype : datatypeUri) + "\">");
+        } else {
+            writer.write(">");
         }
     }
 
@@ -453,11 +463,11 @@ public class RDFXMLSerializer implements RDFSerializer {
         }
 
         base = base.replaceAll("[^a-zA-Z0-9]", SerializationConstants.EMPTY_STRING).toLowerCase();
-        if (base.isEmpty()) base = "p";
+        if (!isAllowedXmlPrefix(base)) base = "p";
 
         String candidate = base;
         int i = 0;
-        while (this.prefixHandler.hasPrefix(candidate) && !this.prefixHandler.getPrefix(candidate).equals(namespace)) {
+        while (this.prefixHandler.hasPrefix(candidate) && !namespace.equals(this.prefixHandler.getNamespace(candidate))) {
             candidate = base + (++i);
         }
         return candidate;
