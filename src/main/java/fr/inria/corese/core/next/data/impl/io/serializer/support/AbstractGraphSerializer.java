@@ -63,11 +63,10 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
         this.model = Objects.requireNonNull(model, "The model cannot be null");
         Objects.requireNonNull(config, "The configuration cannot be null");
         this.option = config;
+        this.prefixHandler = new PrefixHandler(false);
+        model.getNamespaces().forEach(ns -> this.prefixHandler.setPrefix(ns.getPrefix(), ns.getNamespace()));
         if(config instanceof UsesPrefixOptions usesPrefixOptions) {
-            this.prefixHandler = new PrefixHandler(false);
             this.prefixHandler.copyFrom(usesPrefixOptions.getPrefixMapping());
-        } else {
-            this.prefixHandler = new PrefixHandler(false);
         }
         this.consumedBlankNodes = new HashSet<>();
         this.currentlyWritingBlankNodes = new HashSet<>();
