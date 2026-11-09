@@ -1,7 +1,9 @@
 package fr.inria.corese.core.next.data.impl.io.serializer;
 
+import fr.inria.corese.core.next.data.Values;
 import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
+import fr.inria.corese.core.next.data.api.io.option.RDFSerializationOptions;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
 import fr.inria.corese.core.next.data.api.model.Model;
@@ -10,7 +12,6 @@ import fr.inria.corese.core.next.data.impl.io.parser.support.ParserTestBase;
 import fr.inria.corese.core.next.data.impl.io.serializer.rdfxml.RDFXMLSerializerOptions;
 import fr.inria.corese.core.next.data.impl.io.serializer.trig.TriGSerializerOptions;
 import fr.inria.corese.core.next.data.impl.io.serializer.turtle.TurtleSerializerOptions;
-import fr.inria.corese.core.next.data.Values;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,7 @@ import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -49,25 +51,18 @@ class PrefixRoundTripTest extends ParserTestBase {
         return model;
     }
 
-    private String serialize(Model model, RDFFormat format, TurtleSerializerOptions config) {
+    private String serialize(Model model, RDFFormat format, RDFSerializationOptions config) {
         RDFSerializer serializer = serializerFactory.createSerializer(format, model, config);
         StringWriter writer = new StringWriter();
         serializer.write(writer);
         return writer.toString();
     }
 
-    private String serialize(Model model, RDFFormat format, TriGSerializerOptions config) {
-        RDFSerializer serializer = serializerFactory.createSerializer(format, model, config);
-        StringWriter writer = new StringWriter();
-        serializer.write(writer);
-        return writer.toString();
-    }
-
-    private String serialize(Model model, RDFFormat format, RDFXMLSerializerOptions config) {
-        RDFSerializer serializer = serializerFactory.createSerializer(format, model, config);
-        StringWriter writer = new StringWriter();
-        serializer.write(writer);
-        return writer.toString();
+    private void assertPrefixRetained(String output) {
+        String expectedPrefixLine = "@prefix " + PrefixRoundTripTest.CUSTOM_PREFIX + ": <" + PrefixRoundTripTest.CUSTOM_NS + "> .";
+        assertTrue(output.contains(expectedPrefixLine),
+                "Serialized output should keep the model-declared prefix line: \n" + expectedPrefixLine + "\nActual output:\n" + output);
+        assertFalse(output.contains("@prefix ns: <" + PrefixRoundTripTest.CUSTOM_NS + "> ."), "Serializer should not replace the original prefix with generated 'ns:'\n" + output);
     }
 
     @Test
@@ -79,8 +74,7 @@ class PrefixRoundTripTest extends ParserTestBase {
         Model model = parseInput(input, RDFFormat.TURTLE);
         String output = serialize(model, RDFFormat.TURTLE, TurtleSerializerOptions.defaultConfig());
 
-        assertTrue(output.contains(CUSTOM_PREFIX + ":"),
-                "Serialized Turtle should contain declared prefix '" + CUSTOM_PREFIX + ":'\n" + output);
+        assertPrefixRetained(output);
     }
 
     @Test
@@ -109,8 +103,7 @@ class PrefixRoundTripTest extends ParserTestBase {
         Model model = parseInput(input, RDFFormat.TRIG);
         String output = serialize(model, RDFFormat.TRIG, TriGSerializerOptions.defaultConfig());
 
-        assertTrue(output.contains(CUSTOM_PREFIX + ":"),
-                "Serialized TriG should contain declared prefix '" + CUSTOM_PREFIX + ":'\n" + output);
+        assertPrefixRetained(output);
     }
 
     @Test
@@ -122,7 +115,8 @@ class PrefixRoundTripTest extends ParserTestBase {
         Model model = parseInput(input, RDFFormat.TURTLE);
         String output = serialize(model, RDFFormat.RDFXML, RDFXMLSerializerOptions.defaultConfig());
 
-        assertTrue(output.contains(CUSTOM_PREFIX),
-                "Serialized RDF/XML should contain declared prefix '" + CUSTOM_PREFIX + "'\n" + output);
+        assertTrue(output.contains("xmlns:" + CUSTOM_PREFIX + "=\"" + CUSTOM_NS + "\""),
+                "Serialized RDF/XML should retain the model prefix '" + CUSTOM_PREFIX + "'\n" + output);
+        assertFalse(output.contains("xmlns:ns=\"" + CUSTOM_NS + "\""), "Serialized RDF/XML should not overwrite the model prefix with a generated 'ns:' prefix\n" + output);
     }
 }
