@@ -64,18 +64,27 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
         Objects.requireNonNull(config, "The configuration cannot be null");
         this.option = config;
         this.prefixHandler = new PrefixHandler(false);
-        if (config instanceof UsesPrefixOptions usesPrefixOptions && usesPrefixOptions.usePrefixes()) {
-            // Model namespaces are only loaded when autoDeclarePrefixes=true: they will be
-            // declared in the header and are therefore safe to use in writeIRI().
-            // When autoDeclarePrefixes=false only explicitly configured prefixes are used,
-            // preventing QName shortening without a matching @prefix declaration.
-            if (usesPrefixOptions.autoDeclarePrefixes()) {
-                model.getNamespaces().forEach(ns -> this.prefixHandler.setPrefix(ns.getPrefix(), ns.getNamespace()));
-            }
-            this.prefixHandler.copyFrom(usesPrefixOptions.getPrefixMapping());
+        if (config instanceof UsesPrefixOptions usesPrefixOptions) {
+            initializePrefixHandler(usesPrefixOptions);
         }
         this.consumedBlankNodes = new HashSet<>();
         this.currentlyWritingBlankNodes = new HashSet<>();
+    }
+
+    /**
+     * Initializes the serializer prefix registry from the model and any explicitly configured mappings.
+     * Model namespaces are only loaded when auto-declaration is enabled, so autoDeclarePrefixes(false)
+     * still prevents dangling QNames without a matching header declaration.
+     */
+    protected void initializePrefixHandler(UsesPrefixOptions options) {
+        if (!options.usePrefixes()) {
+            return;
+        }
+
+        if (options.autoDeclarePrefixes()) {
+            model.getNamespaces().forEach(ns -> this.prefixHandler.setPrefix(ns.getPrefix(), ns.getNamespace()));
+        }
+        this.prefixHandler.copyFrom(options.getPrefixMapping());
     }
 
     /**
