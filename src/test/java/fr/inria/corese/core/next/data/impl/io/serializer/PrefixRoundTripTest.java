@@ -1,7 +1,5 @@
 package fr.inria.corese.core.next.data.impl.io.serializer;
 
-import fr.inria.corese.core.next.data.Values;
-import fr.inria.corese.core.next.data.api.factory.ValueFactory;
 import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 import fr.inria.corese.core.next.data.api.io.option.RDFSerializationOptions;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
@@ -33,13 +31,11 @@ class PrefixRoundTripTest extends ParserTestBase {
     private static final String CUSTOM_NS = "http://example.org/custom/ns#";
     private static final String CUSTOM_PREFIX = "myprefix";
 
-    private ValueFactory valueFactory;
     private DefaultRDFParserFactory parserFactory;
     private DefaultRDFSerializerFactory serializerFactory;
 
     @BeforeEach
     void setUp() {
-        valueFactory = Values.factory();
         parserFactory = new DefaultRDFParserFactory();
         serializerFactory = new DefaultRDFSerializerFactory();
     }
@@ -65,6 +61,8 @@ class PrefixRoundTripTest extends ParserTestBase {
         assertFalse(output.contains("@prefix ns: <" + PrefixRoundTripTest.CUSTOM_NS + "> ."), "Serializer should not replace the original prefix with generated 'ns:'\n" + output);
     }
 
+    // ── Core round-trip tests ──────────────────────────────────────────────────
+
     @Test
     @DisplayName("Turtle round-trip preserves custom prefix")
     void testTurtleRoundTripPreservesPrefix() {
@@ -75,6 +73,7 @@ class PrefixRoundTripTest extends ParserTestBase {
         String output = serialize(model, RDFFormat.TURTLE, TurtleSerializerOptions.defaultConfig());
 
         assertPrefixRetained(output);
+        assertModelsIsomorphic(model, parseInput(output, RDFFormat.TURTLE));
     }
 
     @Test
@@ -92,6 +91,7 @@ class PrefixRoundTripTest extends ParserTestBase {
 
         assertTrue(output.contains("override:"),
                 "Config-specified prefix 'override' should override model prefix\n" + output);
+        assertModelsIsomorphic(model, parseInput(output, RDFFormat.TURTLE));
     }
 
     @Test
@@ -104,6 +104,7 @@ class PrefixRoundTripTest extends ParserTestBase {
         String output = serialize(model, RDFFormat.TRIG, TriGSerializerOptions.defaultConfig());
 
         assertPrefixRetained(output);
+        assertModelsIsomorphic(model, parseInput(output, RDFFormat.TRIG));
     }
 
     @Test
@@ -118,5 +119,81 @@ class PrefixRoundTripTest extends ParserTestBase {
         assertTrue(output.contains("xmlns:" + CUSTOM_PREFIX + "=\"" + CUSTOM_NS + "\""),
                 "Serialized RDF/XML should retain the model prefix '" + CUSTOM_PREFIX + "'\n" + output);
         assertFalse(output.contains("xmlns:ns=\"" + CUSTOM_NS + "\""), "Serialized RDF/XML should not overwrite the model prefix with a generated 'ns:' prefix\n" + output);
+        assertModelsIsomorphic(model, parseInput(output, RDFFormat.RDFXML));
+    }
+
+    // ── Edge cases ─────────────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("usePrefixes(false) emits full IRIs without any @prefix declarations")
+    void testUsePrefixesFalseEmitsFullIRIs() {
+        String input = "@prefix " + CUSTOM_PREFIX + ": <" + CUSTOM_NS + "> .\n"
+                + CUSTOM_PREFIX + ":item1 " + CUSTOM_PREFIX + ":prop \"value\" .\n";
+
+        Model model = parseInput(input, RDFFormat.TURTLE);
+        TurtleSerializerOptions config = TurtleSerializerOptions.builder().usePrefixes(false).build();
+        String output = serialize(model, RDFFormat.TURTLE, config);
+
+        assertFalse(output.contains("@prefix"), "No @prefix declarations expected when usePrefixes=false\n" + output);
+        assertTrue(output.contains("<" + CUSTOM_NS), "Full IRI should appear in output\n" + output);
+        assertModelsIsomorphic(model, parseInput(output, RDFFormat.TURTLE));
+    }
+
+    @Test
+    @DisplayName("autoDeclarePrefixes(false) still declares model-defined prefixes — output remains parseable")
+    void testAutoDeclarePrefixesFalsePreservesModelPrefixes() {
+        String input = "@prefix " + CUSTOM_PREFIX + ": <" + CUSTOM_NS + "> .\n"
+                + CUSTOM_PREFIX + ":item1 " + CUSTOM_PREFIX + ":prop \"value\" .\n";
+
+        Model model = parseInput(input, RDFFormat.TURTLE);
+        TurtleSerializerOptions config = TurtleSerializerOptions.builder()
+                .autoDeclarePrefixes(false)
+                .build();
+        String output = serialize(model, RDFFormat.TURTLE, config);
+
+        // Model's own prefix must still be declared (the fix for the critical bug)
+        assertPrefixRetained(output);
+        // Output must remain parseable — no dangling QNames
+        assertModelsIsomorphic(model, parseInput(output, RDFFormat.TURTLE));
+    }
+
+    @Test
+    @DisplayName("Empty default prefix (':') is preserved in Turtle round-trip")
+    void testEmptyDefaultPrefixRoundTrip() {
+        String input = """
+                @prefix : <http://example.org/> .
+                :item1 :prop "value" .
+                """;
+
+        Model model = parseInput(input, RDFFormat.TURTLE);
+        String output = serialize(model, RDFFormat.TURTLE, TurtleSerializerOptions.defaultConfig());
+
+        assertTrue(output.contains("@prefix : <http://example.org/> ."),
+                "Empty default prefix declaration should be preserved\n" + output);
+        assertTrue(output.contains(":item1") || output.contains(":prop"),
+                "IRIs should use the empty prefix shorthand\n" + output);
+        assertModelsIsomorphic(model, parseInput(output, RDFFormat.TURTLE));
+    }
+
+    @Test
+    @DisplayName("Config prefix wins over model prefix when both map the same namespace")
+    void testConfigPrefixWinsOnConflict() {
+        // Model declares "myprefix: <CUSTOM_NS>"
+        String input = "@prefix " + CUSTOM_PREFIX + ": <" + CUSTOM_NS + "> .\n"
+                + CUSTOM_PREFIX + ":item1 " + CUSTOM_PREFIX + ":prop \"value\" .\n";
+
+        Model model = parseInput(input, RDFFormat.TURTLE);
+
+        // Config declares a different prefix for the same namespace
+        TurtleSerializerOptions config = TurtleSerializerOptions.builder()
+                .addPrefix("configprefix", CUSTOM_NS)
+                .build();
+        String output = serialize(model, RDFFormat.TURTLE, config);
+
+        assertTrue(output.contains("configprefix:"),
+                "Config prefix 'configprefix' should win over model prefix '" + CUSTOM_PREFIX + "'\n" + output);
+        assertFalse(output.contains(CUSTOM_PREFIX + ":"),
+                "Model prefix '" + CUSTOM_PREFIX + "' should be overridden\n" + output);
+        assertModelsIsomorphic(model, parseInput(output, RDFFormat.TURTLE));
     }
 }

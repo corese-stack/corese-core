@@ -100,8 +100,8 @@ public class RDFXMLSerializer implements RDFSerializer {
         this.config = Objects.requireNonNull(config, "Configuration cannot be null");
 
         this.prefixHandler = new PrefixHandler(false);
-        model.getNamespaces().forEach(ns -> registerPrefix(ns.getPrefix(), ns.getNamespace()));
         if (config instanceof UsesPrefixOptions options && options.usePrefixes()) {
+            model.getNamespaces().forEach(ns -> registerPrefix(ns.getPrefix(), ns.getNamespace()));
             options.getPrefixMapping().getPrefixMap().forEach(this::registerPrefix);
         }
         // RDF/XML syntax and XML namespace bindings cannot be overridden by data/configuration.

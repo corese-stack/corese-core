@@ -64,8 +64,8 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
         Objects.requireNonNull(config, "The configuration cannot be null");
         this.option = config;
         this.prefixHandler = new PrefixHandler(false);
-        model.getNamespaces().forEach(ns -> this.prefixHandler.setPrefix(ns.getPrefix(), ns.getNamespace()));
-        if(config instanceof UsesPrefixOptions usesPrefixOptions) {
+        if (config instanceof UsesPrefixOptions usesPrefixOptions && usesPrefixOptions.usePrefixes()) {
+            model.getNamespaces().forEach(ns -> this.prefixHandler.setPrefix(ns.getPrefix(), ns.getNamespace()));
             this.prefixHandler.copyFrom(usesPrefixOptions.getPrefixMapping());
         }
         this.consumedBlankNodes = new HashSet<>();
@@ -122,20 +122,20 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
         }
 
         Set<String> actuallyUsedNamespaces = Set.of();
-        if (option instanceof UsesPrefixOptions prefixOptions
-                && prefixOptions.usePrefixes()
-                && prefixOptions.autoDeclarePrefixes()) {
-            actuallyUsedNamespaces = collectUsedNamespaces();
+        if (option instanceof UsesPrefixOptions prefixOptions && prefixOptions.usePrefixes()) {
+            actuallyUsedNamespaces = collectUsedNamespaces(prefixOptions.autoDeclarePrefixes());
         }
 
         writePrefixDeclarations(writer, actuallyUsedNamespaces);
     }
 
     /**
-     * Collects all namespaces used in the model and attempts to assign prefixes to them
-     * if auto-declaration is enabled, and they are not already mapped.
+     * Collects all namespaces used in the model that have a known prefix.
+     * When {@code autoGenerate} is true, also auto-generates prefixes for unmapped namespaces.
+     * When {@code autoGenerate} is false, only namespaces already mapped (from model or config)
+     * are returned — preventing QName shortening without a corresponding {@code @prefix} declaration.
      */
-    protected Set<String> collectUsedNamespaces() {
+    protected Set<String> collectUsedNamespaces(boolean autoGenerate) {
         Set<String> namespaces = model.stream()
                 .flatMap(stmt -> {
                     List<Value> values = new ArrayList<>(Arrays.asList(
@@ -157,16 +157,25 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
                 .map(v -> IRIUtils.guessNamespace(v.stringValue()))
                 .collect(Collectors.toSet());
 
-        namespaces.forEach(namespace -> {
-            if (!this.prefixHandler.hasNamespace(namespace)) {
-                String prefix = getSuggestedPrefix(namespace);
-                if (prefix != null) {
-                    addPrefixMapping(namespace, prefix);
+        if (autoGenerate) {
+            namespaces.forEach(namespace -> {
+                if (!this.prefixHandler.hasNamespace(namespace)) {
+                    String prefix = getSuggestedPrefix(namespace);
+                    if (prefix != null) {
+                        addPrefixMapping(namespace, prefix);
+                    }
                 }
-            }
-        });
+            });
+        }
 
-        return namespaces;
+        return namespaces.stream()
+                .filter(this.prefixHandler::hasNamespace)
+                .collect(Collectors.toSet());
+    }
+
+    /** @deprecated use {@link #collectUsedNamespaces(boolean)} */
+    protected Set<String> collectUsedNamespaces() {
+        return collectUsedNamespaces(true);
     }
 
     /**
