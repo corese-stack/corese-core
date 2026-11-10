@@ -49,6 +49,8 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
     protected final Model model;
     protected IOOptions option;
     protected PrefixHandler prefixHandler;
+    /** Namespaces actually written as {@code @prefix} declarations in the header. */
+    protected Set<String> declaredNamespaces = Set.of();
     protected final Set<Resource> consumedBlankNodes;
     protected final Set<Resource> currentlyWritingBlankNodes;
 
@@ -141,7 +143,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             actuallyUsedNamespaces = collectUsedNamespaces(prefixOptions.autoDeclarePrefixes());
         }
 
-        writePrefixDeclarations(writer, actuallyUsedNamespaces);
+        declaredNamespaces = writePrefixDeclarations(writer, actuallyUsedNamespaces);
     }
 
     /**
@@ -151,7 +153,8 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * are returned — preventing QName shortening without a corresponding {@code @prefix} declaration.
      */
     protected Set<String> collectUsedNamespaces(boolean autoGenerate) {
-        Set<String> namespaces = model.stream()
+        // Collect all IRI strings from the model once — model.stream() may not be reusable.
+        List<String> allIRIs = model.stream()
                 .flatMap(stmt -> {
                     List<Value> values = new ArrayList<>(Arrays.asList(
                             stmt.getSubject(),
@@ -161,7 +164,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
                     if (stmt.getContext() != null) {
                         values.add(stmt.getContext());
                     }
-                    if(stmt.getObject().isLiteral()
+                    if (stmt.getObject().isLiteral()
                             && ((Literal) stmt.getObject()).getDatatype() != null) {
                         values.add(((Literal) stmt.getObject()).getDatatype());
                     }
@@ -169,23 +172,32 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
                 })
                 .filter(Objects::nonNull)
                 .filter(Value::isIRI)
-                .map(v -> IRIUtils.guessNamespace(v.stringValue()))
-                .collect(Collectors.toSet());
+                .map(Value::stringValue)
+                .toList();
 
         if (autoGenerate) {
-            namespaces.forEach(namespace -> {
-                if (!this.prefixHandler.hasNamespace(namespace)) {
-                    String prefix = getSuggestedPrefix(namespace);
-                    if (prefix != null) {
-                        addPrefixMapping(namespace, prefix);
-                    }
-                }
-            });
+            allIRIs.stream()
+                    .map(IRIUtils::guessNamespace)
+                    .filter(namespace -> !namespace.isEmpty())
+                    .filter(namespace -> !this.prefixHandler.hasNamespace(namespace))
+                    .forEach(namespace -> {
+                        String prefix = getSuggestedPrefix(namespace);
+                        if (prefix != null) {
+                            addPrefixMapping(namespace, prefix);
+                        }
+                    });
         }
 
-        return namespaces.stream()
-                .filter(this.prefixHandler::hasNamespace)
-                .collect(Collectors.toSet());
+        return allIRIs.stream()
+                .flatMap(iri -> matchingNamespaces(iri).stream())
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    private Set<String> matchingNamespaces(String iriString) {
+        return this.prefixHandler.getNamespaces().stream()
+                .filter(iriString::startsWith)
+                .sorted(Comparator.comparingInt(String::length).reversed())
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     /** @deprecated use {@link #collectUsedNamespaces(boolean)} */
@@ -199,7 +211,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @param writer the {@link Writer} to which prefixes will be written.
      * @throws IOException if an I/O error occurs.
      */
-    protected void writePrefixDeclarations(Writer writer, Set<String> actuallyUsedNamespaces) throws IOException {
+    protected Set<String> writePrefixDeclarations(Writer writer, Set<String> actuallyUsedNamespaces) throws IOException {
         if(this.option instanceof UsesPrefixOptions prefixOptions
                 && this.option instanceof LineEndingOptions lineEndingOptions
                 && this.option instanceof BaseIRIOptions baseIRIOptions
@@ -220,17 +232,10 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             if (!prefixes.isEmpty() || baseIRIOptions.getBaseIRI() != null) {
                 writer.write(lineEndingOptions.getLineEnding());
             }
-        }
-    }
 
-    /**
-     * Writes prefix declarations to the writer, sorted if configured.
-     *
-     * @param writer the {@link Writer} to which prefixes will be written.
-     * @throws IOException if an I/O error occurs.
-     */
-    protected void writePrefixDeclarations(Writer writer) throws IOException {
-        writePrefixDeclarations(writer, Set.of());
+            return actuallyUsedNamespaces;
+        }
+        return Set.of();
     }
 
     /**
@@ -814,21 +819,75 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @return The prefixed name (e.g., "ex:someResource") or null if no suitable prefix is found.
      */
     protected String getPrefixedName(String iriString) {
-        for (String namespace : this.prefixHandler.getNamespaces()) {
-            if (iriString.startsWith(namespace)) {
-                String prefix = this.prefixHandler.getPrefix(namespace);
-                String localName = iriString.substring(namespace.length());
-                if (localName.isEmpty()) {
-                    if (!prefix.isEmpty()) {
-                        return prefix + SerializationConstants.COLON;
-                    } else {
-                        continue;
-                    }
-                }
-                return prefix + SerializationConstants.COLON + localName;
+        List<String> matchingNamespaces = declaredNamespaces.stream()
+                .filter(iriString::startsWith)
+                .sorted(Comparator.comparingInt(String::length).reversed())
+                .toList();
+
+        for (String namespace : matchingNamespaces) {
+            String prefix = this.prefixHandler.getPrefix(namespace);
+            if (prefix == null) {
+                continue;
             }
+
+            String localName = iriString.substring(namespace.length());
+            if (localName.isEmpty()) {
+                return prefix.isEmpty() ? SerializationConstants.COLON : prefix + SerializationConstants.COLON;
+            }
+
+            if (!isTurtleLocalName(localName)) {
+                return null;
+            }
+
+            return prefix + SerializationConstants.COLON + localName;
         }
         return null;
+    }
+
+    /**
+     * Returns true if the given string is a valid Turtle PN_LOCAL (no escaping needed).
+     * Validates both character set AND positional rules:
+     * <ul>
+     *   <li>First character: ASCII letter or digit — not '-', or '.'</li>
+     *   <li>Middle characters: ASCII letters, digits, '_', '-', or '.'</li>
+     *   <li>Last character: ASCII letter, digit, or '_' — not '.'</li>
+     * </ul>
+     * Falls back to full {@code <IRI>} form if any rule is violated.
+     */
+    private static boolean isTurtleLocalName(String localName) {
+        if (localName.isEmpty()) {
+            return true;
+        }
+        // First char: '-' and '.' are not allowed
+        int firstCp = localName.codePointAt(0);
+        if (firstCp == '-' || firstCp == '.') {
+            return false;
+        }
+        if (isInvalidTurtleLocalNameChar(firstCp)) {
+            return false;
+        }
+        // Last char: '.' is not allowed
+        int lastCp = localName.codePointBefore(localName.length());
+        if (lastCp == '.') {
+            return false;
+        }
+        // Middle chars
+        for (int i = Character.charCount(firstCp); i < localName.length(); ) {
+            int cp = localName.codePointAt(i);
+            if (isInvalidTurtleLocalNameChar(cp)) {
+                return false;
+            }
+            i += Character.charCount(cp);
+        }
+        return true;
+    }
+
+    private static boolean isInvalidTurtleLocalNameChar(int cp) {
+        // Restrict to a conservative ASCII subset; non-ASCII names use full IRIs.
+        return !((cp >= 'A' && cp <= 'Z')
+                || (cp >= 'a' && cp <= 'z')
+                || (cp >= '0' && cp <= '9')
+                || cp == '_' || cp == '-' || cp == '.');
     }
 
     /**
