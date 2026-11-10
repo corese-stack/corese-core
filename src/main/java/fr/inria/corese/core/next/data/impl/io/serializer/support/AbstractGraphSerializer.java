@@ -65,7 +65,13 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
         this.option = config;
         this.prefixHandler = new PrefixHandler(false);
         if (config instanceof UsesPrefixOptions usesPrefixOptions && usesPrefixOptions.usePrefixes()) {
-            model.getNamespaces().forEach(ns -> this.prefixHandler.setPrefix(ns.getPrefix(), ns.getNamespace()));
+            // Model namespaces are only loaded when autoDeclarePrefixes=true: they will be
+            // declared in the header and are therefore safe to use in writeIRI().
+            // When autoDeclarePrefixes=false only explicitly configured prefixes are used,
+            // preventing QName shortening without a matching @prefix declaration.
+            if (usesPrefixOptions.autoDeclarePrefixes()) {
+                model.getNamespaces().forEach(ns -> this.prefixHandler.setPrefix(ns.getPrefix(), ns.getNamespace()));
+            }
             this.prefixHandler.copyFrom(usesPrefixOptions.getPrefixMapping());
         }
         this.consumedBlankNodes = new HashSet<>();

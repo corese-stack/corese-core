@@ -140,8 +140,8 @@ class PrefixRoundTripTest extends ParserTestBase {
     }
 
     @Test
-    @DisplayName("autoDeclarePrefixes(false) still declares model-defined prefixes — output remains parseable")
-    void testAutoDeclarePrefixesFalsePreservesModelPrefixes() {
+    @DisplayName("autoDeclarePrefixes(false) without config prefix emits full IRIs — no dangling QName")
+    void testAutoDeclarePrefixesFalseNoConfigPrefix() {
         String input = "@prefix " + CUSTOM_PREFIX + ": <" + CUSTOM_NS + "> .\n"
                 + CUSTOM_PREFIX + ":item1 " + CUSTOM_PREFIX + ":prop \"value\" .\n";
 
@@ -151,9 +151,32 @@ class PrefixRoundTripTest extends ParserTestBase {
                 .build();
         String output = serialize(model, RDFFormat.TURTLE, config);
 
-        // Model's own prefix must still be declared (the fix for the critical bug)
-        assertPrefixRetained(output);
-        // Output must remain parseable — no dangling QNames
+        // Model namespace is not loaded when autoDeclarePrefixes=false → no @prefix, no QName
+        assertFalse(output.contains("@prefix " + CUSTOM_PREFIX + ":"),
+                "Model prefix must not be auto-declared when autoDeclarePrefixes=false\n" + output);
+        assertFalse(output.contains(CUSTOM_PREFIX + ":item1"),
+                "IRI must not be shortened to a dangling QName\n" + output);
+        // Full IRIs are used → output remains re-parseable
+        assertModelsIsomorphic(model, parseInput(output, RDFFormat.TURTLE));
+    }
+
+    @Test
+    @DisplayName("autoDeclarePrefixes(false) with explicit config prefix uses and declares only that prefix")
+    void testAutoDeclarePrefixesFalseWithConfigPrefix() {
+        String input = "@prefix " + CUSTOM_PREFIX + ": <" + CUSTOM_NS + "> .\n"
+                + CUSTOM_PREFIX + ":item1 " + CUSTOM_PREFIX + ":prop \"value\" .\n";
+
+        Model model = parseInput(input, RDFFormat.TURTLE);
+        TurtleSerializerOptions config = TurtleSerializerOptions.builder()
+                .autoDeclarePrefixes(false)
+                .addPrefix("explicit", CUSTOM_NS)
+                .build();
+        String output = serialize(model, RDFFormat.TURTLE, config);
+
+        assertTrue(output.contains("@prefix explicit: <" + CUSTOM_NS + "> ."),
+                "Explicitly configured prefix must be declared\n" + output);
+        assertTrue(output.contains("explicit:"),
+                "Config prefix must be used for shortening\n" + output);
         assertModelsIsomorphic(model, parseInput(output, RDFFormat.TURTLE));
     }
 
