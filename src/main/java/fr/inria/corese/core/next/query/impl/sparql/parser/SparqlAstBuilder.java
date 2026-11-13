@@ -1,9 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.parser;
 
 
-import fr.inria.corese.core.next.common.text.RdfText;
-import fr.inria.corese.core.next.data.spi.term.IRIUtils;
-import fr.inria.corese.core.next.data.api.vocabulary.RDF;
 import fr.inria.corese.core.next.data.spi.io.IOConstants;
 import fr.inria.corese.core.next.generated.antlr.SparqlParser;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
@@ -162,6 +159,9 @@ public abstract class SparqlAstBuilder {
      * having conditions
      */
     protected final List<TermAst> havingConditions = new ArrayList<>();
+    protected final List<HavingAst.SourceLocation> havingLocations = new ArrayList<>();
+    protected int havingLine = -1;
+    protected int havingColumn = -1;
 
     /**
      * Top-level WHERE clause, set when the root group is closed in exitGroup().
@@ -743,6 +743,9 @@ public abstract class SparqlAstBuilder {
         protected GroupByAst groupBy = new GroupByAst(List.of());
         protected final List<OrderConditionAst> orderConditions = new ArrayList<>();
         protected final List<TermAst> havingConditions = new ArrayList<>();
+        protected final List<HavingAst.SourceLocation> havingLocations = new ArrayList<>();
+        protected int havingLine = -1;
+        protected int havingColumn = -1;
         protected ValuesAst valuesClause = ValuesAst.none();
     }
 }

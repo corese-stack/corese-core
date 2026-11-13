@@ -371,7 +371,7 @@ class CoreseAstQueryBuilderTest extends AbstractSparqlParserFeatureTest {
     private static SelectQueryAst getSelectQueryAst() {
         GroupGraphPatternAst existsPattern = new GroupGraphPatternAst(List.of(
                 new BgpAst(List.of(new TriplePatternAst(new VarAst("s"), new VarAst("p"), new VarAst("o"))))));
-        FilterAst filter = new FilterAst(new ExistsAst(existsPattern));
+        FilterAst filter = new FilterAst(new ExistsAst(existsPattern), -1, -1);
         GroupGraphPatternAst where = new GroupGraphPatternAst(List.of(
                 new BgpAst(List.of(new TriplePatternAst(new VarAst("s"), new VarAst("p"), new VarAst("o")))),
                 filter));

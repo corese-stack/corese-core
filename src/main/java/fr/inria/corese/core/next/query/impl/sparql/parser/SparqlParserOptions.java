@@ -33,6 +33,8 @@ public final class SparqlParserOptions
     private final boolean strictMode;
     private final boolean failFast;
     private final boolean collectErrors;
+    private final boolean includeWarnings;
+    private final boolean failOnWarnings;
     private final List<QueryDiagnostic> diagnostics;
 
 
@@ -41,6 +43,8 @@ public final class SparqlParserOptions
         this.strictMode = builder.strictMode;
         this.failFast = builder.failFast;
         this.collectErrors = builder.collectErrors;
+        this.includeWarnings = builder.includeWarnings;
+        this.failOnWarnings = builder.failOnWarnings;
         this.diagnostics = collectErrors ? new ArrayList<>() : Collections.emptyList();
     }
 
@@ -120,6 +124,35 @@ public final class SparqlParserOptions
     }
 
     /**
+     * Indicates whether warning diagnostics should be included in validation results.
+     *
+     * <p><b>Default:</b> {@code true}</p>
+     *
+     * @return true if warnings are included
+     */
+    public boolean includeWarnings() {
+        return includeWarnings;
+    }
+
+    /**
+     * Indicates whether warning diagnostics should be treated as fatal errors.
+     *
+     * <p>When enabled, any {@link QueryDiagnostic.Severity#WARNING} diagnostic
+     * causes {@link fr.inria.corese.core.next.query.api.validation.QueryValidationResult#isValid()}
+     * to return {@code false}. Useful for strict linting or CI pipelines.</p>
+     *
+     * <p>This flag has no effect when {@code includeWarnings} is {@code false}, because
+     * warnings are suppressed before promotion is applied.</p>
+     *
+     * <p><b>Default:</b> {@code false}</p>
+     *
+     * @return true if warnings are treated as errors
+     */
+    public boolean failOnWarnings() {
+        return failOnWarnings;
+    }
+
+    /**
      * Records a parsing error internally if {@code collectErrors} is enabled.
      *
      * @param diagnostic error message (ignored if null or collection disabled)
@@ -150,6 +183,10 @@ public final class SparqlParserOptions
         private boolean failFast = true;
 
         private boolean collectErrors = true;
+
+        private boolean includeWarnings = true;
+
+        private boolean failOnWarnings = false;
 
         public SparqlParserOptions build() {
             return new SparqlParserOptions(this);
@@ -195,6 +232,29 @@ public final class SparqlParserOptions
          */
         public Builder collectErrors(boolean collectErrors) {
             this.collectErrors = collectErrors;
+            return this;
+        }
+
+        /**
+         * Enables or disables inclusion of warning diagnostics in validation results.
+         *
+         * @param includeWarnings false to suppress all warnings
+         * @return this builder
+         */
+        public Builder includeWarnings(boolean includeWarnings) {
+            this.includeWarnings = includeWarnings;
+            return this;
+        }
+
+        /**
+         * When enabled, warning diagnostics are promoted to errors,
+         * causing {@code isValid()} to return {@code false}.
+         *
+         * @param failOnWarnings true to treat warnings as errors
+         * @return this builder
+         */
+        public Builder failOnWarnings(boolean failOnWarnings) {
+            this.failOnWarnings = failOnWarnings;
             return this;
         }
 

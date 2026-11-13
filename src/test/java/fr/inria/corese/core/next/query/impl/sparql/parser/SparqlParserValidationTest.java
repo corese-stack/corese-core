@@ -205,52 +205,39 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
                               FILTER(CONCAT("1", "2") + 1 = ?o)
                             }
                             """,
-                            "CONCAT used in + should be resolvable to a numeric"),
-                    Arguments.of(
-                            "Should reject FILTER with IRI-returning operator",
-                            """
-                            SELECT * WHERE {
-                              ?x ?p ?o .
-                              FILTER(DATATYPE("test"^^<http://ns.inria.fr/test>))
-                            }
-                            """,
-                            "DATATYPE used in FILTER should be resolvable to a boolean"),
-                    Arguments.of(
-                            "Should reject FILTER with datetime operator",
-                            """
-                            SELECT * WHERE {
-                              ?x ?p ?o .
-                              FILTER(NOW())
-                            }
-                            """,
-                            "NOW used in FILTER should be resolvable to a boolean"),
-                    Arguments.of(
-                            "Should reject FILTER when IF condition is not EBV-compatible",
-                            """
-                            SELECT * WHERE {
-                              ?x ?p ?o .
-                              FILTER(IF(NOW(), true, false))
-                            }
-                            """,
-                            "IF used in FILTER should be resolvable to a boolean"),
-                    Arguments.of(
-                            "Should reject FILTER containing an IF that does not return boolean or acceptable AST type",
-                            """
-                            SELECT * WHERE {
-                              ?x ?p ?o .
-                              FILTER(IF(?s, 4, <http://test.inria.fr>))
-                            }
-                            """,
-                            "IF used in FILTER should be resolvable to a boolean"),
-                    Arguments.of(
-                            "Should reject FILTER containing an IF that does not return only boolean or acceptable AST type",
-                            """
-                            SELECT * WHERE {
-                              ?x ?p ?o .
-                              FILTER(IF(?s, true, <http://test.inria.fr>))
-                            }
-                            """,
-                            "IF used in FILTER should be resolvable to a boolean")
+                              "CONCAT used in + should be resolvable to a numeric")
+            );
+        }
+
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("suspiciousFilterQueries")
+        void shouldAcceptSuspiciousFilterQueriesWithWarnings(String testName, String query) {
+            SparqlParser parser = newParserDefault();
+
+            assertTrue(parser.validate(query).isValid());
+            assertTrue(parser.validate(query).diagnostics().stream()
+                    .anyMatch(diagnostic -> diagnostic.severity()
+                            == fr.inria.corese.core.next.query.api.validation.QueryDiagnostic.Severity.WARNING));
+            assertDoesNotThrow(() -> parser.parse(query));
+        }
+
+        private static Stream<Arguments> suspiciousFilterQueries() {
+            return Stream.of(
+                    Arguments.of("IRI-returning function", """
+                            SELECT * WHERE { ?x ?p ?o FILTER(DATATYPE("test")) }
+                            """),
+                    Arguments.of("datetime function", """
+                            SELECT * WHERE { ?x ?p ?o FILTER(NOW()) }
+                            """),
+                    Arguments.of("IF with non-boolean condition", """
+                            SELECT * WHERE { ?x ?p ?o FILTER(IF(NOW(), true, false)) }
+                            """),
+                    Arguments.of("IF with non-boolean return branches", """
+                            SELECT * WHERE { ?x ?p ?o FILTER(IF(?s, 4, <http://test.inria.fr>)) }
+                            """),
+                    Arguments.of("IF returning mixed types", """
+                            SELECT * WHERE { ?x ?p ?o FILTER(IF(?s, true, <http://test.inria.fr>)) }
+                            """)
             );
         }
 
@@ -464,61 +451,72 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
                               FILTER(STRLEN("test") * NOW() = ?o)
                             }
                             """,
-                            "NOW used in * should be resolvable to a numeric"),
+                            "NOW used in * should be resolvable to a numeric")
+            );
+        }
+
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("advisoryOperandQueries")
+        void shouldAcceptSuspiciousBooleanAndIriOperandsWithWarnings(String testName, String query) {
+            var result = newParserDefault().validate(query);
+
+            assertTrue(result.isValid(), "Suspicious operands should not block query parsing");
+            assertTrue(result.diagnostics().stream().anyMatch(diagnostic ->
+                    diagnostic.severity()
+                            == fr.inria.corese.core.next.query.api.validation.QueryDiagnostic.Severity.WARNING));
+            assertDoesNotThrow(() -> newParserDefault().parse(query));
+        }
+
+        private static Stream<Arguments> advisoryOperandQueries() {
+            return Stream.of(
                     Arguments.of(
-                            "Should reject && operator with non booleans",
+                            "Should warn on && with an IRI operand",
                             """
                             SELECT * WHERE {
                               ?x ?p ?o .
                               FILTER(<http://ns.inria.fr/test> && langMatches("potato", "fr"))
                             }
-                            """,
-                            "<http://ns.inria.fr/test> used in && should be resolvable to a boolean"),
+                            """),
                     Arguments.of(
-                            "Should reject ! operator with non booleans",
+                            "Should warn on ! with an IRI operand",
                             """
                             SELECT * WHERE {
                               ?x ?p ?o .
                               FILTER(! <http://ns.inria.fr/test>)
                             }
-                            """,
-                            "<http://ns.inria.fr/test> used in ! should be resolvable to a boolean"),
+                            """),
                     Arguments.of(
-                            "Should reject < operator with IRIs",
+                            "Should warn on < with an IRI operand",
                             """
                             SELECT * WHERE {
                               ?x ?p ?o .
                               FILTER(2 < <http://ns.inria.fr/test>)
                             }
-                            """,
-                            "<http://ns.inria.fr/test> used in < should be resolvable to a not an IRI"),
+                            """),
                     Arguments.of(
-                            "Should reject <= operator with IRIs",
+                            "Should warn on <= with an IRI operand",
                             """
                             SELECT * WHERE {
                               ?x ?p ?o .
                               FILTER(STRLEN("test") <= <http://ns.inria.fr/test>)
                             }
-                            """,
-                            "<http://ns.inria.fr/test> used in <= should be resolvable to a not an IRI"),
+                            """),
                     Arguments.of(
-                            "Should reject > operator with IRIs",
+                            "Should warn on > with an IRI operand",
                             """
                             SELECT * WHERE {
                               ?x ?p ?o .
                               FILTER("2"^^<http://www.w3.org/2001/XMLSchema#integer> > <http://ns.inria.fr/test>)
                             }
-                            """,
-                            "<http://ns.inria.fr/test> used in > should be resolvable to a not an IRI"),
+                            """),
                     Arguments.of(
-                            "Should reject >= operator with IRIs",
+                            "Should warn on >= with an IRI-returning operand",
                             """
                             SELECT * WHERE {
                               ?x ?p ?o .
                               FILTER(datatype("2"^^<http://www.w3.org/2001/XMLSchema#integer>) >= 4)
                             }
-                            """,
-                            "DATATYPE used in >= should be resolvable to a not an IRI")
+                            """)
             );
         }
     }

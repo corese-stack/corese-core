@@ -4,11 +4,13 @@ import fr.inria.corese.core.next.data.api.vocabulary.RDF;
 import fr.inria.corese.core.next.data.api.vocabulary.XSD;
 import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.AggregateAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 
 import java.util.Set;
+import java.util.function.Consumer;
 
 public class SemanticValidationUtils {
 
@@ -177,5 +179,203 @@ public class SemanticValidationUtils {
      */
     public static boolean isPotentialStringLiteral(TermAst termAst) {
         return isUnknownType(termAst) || isStringLiteral(termAst) || termAst instanceof SimpleLiteralExpressionAst;
+    }
+
+    /**
+     * Returns {@code true} when the term is structurally valid in a FILTER or HAVING
+     * but its use as an effective boolean value (EBV) is likely a mistake.
+     *
+     * <p>Suspicious patterns:</p>
+     * <ul>
+     *   <li>Numeric literal — EBV reduces to non-zero check; user probably meant a comparison.</li>
+     *   <li>Plain or {@code xsd:string} literal — EBV reduces to non-empty check.</li>
+     *   <li>String-producing built-in (e.g. {@code STR}, {@code CONCAT}, {@code LCASE}) —
+     *       the EBV of a string is non-empty; user probably meant a boolean predicate.</li>
+     *   <li>Numeric-producing built-in (e.g. {@code ABS}, {@code STRLEN}, {@code ROUND}) —
+     *       EBV reduces to non-zero check; user probably meant an explicit comparison.</li>
+     * </ul>
+     *
+     * <p>Boolean literals ({@code true}/{@code false}) are <em>not</em> flagged here — they have
+     * a well-defined EBV and are reported separately as a "Constant condition" by
+     * {@link #isConstantBooleanCondition(TermAst)}.</p>
+     *
+     * @param termAst the FILTER/HAVING operand to inspect
+     * @return {@code true} if the term triggers a suspicious EBV coercion warning
+     */
+    public static boolean isSuspiciousEBVCoercion(TermAst termAst) {
+        if (termAst instanceof LiteralAst literalAst) {
+            // Boolean literals have a well-defined EBV — handled as "Constant condition", not coercion
+            return !BOOLEAN_DATATYPE.equals(literalAst.datatype());
+        }
+        if (termAst instanceof SimpleLiteralExpressionAst) {
+            return true;
+        }
+        if (termAst instanceof NumericExpressionAst) {
+            return true;
+        }
+        if (termAst instanceof VarAst) {
+            return true;
+        }
+        if (termAst instanceof IfAst(TermAst condition, TermAst thenExpr, TermAst elseExpr)) {
+            return isSuspiciousEBVCoercion(condition)
+                    || isSuspiciousEBVCoercion(thenExpr)
+                    || isSuspiciousEBVCoercion(elseExpr);
+        }
+        return false;
+    }
+
+    /**
+     * Visits expression terms without descending into graph patterns embedded in EXISTS.
+     * Those patterns are visited separately, where their own FILTER locations are available.
+     */
+    public static void visitExpressionTerms(TermAst termAst, Consumer<TermAst> visitor) {
+        if (termAst == null || visitor == null) {
+            return;
+        }
+        visitor.accept(termAst);
+        if (termAst instanceof ExistsAst || termAst instanceof NotExistsAst) {
+            return;
+        }
+        if (termAst instanceof UnaryConstraintAst unaryConstraintAst) {
+            visitExpressionTerms(unaryConstraintAst.argument(), visitor);
+        } else if (termAst instanceof BinaryConstraintAst binaryConstraintAst) {
+            visitExpressionTerms(binaryConstraintAst.getLeftArgument(), visitor);
+            visitExpressionTerms(binaryConstraintAst.getRightArgument(), visitor);
+        } else if (termAst instanceof UnlimitedArgumentsFunctionAst unlimitedArgumentsFunctionAst) {
+            unlimitedArgumentsFunctionAst.arguments()
+                    .forEach(argument -> visitExpressionTerms(argument, visitor));
+        } else if (termAst instanceof FunctionCallAst functionCallAst) {
+            functionCallAst.arguments().forEach(argument -> visitExpressionTerms(argument, visitor));
+        } else if (termAst instanceof IfAst(TermAst condition, TermAst thenExpr, TermAst elseExpr)) {
+            visitExpressionTerms(condition, visitor);
+            visitExpressionTerms(thenExpr, visitor);
+            visitExpressionTerms(elseExpr, visitor);
+        } else if (termAst instanceof AggregateAst aggregateAst) {
+            visitExpressionTerms(aggregateAst.expression(), visitor);
+        } else if (termAst instanceof InAst(TermAst left, java.util.List<TermAst> candidates)) {
+            visitExpressionTerms(left, visitor);
+            candidates.forEach(candidate -> visitExpressionTerms(candidate, visitor));
+        } else if (termAst instanceof NotInAst(TermAst left, java.util.List<TermAst> candidates)) {
+            visitExpressionTerms(left, visitor);
+            candidates.forEach(candidate -> visitExpressionTerms(candidate, visitor));
+        }
+    }
+
+    /**
+     * Identifies boolean conditions whose value can be determined from constants alone.
+     */
+    public static boolean isConstantBooleanCondition(TermAst termAst) {
+        if (termAst instanceof LiteralAst literalAst) {
+            return BOOLEAN_DATATYPE.equals(literalAst.datatype());
+        }
+        return termAst instanceof BooleanExpressionAst && isConstantExpression(termAst);
+    }
+
+    /**
+     * Checks for ordering comparisons between statically known, incompatible value types.
+     */
+    public static boolean hasIncompatibleComparison(TermAst termAst) {
+        if (termAst instanceof GreaterThanAst
+                || termAst instanceof GreaterOrEqualThanAst
+                || termAst instanceof LowerThanAst
+                || termAst instanceof LowerOrEqualThanAst) {
+            BinaryConstraintAst comparison = (BinaryConstraintAst) termAst;
+            ValueType left = valueType(comparison.getLeftArgument());
+            ValueType right = valueType(comparison.getRightArgument());
+            if (left != null && right != null && left != right
+                        && left != ValueType.IRI && right != ValueType.IRI) {
+                return true;
+            }
+        }
+        if (termAst instanceof UnaryConstraintAst unaryConstraintAst) {
+            return hasIncompatibleComparison(unaryConstraintAst.argument());
+        }
+        if (termAst instanceof BinaryConstraintAst binaryConstraintAst) {
+            return hasIncompatibleComparison(binaryConstraintAst.getLeftArgument())
+                    || hasIncompatibleComparison(binaryConstraintAst.getRightArgument());
+        }
+        if (termAst instanceof UnlimitedArgumentsFunctionAst unlimitedArgumentsFunctionAst) {
+            return unlimitedArgumentsFunctionAst.arguments().stream()
+                    .anyMatch(SemanticValidationUtils::hasIncompatibleComparison);
+        }
+        if (termAst instanceof IfAst(TermAst condition, TermAst thenExpr, TermAst elseExpr)) {
+            return hasIncompatibleComparison(condition)
+                    || hasIncompatibleComparison(thenExpr)
+                    || hasIncompatibleComparison(elseExpr);
+        }
+        return false;
+    }
+
+    private static boolean isConstantExpression(TermAst termAst) {
+        if (termAst instanceof LiteralAst || termAst instanceof IriAst) {
+            return true;
+        }
+        if (termAst instanceof VarAst || termAst instanceof FunctionCallAst || termAst instanceof IriExpressionAst) {
+            return false;
+        }
+        if (termAst instanceof UnaryConstraintAst unaryConstraintAst) {
+            return isConstantExpression(unaryConstraintAst.argument());
+        }
+        if (termAst instanceof BinaryConstraintAst binaryConstraintAst) {
+            return isConstantExpression(binaryConstraintAst.getLeftArgument())
+                    && isConstantExpression(binaryConstraintAst.getRightArgument());
+        }
+        if (termAst instanceof UnlimitedArgumentsFunctionAst unlimitedArgumentsFunctionAst) {
+            return unlimitedArgumentsFunctionAst.arguments().stream()
+                    .allMatch(SemanticValidationUtils::isConstantExpression);
+        }
+        if (termAst instanceof IfAst(TermAst condition, TermAst thenExpr, TermAst elseExpr)) {
+            return isConstantExpression(condition)
+                    && isConstantExpression(thenExpr)
+                    && isConstantExpression(elseExpr);
+        }
+        return false;
+    }
+
+    private static ValueType valueType(TermAst termAst) {
+        if (termAst instanceof LiteralAst(String lexical, String lang, String datatype)) {
+            if ((datatype != null && NUMERIC_DATATYPES.contains(datatype))
+                    || (datatype == null && lang == null && isNumeric(lexical))) {
+                return ValueType.NUMERIC;
+            }
+            if (BOOLEAN_DATATYPE.equals(datatype)) {
+                return ValueType.BOOLEAN;
+            }
+            if (lang != null || datatype == null || STRING_DATATYPE.contains(datatype)) {
+                return ValueType.STRING;
+            }
+        }
+        if (termAst instanceof NumericExpressionAst) {
+            return ValueType.NUMERIC;
+        }
+        if (termAst instanceof SimpleLiteralExpressionAst) {
+            return ValueType.STRING;
+        }
+        if (termAst instanceof IriAst || termAst instanceof IriExpressionAst) {
+            return ValueType.IRI;
+        }
+        if (termAst instanceof XsdDateTimeExpressionAst) {
+            return ValueType.DATETIME;
+        }
+        if (termAst instanceof XsdDayTimeDurationExpressionAst) {
+            return ValueType.DURATION;
+        }
+        if (termAst instanceof BooleanExpressionAst) {
+            return ValueType.BOOLEAN;
+        }
+        if (termAst instanceof IfAst ifAst) {
+            ValueType thenType = valueType(ifAst.thenExpr());
+            return thenType == valueType(ifAst.elseExpr()) ? thenType : null;
+        }
+        return null;
+    }
+
+    private enum ValueType {
+        NUMERIC,
+        STRING,
+        BOOLEAN,
+        IRI,
+        DATETIME,
+        DURATION
     }
 }

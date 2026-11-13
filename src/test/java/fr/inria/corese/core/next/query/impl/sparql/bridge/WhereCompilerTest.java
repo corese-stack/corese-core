@@ -67,7 +67,7 @@ class WhereCompilerTest extends AbstractSparqlParserFeatureTest {
         BgpAst bgp = new BgpAst(List.of(
                 new TriplePatternAst(new VarAst("s"), new VarAst("p"), new VarAst("o"))));
         FilterAst filter = new FilterAst(new GreaterThanAst(List.of(
-                new VarAst("o"), new LiteralAst("5", null, null))));
+                new VarAst("o"), new LiteralAst("5", null, null))), -1, -1);
 
         Exp body = compiler.compile(group(bgp, filter));
 
@@ -100,10 +100,10 @@ class WhereCompilerTest extends AbstractSparqlParserFeatureTest {
     @DisplayName("OPTIONAL { BGP . FILTER } — the filter is compiled inside the optional right part")
     void compilesOptionalWithFilter() {
         FilterAst filter = new FilterAst(new GreaterThanAst(List.of(
-                new VarAst("z"), new LiteralAst("5", null, null))));
-        GroupGraphPatternAst optionalBody = group(bgp("s", "q", "z"), filter);
+                new VarAst("z"), new LiteralAst("5", null, null))), -1, -1);
+        GroupGraphPatternAst optionalBody = group(bgp("q", "z"), filter);
 
-        Exp body = compiler.compile(group(bgp("s", "p", "o"), new OptionalAst(optionalBody)));
+        Exp body = compiler.compile(group(bgp("p", "o"), new OptionalAst(optionalBody)));
 
         Exp optional = body.get(0);
         assertTrue(optional.isOptional());
@@ -190,7 +190,7 @@ class WhereCompilerTest extends AbstractSparqlParserFeatureTest {
     @Test
     @DisplayName("Subqueries compile to runtime queries")
     void subqueryCompilesToRuntimeQuery() {
-        SubQueryAst subQuery = new SubQueryAst(new SelectQueryAst(group(bgp("s", "p", "o"))));
+        SubQueryAst subQuery = new SubQueryAst(new SelectQueryAst(group(bgp("p", "o"))));
 
         Exp exp = compiler.compile(subQuery);
 
@@ -232,9 +232,9 @@ class WhereCompilerTest extends AbstractSparqlParserFeatureTest {
     @DisplayName("Pattern after OPTIONAL stays a sibling: { P1 . OPTIONAL{P2} . P3 } -> AND[ OPTIONAL(AND[P1], P2), BGP(P3) ]")
     void patternAfterOptionalStaysSibling() {
         Exp body = compiler.compile(group(
-                bgp("s", "p", "o"),
-                new OptionalAst(bgp("s", "q", "z")),
-                bgp("s", "r", "w")));
+                bgp("p", "o"),
+                new OptionalAst(bgp("q", "z")),
+                bgp("r", "w")));
 
         assertTrue(body.isAnd());
         assertEquals(2, body.size(), "OPTIONAL and the trailing BGP are two siblings");
@@ -252,9 +252,9 @@ class WhereCompilerTest extends AbstractSparqlParserFeatureTest {
     @DisplayName("Chained OPTIONALs left-associate: { P1 . OPTIONAL{P2} . OPTIONAL{P3} } -> OPTIONAL(OPTIONAL(P1,P2), P3)")
     void chainedOptionalsLeftAssociate() {
         Exp body = compiler.compile(group(
-                bgp("s", "p", "o"),
-                new OptionalAst(bgp("s", "q", "z")),
-                new OptionalAst(bgp("s", "r", "w"))));
+                bgp("p", "o"),
+                new OptionalAst(bgp("q", "z")),
+                new OptionalAst(bgp("r", "w"))));
 
         assertEquals(1, body.size());
         Exp outer = body.get(0);
@@ -271,9 +271,9 @@ class WhereCompilerTest extends AbstractSparqlParserFeatureTest {
     @DisplayName("Pattern after MINUS stays a sibling: { P1 . MINUS{P2} . P3 } -> AND[ MINUS(AND[P1], AND[P2]), BGP(P3) ]")
     void patternAfterMinusStaysSibling() {
         Exp body = compiler.compile(group(
-                bgp("s", "p", "o"),
-                new MinusAst(group(bgp("s", "q", "z"))),
-                bgp("s", "r", "w")));
+                bgp("p", "o"),
+                new MinusAst(group(bgp("q", "z"))),
+                bgp("r", "w")));
 
         assertTrue(body.isAnd());
         assertEquals(2, body.size());
@@ -291,7 +291,7 @@ class WhereCompilerTest extends AbstractSparqlParserFeatureTest {
     @Test
     @DisplayName("OPTIONAL first in the group has an empty mandatory left part: { OPTIONAL{P1} } -> OPTIONAL(AND[], P1)")
     void optionalFirstHasEmptyMandatoryPart() {
-        Exp body = compiler.compile(group(new OptionalAst(bgp("s", "p", "o"))));
+        Exp body = compiler.compile(group(new OptionalAst(bgp("p", "o"))));
 
         assertEquals(1, body.size());
         Exp optional = body.get(0);
@@ -304,13 +304,13 @@ class WhereCompilerTest extends AbstractSparqlParserFeatureTest {
     @Test
     @DisplayName("Bare OPTIONAL/MINUS via the pattern dispatcher use an empty mandatory left part")
     void bareOptionalAndMinusUseEmptyLeft() {
-        Exp optional = compiler.compile(new OptionalAst(bgp("s", "p", "o")));
+        Exp optional = compiler.compile(new OptionalAst(bgp("p", "o")));
         assertTrue(optional.isOptional());
         assertTrue(optional.first().isAnd());
         assertEquals(0, optional.first().size(), "bare OPTIONAL: {} OPTIONAL { ... }");
         assertTrue(optional.rest().isBGP());
 
-        Exp minus = compiler.compile(new MinusAst(group(bgp("s", "p", "o"))));
+        Exp minus = compiler.compile(new MinusAst(group(bgp("p", "o"))));
         assertTrue(minus.isMinus());
         assertTrue(minus.first().isAnd());
         assertEquals(0, minus.first().size(), "bare MINUS: {} MINUS { ... }");
@@ -349,8 +349,8 @@ class WhereCompilerTest extends AbstractSparqlParserFeatureTest {
         assertTrue(minus.rest().isAnd(), "right part is the MINUS body");
     }
 
-    private static BgpAst bgp(String s, String p, String o) {
+    private static BgpAst bgp(String p, String o) {
         return new BgpAst(List.of(
-                new TriplePatternAst(new VarAst(s), new VarAst(p), new VarAst(o))));
+                new TriplePatternAst(new VarAst("s"), new VarAst(p), new VarAst(o))));
     }
 }

@@ -187,6 +187,7 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
         this.projection = ProjectionAsts.selectAll();
     }
 
+
     /**
      * Sets explicit SELECT variables where some may be introduced by {@code (expr AS ?var)}.
      * Variable names may include ? or $ prefix.
@@ -306,15 +307,28 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
         else this.offset = offset;
     }
 
-    public void addHavingCondition(TermAst condition) {
+
+    public void addHavingCondition(TermAst condition, int line, int column) {
         if (condition == null) {
             throw new IllegalArgumentException("HAVING condition is null");
         }
 
+        HavingAst.SourceLocation location = new HavingAst.SourceLocation(line, column);
         if (hasCurrentSelect()) {
-            getCurrentSelectFrame().havingConditions.add(condition);
+            SelectFrame frame = getCurrentSelectFrame();
+            frame.havingConditions.add(condition);
+            frame.havingLocations.add(location);
+            if (frame.havingLine < 1 && line >= 1) {
+                frame.havingLine = line;
+                frame.havingColumn = column;
+            }
         } else {
             havingConditions.add(condition);
+            havingLocations.add(location);
+            if (havingLine < 1 && line >= 1) {
+                havingLine = line;
+                havingColumn = column;
+            }
         }
     }
 
@@ -446,7 +460,8 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
                 distinct,
                 reduced,
                 this.orderConditions,
-                new HavingAst(List.copyOf(havingConditions)),
+                new HavingAst(List.copyOf(havingConditions), havingLine, havingColumn,
+                        List.copyOf(havingLocations)),
                 limit,
                 offset);
     }
@@ -460,7 +475,8 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
                 frame.distinct,
                 frame.reduced,
                 frame.orderConditions,
-                new HavingAst(List.copyOf(frame.havingConditions)),
+                new HavingAst(List.copyOf(frame.havingConditions), frame.havingLine, frame.havingColumn,
+                        List.copyOf(frame.havingLocations)),
                 frame.limit,
                 frame.offset);
     }
