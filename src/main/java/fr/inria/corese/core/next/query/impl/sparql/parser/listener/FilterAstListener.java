@@ -19,7 +19,15 @@ public class FilterAstListener extends AbstractSparqlAstListener {
         FilterAst filter;
 
         if(ctx.constraint() != null) {
-            filter = new FilterAst(this.builder().expressions().termFromConstraint(ctx.constraint()));
+            var constraint = ctx.constraint();
+            var location = constraint.brackettedExpression() != null
+                    ? constraint.brackettedExpression().expression().start
+                    : constraint.start;
+            filter = new FilterAst(
+                    this.builder().expressions().termFromConstraint(constraint),
+                    location.getLine(),
+                    location.getCharPositionInLine()
+            );
         } else {
             throw new QueryEvaluationException("Empty filter " + ctx.getText() + ", no createFunCall found");
         }

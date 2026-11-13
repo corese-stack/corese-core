@@ -18,7 +18,14 @@ public class HavingAstListener extends AbstractSparqlQueryAstListener {
     @Override
     public void exitHavingClause(SparqlParser.HavingClauseContext ctx) {
         for (SparqlParser.HavingConditionContext condition : ctx.havingCondition()) {
-            queryBuilder().addHavingCondition(havingConditionToTerm(condition));
+            var constraint = condition.constraint();
+            var location = constraint.brackettedExpression() != null
+                    ? constraint.brackettedExpression().expression().start
+                    : constraint.start;
+            queryBuilder().addHavingCondition(
+                    havingConditionToTerm(condition),
+                    location.getLine(),
+                    location.getCharPositionInLine());
         }
     }
 

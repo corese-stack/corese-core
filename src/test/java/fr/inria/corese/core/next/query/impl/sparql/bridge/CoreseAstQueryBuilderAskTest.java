@@ -76,7 +76,7 @@ class CoreseAstQueryBuilderAskTest extends AbstractSparqlParserFeatureTest {
     @DisplayName("A FILTER in the WHERE no longer throws an NPE")
     void buildsAskWithFilter() {
         FilterAst filter = new FilterAst(new GreaterThanAst(List.of(
-                new VarAst("o"), new LiteralAst("5", null, null))));
+                new VarAst("o"), new LiteralAst("5", null, null))), -1, -1);
         GroupGraphPatternAst where = new GroupGraphPatternAst(List.of(
                 new BgpAst(List.of(
                         new TriplePatternAst(new VarAst("s"), new VarAst("p"), new VarAst("o")))),
@@ -178,7 +178,7 @@ class CoreseAstQueryBuilderAskTest extends AbstractSparqlParserFeatureTest {
     void filterExistsInAskWhere() {
         GroupGraphPatternAst existsPattern = new GroupGraphPatternAst(List.of(
                 new BgpAst(List.of(new TriplePatternAst(new VarAst("s"), new VarAst("p"), new VarAst("o"))))));
-        FilterAst filter = new FilterAst(new ExistsAst(existsPattern));
+        FilterAst filter = new FilterAst(new ExistsAst(existsPattern), -1, -1);
         GroupGraphPatternAst where = new GroupGraphPatternAst(List.of(
                 new BgpAst(List.of(new TriplePatternAst(new VarAst("s"), new VarAst("p"), new VarAst("o")))),
                 filter));

@@ -45,7 +45,7 @@ final class SparqlQueryAnalyzer {
 
         try {
             QueryAst ast = buildAst(syntaxAnalysis.parseTree(), options, syntaxAnalysis.blankNodeLabels());
-            QueryValidationResult semanticValidation = semanticValidator.validate(ast);
+            QueryValidationResult semanticValidation = applyWarningOptions(semanticValidator.validate(ast), options);
             return new AnalysisResult(ast, semanticValidation);
         } catch (QuerySyntaxException e) {
             return new AnalysisResult(null, new QueryValidationResult(List.of(toSyntaxDiagnostic(e))));
@@ -195,6 +195,22 @@ final class SparqlQueryAnalyzer {
                 .filter(token -> token.getType() == SparqlLexer.BLANK_NODE_LABEL)
                 .map(Token::getText)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    private QueryValidationResult applyWarningOptions(QueryValidationResult result, SparqlParserOptions options) {
+        if (!options.includeWarnings()) {
+            return new QueryValidationResult(result.diagnostics().stream()
+                    .filter(d -> d.severity() != QueryDiagnostic.Severity.WARNING)
+                    .toList());
+        }
+        if (options.failOnWarnings()) {
+            return new QueryValidationResult(result.diagnostics().stream()
+                    .map(d -> d.severity() == QueryDiagnostic.Severity.WARNING
+                            ? new QueryDiagnostic(d.kind(), QueryDiagnostic.Severity.ERROR, d.message(), d.line(), d.column(), d.offendingText(), d.source())
+                            : d)
+                    .toList());
+        }
+        return result;
     }
 
     private QueryDiagnostic toSyntaxDiagnostic(QuerySyntaxException exception) {

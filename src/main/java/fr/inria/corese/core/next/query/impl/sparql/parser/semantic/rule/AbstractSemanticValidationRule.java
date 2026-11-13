@@ -136,4 +136,30 @@ public abstract class AbstractSemanticValidationRule implements SemanticValidati
                 source);
     }
 
+    protected QueryDiagnostic buildSuspiciousEBVDiagnostic(String expressionName, String clause, int line, int column) {
+        return new QueryDiagnostic(
+                QueryDiagnostic.Kind.SEMANTIC_ERROR,
+                QueryDiagnostic.Severity.WARNING,
+                expressionName + " used in " + clause + " is evaluated via EBV coercion; consider an explicit boolean comparison",
+                line,
+                column,
+                expressionName,
+                getDiagnosticSource());
+    }
+
+    protected QueryDiagnostic buildAdvisoryDiagnostic(
+            String message,
+            String expressionName,
+            int line,
+            int column) {
+        return new QueryDiagnostic(
+                QueryDiagnostic.Kind.SEMANTIC_ERROR,
+                QueryDiagnostic.Severity.WARNING,
+                message,
+                line,
+                column,
+                expressionName,
+                getDiagnosticSource());
+    }
+
 }

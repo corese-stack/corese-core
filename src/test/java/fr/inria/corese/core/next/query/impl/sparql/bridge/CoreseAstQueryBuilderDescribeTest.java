@@ -169,7 +169,7 @@ class CoreseAstQueryBuilderDescribeTest {
     void filterExistsInDescribeWhere() {
         GroupGraphPatternAst existsPattern = new GroupGraphPatternAst(List.of(
                 new BgpAst(List.of(new TriplePatternAst(new VarAst("x"), new VarAst("q"), new VarAst("z"))))));
-        FilterAst filter = new FilterAst(new ExistsAst(existsPattern));
+        FilterAst filter = new FilterAst(new ExistsAst(existsPattern), -1, -1);
         GroupGraphPatternAst where = new GroupGraphPatternAst(List.of(
                 new BgpAst(List.of(new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o")))),
                 filter));
@@ -191,7 +191,7 @@ class CoreseAstQueryBuilderDescribeTest {
     void filterNotExistsInDescribeWhere() {
         GroupGraphPatternAst existsPattern = new GroupGraphPatternAst(List.of(
                 new BgpAst(List.of(new TriplePatternAst(new VarAst("x"), new VarAst("q"), new VarAst("z"))))));
-        FilterAst filter = new FilterAst(new NotExistsAst(existsPattern));
+        FilterAst filter = new FilterAst(new NotExistsAst(existsPattern), -1, -1);
         GroupGraphPatternAst where = new GroupGraphPatternAst(List.of(
                 new BgpAst(List.of(new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o")))),
                 filter));
