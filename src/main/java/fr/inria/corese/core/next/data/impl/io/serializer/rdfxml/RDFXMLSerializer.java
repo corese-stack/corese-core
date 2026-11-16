@@ -101,8 +101,9 @@ public class RDFXMLSerializer implements RDFSerializer {
 
         this.prefixHandler = new PrefixHandler(false);
         if (config instanceof UsesPrefixOptions options && options.usePrefixes()) {
-            model.getNamespaces().forEach(ns -> registerPrefix(ns.getPrefix(), ns.getNamespace()));
             options.getPrefixMapping().getPrefixMap().forEach(this::registerPrefix);
+            model.getNamespaces().forEach(ns -> registerPrefix(ns.getPrefix(), ns.getNamespace()));
+            options.getPrefixMapping().getExplicitPrefixMap().forEach(this::registerPrefix);
         }
         // RDF/XML syntax and XML namespace bindings cannot be overridden by data/configuration.
         this.prefixHandler.setPrefix(RDF.getVocabularyPreferredPrefix(), RDF.getVocabularyNamespace());

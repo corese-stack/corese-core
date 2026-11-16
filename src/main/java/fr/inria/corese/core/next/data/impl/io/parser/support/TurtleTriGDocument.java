@@ -181,7 +181,7 @@ public class TurtleTriGDocument {
         }
 
         // Name: SPARQL keyword (PREFIX / BASE) or prefixed-name subject
-        if (isAsciiAlpha(c) || unicodeNameStart(c)) {
+        if (prefixStart(c)) {
             String name = readName();
             if (peek() == ':') {
                 take();
@@ -293,7 +293,7 @@ public class TurtleTriGDocument {
         if (c == '[') return blankNodePropertyList();
         if (c == '(') return collection();
         if (c == ':') { take(); return intern(lookupPrefix("") + readLocalPart()); }
-        if (isAsciiAlpha(c) || unicodeNameStart(c)) {
+        if (prefixStart(c)) {
             String name = readName();
             if (peek() == ':') { take(); return intern(lookupPrefix(name) + readLocalPart()); }
             throw error("Expected ':' after prefix '" + name + "'");
@@ -321,7 +321,7 @@ public class TurtleTriGDocument {
     }
 
     private Value namedObject(int c) throws IOException {
-        if (!isAsciiAlpha(c) && !unicodeNameStart(c)) {
+        if (!prefixStart(c)) {
             throw error("Expected object (IRI, literal, blank node, or collection), got: '" + (char) c + "'");
         }
         String name = readName();
@@ -860,6 +860,11 @@ public class TurtleTriGDocument {
 
     private static boolean isLineEnd(int c)    { return c == '\r' || c == '\n'; }
     private static boolean isWhitespace(int c) { return c == ' ' || c == '\t' || c == '\r' || c == '\n'; }
+
+    /** Allows a supplementary code point to be decoded and validated by readName(). */
+    protected static boolean prefixStart(int c) {
+        return isAsciiAlpha(c) || unicodeNameStart(c) || Character.isHighSurrogate((char) c);
+    }
 
     protected static boolean nameStart(int c) { return c == '_' || letter(c) || unicodeNameStart(c); }
 

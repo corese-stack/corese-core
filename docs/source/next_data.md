@@ -81,6 +81,17 @@ PrefixMapping independentCopy = prefixes.copy();
 Collections returned by a prefix mapping are immutable snapshots. Models keep
 their own namespace metadata through `setNamespace` and `getNamespaces`.
 
+Turtle and TriG serialization preserve used model prefixes when automatic
+declaration is enabled. Explicit serializer mappings take precedence over model
+metadata; built-in vocabulary mappings are fallbacks. `getExplicitPrefixMap()`
+distinguishes caller-supplied bindings from those fallbacks, including after a
+mapping is copied. Setting a built-in binding explicitly makes it an override.
+Names incompatible with Turtle prefix syntax are replaced by generated prefixes
+or full IRIs. With `autoDeclarePrefixes(false)`, model metadata is ignored and
+only configured mappings are used. With `usePrefixes(false)`, IRIs remain full.
+RDF/XML also prefers model bindings over fallback bindings, while retaining its
+required RDF and XML namespace bindings.
+
 ## RDF 1.2 triple terms
 
 `ValueFactory.createTriple` creates a triple term following the current RDF 1.2

@@ -5,18 +5,23 @@ import fr.inria.corese.core.next.data.api.io.option.RDFSerializationOptions;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
 import fr.inria.corese.core.next.data.api.model.Model;
+import fr.inria.corese.core.next.data.api.vocabulary.XSD;
 import fr.inria.corese.core.next.data.impl.io.parser.DefaultRDFParserFactory;
 import fr.inria.corese.core.next.data.impl.io.parser.support.ParserTestBase;
 import fr.inria.corese.core.next.data.impl.io.serializer.rdfxml.RDFXMLSerializerOptions;
 import fr.inria.corese.core.next.data.impl.io.serializer.trig.TriGSerializerOptions;
 import fr.inria.corese.core.next.data.impl.io.serializer.turtle.TurtleSerializerOptions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -345,6 +350,130 @@ class PrefixRoundTripTest extends ParserTestBase {
         assertFalse(output.contains("ex:subjectA") && !output.contains("@prefix ex: <" + nsA),
                 "NS_A IRI must not be shortened with 'ex:' when ex: now resolves to NS_B\n" + output);
         // Round-trip: model data must survive intact
+        assertModelsIsomorphic(model, parseInput(output, RDFFormat.TURTLE));
+    }
+    private static Stream<Arguments> standardVocabularyCases() {
+        return Stream.of(RDFFormat.TURTLE, RDFFormat.TRIG).flatMap(format -> Stream.of(
+                "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+                "http://www.w3.org/2000/01/rdf-schema#",
+                "http://www.w3.org/2001/XMLSchema#",
+                "http://www.w3.org/2002/07/owl#",
+                "http://xmlns.com/foaf/0.1/").map(namespace -> Arguments.of(format, namespace)));
+    }
+
+    @ParameterizedTest
+    @MethodSource("standardVocabularyCases")
+    void testModelPrefixWinsOverStandardFallback(RDFFormat format, String namespace) {
+        Model model = parseInput("@prefix custom: <" + namespace + "> . custom:s custom:p custom:o .", format);
+        RDFSerializationOptions options = format == RDFFormat.TURTLE
+                ? TurtleSerializerOptions.defaultConfig() : TriGSerializerOptions.defaultConfig();
+        String output = serialize(model, format, options);
+        assertTrue(output.contains("@prefix custom: <" + namespace + "> ."), output);
+        assertModelsIsomorphic(model, parseInput(output, format));
+    }
+
+    @Test
+    void testExplicitStandardPrefixWinsAfterOptionsCopy() {
+        String namespace = XSD.getVocabularyNamespace();
+        Model model = parseInput("@prefix custom: <" + namespace + "> . custom:s custom:p custom:o .", RDFFormat.TURTLE);
+        TurtleSerializerOptions original = TurtleSerializerOptions.builder().addPrefix("xsd", namespace).build();
+        TurtleSerializerOptions options = new TurtleSerializerOptions.Builder(original).build();
+        String output = serialize(model, RDFFormat.TURTLE, options);
+        assertTrue(output.contains("@prefix xsd: <" + namespace + "> ."), output);
+        assertFalse(output.contains("@prefix custom:"), output);
+        assertModelsIsomorphic(model, parseInput(output, RDFFormat.TURTLE));
+    }
+
+    @Test
+    void testOptionsCopyPreservesFallbackPriority() {
+        String namespace = XSD.getVocabularyNamespace();
+        Model model = parseInput("@prefix custom: <" + namespace + "> . custom:s custom:p custom:o .", RDFFormat.TURTLE);
+        TurtleSerializerOptions options = new TurtleSerializerOptions.Builder(TurtleSerializerOptions.defaultConfig()).build();
+        String output = serialize(model, RDFFormat.TURTLE, options);
+        assertTrue(output.contains("@prefix custom:"), output);
+        assertModelsIsomorphic(model, parseInput(output, RDFFormat.TURTLE));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"_custom", "1custom", "bad prefix", "custom.", "-custom"})
+    void testInvalidModelPrefixUsesSafeFallback(String prefix) {
+        Model model = parseInput("<" + CUSTOM_NS + "s> <" + CUSTOM_NS + "p> <" + CUSTOM_NS + "o> .", RDFFormat.TURTLE);
+        model.setNamespace(prefix, CUSTOM_NS);
+        for (RDFFormat format : new RDFFormat[] {RDFFormat.TURTLE, RDFFormat.TRIG}) {
+            RDFSerializationOptions options = format == RDFFormat.TURTLE
+                    ? TurtleSerializerOptions.defaultConfig() : TriGSerializerOptions.defaultConfig();
+            String output = serialize(model, format, options);
+            assertFalse(output.contains("@prefix " + prefix + ":"), output);
+            assertModelsIsomorphic(model, parseInput(output, format));
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"_custom", "1custom", "bad prefix", "custom.", "-custom"})
+    void testInvalidConfiguredPrefixWithoutAutoDeclarationUsesFullIRIs(String prefix) {
+        Model model = parseInput("<" + CUSTOM_NS + "s> <" + CUSTOM_NS + "p> <" + CUSTOM_NS + "o> .", RDFFormat.TURTLE);
+        TurtleSerializerOptions options = TurtleSerializerOptions.builder()
+                .autoDeclarePrefixes(false).addPrefix(prefix, CUSTOM_NS).build();
+        String output = serialize(model, RDFFormat.TURTLE, options);
+        assertFalse(output.contains("@prefix " + prefix + ":"), output);
+        assertTrue(output.contains("<" + CUSTOM_NS + "s>"), output);
+        assertModelsIsomorphic(model, parseInput(output, RDFFormat.TURTLE));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"é", "école", "a.b", "a_b", "a-b", "a·b", "𐀀"})
+    void testValidUnicodeAndInternalPunctuationPrefixesArePreserved(String prefix) {
+        Model model = parseInput("<" + CUSTOM_NS + "s> <" + CUSTOM_NS + "p> <" + CUSTOM_NS + "o> .", RDFFormat.TURTLE);
+        model.setNamespace(prefix, CUSTOM_NS);
+        for (RDFFormat format : new RDFFormat[] {RDFFormat.TURTLE, RDFFormat.TRIG}) {
+            RDFSerializationOptions options = format == RDFFormat.TURTLE
+                    ? TurtleSerializerOptions.defaultConfig() : TriGSerializerOptions.defaultConfig();
+            String output = serialize(model, format, options);
+            assertTrue(output.contains("@prefix " + prefix + ":"), output);
+            assertModelsIsomorphic(model, parseInput(output, format));
+        }
+    }
+
+    @Test
+    void testGeneratedPrefixCannotStartWithDigit() {
+        Model model = parseInput("<http://example.org/123#s> <http://example.org/123#p> <http://example.org/123#o> .", RDFFormat.TURTLE);
+        String output = serialize(model, RDFFormat.TURTLE, TurtleSerializerOptions.defaultConfig());
+        assertFalse(output.contains("@prefix 123:"), output);
+        assertModelsIsomorphic(model, parseInput(output, RDFFormat.TURTLE));
+    }
+
+    @Test
+    void testRdfXmlPreservesCustomStandardVocabularyPrefix() {
+        String namespace = XSD.getVocabularyNamespace();
+        Model model = parseInput("@prefix custom: <" + namespace + "> . custom:s custom:p custom:o .", RDFFormat.TURTLE);
+        String output = serialize(model, RDFFormat.RDFXML, RDFXMLSerializerOptions.defaultConfig());
+        assertTrue(output.contains("xmlns:custom=\"" + namespace + "\""), output);
+        assertModelsIsomorphic(model, parseInput(output, RDFFormat.RDFXML));
+    }
+    @Test
+    void testTriGPreservesPrefixUsedByNamedGraph() {
+        String input = """
+                @prefix graph: <http://example.org/graph> .
+                graph:123 { <http://example.org/s> <http://example.org/p> "value" . }
+                """;
+        Model model = parseInput(input, RDFFormat.TRIG);
+        String output = serialize(model, RDFFormat.TRIG, TriGSerializerOptions.defaultConfig());
+        assertTrue(output.contains("@prefix graph: <http://example.org/graph> ."), output);
+        assertTrue(output.contains("graph:123"), output);
+        assertModelsIsomorphic(model, parseInput(output, RDFFormat.TRIG));
+    }
+
+    @Test
+    void testOverlappingNamespaceFallsBackToUsableParentPrefix() {
+        Model model = parseInput("<http://example.org/ns#foo-item> <http://example.org/ns#prop> \"value\" .", RDFFormat.TURTLE);
+        TurtleSerializerOptions options = TurtleSerializerOptions.builder()
+                .autoDeclarePrefixes(false)
+                .addPrefix("parent", "http://example.org/ns#")
+                .addPrefix("child", "http://example.org/ns#foo")
+                .build();
+        String output = serialize(model, RDFFormat.TURTLE, options);
+        assertFalse(output.contains("child:-item"), output);
+        assertTrue(output.contains("parent:foo-item"), output);
         assertModelsIsomorphic(model, parseInput(output, RDFFormat.TURTLE));
     }
 }

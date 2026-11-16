@@ -336,4 +336,41 @@ class PrefixHandlerTest {
         String str = handler.toString();
         assertEquals("PrefixHandler{}", str);
     }
+    @Test
+    void testBuiltInMappingsAreFallbacksUntilExplicitlySet() {
+        PrefixHandler defaults = new PrefixHandler(true);
+        assertFalse(defaults.getPrefixMap().isEmpty());
+        assertTrue(defaults.getExplicitPrefixMap().isEmpty());
+        String namespace = defaults.getNamespace("rdf");
+        defaults.setPrefix("rdf", namespace);
+        assertEquals(java.util.Map.of("rdf", namespace), defaults.getExplicitPrefixMap());
+        assertTrue(new PrefixHandler(true).getExplicitPrefixMap().isEmpty());
+    }
+
+    @Test
+    void testCopyPreservesExplicitAndFallbackBindings() {
+        PrefixHandler original = new PrefixHandler(true);
+        original.setPrefix("ex", "http://example.org/");
+        PrefixHandler copy = original.copy();
+        handler.copyFrom(original);
+        assertEquals(original.getExplicitPrefixMap(), copy.getExplicitPrefixMap());
+        assertEquals(original.getExplicitPrefixMap(), handler.getExplicitPrefixMap());
+        assertEquals(original.getPrefixMap(), handler.getPrefixMap());
+        copy.setPrefix("rdf", copy.getNamespace("rdf"));
+        assertFalse(original.getExplicitPrefixMap().containsKey("rdf"));
+        assertTrue(copy.getExplicitPrefixMap().containsKey("rdf"));
+    }
+
+    @Test
+    void testRemoveAndClearDiscardFallbackClassification() {
+        PrefixHandler defaults = new PrefixHandler(true);
+        String namespace = defaults.getNamespace("rdf");
+        defaults.removePrefix("rdf");
+        defaults.setPrefix("rdf", namespace);
+        assertTrue(defaults.getExplicitPrefixMap().containsKey("rdf"));
+        defaults.clear();
+        assertTrue(defaults.getExplicitPrefixMap().isEmpty());
+        defaults.setPrefix("rdf", namespace);
+        assertTrue(defaults.getExplicitPrefixMap().containsKey("rdf"));
+    }
 }

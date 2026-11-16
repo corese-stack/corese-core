@@ -155,11 +155,11 @@ class TriGSerializerTest {
 
         verify(mockModel, times(2)).stream();
         String expected = """
-                @prefix 11: <http://purl.org/dc/elements/1.1/> .
                 @prefix data: <http://example.org/data/> .
+                @prefix p11: <http://purl.org/dc/elements/1.1/> .
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
-                data:book1 11:title "The Odyssey"@en .
+                data:book1 p11:title "The Odyssey"@en .
 
                 """;
         String actual = writer.toString().replace("\r\n", "\n");
@@ -201,11 +201,11 @@ class TriGSerializerTest {
 
         verify(mockModel, times(2)).stream();
         String expected = """
-                @prefix 11: <http://purl.org/dc/elements/1.1/> .
                 @prefix data: <http://example.org/data/> .
+                @prefix p11: <http://purl.org/dc/elements/1.1/> .
                 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-                data:book2 11:creator "Homer"^^xsd:string .
+                data:book2 p11:creator "Homer"^^xsd:string .
 
                 """;
         String actual = writer.toString().replace("\r\n", "\n");
