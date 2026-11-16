@@ -170,7 +170,7 @@ public final class TriGScanner extends AbstractRDFParser {
         }
 
         private void namedTopLevel(int c) throws IOException {
-            if (isAsciiAlpha(c) || unicodeNameStart(c)) {
+            if (prefixStart(c)) {
                 String name = readName();
                 if (peek() == ':') {
                     take();
@@ -226,7 +226,7 @@ public final class TriGScanner extends AbstractRDFParser {
             } else if (c == ':') {
                 take();
                 graphLabel = intern(lookupPrefix("") + readLocalPart());
-            } else if (isAsciiAlpha(c) || unicodeNameStart(c)) {
+            } else if (prefixStart(c)) {
                 String pfx = readName();
                 expect(':');
                 graphLabel = intern(lookupPrefix(pfx) + readLocalPart());

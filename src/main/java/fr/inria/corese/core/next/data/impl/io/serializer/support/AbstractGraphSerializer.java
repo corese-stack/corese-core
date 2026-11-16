@@ -23,7 +23,6 @@ import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Abstract base class for RDF serializers based on TriG and Turtle syntax.
@@ -49,6 +48,8 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
     protected final Model model;
     protected IOOptions option;
     protected PrefixHandler prefixHandler;
+    /** Namespaces actually written as {@code @prefix} declarations in the header. */
+    protected Set<String> declaredNamespaces = Set.of();
     protected final Set<Resource> consumedBlankNodes;
     protected final Set<Resource> currentlyWritingBlankNodes;
 
@@ -63,14 +64,38 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
         this.model = Objects.requireNonNull(model, "The model cannot be null");
         Objects.requireNonNull(config, "The configuration cannot be null");
         this.option = config;
-        if(config instanceof UsesPrefixOptions usesPrefixOptions) {
-            this.prefixHandler = new PrefixHandler(false);
-            this.prefixHandler.copyFrom(usesPrefixOptions.getPrefixMapping());
-        } else {
-            this.prefixHandler = new PrefixHandler(false);
+        this.prefixHandler = new PrefixHandler(false);
+        if (config instanceof UsesPrefixOptions usesPrefixOptions) {
+            initializePrefixHandler(usesPrefixOptions);
         }
         this.consumedBlankNodes = new HashSet<>();
         this.currentlyWritingBlankNodes = new HashSet<>();
+    }
+
+    /**
+     * Initializes the serializer prefix registry from the model and any explicitly configured mappings.
+     * Model namespaces are only loaded when auto-declaration is enabled, so autoDeclarePrefixes(false)
+     * still prevents dangling QNames without a matching header declaration.
+     */
+    protected void initializePrefixHandler(UsesPrefixOptions options) {
+        if (!options.usePrefixes()) {
+            return;
+        }
+
+        this.prefixHandler.copyFrom(options.getPrefixMapping());
+        prefixHandler.getPrefixes().stream()
+                .filter(prefix -> !TurtleNames.isPrefix(prefix))
+                .forEach(prefixHandler::removePrefix);
+        if (options.autoDeclarePrefixes()) {
+            model.getNamespaces().forEach(ns -> registerPrefix(ns.getPrefix(), ns.getNamespace()));
+        }
+        options.getPrefixMapping().getExplicitPrefixMap().forEach(this::registerPrefix);
+    }
+
+    private void registerPrefix(String prefix, String namespace) {
+        if (TurtleNames.isPrefix(prefix)) {
+            prefixHandler.setPrefix(prefix, namespace);
+        }
     }
 
     /**
@@ -123,51 +148,61 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
         }
 
         Set<String> actuallyUsedNamespaces = Set.of();
-        if (option instanceof UsesPrefixOptions prefixOptions
-                && prefixOptions.usePrefixes()
-                && prefixOptions.autoDeclarePrefixes()) {
-            actuallyUsedNamespaces = collectUsedNamespaces();
+        if (option instanceof UsesPrefixOptions prefixOptions && prefixOptions.usePrefixes()) {
+            actuallyUsedNamespaces = prefixOptions.autoDeclarePrefixes()
+                    ? collectUsedNamespaces() : collectUsedNamespaces(false);
         }
 
+        declaredNamespaces = Set.of();
         writePrefixDeclarations(writer, actuallyUsedNamespaces);
     }
 
     /**
-     * Collects all namespaces used in the model and attempts to assign prefixes to them
-     * if auto-declaration is enabled, and they are not already mapped.
+     * Collects used namespaces and automatically generates missing prefixes.
+     *
+     * @return namespaces used by the model
      */
     protected Set<String> collectUsedNamespaces() {
-        Set<String> namespaces = model.stream()
-                .flatMap(stmt -> {
-                    List<Value> values = new ArrayList<>(Arrays.asList(
-                            stmt.getSubject(),
-                            stmt.getPredicate(),
-                            stmt.getObject()
-                    ));
-                    if (stmt.getContext() != null) {
-                        values.add(stmt.getContext());
-                    }
-                    if(stmt.getObject().isLiteral()
-                            && ((Literal) stmt.getObject()).getDatatype() != null) {
-                        values.add(((Literal) stmt.getObject()).getDatatype());
-                    }
-                    return values.stream();
-                })
-                .filter(Objects::nonNull)
-                .filter(Value::isIRI)
-                .map(v -> IRIUtils.guessNamespace(v.stringValue()))
-                .collect(Collectors.toSet());
+        return collectUsedNamespaces(true);
+    }
 
-        namespaces.forEach(namespace -> {
-            if (!this.prefixHandler.hasNamespace(namespace)) {
-                String prefix = getSuggestedPrefix(namespace);
-                if (prefix != null) {
-                    addPrefixMapping(namespace, prefix);
+    /**
+     * Collects all namespaces used in the model that have a known prefix.
+     * When {@code autoGenerate} is true, also auto-generates prefixes for unmapped namespaces.
+     * When {@code autoGenerate} is false, only namespaces already mapped (from model or config)
+     * are returned — preventing QName shortening without a corresponding {@code @prefix} declaration.
+     */
+    protected Set<String> collectUsedNamespaces(boolean autoGenerate) {
+        Set<String> namespaces = new LinkedHashSet<>();
+        try (var statements = model.stream()) {
+            statements.forEach(stmt -> {
+                collectNamespaces(stmt.getSubject(), autoGenerate, namespaces);
+                collectNamespaces(stmt.getPredicate(), autoGenerate, namespaces);
+                collectNamespaces(stmt.getObject(), autoGenerate, namespaces);
+                collectNamespaces(stmt.getContext(), autoGenerate, namespaces);
+                if (stmt.getObject() instanceof Literal literal) {
+                    collectNamespaces(literal.getDatatype(), autoGenerate, namespaces);
                 }
-            }
-        });
-
+            });
+        }
         return namespaces;
+    }
+
+    private void collectNamespaces(Value value, boolean autoGenerate, Set<String> namespaces) {
+        if (!(value instanceof IRI iri)) {
+            return;
+        }
+        String iriString = iri.stringValue();
+        String namespace = IRIUtils.guessNamespace(iriString);
+        if (autoGenerate && !namespace.isEmpty()) {
+            if (!prefixHandler.hasNamespace(namespace)) {
+                addPrefixMapping(namespace, getSuggestedPrefix(namespace));
+            } else if (!prefixHandler.getExplicitPrefixMap().containsValue(namespace)) {
+                // Built-in fallback: namespace is used by the data, promote it to explicit.
+                prefixHandler.setPrefix(prefixHandler.getPrefix(namespace), namespace);
+            }
+        }
+        prefixHandler.getExplicitPrefixMap().values().stream().filter(iriString::startsWith).forEach(namespaces::add);
     }
 
     /**
@@ -197,14 +232,16 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             if (!prefixes.isEmpty() || baseIRIOptions.getBaseIRI() != null) {
                 writer.write(lineEndingOptions.getLineEnding());
             }
+
+            declaredNamespaces = Set.copyOf(actuallyUsedNamespaces);
         }
     }
 
     /**
-     * Writes prefix declarations to the writer, sorted if configured.
+     * Writes the prefix header for an empty set of used namespaces.
      *
-     * @param writer the {@link Writer} to which prefixes will be written.
-     * @throws IOException if an I/O error occurs.
+     * @param writer the destination writer
+     * @throws IOException if the header cannot be written
      */
     protected void writePrefixDeclarations(Writer writer) throws IOException {
         writePrefixDeclarations(writer, Set.of());
@@ -791,21 +828,65 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @return The prefixed name (e.g., "ex:someResource") or null if no suitable prefix is found.
      */
     protected String getPrefixedName(String iriString) {
-        for (String namespace : this.prefixHandler.getNamespaces()) {
-            if (iriString.startsWith(namespace)) {
-                String prefix = this.prefixHandler.getPrefix(namespace);
-                String localName = iriString.substring(namespace.length());
-                if (localName.isEmpty()) {
-                    if (!prefix.isEmpty()) {
-                        return prefix + SerializationConstants.COLON;
-                    } else {
-                        continue;
-                    }
-                }
+        List<String> matchingNamespaces = declaredNamespaces.stream()
+                .filter(iriString::startsWith)
+                .sorted(Comparator.comparingInt(String::length).reversed())
+                .toList();
+
+        for (String namespace : matchingNamespaces) {
+            String prefix = this.prefixHandler.getPrefix(namespace);
+            if (prefix == null) {
+                continue;
+            }
+
+            String localName = iriString.substring(namespace.length());
+            if (localName.isEmpty()) {
+                return prefix.isEmpty() ? SerializationConstants.COLON : prefix + SerializationConstants.COLON;
+            }
+
+            if (isTurtleLocalName(localName)) {
                 return prefix + SerializationConstants.COLON + localName;
             }
         }
         return null;
+    }
+
+    /**
+     * Returns true if the given string is a valid Turtle PN_LOCAL (no escaping needed).
+     * Validates both character set AND positional rules:
+     * <ul>
+     *   <li>First character: ASCII letter, digit, or '_'</li>
+     *   <li>Middle characters: ASCII letters, digits, '_', '-', or '.'</li>
+     *   <li>Last character: ASCII letter, digit, '_', or '-'</li>
+     * </ul>
+     * Falls back to full {@code <IRI>} form if any rule is violated.
+     */
+    private static boolean isTurtleLocalName(String localName) {
+        if (localName.isEmpty()) {
+            return true;
+        }
+        // First char: '-' and '.' are not allowed
+        int firstCp = localName.codePointAt(0);
+        if (firstCp == '-' || firstCp == '.') {
+            return false;
+        }
+        if (isInvalidTurtleLocalNameChar(firstCp)) {
+            return false;
+        }
+        // Last char: '.' is not allowed
+        int lastCp = localName.codePointBefore(localName.length());
+        if (lastCp == '.') {
+            return false;
+        }
+        return localName.codePoints().noneMatch(AbstractGraphSerializer::isInvalidTurtleLocalNameChar);
+    }
+
+    private static boolean isInvalidTurtleLocalNameChar(int cp) {
+        // Restrict to a conservative ASCII subset; non-ASCII names use full IRIs.
+        return !((cp >= 'A' && cp <= 'Z')
+                || (cp >= 'a' && cp <= 'z')
+                || (cp >= '0' && cp <= '9')
+                || cp == '_' || cp == '-' || cp == '.');
     }
 
     /**
@@ -839,6 +920,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
 
         base = base.replaceAll("[^a-zA-Z0-9]", SerializationConstants.EMPTY_STRING).toLowerCase();
         if (base.isEmpty()) base = "p";
+        if (!TurtleNames.isPrefix(base)) base = "p" + base;
 
         String candidatePrefix = base;
         int i = 0;

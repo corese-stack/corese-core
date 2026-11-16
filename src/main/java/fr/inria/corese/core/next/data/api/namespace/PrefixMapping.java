@@ -70,6 +70,16 @@ public interface PrefixMapping {
     Map<String, String> getPrefixMap();
 
     /**
+     * Returns explicitly supplied bindings, excluding any built-in fallback bindings.
+     * Implementations without built-in defaults treat every binding as explicit.
+     *
+     * @return an immutable map of explicit prefix-to-namespace bindings
+     */
+    default Map<String, String> getExplicitPrefixMap() {
+        return getPrefixMap();
+    }
+
+    /**
      * Returns all namespaces mappings as an unmodifiable map.
      *
      * @return an unmodifiable map where keys are namespaces IRIs and values are prefixes

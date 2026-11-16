@@ -33,6 +33,9 @@ public final class PrefixHandler implements PrefixMapping {
      */
     private final ConcurrentHashMap<String, String> namespaceToPrefix;
 
+    /** Prefixes installed as fallback vocabularies rather than by a caller. */
+    private final Set<String> implicitPrefixes = ConcurrentHashMap.newKeySet();
+
     /**
      * The default namespace
      */
@@ -58,6 +61,7 @@ public final class PrefixHandler implements PrefixMapping {
 
         if (includeStandardVocabularies) {
             initializeStandardVocabularies();
+            implicitPrefixes.addAll(prefixToNamespace.keySet());
         }
     }
 
@@ -68,6 +72,7 @@ public final class PrefixHandler implements PrefixMapping {
         this.prefixToNamespace = new ConcurrentHashMap<>(oHandler.prefixToNamespace);
         this.namespaceToPrefix = new ConcurrentHashMap<>(oHandler.namespaceToPrefix);
         this.defaultNamespace = oHandler.defaultNamespace;
+        this.implicitPrefixes.addAll(oHandler.implicitPrefixes);
     }
 
     /**
@@ -107,6 +112,7 @@ public final class PrefixHandler implements PrefixMapping {
 
         prefixToNamespace.put(prefix, namespace);
         namespaceToPrefix.put(namespace, prefix);
+        implicitPrefixes.remove(prefix);
     }
 
     /**
@@ -189,6 +195,7 @@ public final class PrefixHandler implements PrefixMapping {
      */
     @Override
     public boolean removePrefix(String prefix) {
+        implicitPrefixes.remove(prefix);
         String namespace = prefixToNamespace.remove(prefix);
         if (namespace != null) {
             namespaceToPrefix.remove(namespace);
@@ -204,6 +211,7 @@ public final class PrefixHandler implements PrefixMapping {
     public void clear() {
         prefixToNamespace.clear();
         namespaceToPrefix.clear();
+        implicitPrefixes.clear();
         defaultNamespace = null;
     }
 
@@ -235,6 +243,13 @@ public final class PrefixHandler implements PrefixMapping {
     @Override
     public Map<String, String> getPrefixMap() {
         return Collections.unmodifiableMap(new HashMap<>(prefixToNamespace));
+    }
+
+    @Override
+    public Map<String, String> getExplicitPrefixMap() {
+        Map<String, String> explicit = new HashMap<>(prefixToNamespace);
+        implicitPrefixes.forEach(explicit::remove);
+        return Collections.unmodifiableMap(explicit);
     }
 
     /**
@@ -376,7 +391,14 @@ public final class PrefixHandler implements PrefixMapping {
             throw new IllegalArgumentException("Source handler cannot be null");
         }
 
-        new HashMap<>(other.getPrefixMap()).forEach(this::setPrefix);
+        Map<String, String> bindings = other.getPrefixMap();
+        Set<String> explicit = other.getExplicitPrefixMap().keySet();
+        bindings.forEach((prefix, namespace) -> {
+            setPrefix(prefix, namespace);
+            if (!explicit.contains(prefix)) {
+                implicitPrefixes.add(prefix);
+            }
+        });
 
         String otherDefault = other.getDefaultNamespace();
         if (otherDefault != null) {
