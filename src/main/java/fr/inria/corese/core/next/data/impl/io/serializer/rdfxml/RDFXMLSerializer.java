@@ -101,7 +101,10 @@ public class RDFXMLSerializer implements RDFSerializer {
 
         this.prefixHandler = new PrefixHandler(false);
         if (config instanceof UsesPrefixOptions options && options.usePrefixes()) {
-            options.getPrefixMapping().getPrefixMap().forEach(this::registerPrefix);
+            this.prefixHandler.copyFrom(options.getPrefixMapping());
+            new ArrayList<>(this.prefixHandler.getPrefixes()).stream()
+                    .filter(p -> !isAllowedXmlPrefix(p))
+                    .forEach(this.prefixHandler::removePrefix);
             model.getNamespaces().forEach(ns -> registerPrefix(ns.getPrefix(), ns.getNamespace()));
             options.getPrefixMapping().getExplicitPrefixMap().forEach(this::registerPrefix);
         }

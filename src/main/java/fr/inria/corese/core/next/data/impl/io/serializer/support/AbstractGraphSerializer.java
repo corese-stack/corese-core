@@ -194,10 +194,15 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
         }
         String iriString = iri.stringValue();
         String namespace = IRIUtils.guessNamespace(iriString);
-        if (autoGenerate && !namespace.isEmpty() && !prefixHandler.hasNamespace(namespace)) {
-            addPrefixMapping(namespace, getSuggestedPrefix(namespace));
+        if (autoGenerate && !namespace.isEmpty()) {
+            if (!prefixHandler.hasNamespace(namespace)) {
+                addPrefixMapping(namespace, getSuggestedPrefix(namespace));
+            } else if (!prefixHandler.getExplicitPrefixMap().containsValue(namespace)) {
+                // Built-in fallback: namespace is used by the data, promote it to explicit.
+                prefixHandler.setPrefix(prefixHandler.getPrefix(namespace), namespace);
+            }
         }
-        prefixHandler.getNamespaces().stream().filter(iriString::startsWith).forEach(namespaces::add);
+        prefixHandler.getExplicitPrefixMap().values().stream().filter(iriString::startsWith).forEach(namespaces::add);
     }
 
     /**
