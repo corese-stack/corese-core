@@ -24,13 +24,17 @@ class CoreseAstQueryBuilderConstructTest extends AbstractSparqlParserFeatureTest
 
     private final CoreseAstQueryBuilder builder = new CoreseAstQueryBuilder();
 
+    private static TriplePatternAst tripleXPO() {
+        return new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o"));
+    }
+
     private static GroupGraphPatternAst whereSPO() {
-        return new GroupGraphPatternAst(List.of(new BgpAst(List.of(new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o"))))));
+        return new GroupGraphPatternAst(List.of(new BgpAst(List.of(tripleXPO()))));
     }
 
     private static GroupGraphPatternAst whereWithMinusOnlyZ() {
         return new GroupGraphPatternAst(List.of(
-                new BgpAst(List.of(new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o")))),
+                new BgpAst(List.of(tripleXPO())),
                 new MinusAst(new GroupGraphPatternAst(List.of(
                         new BgpAst(List.of(new TriplePatternAst(new VarAst("x"), new VarAst("q"), new VarAst("z")))))))));
     }
@@ -42,7 +46,7 @@ class CoreseAstQueryBuilderConstructTest extends AbstractSparqlParserFeatureTest
     @Test
     @DisplayName("CONSTRUCT { ?x ?p ?o } WHERE { ?x ?p ?o }: flagged CONSTRUCT, template is a BGP with one edge")
     void templateCompiledAsBgp() {
-        ConstructQueryAst construct = new ConstructQueryAst(template(new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o"))), whereSPO());
+        ConstructQueryAst construct = new ConstructQueryAst(template(tripleXPO()), whereSPO());
 
         QueryPlan query = builder.toNextQuery(construct);
         assertFalse(query.getConstructNodes().isEmpty(), "construct nodes populated");
@@ -83,7 +87,7 @@ class CoreseAstQueryBuilderConstructTest extends AbstractSparqlParserFeatureTest
     @Test
     @DisplayName("Template variable bound by WHERE reuses the runtime body node")
     void templateVariableResolvesToBodyNode() {
-        ConstructQueryAst construct = new ConstructQueryAst(template(new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o"))), whereSPO());
+        ConstructQueryAst construct = new ConstructQueryAst(template(tripleXPO()), whereSPO());
 
         QueryPlan query = builder.toNextQuery(construct);
 
@@ -138,7 +142,7 @@ class CoreseAstQueryBuilderConstructTest extends AbstractSparqlParserFeatureTest
     void appliesDatasetLimitOffset() {
         DatasetClauseAst dataset = new DatasetClauseAst(Set.of(new IriAst("http://example.org/g")), Set.of(new IriAst("http://example.org/n")));
         SolutionModifierAst mod = SolutionModifierAst.withoutGroupBy(false, false, List.of(), 5L, 2L);
-        ConstructQueryAst construct = new ConstructQueryAst(template(new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o"))), dataset, whereSPO(), mod);
+        ConstructQueryAst construct = new ConstructQueryAst(template(tripleXPO()), dataset, whereSPO(), mod);
 
         QueryPlan query = builder.toNextQuery(construct);
 
@@ -152,7 +156,7 @@ class CoreseAstQueryBuilderConstructTest extends AbstractSparqlParserFeatureTest
     @DisplayName("ORDER BY ?x is applied")
     void appliesOrderBy() {
         SolutionModifierAst mod = SolutionModifierAst.withoutGroupBy(false, false, List.of(new OrderConditionAst(ASTConstants.OrderDirection.ASC, new VarAst("x"))), null, null);
-        ConstructQueryAst construct = new ConstructQueryAst(template(new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o"))), DatasetClauseAst.none(), whereSPO(), mod);
+        ConstructQueryAst construct = new ConstructQueryAst(template(tripleXPO()), DatasetClauseAst.none(), whereSPO(), mod);
 
         QueryPlan query = builder.toNextQuery(construct);
 
@@ -163,7 +167,7 @@ class CoreseAstQueryBuilderConstructTest extends AbstractSparqlParserFeatureTest
     @DisplayName("Query-level VALUES is compiled as a runtime table")
     void compilesValuesClause() {
         ValuesAst values = new ValuesAst(List.of(new ValueMappingAst(Map.of(new VarAst("x"), new IriAst("http://example.org/v")))));
-        ConstructQueryAst construct = new ConstructQueryAst(template(new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o"))), DatasetClauseAst.none(), whereSPO(), null, null, values);
+        ConstructQueryAst construct = new ConstructQueryAst(template(tripleXPO()), DatasetClauseAst.none(), whereSPO(), null, null, values);
 
         QueryPlan query = builder.toNextQuery(construct);
         assertTrue(query.getBody().isJoin());
@@ -181,13 +185,13 @@ class CoreseAstQueryBuilderConstructTest extends AbstractSparqlParserFeatureTest
     @DisplayName("CONSTRUCT WHERE { ... FILTER EXISTS { ... } } compiles the EXISTS pattern")
     void filterExistsInConstructWhere() {
         GroupGraphPatternAst existsPattern = new GroupGraphPatternAst(List.of(
-                new BgpAst(List.of(new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o"))))));
-        FilterAst filter = new FilterAst(new ExistsAst(existsPattern));
+                new BgpAst(List.of(tripleXPO()))));
+        FilterAst filter = new FilterAst(new ExistsAst(existsPattern), -1, -1);
         GroupGraphPatternAst where = new GroupGraphPatternAst(List.of(
-                new BgpAst(List.of(new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o")))),
+                new BgpAst(List.of(tripleXPO())),
                 filter));
         ConstructQueryAst construct = new ConstructQueryAst(
-                template(new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o"))),
+                template(tripleXPO()),
                 where);
 
         QueryPlan query = builder.toNextQuery(construct);
@@ -204,13 +208,13 @@ class CoreseAstQueryBuilderConstructTest extends AbstractSparqlParserFeatureTest
     @DisplayName("CONSTRUCT WHERE { ... FILTER NOT EXISTS { ... } } compiles as NOT wrapping EXIST")
     void filterNotExistsInConstructWhere() {
         GroupGraphPatternAst existsPattern = new GroupGraphPatternAst(List.of(
-                new BgpAst(List.of(new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o"))))));
-        FilterAst filter = new FilterAst(new NotExistsAst(existsPattern));
+                new BgpAst(List.of(tripleXPO()))));
+        FilterAst filter = new FilterAst(new NotExistsAst(existsPattern), -1, -1);
         GroupGraphPatternAst where = new GroupGraphPatternAst(List.of(
-                new BgpAst(List.of(new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o")))),
+                new BgpAst(List.of(tripleXPO())),
                 filter));
         ConstructQueryAst construct = new ConstructQueryAst(
-                template(new TriplePatternAst(new VarAst("x"), new VarAst("p"), new VarAst("o"))),
+                template(tripleXPO()),
                 where);
 
         QueryPlan query = builder.toNextQuery(construct);

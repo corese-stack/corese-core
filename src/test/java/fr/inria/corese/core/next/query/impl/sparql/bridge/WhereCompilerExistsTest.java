@@ -44,24 +44,23 @@ class WhereCompilerExistsTest {
     @Test
     @DisplayName("FILTER EXISTS { ?s ?p ?o } -> Expr with oper EXIST carrying the compiled pattern")
     void compilesExists() {
-        FilterAst filter = new FilterAst(new ExistsAst(group(bgp("s", "p", "o"))));
+        FilterAst filter = new FilterAst(new ExistsAst(group(bgp("s", "p", "o"))), -1, -1);
 
         Exp body = compiler.compile(group(bgp("a", "b", "c"), filter));
 
         Expr exist = filterExpr(body);
         assertEquals(ExprType.EXIST, exist.oper(), "operator is EXIST");
 
-        Object pattern = exist.getPattern();
+        Exp pattern = exist.getPattern();
         assertNotNull(pattern, "EXISTS pattern is attached");
         assertInstanceOf(Exp.class, pattern, "pattern is a runtime Exp");
-        Exp patternExp = (Exp) pattern;
-        assertTrue(patternExp.isAnd() || patternExp.isBGP(), "pattern is the compiled graph pattern");
+        assertTrue(pattern.isAnd() || pattern.isBGP(), "pattern is the compiled graph pattern");
     }
 
     @Test
     @DisplayName("FILTER NOT EXISTS { ?s ?p ?o } -> negation wrapping an EXIST expression")
     void compilesNotExists() {
-        FilterAst filter = new FilterAst(new NotExistsAst(group(bgp("s", "p", "o"))));
+        FilterAst filter = new FilterAst(new NotExistsAst(group(bgp("s", "p", "o"))), -1, -1);
 
         Exp body = compiler.compile(group(bgp("a", "b", "c"), filter));
 
@@ -82,7 +81,7 @@ class WhereCompilerExistsTest {
         AndAst and = new AndAst(List.of(
                 exists,
                 new GreaterThanAst(List.of(new VarAst("o"), new LiteralAst("5", null, null)))));
-        FilterAst filter = new FilterAst(and);
+        FilterAst filter = new FilterAst(and, -1, -1);
 
         Exp body = compiler.compile(group(bgp("a", "b", "o"), filter));
 
@@ -101,7 +100,7 @@ class WhereCompilerExistsTest {
     @Test
     @DisplayName("{ ?s ?p ?o FILTER EXISTS { ?s ?q ?z } } : ?z is collected as a query node (exists scope)")
     void existsVariablesAreCollectedInExistsScope() {
-        FilterAst filter = new FilterAst(new ExistsAst(group(bgp("s", "q", "z"))));
+        FilterAst filter = new FilterAst(new ExistsAst(group(bgp("s", "q", "z"))), -1, -1);
         Exp body = compiler.compile(group(bgp("s", "p", "o"), filter));
 
         QueryPlan query = QueryPlan.create(body);

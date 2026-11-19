@@ -139,6 +139,8 @@ public class SparqlParser extends AbstractQueryParser implements QueryTextValida
                 .strictMode(config.isStrictMode())
                 .failFast(!validationMode && config.isFailFast())
                 .collectErrors(validationMode || config.isCollectErrors())
+                .includeWarnings(config.includeWarnings())
+                .failOnWarnings(config.failOnWarnings())
                 .build();
     }
 

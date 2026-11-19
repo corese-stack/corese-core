@@ -4,14 +4,18 @@ import fr.inria.corese.core.next.data.api.vocabulary.RDF;
 import fr.inria.corese.core.next.data.api.vocabulary.XSD;
 import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static fr.inria.corese.core.next.query.impl.sparql.parser.semantic.support.SemanticValidationUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
+
+
 
 class SemanticValidationUtilsTest {
 
@@ -69,5 +73,99 @@ class SemanticValidationUtilsTest {
         assertFalse(isPotentialStringLiteral(new DatatypeAst(List.of(new LiteralAst("1", null, null)))));
         assertFalse(isPotentialStringLiteral(new IriAst("<http://ns.inria.de/test>")));
         assertFalse(isPotentialStringLiteral(new NowAst()));
+    }
+
+    @Test
+    void hasIncompatibleComparisonTest() {
+        LiteralAst strLiteral = new LiteralAst("text", null, null);
+        LiteralAst numLiteral = new LiteralAst("1", null, XSD.xsdInteger.getIRI().stringValue());
+        IriAst iri = new IriAst("<http://example.org/>");
+
+        // string vs numeric → incompatible
+        assertTrue(hasIncompatibleComparison(new GreaterThanAst(List.of(strLiteral, numLiteral))));
+        // IRI operands are excluded — handled by OperandArgumentIRITypeValidationRule
+        assertFalse(hasIncompatibleComparison(new GreaterThanAst(List.of(iri, numLiteral))));
+        // same type → compatible
+        assertFalse(hasIncompatibleComparison(new LowerThanAst(List.of(numLiteral, numLiteral))));
+        // variable → unknown type, no incompatibility detected statically
+        assertFalse(hasIncompatibleComparison(new GreaterThanAst(List.of(new VarAst("x"), numLiteral))));
+    }
+
+    @Test
+    void visitExpressionTermsTest() {
+        // Collects all terms in a simple expression tree
+        LiteralAst left = new LiteralAst("1", null, null);
+        LiteralAst right = new LiteralAst("2", null, null);
+        GreaterThanAst gt = new GreaterThanAst(List.of(left, right));
+
+        List<TermAst> visited = new ArrayList<>();
+        visitExpressionTerms(gt, visited::add);
+
+        assertTrue(visited.contains(gt));
+        assertTrue(visited.contains(left));
+        assertTrue(visited.contains(right));
+        assertEquals(3, visited.size());
+    }
+
+    @Test
+    void isSuspiciousEBVCoercionTest() {
+        // Suspicious: numeric literals
+        assertTrue(isSuspiciousEBVCoercion(new LiteralAst("42", null, XSD.xsdInteger.getIRI().stringValue())));
+        assertTrue(isSuspiciousEBVCoercion(new LiteralAst("3.14", null, XSD.xsdDecimal.getIRI().stringValue())));
+        assertTrue(isSuspiciousEBVCoercion(new LiteralAst("1.0", null, XSD.xsdDouble.getIRI().stringValue())));
+        // Boolean literals have a valid EBV; constant-condition diagnostics handle them separately.
+        LiteralAst trueLiteral = new LiteralAst("true", null, XSD.xsdBoolean.getIRI().stringValue());
+        LiteralAst falseLiteral = new LiteralAst("false", null, XSD.xsdBoolean.getIRI().stringValue());
+        assertFalse(isSuspiciousEBVCoercion(trueLiteral));
+        assertFalse(isSuspiciousEBVCoercion(falseLiteral));
+        assertTrue(isConstantBooleanCondition(trueLiteral));
+        assertTrue(isConstantBooleanCondition(falseLiteral));
+        // Suspicious: plain string literal
+        assertTrue(isSuspiciousEBVCoercion(new LiteralAst("text", null, null)));
+        assertTrue(isSuspiciousEBVCoercion(new LiteralAst("text", null, XSD.xsdString.getIRI().stringValue())));
+        // Variables have unknown runtime type and are not suspicious statically
+        assertFalse(isSuspiciousEBVCoercion(new VarAst("x")));
+        // Not suspicious: IRI, function call
+        assertFalse(isSuspiciousEBVCoercion(new IriAst("<http://example.org/>")));
+        assertFalse(isSuspiciousEBVCoercion(new NowAst()));
+    }
+
+    @Test
+    void shouldTreatUntypedNumericLookingLiteralAsString() {
+        LiteralAst plain = new LiteralAst("42", null, null);
+        LiteralAst integer = new LiteralAst("42", null, XSD.xsdInteger.getIRI().stringValue());
+
+        assertTrue(hasIncompatibleComparison(new GreaterThanAst(List.of(plain, integer))));
+    }
+
+    @Test
+    void shouldVisitOptionalAndSpecializedArguments() {
+        TermAst comparison = new GreaterThanAst(List.of(
+                new LiteralAst("42", null, null),
+                new LiteralAst("1", null, XSD.xsdInteger.getIRI().stringValue())));
+
+        List<TermAst> expressions = List.of(
+                new SubstrAst(List.of(new LiteralAst("abc", null, null), comparison)),
+                new ReplaceAst(List.of(
+                        new LiteralAst("abc", null, null),
+                        new LiteralAst("a", null, null),
+                        comparison)),
+                new TrinaryRegexAst(List.of(
+                        new LiteralAst("abc", null, null),
+                        new LiteralAst("a", null, null),
+                        comparison)),
+                new BnodeAst(List.of(comparison)),
+                new FunctionCallAst(new IriAst("<urn:function>"), List.of(comparison)),
+                new InAst(new VarAst("x"), List.of(comparison)),
+                new NotInAst(new VarAst("x"), List.of(comparison)));
+
+        for (TermAst expression : expressions) {
+            List<TermAst> visited = new ArrayList<>();
+            assertDoesNotThrow(() -> visitExpressionTerms(expression, visited::add));
+            assertTrue(visited.contains(comparison), expression.getName());
+            assertTrue(hasIncompatibleComparison(expression), expression.getName());
+        }
+
+        assertDoesNotThrow(() -> visitExpressionTerms(new BnodeAst(List.of()), term -> {}));
     }
 }
