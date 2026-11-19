@@ -308,6 +308,10 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
     }
 
 
+    public void addHavingCondition(TermAst condition) {
+        addHavingCondition(condition, -1, -1);
+    }
+
     public void addHavingCondition(TermAst condition, int line, int column) {
         if (condition == null) {
             throw new IllegalArgumentException("HAVING condition is null");

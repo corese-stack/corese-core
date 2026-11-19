@@ -16,6 +16,19 @@ public record FilterAst(TermAst operator, int line, int column) implements Patte
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        FilterAst other = (FilterAst) obj;
+        return java.util.Objects.equals(this.operator, other.operator);
+    }
+
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hashCode(operator);
+    }
+
+    @Override
     public void accept(AstVisitor visitor) {
         visitor.visit(this);
         this.operator.accept(visitor);

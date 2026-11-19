@@ -30,6 +30,19 @@ public record HavingAst(
         return new HavingAst(List.of());
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        HavingAst other = (HavingAst) obj;
+        return java.util.Objects.equals(this.conditions, other.conditions);
+    }
+
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hashCode(conditions);
+    }
+
     public record SourceLocation(int line, int column) {
         public SourceLocation {
             if (line < -1 || column < -1) {
