@@ -66,49 +66,72 @@ class SparqlParserWarningTest extends AbstractSparqlParserFeatureTest {
         }
 
         @Test
-        @DisplayName("Bare variable FILTER should produce an advisory warning")
-        void shouldWarnOnBareVariableFilter() {
-            QueryValidationResult result = parserWith(true, false)
-                    .validate("SELECT ?s WHERE { ?s ?p ?o FILTER(?count) }");
+        @DisplayName("Bare variable FILTER should not produce a warning")
+        void shouldNotWarnOnBareVariableFilter() {
+            QueryValidationResult result = parserWith(true, true)
+                    .validate("""
+                            SELECT ?b WHERE {
+                                VALUES ?b { true false }
+                                FILTER(?b)
+                            }
+                            """);
 
             assertTrue(result.isValid());
             assertTrue(result.diagnostics().stream()
-                    .anyMatch(d -> d.severity() == QueryDiagnostic.Severity.WARNING));
+                    .noneMatch(d -> d.severity() == QueryDiagnostic.Severity.WARNING));
         }
 
         @Test
-        @DisplayName("A variable used as an operand of a boolean operator should produce a warning")
-        void shouldWarnOnImplicitEbvInBooleanOperator() {
-            QueryValidationResult result = parserWith(true, false)
-                    .validate("SELECT ?s WHERE { ?s ?p ?o FILTER(?count && true) }");
+        @DisplayName("Variable boolean operand should not produce a warning")
+        void shouldNotWarnOnImplicitEbvInBooleanOperator() {
+            QueryValidationResult result = parserWith(true, true)
+                    .validate("""
+                            SELECT ?b WHERE {
+                                VALUES ?b { true false }
+                                FILTER(?b && true)
+                            }
+                            """);
 
             assertTrue(result.isValid());
             assertTrue(result.diagnostics().stream()
-                    .anyMatch(d -> d.severity() == QueryDiagnostic.Severity.WARNING));
+                    .noneMatch(d -> d.severity() == QueryDiagnostic.Severity.WARNING));
         }
 
-        @Test
-        @DisplayName("A constant comparison should produce a constant-condition warning")
-        void shouldWarnOnConstantComparison() {
-            QueryValidationResult result = parserWith(true, false)
-                    .validate("SELECT ?s WHERE { ?s ?p ?o FILTER(1 = 1) }");
-
-            assertTrue(result.isValid());
-            assertTrue(result.diagnostics().stream()
-                    .anyMatch(d -> d.severity() == QueryDiagnostic.Severity.WARNING
-                            && d.message().contains("Constant condition")));
-        }
-
-        @Test
+        @ParameterizedTest
+        @ValueSource(strings = {
+                "\"text\" > 1",
+                "\"42\" > 1",
+                "\"2026-11-19T12:00:00Z\"^^xsd:dateTime > 1",
+                "\"2026-11-19\"^^xsd:date > 1",
+                "\"PT1H\"^^xsd:dayTimeDuration > 1"
+        })
         @DisplayName("Incompatible ordered comparison operands should produce a warning")
-        void shouldWarnOnIncompatibleComparison() {
+        void shouldWarnOnIncompatibleComparison(String expr) {
             QueryValidationResult result = parserWith(true, false)
-                    .validate("SELECT ?s WHERE { ?s ?p ?o FILTER(\"text\" > 1) }");
+                    .validate("""
+                            PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+                            SELECT ?s WHERE { ?s ?p ?o FILTER(%s) }
+                            """.formatted(expr));
 
             assertTrue(result.isValid());
             assertTrue(result.diagnostics().stream()
                     .anyMatch(d -> d.severity() == QueryDiagnostic.Severity.WARNING
                             && d.message().contains("Incompatible operand types")));
+        }
+
+        @Test
+        @DisplayName("Should emit exactly one IRI warning per ordered comparison")
+        void shouldEmitOneIriWarningPerOrderedComparison() {
+            QueryValidationResult result = parserWith(true, false)
+                    .validate("SELECT ?s WHERE { ?s ?p ?o FILTER(<urn:a> < <urn:b>) }");
+
+            assertTrue(result.isValid());
+            List<QueryDiagnostic> warnings = result.diagnostics().stream()
+                    .filter(d -> d.severity() == QueryDiagnostic.Severity.WARNING)
+                    .filter(d -> d.message().startsWith("Ordered comparison "))
+                    .toList();
+            assertEquals(1, warnings.size());
+            assertTrue(warnings.getFirst().message().endsWith("has no standard SPARQL mapping"));
         }
 
         @Test

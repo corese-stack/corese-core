@@ -123,10 +123,49 @@ class SemanticValidationUtilsTest {
         // Suspicious: plain string literal
         assertTrue(isSuspiciousEBVCoercion(new LiteralAst("text", null, null)));
         assertTrue(isSuspiciousEBVCoercion(new LiteralAst("text", null, XSD.xsdString.getIRI().stringValue())));
-        // A bare variable may hold a non-boolean value, so flag its implicit EBV use.
-        assertTrue(isSuspiciousEBVCoercion(new VarAst("x")));
+        // Variables have unknown runtime type and are not suspicious statically
+        assertFalse(isSuspiciousEBVCoercion(new VarAst("x")));
         // Not suspicious: IRI, function call
         assertFalse(isSuspiciousEBVCoercion(new IriAst("<http://example.org/>")));
         assertFalse(isSuspiciousEBVCoercion(new NowAst()));
+    }
+
+    @Test
+    void shouldTreatUntypedNumericLookingLiteralAsString() {
+        LiteralAst plain = new LiteralAst("42", null, null);
+        LiteralAst integer = new LiteralAst("42", null, XSD.xsdInteger.getIRI().stringValue());
+
+        assertTrue(hasIncompatibleComparison(new GreaterThanAst(List.of(plain, integer))));
+    }
+
+    @Test
+    void shouldVisitOptionalAndSpecializedArguments() {
+        TermAst comparison = new GreaterThanAst(List.of(
+                new LiteralAst("42", null, null),
+                new LiteralAst("1", null, XSD.xsdInteger.getIRI().stringValue())));
+
+        List<TermAst> expressions = List.of(
+                new SubstrAst(List.of(new LiteralAst("abc", null, null), comparison)),
+                new ReplaceAst(List.of(
+                        new LiteralAst("abc", null, null),
+                        new LiteralAst("a", null, null),
+                        comparison)),
+                new TrinaryRegexAst(List.of(
+                        new LiteralAst("abc", null, null),
+                        new LiteralAst("a", null, null),
+                        comparison)),
+                new BnodeAst(List.of(comparison)),
+                new FunctionCallAst(new IriAst("<urn:function>"), List.of(comparison)),
+                new InAst(new VarAst("x"), List.of(comparison)),
+                new NotInAst(new VarAst("x"), List.of(comparison)));
+
+        for (TermAst expression : expressions) {
+            List<TermAst> visited = new ArrayList<>();
+            assertDoesNotThrow(() -> visitExpressionTerms(expression, visited::add));
+            assertTrue(visited.contains(comparison), expression.getName());
+            assertTrue(hasIncompatibleComparison(expression), expression.getName());
+        }
+
+        assertDoesNotThrow(() -> visitExpressionTerms(new BnodeAst(List.of()), term -> {}));
     }
 }

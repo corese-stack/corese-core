@@ -63,11 +63,13 @@ public class OperandArgumentIRITypeValidationRule extends AbstractSemanticValida
                         || termAst instanceof GreaterThanAst
                         || termAst instanceof GreaterOrEqualThanAst) {
                     BinaryConstraintAst comparison = (BinaryConstraintAst) termAst;
-                    if (isPotentialIri(comparison.getLeftArgument())) {
-                        addIriComparisonWarning(comparison, comparison.getLeftArgument(), line, column);
-                    }
-                    if (isPotentialIri(comparison.getRightArgument())) {
-                        addIriComparisonWarning(comparison, comparison.getRightArgument(), line, column);
+                    TermAst left = comparison.getLeftArgument();
+                    TermAst right = comparison.getRightArgument();
+
+                    if (isPotentialIri(left)) {
+                        addIriComparisonWarning(comparison, left, line, column);
+                    } else if (isPotentialIri(right)) {
+                        addIriComparisonWarning(comparison, right, line, column);
                     }
                 }
             });
@@ -79,7 +81,8 @@ public class OperandArgumentIRITypeValidationRule extends AbstractSemanticValida
                 int line,
                 int column) {
             result.add(buildAdvisoryDiagnostic(
-                    operand.getName() + " is an IRI used with ordered comparison " + comparison.getName(),
+                    "Ordered comparison %s on IRI operand %s has no standard SPARQL mapping"
+                            .formatted(comparison.getName(), operand.getName()),
                     operand.getName(),
                     line,
                     column));

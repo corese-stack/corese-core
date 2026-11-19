@@ -205,15 +205,9 @@ public class SemanticValidationUtils {
     public static boolean isSuspiciousEBVCoercion(TermAst termAst) {
         if (termAst instanceof LiteralAst literalAst) {
             // Boolean literals have a well-defined EBV — handled as "Constant condition", not coercion
-            return !BOOLEAN_DATATYPE.equals(literalAst.datatype());
+            return !isBooleanDatatype(literalAst.datatype());
         }
-        if (termAst instanceof SimpleLiteralExpressionAst) {
-            return true;
-        }
-        if (termAst instanceof NumericExpressionAst) {
-            return true;
-        }
-        if (termAst instanceof VarAst) {
+        if (termAst instanceof SimpleLiteralExpressionAst || termAst instanceof NumericExpressionAst) {
             return true;
         }
         if (termAst instanceof IfAst(TermAst condition, TermAst thenExpr, TermAst elseExpr)) {
@@ -233,31 +227,65 @@ public class SemanticValidationUtils {
             return;
         }
         visitor.accept(termAst);
-        if (termAst instanceof ExistsAst || termAst instanceof NotExistsAst) {
+
+        switch (termAst) {
+            case ExistsAst ignored -> {}
+            case NotExistsAst ignored -> {}
+            case UnaryConstraintAst unary -> visitExpressionTerms(unary.argument(), visitor);
+            case BinaryConstraintAst binary -> {
+                visitExpressionTerms(binary.getLeftArgument(), visitor);
+                visitExpressionTerms(binary.getRightArgument(), visitor);
+            }
+            case UnlimitedArgumentsFunctionAst function -> visitExpressionArguments(function.arguments(), visitor);
+            case FunctionCallAst function -> {
+                visitExpressionTerms(function.functionName(), visitor);
+                visitExpressionArguments(function.arguments(), visitor);
+            }
+            case IfAst conditional -> {
+                visitExpressionTerms(conditional.condition(), visitor);
+                visitExpressionTerms(conditional.thenExpr(), visitor);
+                visitExpressionTerms(conditional.elseExpr(), visitor);
+            }
+            case AggregateAst aggregate -> visitExpressionTerms(aggregate.expression(), visitor);
+            case InAst in -> {
+                visitExpressionTerms(in.left(), visitor);
+                visitExpressionArguments(in.candidates(), visitor);
+            }
+            case NotInAst notIn -> {
+                visitExpressionTerms(notIn.left(), visitor);
+                visitExpressionArguments(notIn.candidates(), visitor);
+            }
+            case SubstrAst substr -> {
+                visitExpressionTerms(substr.getString(), visitor);
+                visitExpressionTerms(substr.getStart(), visitor);
+                visitExpressionTerms(substr.getLength(), visitor);
+            }
+            case ReplaceAst replace -> {
+                visitExpressionTerms(replace.getString(), visitor);
+                visitExpressionTerms(replace.getPattern(), visitor);
+                visitExpressionTerms(replace.getReplacement(), visitor);
+                visitExpressionTerms(replace.getFlags(), visitor);
+            }
+            case TrinaryRegexAst regex -> {
+                visitExpressionTerms(regex.getString(), visitor);
+                visitExpressionTerms(regex.getPattern(), visitor);
+                visitExpressionTerms(regex.getFlags(), visitor);
+            }
+            case BnodeAst bnode -> visitExpressionTerms(bnode.getLabel(), visitor);
+            default -> {
+                // Leaf terms and zero-argument expressions
+            }
+        }
+    }
+
+    private static void visitExpressionArguments(
+            Iterable<? extends TermAst> arguments,
+            Consumer<TermAst> visitor) {
+        if (arguments == null) {
             return;
         }
-        if (termAst instanceof UnaryConstraintAst unaryConstraintAst) {
-            visitExpressionTerms(unaryConstraintAst.argument(), visitor);
-        } else if (termAst instanceof BinaryConstraintAst binaryConstraintAst) {
-            visitExpressionTerms(binaryConstraintAst.getLeftArgument(), visitor);
-            visitExpressionTerms(binaryConstraintAst.getRightArgument(), visitor);
-        } else if (termAst instanceof UnlimitedArgumentsFunctionAst unlimitedArgumentsFunctionAst) {
-            unlimitedArgumentsFunctionAst.arguments()
-                    .forEach(argument -> visitExpressionTerms(argument, visitor));
-        } else if (termAst instanceof FunctionCallAst functionCallAst) {
-            functionCallAst.arguments().forEach(argument -> visitExpressionTerms(argument, visitor));
-        } else if (termAst instanceof IfAst(TermAst condition, TermAst thenExpr, TermAst elseExpr)) {
-            visitExpressionTerms(condition, visitor);
-            visitExpressionTerms(thenExpr, visitor);
-            visitExpressionTerms(elseExpr, visitor);
-        } else if (termAst instanceof AggregateAst aggregateAst) {
-            visitExpressionTerms(aggregateAst.expression(), visitor);
-        } else if (termAst instanceof InAst(TermAst left, java.util.List<TermAst> candidates)) {
-            visitExpressionTerms(left, visitor);
-            candidates.forEach(candidate -> visitExpressionTerms(candidate, visitor));
-        } else if (termAst instanceof NotInAst(TermAst left, java.util.List<TermAst> candidates)) {
-            visitExpressionTerms(left, visitor);
-            candidates.forEach(candidate -> visitExpressionTerms(candidate, visitor));
+        for (TermAst argument : arguments) {
+            visitExpressionTerms(argument, visitor);
         }
     }
 
@@ -266,7 +294,7 @@ public class SemanticValidationUtils {
      */
     public static boolean isConstantBooleanCondition(TermAst termAst) {
         if (termAst instanceof LiteralAst literalAst) {
-            return BOOLEAN_DATATYPE.equals(literalAst.datatype());
+            return isBooleanDatatype(literalAst.datatype());
         }
         return termAst instanceof BooleanExpressionAst && isConstantExpression(termAst);
     }
@@ -275,35 +303,30 @@ public class SemanticValidationUtils {
      * Checks for ordering comparisons between statically known, incompatible value types.
      */
     public static boolean hasIncompatibleComparison(TermAst termAst) {
-        if (termAst instanceof GreaterThanAst
-                || termAst instanceof GreaterOrEqualThanAst
-                || termAst instanceof LowerThanAst
-                || termAst instanceof LowerOrEqualThanAst) {
-            BinaryConstraintAst comparison = (BinaryConstraintAst) termAst;
-            ValueType left = valueType(comparison.getLeftArgument());
-            ValueType right = valueType(comparison.getRightArgument());
-            if (left != null && right != null && left != right
-                        && left != ValueType.IRI && right != ValueType.IRI) {
-                return true;
+        boolean[] incompatible = {false};
+        visitExpressionTerms(termAst, term -> {
+            if (isOrderedComparison(term)) {
+                BinaryConstraintAst comparison = (BinaryConstraintAst) term;
+                ValueType left = valueType(comparison.getLeftArgument());
+                ValueType right = valueType(comparison.getRightArgument());
+                // IRI comparisons are handled by dedicated rule OperandArgumentIRITypeValidationRule
+                if (left != null
+                        && right != null
+                        && left != ValueType.IRI
+                        && right != ValueType.IRI
+                        && left != right) {
+                    incompatible[0] = true;
+                }
             }
-        }
-        if (termAst instanceof UnaryConstraintAst unaryConstraintAst) {
-            return hasIncompatibleComparison(unaryConstraintAst.argument());
-        }
-        if (termAst instanceof BinaryConstraintAst binaryConstraintAst) {
-            return hasIncompatibleComparison(binaryConstraintAst.getLeftArgument())
-                    || hasIncompatibleComparison(binaryConstraintAst.getRightArgument());
-        }
-        if (termAst instanceof UnlimitedArgumentsFunctionAst unlimitedArgumentsFunctionAst) {
-            return unlimitedArgumentsFunctionAst.arguments().stream()
-                    .anyMatch(SemanticValidationUtils::hasIncompatibleComparison);
-        }
-        if (termAst instanceof IfAst(TermAst condition, TermAst thenExpr, TermAst elseExpr)) {
-            return hasIncompatibleComparison(condition)
-                    || hasIncompatibleComparison(thenExpr)
-                    || hasIncompatibleComparison(elseExpr);
-        }
-        return false;
+        });
+        return incompatible[0];
+    }
+
+    private static boolean isOrderedComparison(TermAst termAst) {
+        return termAst instanceof LowerThanAst
+                || termAst instanceof LowerOrEqualThanAst
+                || termAst instanceof GreaterThanAst
+                || termAst instanceof GreaterOrEqualThanAst;
     }
 
     private static boolean isConstantExpression(TermAst termAst) {
@@ -332,18 +355,64 @@ public class SemanticValidationUtils {
         return false;
     }
 
+    public static boolean isBooleanDatatype(String datatype) {
+        return matchesDatatype(datatype, BOOLEAN_DATATYPE, "boolean");
+    }
+
+    private static boolean matchesDatatype(String datatype, String iriString, String localName) {
+        if (datatype == null) {
+            return false;
+        }
+        return datatype.equals(iriString)
+                || datatype.equals("<" + iriString + ">")
+                || datatype.equals("xsd:" + localName);
+    }
+
+    private static boolean isNumericDatatype(String datatype) {
+        if (datatype == null) {
+            return false;
+        }
+        if (NUMERIC_DATATYPES.contains(datatype)) {
+            return true;
+        }
+        for (String numIri : NUMERIC_DATATYPES) {
+            if (datatype.equals("<" + numIri + ">")) {
+                return true;
+            }
+            int hash = numIri.indexOf('#');
+            if (hash >= 0 && datatype.equals("xsd:" + numIri.substring(hash + 1))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static ValueType valueType(TermAst termAst) {
-        if (termAst instanceof LiteralAst(String lexical, String lang, String datatype)) {
-            if ((datatype != null && NUMERIC_DATATYPES.contains(datatype))
-                    || (datatype == null && lang == null && isNumeric(lexical))) {
-                return ValueType.NUMERIC;
-            }
-            if (BOOLEAN_DATATYPE.equals(datatype)) {
-                return ValueType.BOOLEAN;
-            }
-            if (lang != null || datatype == null || STRING_DATATYPE.contains(datatype)) {
+        if (termAst instanceof LiteralAst literal) {
+            String datatype = literal.datatype();
+            if (literal.lang() != null) {
                 return ValueType.STRING;
             }
+            if (datatype == null) {
+                return ValueType.STRING;
+            }
+            if (isNumericDatatype(datatype)) {
+                return ValueType.NUMERIC;
+            }
+            if (matchesDatatype(datatype, BOOLEAN_DATATYPE, "boolean")) {
+                return ValueType.BOOLEAN;
+            }
+            if (STRING_DATATYPE.contains(datatype) || matchesDatatype(datatype, XSD.xsdString.getIRI().stringValue(), "string")) {
+                return ValueType.STRING;
+            }
+            if (matchesDatatype(datatype, XSD.xsdDateTime.getIRI().stringValue(), "dateTime")
+                    || matchesDatatype(datatype, XSD.xsdDate.getIRI().stringValue(), "date")) {
+                return ValueType.DATETIME;
+            }
+            if (matchesDatatype(datatype, XSD.xsdDayTimeDuration.getIRI().stringValue(), "dayTimeDuration")) {
+                return ValueType.DURATION;
+            }
+            return null;
         }
         if (termAst instanceof NumericExpressionAst) {
             return ValueType.NUMERIC;
@@ -365,7 +434,8 @@ public class SemanticValidationUtils {
         }
         if (termAst instanceof IfAst ifAst) {
             ValueType thenType = valueType(ifAst.thenExpr());
-            return thenType == valueType(ifAst.elseExpr()) ? thenType : null;
+            ValueType elseType = valueType(ifAst.elseExpr());
+            return thenType == elseType ? thenType : null;
         }
         return null;
     }
