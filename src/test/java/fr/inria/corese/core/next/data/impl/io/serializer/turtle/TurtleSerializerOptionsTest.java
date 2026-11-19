@@ -5,7 +5,7 @@ import fr.inria.corese.core.next.data.api.vocabulary.OWL;
 import fr.inria.corese.core.next.data.api.vocabulary.RDF;
 import fr.inria.corese.core.next.data.api.vocabulary.RDFS;
 import fr.inria.corese.core.next.data.api.vocabulary.XSD;
-import fr.inria.corese.core.next.data.impl.io.serializer.option.BlankNodeStyle;
+import fr.inria.corese.core.next.data.api.io.serializer.option.BlankNodeStyle;
 import fr.inria.corese.core.next.data.api.io.serializer.option.LiteralDatatypePolicy;
 import fr.inria.corese.core.next.data.api.io.serializer.option.PrefixOrdering;
 import fr.inria.corese.core.next.data.impl.io.serializer.support.SerializationConstants;

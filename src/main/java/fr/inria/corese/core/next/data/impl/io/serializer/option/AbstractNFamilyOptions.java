@@ -14,6 +14,10 @@ import fr.inria.corese.core.next.data.api.io.serializer.option.LiteralDatatypePo
  */
 public abstract class AbstractNFamilyOptions extends AbstractSerializerOptions {
 
+    protected final boolean sortSubjects;
+    protected final boolean sortPredicates;
+    protected final boolean sortObjects;
+
     /**
      * Protected constructor to be used by concrete builder implementations.
      * Initializes the N-Family serialization configuration options, calling the superclass
@@ -23,6 +27,20 @@ public abstract class AbstractNFamilyOptions extends AbstractSerializerOptions {
      */
     protected AbstractNFamilyOptions(AbstractNFamilyBuilder<?> builder) {
         super(builder);
+        this.sortSubjects = builder.sortSubjects;
+        this.sortPredicates = builder.sortPredicates;
+        this.sortObjects = builder.sortObjects;
+    }
+
+    public boolean sortSubjects() { return sortSubjects; }
+    public boolean sortPredicates() { return sortPredicates; }
+    public boolean sortObjects() { return sortObjects; }
+
+    /**
+     * Returns {@code true} if any sort key is enabled.
+     */
+    public boolean sortStatements() {
+        return sortSubjects || sortPredicates || sortObjects;
     }
 
     /**
@@ -40,17 +58,27 @@ public abstract class AbstractNFamilyOptions extends AbstractSerializerOptions {
     public abstract static class AbstractNFamilyBuilder<S extends AbstractNFamilyBuilder<S>>
             extends AbstractSerializerOptions.AbstractBuilder<S> {
 
-        /**
-         * Default constructor for the builder.
-         * Initializes common N-Family specific defaults:
-         * <ul>
-         * <li>{@code literalDatatypePolicy} is set to {@link LiteralDatatypePolicy#ALWAYS_TYPED}.</li>
-         * <li>{@code escapeUnicode} is set to {@code true}.</li>
-         * </ul>
-         */
+        protected boolean sortSubjects = false;
+        protected boolean sortPredicates = false;
+        protected boolean sortObjects = false;
+
         protected AbstractNFamilyBuilder() {
             super.literalDatatypePolicy = LiteralDatatypePolicy.ALWAYS_TYPED;
             super.escapeUnicode = true;
+        }
+
+        public S sortSubjects(boolean v) { this.sortSubjects = v; return self(); }
+        public S sortPredicates(boolean v) { this.sortPredicates = v; return self(); }
+        public S sortObjects(boolean v) { this.sortObjects = v; return self(); }
+
+        /**
+         * Convenience method: sets sortSubjects, sortPredicates, and sortObjects to the same value.
+         */
+        public S sortStatements(boolean v) {
+            this.sortSubjects = v;
+            this.sortPredicates = v;
+            this.sortObjects = v;
+            return self();
         }
 
         /**

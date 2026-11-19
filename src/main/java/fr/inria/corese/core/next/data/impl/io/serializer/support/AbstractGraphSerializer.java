@@ -566,8 +566,14 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
                 writePredicate(writer, predicateEntry.getKey());
                 writer.write(SerializationConstants.SPACE);
 
+                List<Statement> objects = predicateEntry.getValue();
+                if (this.option instanceof PrettyPrintOptions prettyPrintOptions && prettyPrintOptions.sortObjects()) {
+                    objects = objects.stream()
+                            .sorted(Comparator.comparing(s -> AbstractLineBasedSerializer.canonicalTermKey(s.getObject())))
+                            .toList();
+                }
                 boolean firstObject = true;
-                for (Statement stmt : predicateEntry.getValue()) {
+                for (Statement stmt : objects) {
                     if (!firstObject) {
                         writer.write(SerializationConstants.COMMA);
                         if (this.option instanceof PrettyPrintOptions prettyPrintOptions

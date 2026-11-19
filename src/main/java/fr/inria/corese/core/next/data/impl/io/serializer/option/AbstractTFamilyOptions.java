@@ -3,6 +3,8 @@ package fr.inria.corese.core.next.data.impl.io.serializer.option;
 import fr.inria.corese.core.next.data.api.io.serializer.option.PrefixOrdering;
 
 import fr.inria.corese.core.next.data.api.io.option.IOOptions;
+import fr.inria.corese.core.next.data.api.io.serializer.option.BlankNodeStyle;
+import fr.inria.corese.core.next.data.api.io.serializer.option.GraphStyleOptions;
 import fr.inria.corese.core.next.data.api.io.serializer.option.PrettyPrintOptions;
 import fr.inria.corese.core.next.data.api.io.serializer.option.UsesPrefixOptions;
 import fr.inria.corese.core.next.data.impl.namespace.PrefixHandler;
@@ -20,7 +22,7 @@ import java.util.Objects;
  * nested {@link AbstractTFamilyBuilder}. Subclasses are expected to extend this
  * configuration and its builder to add format-specific options.</p>
  */
-public abstract class AbstractTFamilyOptions extends AbstractSerializerOptions implements UsesPrefixOptions, PrettyPrintOptions {
+public abstract class AbstractTFamilyOptions extends AbstractSerializerOptions implements UsesPrefixOptions, PrettyPrintOptions, GraphStyleOptions {
 
     /**
      * Whether prefix declarations (e.g., `@prefix`, `PREFIX`) should be used for compact IRIs.
@@ -100,6 +102,11 @@ public abstract class AbstractTFamilyOptions extends AbstractSerializerOptions i
      * This ensures a consistent and reproducible order of properties for a given subject.
      */
     protected final boolean sortPredicates; // Sort predicates alphabetically within a subject group
+    /**
+     * Whether objects should be sorted alphabetically within a predicate group.
+     * This ensures a consistent and reproducible order of objects for a given subject/predicate pair.
+     */
+    protected final boolean sortObjects; // Sort objects alphabetically within a predicate group
 
     /**
      * Protected constructor to be used by concrete builder implementations.
@@ -129,6 +136,7 @@ public abstract class AbstractTFamilyOptions extends AbstractSerializerOptions i
         this.groupBySubject = builder.groupBySubject;
         this.sortSubjects = builder.sortSubjects;
         this.sortPredicates = builder.sortPredicates;
+        this.sortObjects = builder.sortObjects;
 
         if (this.escapeUnicode && this.useMultilineLiterals) {
             throw new IllegalArgumentException("Cannot enable both escapeUnicode and useMultilineLiterals in Turtle TriG configs.");
@@ -280,6 +288,16 @@ public abstract class AbstractTFamilyOptions extends AbstractSerializerOptions i
     }
 
     /**
+     * Checks if objects should be sorted alphabetically within a predicate group.
+     *
+     * @return {@code true} if object sorting is enabled, {@code false} otherwise.
+     */
+    @Override
+    public boolean sortObjects() {
+        return sortObjects;
+    }
+
+    /**
      * An abstract base builder for {@link AbstractTFamilyOptions}.
      * This builder provides methods for setting Turtle Trig serialization configuration options.
      * parameter (`S`) to allow concrete subclass builders to return their own specific type,
@@ -308,6 +326,7 @@ public abstract class AbstractTFamilyOptions extends AbstractSerializerOptions i
         protected boolean groupBySubject = true;
         protected boolean sortSubjects = false;
         protected boolean sortPredicates = false;
+        protected boolean sortObjects = false;
 
         /**
          * Copy builder
@@ -317,7 +336,11 @@ public abstract class AbstractTFamilyOptions extends AbstractSerializerOptions i
             if(otherOptions instanceof AbstractTFamilyOptions otherTFamilyOptions) {
                 this.useRdfTypeShortcut = otherTFamilyOptions.useRdfTypeShortcut();
                 this.useCollections = otherTFamilyOptions.useCollections();
-                this.useMultilineLiterals = otherTFamilyOptions.useMultilineLiterals();
+            }
+            if(otherOptions instanceof GraphStyleOptions graphStyleOptions) {
+                this.usePrefixes = graphStyleOptions.usePrefixes();
+                this.useMultilineLiterals = graphStyleOptions.useMultilineLiterals();
+                this.blankNodeStyle = graphStyleOptions.getBlankNodeStyle();
             }
             if(otherOptions instanceof UsesPrefixOptions usesPrefixOptions) {
                 this.usePrefixes = usesPrefixOptions.usePrefixes();
@@ -333,6 +356,7 @@ public abstract class AbstractTFamilyOptions extends AbstractSerializerOptions i
                 this.maxLineLength = prettyPrintOptions.getMaxLineLength();
                 this.sortSubjects = prettyPrintOptions.sortSubjects();
                 this.sortPredicates = prettyPrintOptions.sortPredicates();
+                this.sortObjects = prettyPrintOptions.sortObjects();
                 this.prefixOrdering = Objects.requireNonNull(prettyPrintOptions.getPrefixOrdering());
             }
         }
@@ -535,6 +559,17 @@ public abstract class AbstractTFamilyOptions extends AbstractSerializerOptions i
          */
         public S sortPredicates(boolean sortPredicates) {
             this.sortPredicates = sortPredicates;
+            return self();
+        }
+
+        /**
+         * Sets whether objects should be sorted alphabetically within a predicate group.
+         *
+         * @param sortObjects {@code true} to enable object sorting, {@code false} otherwise.
+         * @return The builder instance for fluent chaining.
+         */
+        public S sortObjects(boolean sortObjects) {
+            this.sortObjects = sortObjects;
             return self();
         }
 
