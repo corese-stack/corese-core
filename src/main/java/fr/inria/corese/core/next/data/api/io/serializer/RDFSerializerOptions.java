@@ -3,7 +3,9 @@ package fr.inria.corese.core.next.data.api.io.serializer;
 import fr.inria.corese.core.next.data.api.io.option.BaseIRIOptions;
 import fr.inria.corese.core.next.data.api.io.option.RDFSerializationOptions;
 import fr.inria.corese.core.next.data.api.io.serializer.option.BlankNodeIdGenerationOptions;
+import fr.inria.corese.core.next.data.api.io.serializer.option.BlankNodeStyle;
 import fr.inria.corese.core.next.data.api.io.serializer.option.DatatypePolicyOptions;
+import fr.inria.corese.core.next.data.api.io.serializer.option.GraphStyleOptions;
 import fr.inria.corese.core.next.data.api.io.serializer.option.LineEndingOptions;
 import fr.inria.corese.core.next.data.api.io.serializer.option.LiteralDatatypePolicy;
 import fr.inria.corese.core.next.data.api.io.serializer.option.PrefixOrdering;
@@ -24,6 +26,7 @@ public final class RDFSerializerOptions implements
         LineEndingOptions,
         BlankNodeIdGenerationOptions,
         DatatypePolicyOptions,
+        GraphStyleOptions,
         PrettyPrintOptions {
 
     private final String baseIRI;
@@ -35,6 +38,10 @@ public final class RDFSerializerOptions implements
     private final int maxLineLength;
     private final boolean sortSubjects;
     private final boolean sortPredicates;
+    private final boolean sortObjects;
+    private final boolean usePrefixes;
+    private final boolean useMultilineLiterals;
+    private final BlankNodeStyle blankNodeStyle;
     private final PrefixOrdering prefixOrdering;
 
     private RDFSerializerOptions(Builder builder) {
@@ -47,6 +54,10 @@ public final class RDFSerializerOptions implements
         this.maxLineLength = builder.maxLineLength;
         this.sortSubjects = builder.sortSubjects;
         this.sortPredicates = builder.sortPredicates;
+        this.sortObjects = builder.sortObjects;
+        this.usePrefixes = builder.usePrefixes;
+        this.useMultilineLiterals = builder.useMultilineLiterals;
+        this.blankNodeStyle = builder.blankNodeStyle;
         this.prefixOrdering = builder.prefixOrdering;
     }
 
@@ -100,6 +111,26 @@ public final class RDFSerializerOptions implements
     }
 
     @Override
+    public boolean sortObjects() {
+        return sortObjects;
+    }
+
+    @Override
+    public boolean usePrefixes() {
+        return usePrefixes;
+    }
+
+    @Override
+    public boolean useMultilineLiterals() {
+        return useMultilineLiterals;
+    }
+
+    @Override
+    public BlankNodeStyle getBlankNodeStyle() {
+        return blankNodeStyle;
+    }
+
+    @Override
     public PrefixOrdering getPrefixOrdering() {
         return prefixOrdering;
     }
@@ -114,6 +145,10 @@ public final class RDFSerializerOptions implements
         private int maxLineLength = 80;
         private boolean sortSubjects;
         private boolean sortPredicates;
+        private boolean sortObjects;
+        private boolean usePrefixes = true;
+        private boolean useMultilineLiterals;
+        private BlankNodeStyle blankNodeStyle = BlankNodeStyle.NAMED;
         private PrefixOrdering prefixOrdering = PrefixOrdering.ALPHABETICAL;
 
         private Builder() {
@@ -164,6 +199,26 @@ public final class RDFSerializerOptions implements
 
         public Builder sortPredicates(boolean sortPredicates) {
             this.sortPredicates = sortPredicates;
+            return this;
+        }
+
+        public Builder sortObjects(boolean sortObjects) {
+            this.sortObjects = sortObjects;
+            return this;
+        }
+
+        public Builder usePrefixes(boolean usePrefixes) {
+            this.usePrefixes = usePrefixes;
+            return this;
+        }
+
+        public Builder useMultilineLiterals(boolean useMultilineLiterals) {
+            this.useMultilineLiterals = useMultilineLiterals;
+            return this;
+        }
+
+        public Builder blankNodeStyle(BlankNodeStyle blankNodeStyle) {
+            this.blankNodeStyle = Objects.requireNonNull(blankNodeStyle, "blankNodeStyle");
             return this;
         }
 
