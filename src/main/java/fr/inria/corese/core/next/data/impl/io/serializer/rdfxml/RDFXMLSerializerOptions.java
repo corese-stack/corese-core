@@ -27,61 +27,19 @@ public class RDFXMLSerializerOptions extends AbstractSerializerOptions implement
      * properties use local names with an inline default namespace declaration.
      * RDF/XML syntax retains its required {@code rdf} binding.
      */
-    protected final boolean usePrefixes;
-    /**
-     * Whether the serializer generates prefixes for namespaces discovered in the graph.
-     * Used model/configuration prefixes are always declared. If discovery is disabled,
-     * unmapped properties use an inline default namespace to keep the XML valid.
-     */
-    protected final boolean autoDeclarePrefixes;
-    /**
-     * The policy for ordering prefix declarations (e.g., alphabetically, by usage, or custom).
-     * This impacts the determinism and readability of the prefix block.
-     */
-    protected final PrefixOrdering prefixOrdering;
-    /**
-     * The prefix handler for managing namespace prefix mappings.
-     * Provides unified prefix management across all RDF formats.
-     */
-    protected final PrefixHandler prefixHandler;
-    /**
-     * Whether human-readable formatting with indentation and newlines (pretty-printing) is enabled.
-     * This makes the output easier for humans to read and debug, but increases file size slightly.
-     */
-    protected final boolean prettyPrint;
-    /**
-     * The string used for indentation (e.g., "  ", "\t").
-     * This defines the visual spacing for nested structures when pretty-printing.
-     */
-    protected final String indent;
-    /**
-     * The maximum desired line length before the serializer attempts to break lines.
-     * This helps ensure readability by preventing very long lines in the output.
-     */
-    protected final int maxLineLength;
-    /**
-     * Whether subjects should be sorted alphabetically in the output.
-     * This ensures a consistent and reproducible order of subjects, useful for diffing or testing.
-     */
-    protected final boolean sortSubjects;
-    /**
-     * Whether predicates should be sorted alphabetically within a subject group.
-     * This ensures a consistent and reproducible order of properties for a given subject.
-     */
-    protected final boolean sortPredicates;
-    /**
-     * Whether multi-line literal syntax (e.g., CDATA sections or direct text nodes with newlines)
-     * should be used for literals containing newline characters.
-     */
-    protected final boolean useMultilineLiterals;
+    private final boolean usePrefixes;
+    private final boolean autoDeclarePrefixes;
+    private final PrefixOrdering prefixOrdering;
+    private final PrefixHandler prefixHandler;
+    private final boolean prettyPrint;
+    private final String indent;
+    private final int maxLineLength;
+    private final boolean sortSubjects;
+    private final boolean sortPredicates;
+    private final boolean sortObjects;
+    private final boolean useMultilineLiterals;
 
-
-    /**
-     * Protected constructor to be used by the {@link Builder}.
-     *
-     * @param builder The builder instance containing the desired configuration values.
-     */
-    protected RDFXMLSerializerOptions(Builder builder) {
+    private RDFXMLSerializerOptions(Builder builder) {
         super(builder);
 
         this.usePrefixes = builder.usePrefixes;
@@ -93,6 +51,7 @@ public class RDFXMLSerializerOptions extends AbstractSerializerOptions implement
         this.maxLineLength = builder.maxLineLength;
         this.sortSubjects = builder.sortSubjects;
         this.sortPredicates = builder.sortPredicates;
+        this.sortObjects = builder.sortObjects;
         this.useMultilineLiterals = builder.useMultilineLiterals;
 
     }
@@ -187,6 +146,11 @@ public class RDFXMLSerializerOptions extends AbstractSerializerOptions implement
         return sortPredicates;
     }
 
+    @Override
+    public boolean sortObjects() {
+        return sortObjects;
+    }
+
     /**
      * Checks if multi-line literal syntax should be used.
      *
@@ -202,16 +166,17 @@ public class RDFXMLSerializerOptions extends AbstractSerializerOptions implement
      * specific to the RDF/XML format.
      */
     public static final class Builder extends AbstractSerializerOptions.AbstractBuilder<Builder> {
-        protected boolean usePrefixes = true;
-        protected boolean autoDeclarePrefixes = true;
-        protected PrefixOrdering prefixOrdering = PrefixOrdering.ALPHABETICAL;
-        protected PrefixHandler prefixHandler = new PrefixHandler(true);
-        protected boolean prettyPrint = true;
-        protected String indent = SerializationConstants.DEFAULT_INDENTATION;
-        protected int maxLineLength = 0;
-        protected boolean sortSubjects = false;
-        protected boolean sortPredicates = false;
-        protected boolean useMultilineLiterals = true;
+        private boolean usePrefixes = true;
+        private boolean autoDeclarePrefixes = true;
+        private PrefixOrdering prefixOrdering = PrefixOrdering.ALPHABETICAL;
+        private PrefixHandler prefixHandler = new PrefixHandler(true);
+        private boolean prettyPrint = true;
+        private String indent = SerializationConstants.DEFAULT_INDENTATION;
+        private int maxLineLength = 0;
+        private boolean sortSubjects = false;
+        private boolean sortPredicates = false;
+        private boolean sortObjects = false;
+        private boolean useMultilineLiterals = true;
 
 
         /**
@@ -245,6 +210,7 @@ public class RDFXMLSerializerOptions extends AbstractSerializerOptions implement
                 maxLineLength(prettyOptions.getMaxLineLength());
                 sortSubjects(prettyOptions.sortSubjects());
                 sortPredicates(prettyOptions.sortPredicates());
+                sortObjects(prettyOptions.sortObjects());
                 prefixOrdering(prettyOptions.getPrefixOrdering());
             }
         }
@@ -377,6 +343,11 @@ public class RDFXMLSerializerOptions extends AbstractSerializerOptions implement
          */
         public Builder sortPredicates(boolean sortPredicates) {
             this.sortPredicates = sortPredicates;
+            return self();
+        }
+
+        public Builder sortObjects(boolean sortObjects) {
+            this.sortObjects = sortObjects;
             return self();
         }
 

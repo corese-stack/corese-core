@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.data.impl.io.serializer.trig;
 
 import fr.inria.corese.core.next.data.impl.io.serializer.option.AbstractTFamilyOptions;
 import fr.inria.corese.core.next.data.api.io.option.IOOptions;
-import fr.inria.corese.core.next.data.impl.io.serializer.option.BlankNodeStyle;
+import fr.inria.corese.core.next.data.api.io.serializer.option.BlankNodeStyle;
 
 /**
  * Configuration for TriG serialization format.

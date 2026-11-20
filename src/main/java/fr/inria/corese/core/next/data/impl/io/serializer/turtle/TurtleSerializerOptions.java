@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.data.impl.io.serializer.turtle;
 import fr.inria.corese.core.next.data.api.io.option.IOOptions;
 import fr.inria.corese.core.next.data.api.io.serializer.option.LineEndingOptions;
 import fr.inria.corese.core.next.data.impl.io.serializer.option.AbstractTFamilyOptions;
-import fr.inria.corese.core.next.data.impl.io.serializer.option.BlankNodeStyle;
+import fr.inria.corese.core.next.data.api.io.serializer.option.BlankNodeStyle;
 
 /**
  * Configuration for Turtle serialization format.

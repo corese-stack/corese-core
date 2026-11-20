@@ -41,6 +41,13 @@ public interface PrettyPrintOptions {
     boolean sortPredicates();
 
     /**
+     * Checks if objects should be sorted alphabetically within a predicate group.
+     *
+     * @return {@code true} if object sorting is enabled, {@code false} otherwise.
+     */
+    boolean sortObjects();
+
+    /**
      * Returns the policy for ordering prefix declarations.
      *
      * @return The {@link PrefixOrdering} for prefix ordering.

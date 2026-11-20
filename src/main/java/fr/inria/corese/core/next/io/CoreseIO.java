@@ -237,6 +237,46 @@ public final class CoreseIO {
         serializer(source, format, options).write(destination);
     }
 
+    public static void write(
+            Model source,
+            RDFFormat format,
+            RDFSerializationOptions options,
+            OutputStream destination) {
+        serializer(source, format, options).write(destination);
+    }
+
+    public static void write(
+            Model source,
+            RDFFormat format,
+            RDFSerializationOptions options,
+            Path destination) {
+        serializer(source, format, options).write(destination);
+    }
+
+    public static void write(
+            Model source,
+            RDFFormat format,
+            SerializationProfile profile,
+            Writer destination) {
+        serializer(source, format, profile.toOptions()).write(destination);
+    }
+
+    public static void write(
+            Model source,
+            RDFFormat format,
+            SerializationProfile profile,
+            OutputStream destination) {
+        serializer(source, format, profile.toOptions()).write(destination);
+    }
+
+    public static void write(
+            Model source,
+            RDFFormat format,
+            SerializationProfile profile,
+            Path destination) {
+        serializer(source, format, profile.toOptions()).write(destination);
+    }
+
     public static void write(StatementResult source, RDFFormat format, Writer destination) {
         serializer(source, format).write(destination);
     }
@@ -314,6 +354,13 @@ public final class CoreseIO {
             RDFFormat format,
             RDFSerializationOptions options) {
         return serializer(source, format, options).writeToString();
+    }
+
+    public static String writeToString(
+            Model source,
+            RDFFormat format,
+            SerializationProfile profile) {
+        return serializer(source, format, profile.toOptions()).writeToString();
     }
 
     public static String writeToString(StatementResult source, RDFFormat format) {

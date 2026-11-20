@@ -4,8 +4,13 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.StreamSupport;
 
 import fr.inria.corese.core.next.data.api.literal.XSDDatatype;
 import fr.inria.corese.core.next.data.impl.io.serializer.option.AbstractSerializerOptions;
@@ -22,6 +27,7 @@ import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
 import fr.inria.corese.core.next.data.api.literal.RDFDatatype;
 import fr.inria.corese.core.next.data.api.exception.SerializationException;
 import fr.inria.corese.core.next.data.api.io.serializer.option.LiteralDatatypePolicy;
+import fr.inria.corese.core.next.data.impl.io.serializer.option.AbstractNFamilyOptions;
 
 /**
  * Base class for line-based RDF serializers (N-Triples, N-Quads).
@@ -38,6 +44,9 @@ public abstract class AbstractLineBasedSerializer implements RDFSerializer {
     protected final Model model;
     protected final Iterable<Statement> statements;
     protected AbstractSerializerOptions config;
+
+    /** Maps original blank node IDs to stable sequential IDs when stableBlankNodeIds is enabled. */
+    private Map<String, String> blankNodeIdMap = null;
 
     /**
      * Constructs a new line-based serializer.
@@ -72,7 +81,18 @@ public abstract class AbstractLineBasedSerializer implements RDFSerializer {
         try {
             Set<Resource> processedNodes = preprocessModel();
 
-            for (Statement stmt : statements) {
+            Iterable<Statement> statementsToWrite = statements;
+            if (config instanceof AbstractNFamilyOptions nOpts && nOpts.sortStatements()) {
+                statementsToWrite = StreamSupport.stream(statements.spliterator(), false)
+                        .sorted(buildSortComparator(nOpts))
+                        .toList();
+            }
+
+            if (config.stableBlankNodeIds()) {
+                buildBlankNodeIdMap(statementsToWrite);
+            }
+
+            for (Statement stmt : statementsToWrite) {
                 if (shouldProcess(stmt, processedNodes)) {
                     writeStatement(bufferedWriter, stmt);
                 }
@@ -83,6 +103,51 @@ public abstract class AbstractLineBasedSerializer implements RDFSerializer {
         } catch (IllegalArgumentException e) {
             throw new SerializationException("Invalid " + getFormatName() + " data: " + e.getMessage(), getFormatName(), e);
         }
+    }
+
+    private static Comparator<Statement> buildSortComparator(AbstractNFamilyOptions opts) {
+        Comparator<Statement> cmp = null;
+        if (opts.sortSubjects()) {
+            cmp = Comparator.comparing((Statement s) -> canonicalTermKey(s.getSubject()));
+        }
+        if (opts.sortPredicates()) {
+            cmp = cmp == null
+                    ? Comparator.comparing((Statement s) -> canonicalTermKey(s.getPredicate()))
+                    : cmp.thenComparing((Statement s) -> canonicalTermKey(s.getPredicate()));
+        }
+        if (opts.sortObjects()) {
+            cmp = cmp == null
+                    ? Comparator.comparing((Statement s) -> canonicalTermKey(s.getObject()))
+                    : cmp.thenComparing((Statement s) -> canonicalTermKey(s.getObject()));
+        }
+        if (opts.includeContext()) {
+            cmp = cmp == null
+                    ? Comparator.comparing((Statement s) -> s.getContext() != null ? canonicalTermKey(s.getContext()) : "")
+                    : cmp.thenComparing((Statement s) -> s.getContext() != null ? canonicalTermKey(s.getContext()) : "");
+        }
+        return Objects.requireNonNull(cmp);
+    }
+
+    /**
+     * Returns the canonical N-Triples representation of a term, used as sort key.
+     * Unlike {@code stringValue()}, this key includes the datatype and language tag
+     * of literals, ensuring that terms with the same lexical form but different
+     * types or languages are always ordered consistently.
+     */
+    static String canonicalTermKey(Value v) {
+        if (v.isIRI()) {
+            return "<" + v.stringValue() + ">";
+        }
+        if (v.isBNode()) {
+            return "_:" + v.stringValue();
+        }
+        Literal lit = (Literal) v;
+        String base = "\"" + lit.stringValue() + "\"";
+        if (lit.getLanguage().isPresent()) {
+            return base + "@" + lit.getLanguage().get();
+        }
+        IRI dt = lit.getDatatype();
+        return dt != null ? base + "^^<" + dt.stringValue() + ">" : base;
     }
 
     /**
@@ -206,7 +271,9 @@ public abstract class AbstractLineBasedSerializer implements RDFSerializer {
 
     /**
      * Writes a blank node to the writer.
-     * Blank nodes are prefixed with "_:", and the identifier is appended.
+     * When stableBlankNodeIds is enabled the original ID is replaced by a
+     * sequential identifier (b0, b1, …) assigned in first-appearance order
+     * through the sorted output, ensuring deterministic output for CANONICAL mode.
      *
      * @param writer    the {@link Writer} to which the blank node will be written.
      * @param blankNode the {@link Resource} representing the blank node.
@@ -214,7 +281,27 @@ public abstract class AbstractLineBasedSerializer implements RDFSerializer {
      */
     protected void writeBlankNode(Writer writer, Resource blankNode) throws IOException {
         writer.write(SerializationConstants.BLANK_NODE_PREFIX);
-        writer.write(blankNode.stringValue());
+        String id = blankNode.stringValue();
+        writer.write(blankNodeIdMap != null ? blankNodeIdMap.getOrDefault(id, id) : id);
+    }
+
+    private void buildBlankNodeIdMap(Iterable<Statement> statementsToWrite) {
+        blankNodeIdMap = new LinkedHashMap<>();
+        int[] counter = {0};
+        for (Statement stmt : statementsToWrite) {
+            registerBNodeId(stmt.getSubject(), counter);
+            registerBNodeId(stmt.getObject(), counter);
+            Resource ctx = stmt.getContext();
+            if (ctx != null) {
+                registerBNodeId(ctx, counter);
+            }
+        }
+    }
+
+    private void registerBNodeId(Value v, int[] counter) {
+        if (v != null && v.isBNode()) {
+            blankNodeIdMap.computeIfAbsent(v.stringValue(), k -> "b" + counter[0]++);
+        }
     }
 
     /**

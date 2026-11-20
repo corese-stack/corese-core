@@ -7,7 +7,9 @@ import fr.inria.corese.core.next.data.api.io.format.RDFFormat;
 import fr.inria.corese.core.next.data.api.io.option.IOOptions;
 import fr.inria.corese.core.next.data.api.io.option.BaseIRIOptions;
 import fr.inria.corese.core.next.data.api.io.serializer.option.BlankNodeIdGenerationOptions;
+import fr.inria.corese.core.next.data.api.io.serializer.option.DatatypePolicyOptions;
 import fr.inria.corese.core.next.data.api.io.serializer.option.LineEndingOptions;
+import fr.inria.corese.core.next.data.api.io.serializer.option.PrettyPrintOptions;
 import fr.inria.corese.core.next.data.impl.io.serializer.support.AbstractLineBasedSerializer;
 import fr.inria.corese.core.next.data.impl.io.serializer.option.AbstractNFamilyOptions;
 import fr.inria.corese.core.next.data.impl.io.serializer.support.SerializationConstants;
@@ -77,6 +79,14 @@ public class NQuadsSerializer extends AbstractLineBasedSerializer {
             }
             if (config instanceof BlankNodeIdGenerationOptions blankNodeIdGenerationOptions) {
                 optionBuilder.stableBlankNodeIds(blankNodeIdGenerationOptions.stableBlankNodeIds());
+            }
+            if (config instanceof DatatypePolicyOptions datatypePolicyOptions) {
+                optionBuilder.literalDatatypePolicy(datatypePolicyOptions.getLiteralDatatypePolicy());
+            }
+            if (config instanceof PrettyPrintOptions pp) {
+                optionBuilder.sortSubjects(pp.sortSubjects())
+                             .sortPredicates(pp.sortPredicates())
+                             .sortObjects(pp.sortObjects());
             }
             this.config = optionBuilder.build();
         }
